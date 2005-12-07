@@ -23,7 +23,7 @@
 [% today = 1 UNLESS calc.Delta_Days( now.year, now.month, now.day, year, 12, day ) %]
         [% TRY %]
             [% USE File( c.path_to( 'root', year, "${day}.pod" ) ) %]
-    <td class="link[% IF today %] today[% END %]"><a href="[% c.uri_for( year, day ) %]">[% day %]</a></td>
+    <td class="link[% IF today %] today[% END %]"><a href="[% c.uri_for( '/', year, day ) %]">[% day %]</a></td>
         [% CATCH File %]
     <td[% IF today %] class="today"[% END %]>[% day  %]</td>
         [% END %]
