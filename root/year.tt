@@ -1,0 +1,34 @@
+<img src="[% c.uri_for( '/static/images/catalyst_logo.png' ) %]" alt="Catalyst Logo" style="float: right;" />
+<h2>December [% year %]</h2>
+<table class="calendar">
+<tr>
+    <th>Sunday</th>
+    <th>Monday</th>
+    <th>Tuesday</th>
+    <th>Wednesday</th>
+    <th>Thursday</th>
+    <th>Friday</th>
+    <th>Saturday</th>
+</tr>
+[% USE date %]
+[% calc = date.calc %]
+[% FOR week = calendar %]
+<tr>
+    [% FOR day = week %]
+        [% UNLESS day %]
+    <td>&nbsp;</td>
+            [% NEXT %]
+        [% END %]
+[% today = 0 %]
+[% today = 1 UNLESS calc.Delta_Days( now.year, now.month, now.day, year, 12, day ) %]
+        [% TRY %]
+            [% USE File( c.path_to( 'root', year, "${day}.pod" ) ) %]
+    <td class="link[% IF today %] today[% END %]"><a href="[% c.uri_for( year, day ) %]">[% day %]</a></td>
+        [% CATCH File %]
+    <td[% IF today %] class="today"[% END %]>[% day  %]</td>
+        [% END %]
+    [% END %]
+</tr>
+[% END %]
+</table>
+<div style="clear: both"></div>

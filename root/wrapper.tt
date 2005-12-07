@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Catalyst Advent Calendar</title>
+    <style type="text/css">
+body {
+    color: #000;
+    background: #977;
+    font-family: verdana, tahoma, sans-serif;
+}
+
+#contentwrapper {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background: #d9d9d9;
+    border: 1px solid #aaa;
+    -moz-border-radius: 10px;
+}
+
+h1 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 1.6em;
+    text-align: center;
+}
+
+#content, #note{
+    font-size: 0.9em;
+    padding: 8px 20px;
+    margin: 10px;
+    -moz-border-radius: 10px;
+}
+
+#content {
+    border: 1px solid #aaa;
+    background: #fff;
+}
+
+#note {
+    background: #797;
+    border: 1px solid #575;
+    color: #fff;
+}
+
+.pod h1, .pod h2 {
+    text-align: left;
+    color: #b00;
+}
+
+h2 {
+    text-align: center;
+}
+
+.calendar {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1em;
+}
+
+.calendar td {
+    text-align: center;
+}
+
+.calendar th {
+    padding: 5px;
+    border: 1px solid #ddd;
+    background: #f0f0f0;
+}
+
+.calendar td {
+    padding: 5px;
+}
+
+.calendar td.link {
+    padding: 0;
+}
+
+.calendar td.today {
+    background: #797;
+    color: #fff;
+}
+
+.calendar a {
+    display: block;
+    padding: 5px;
+    border: 1px solid #eee;
+}
+
+.calendar a:hover {
+    background: #f0f0f0;
+}
+    </style>
+</head>
+<body>
+    <div id="contentwrapper">
+        <div id="header">
+            <h1>Catalyst Advent Calendar</h1>
+        </div>
+[% UNLESS pod %]
+	<p id="note">25 days of Catalyst tips!</p>
+[% END %]
+        <div id="content">
+[% content %]
+        </div>
+    </div>
+</body>
+</html>
