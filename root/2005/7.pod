@@ -123,15 +123,16 @@ Catalyst for constructing correct links.
 
 =head3 Static file handling
 
-Static files can be served directly by Apache for a performance boost.  In
-a two-tiered setup, they should be served by the frontend server.
+Static files can be served directly by Apache for a performance boost.
 
     DocumentRoot /var/www/MyApp/root
     <Location /static>
         SetHandler default-handler
     </Location>
     
-This will let all files within root/static be handled directly by Apache. 
+This will let all files within root/static be handled directly by Apache.  In
+a two-tiered setup, the frontend server should handle static files.
+The configuration to do this on the frontend will vary.
 
 --Andy Grundman
 
