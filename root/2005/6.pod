@@ -36,7 +36,7 @@ in the standard Perl distribution,
 directory is ready
 
 
-4. Prepare the Makefile, test your app, create a PAR
+4. Prepare the Makefile, test your app, create a PAR (the two Makefile.PL calls are no typo)
 
     % perl Makefile.PL
     ...
