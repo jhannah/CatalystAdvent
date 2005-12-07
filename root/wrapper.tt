@@ -13,6 +13,7 @@ body {
 
 #contentwrapper {
     width: 75%;
+    min-width: 800px;
     margin-left: auto;
     margin-right: auto;
     margin-top: 10px;
