@@ -69,6 +69,7 @@ sub rss : Global {
     }
     $feed->modified(DateTime->from_epoch(epoch=>$feed_mtime));
     $c->res->body($feed->as_xml);
+    $c->res->content_type('application/rss+xml');
 }
 
 sub day : Regex('^(\d{4})/(\d\d?)$') {
