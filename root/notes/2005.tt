@@ -1,0 +1,5 @@
+<h2>About the Calendar</h2>
+<p>After some sudden inspiration, Catalysters decided to put together a Catalyst advent calendar to complement the excellent perl one.</p>
+<p>The source for this application is available in the Catalyst trunk:</p>
+<p><a href="http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/CatalystAdvent/">http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/CatalystAdvent/</a></p>
+<p>An <a href="[% c.uri_for('/rss', year) %]">RSS</a> feed is also available.</p>
