@@ -3,7 +3,10 @@ package CatalystAdvent;
 use strict;
 use warnings;
 
-use Catalyst qw( -Debug Static::Simple DefaultEnd );
+use Catalyst qw( -Debug 
+                 Static::Simple
+                 Cache::FileCache
+                 DefaultEnd );
 
 our $VERSION = '0.02';
 

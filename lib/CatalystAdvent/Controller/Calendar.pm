@@ -7,6 +7,7 @@ use base qw( Catalyst::Controller );
 
 use DateTime;
 use Calendar::Simple;
+use File::stat;
 use XML::Feed;
 use Pod::Xhtml;
 
@@ -70,9 +71,22 @@ sub day : Regex('^(\d{4})/(\d\d?)$') {
     $c->stash->{ year }     = $year;
     $c->stash->{ day }      = $day;
     $c->stash->{ template } = 'day.tt';
-        my $parser = Pod::Xhtml->new( StringMode => 1, FragmentOnly => 1, MakeIndex => 0, TopLinks => 0 );
+    
+    # cache the generated XHTML file so we're not parsing it on every request
+    my $mtime = (stat $file)->mtime;
+    my $cached_pod = $c->cache->get( "$file $mtime" );
+    if ( !$cached_pod ) {
+        my $parser = Pod::Xhtml->new( 
+            StringMode   => 1, 
+            FragmentOnly => 1, 
+            MakeIndex    => 0, 
+            TopLinks     => 0
+        );
         $parser->parse_from_file( "$file" );
-        $c->stash->{ pod }      = $parser->asString;
+        $cached_pod = $parser->asString;
+        $c->cache->set( "$file $mtime", $cached_pod, '12h' );
+    }
+    $c->stash->{ pod } = $cached_pod;
 }
 
 =head2 rss

@@ -1,6 +1,7 @@
 This file documents the revision history for Perl extension CatalystAdvent.
 
 0.02  Thu Dec  8 2005
+        - Cache generated xhtml files
         - RSS feed available
         - code refactored
         - CSS fixings, now using static file
