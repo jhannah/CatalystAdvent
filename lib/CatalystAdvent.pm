@@ -4,7 +4,6 @@ use strict;
 use warnings;
 
 use Catalyst qw( -Debug Static::Simple DefaultEnd );
-use Pod::Xhtml;
 
 our $VERSION = '0.02';
 
@@ -13,7 +12,7 @@ __PACKAGE__->setup;
 
 =head1 NAME
 
-CatalystAdvent - Catalyst based application
+CatalystAdvent - Catalyst-based Advent Calendar
 
 =head1 SYNOPSIS
 
@@ -21,13 +20,14 @@ CatalystAdvent - Catalyst based application
 
 =head1 DESCRIPTION
 
-Catalyst based application.
+After some sudden inspiration, Catalysters decided to put
+together a Catalyst advent calendar to complement the excellent perl one.
 
 =head1 METHODS
 
-=cut
-
 =head2 default
+
+Detaches you to the calendar index if no other path is a match.
 
 =cut
 
@@ -36,16 +36,27 @@ sub default : Private {
     $c->detach( '/calendar/index' );
 }
 
-sub begin : Private {
-    my( $self, $c ) = @_;
-    $c->stash->{now}=DateTime->now();
+=head2 begin
 
+Simply adds the current date to the stash for some operations needed
+across various methods.
+
+=cut
+
+sub begin : Private {
+    my( $self, $c )  = @_;
+    $c->stash->{now} = DateTime->now();
 }
 
+=head1 AUTHORS
 
-=head1 AUTHOR
+Brian Cassidy, <bricas@cpan.org>
 
-Catalyst developer
+Sebastian Riedel, <sri@cpan.org>
+
+Andy Grundman, <andy@hybridized.org>
+
+Marcus Ramberg, <mramberg@cpan.org>
 
 =head1 LICENSE
 

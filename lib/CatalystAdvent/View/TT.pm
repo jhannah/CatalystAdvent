@@ -21,9 +21,15 @@ See L<CatalystAdvent>
 
 Catalyst TT View.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-A clever guy
+Brian Cassidy, <bricas@cpan.org>
+
+Sebastian Riedel, <sri@cpan.org>
+
+Andy Grundman, <andy@hybridized.org>
+
+Marcus Ramberg, <mramberg@cpan.org>
 
 =head1 LICENSE
 
