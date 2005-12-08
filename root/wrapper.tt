@@ -3,6 +3,7 @@
 <head>
     <meta http-equiv="Content-Language" content="en" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="alternate" title="Advent Calendar RSS feed" href=[%c.uri_for('/rss')%]" type="application/rss+xml"/>
     <title>Catalyst Advent Calendar</title>
     <style type="text/css">
 body {

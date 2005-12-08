@@ -32,3 +32,4 @@
 [% END %]
 </table>
 <div style="clear: both"></div>
+<small>[<a href="[%c.uri_for('/rss')%]">rss</a>]</small>

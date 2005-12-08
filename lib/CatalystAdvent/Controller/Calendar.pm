@@ -6,6 +6,7 @@ use warnings;
 use base qw( Catalyst::Controller );
 use DateTime;
 use Calendar::Simple;
+use XML::Feed;
 
 =head1 NAME
 
@@ -36,6 +37,38 @@ sub year : Regex('^(\d{4})$') {
     $c->stash->{ year }     = $year;
     $c->stash->{ calendar } = calendar( 12, $year );
     $c->stash->{ template } = 'year.tt';
+}
+
+sub rss : Global {
+    my( $self, $c, $year ) = @_;
+    my $feed=XML::Feed->new('RSS');
+    $year ||= $c->stash->{now}->year;
+    $feed->title($c->config->{name}. ' RSS Feed');
+    $feed->link($c->req->base);
+    $feed->description('Catalyst advent calendar');
+    $year ||= $c->req->snippets->[ 0 ];
+    $c->res->redirect( $c->uri_for( '/' ) )
+        unless ( -e $c->path_to( 'root', $year ) );
+    $c->stash->{ year }     = $year;
+    my ($day,$entries)      = (24, 0);
+    my $feed_mtime=0;
+    while ($day>0 && $entries<5) {
+        if ( -e ( my $file = $c->path_to( 'root', $year, "$day.pod" ) ) )  {
+            my ($mtime,$ctime) = (stat($file))[9,10];
+            $feed_mtime=$mtime if $mtime>$feed_mtime;
+            my $entry = XML::Feed::Entry->new('RSS');
+            $entry->title("Calendar entry for day $day.");
+            $entry->link($c->uri_for("/$year/$day"));
+            $entry->issued(DateTime->from_epoch(epoch=>$ctime));
+            $entry->modified(DateTime->from_epoch(epoch=>$mtime));
+
+            $feed->add_entry($entry);
+            $entries++;   
+        }
+        $day--;
+    }
+    $feed->modified(DateTime->from_epoch(epoch=>$feed_mtime));
+    $c->res->body($feed->as_xml);
 }
 
 sub day : Regex('^(\d{4})/(\d\d?)$') {
