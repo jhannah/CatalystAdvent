@@ -39,9 +39,12 @@ $c->config->{view}.
 If you need to add more things to your end action, you can extend it like this.
 
   sub end : Private {
-      my $self=shift; my $c=shift;
+      my ( $self, $c ) = ( shift, shift );
+
       ... #code before view
-      $c->NEXT::end(@_);
+
+      $c->NEXT::end( $c, @_ );
+  
       ... #code after view
   }
 
