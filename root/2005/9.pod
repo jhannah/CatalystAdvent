@@ -25,7 +25,7 @@ Catalyst::Model).
     package MyApp::Controller::Foo;
     use base 'Catalyst::Controller';
     
-    __PACKAGE__->config( lalala => ' can't sing!' );
+    __PACKAGE__->config( lalala => " can't sing!" );
     
     sub default : Private {
         my ( $self, $c ) = @_;
