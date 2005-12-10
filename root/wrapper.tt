@@ -10,7 +10,7 @@
 <body>
     <div id="contentwrapper">
         <div id="header">
-            <h1>Catalyst Advent Calendar</h1>
+            <h1><a href="[% c.uri_for( '/' ) %]">Catalyst Advent Calendar</a></h1>
         </div>
 [% UNLESS pod %]
 	<p id="note">25 days of Catalyst tips!</p>

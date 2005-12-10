@@ -3,12 +3,16 @@ use inc::Module::Install;
 name('CatalystAdvent');
 abstract('Catalyst Application');
 author('Catalyst developers');
-version_from('lib\CatalystAdvent.pm');
+version_from('lib/CatalystAdvent.pm');
 license('perl');
 
 include('ExtUtils::AutoInstall');
 
 requires( Catalyst => '5.60' );
+requires( 'Catalyst::Plugin::DefaultEnd' );
+requires( 'Catalyst::Plugin::Cache::FileCache' );
+requires( 'DateTime' );
+requires( 'File::stat' );
 requires( 'Pod::Xhtml' );
 requires( 'Calendar::Simple' );
 requires( 'XML::Feed' );
