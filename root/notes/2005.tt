@@ -3,3 +3,5 @@
 <p>The source for this application is available in the Catalyst trunk:</p>
 <p><a href="http://dev.catalyst.perl.org/browser/trunk/examples/CatalystAdvent/">http://dev.catalyst.perl.org/browser/trunk/examples/CatalystAdvent/</a></p>
 <p>An <a href="[% c.uri_for('/rss', year) %]">RSS</a> feed is also available.</p>
+<h2>Sebastian says Merry Christmas!</h2>
+<img src="[% c.uri_for('/static/images/hohoho.png') %]"/>
