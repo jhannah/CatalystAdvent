@@ -78,7 +78,7 @@ page and it will be re-cached.
 
 Note that the page cache is keyed on the page URI plus all parameters, so
 requests for / and /?foo=bar will result in different cache items.  Also,
-only non-SSL GET requests will be cached by the plugin.
+only GET requests will be cached by the plugin.
 
 You can even get that front-end Squid proxy to help out by enabling HTTP
 headers for the cached page.
