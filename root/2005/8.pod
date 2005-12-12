@@ -5,7 +5,7 @@ that is identical in 90% of all Catalyst applications.
 
   sub end : Private {
       my ($self,$c) = @_;
-      return 1 if defined $c->res->body;
+      return 1 if $c->res->body;
       return 1 if $c->response->status =~ /^3\d\d$/;
       $c->forward( 'MyApp::View::TT' );
   }
