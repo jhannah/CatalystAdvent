@@ -125,3 +125,7 @@ h2 {
     font-size: x-small;
     text-align: right;
 }
+
+a img {
+    border: 0;
+}
