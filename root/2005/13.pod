@@ -99,18 +99,20 @@ Search and retrieve from the database:
 You can find the documentation of C<Catalyst::Model::DBIC> and it's helper
 at
 
-  <http://search.cpan.org/dist/Catalyst-Model-DBIC/>
+L<http://search.cpan.org/dist/Catalyst-Model-DBIC/>
 
 For information concerning DBIx::Class please visit the documentation and
 Intro on CPAN:
 
-  <http://search.cpan.org/dist/DBIx-Class/>
-  <http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual/Intro.pod>
+L<http://search.cpan.org/dist/DBIx-Class/>
+L<http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual/Intro.pod>
 
 or it's own Wiki
 
-  <http://dbix-class.shadowcatsystems.co.uk/>
+L<http://dbix-class.shadowcatsystems.co.uk/>
 
 and of course, you can find support on irc.perl.org#catalyst and 
 irc.perl.org#dbix-class.
+
+--phaylon
 
