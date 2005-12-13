@@ -96,7 +96,7 @@ Search and retrieve from the database:
 
 =head2 More Information
 
-You can find the documentation of C<Catalyst::Model::DBIC> and it's helper
+You can find the documentation of C<Catalyst::Model::DBIC> and its helper
 at
 
 L<http://search.cpan.org/dist/Catalyst-Model-DBIC/>
@@ -107,7 +107,7 @@ Intro on CPAN:
 L<http://search.cpan.org/dist/DBIx-Class/>
 L<http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual/Intro.pod>
 
-or it's own Wiki
+or its own Wiki
 
 L<http://dbix-class.shadowcatsystems.co.uk/>
 
