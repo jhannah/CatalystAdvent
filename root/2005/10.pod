@@ -27,7 +27,9 @@ and symlink your application's script directory in -
   cd path/to/mydomain.com
   ln -s ~/lib/MyApp/script script
 
-And add the following lines to your .htaccess file -
+And add the following lines to your .htaccess file (assuming the server is
+setup to handle .pl as fcgi - you may need to rename the script to
+myapp_fastcgi.fcgi and/or use a SetHandler directive) -
 
   RewriteEngine On
   RewriteCond %{REQUEST_URI} !^/?script/myapp_fastcgi.pl
