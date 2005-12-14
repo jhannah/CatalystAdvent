@@ -118,7 +118,7 @@ the name of a role to check, and it returns true if the user is a member.
 
 =head1 More information
 
-L<http://http://search.cpan.org/~nuffin/Catalyst-Plugin-Authentication-0.04/lib/Catalyst/Plugin/Authentication.pm|Catalyst::Plugin::Authentication> has a longer explanation.
+L<http://search.cpan.org/~nuffin/Catalyst-Plugin-Authentication-0.04/lib/Catalyst/Plugin/Authentication.pm|Catalyst::Plugin::Authentication> has a longer explanation.
 
 
  --castaway       
