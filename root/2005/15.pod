@@ -1,7 +1,7 @@
-=head1 Sessions
+=head1 Catalyst Advent - Day 15 - Sessions
 
 When you have your users identified, you will want to somehow remember that
-fact, to save thm from having to identify themselves for every single
+fact, to save them from having to identify themselves for every single
 page. One way to do this is to send the username and password parameters in
 every single page, but that's ugly, and won't work for static pages. 
 
