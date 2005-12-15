@@ -63,7 +63,7 @@ $c->session >>, and can be writen to and read from as a simple hash reference.
   sub get_items : Local {
      my ( $self, $c ) = @_;
 
-     $c->stash->{items_to_display} = [ $c->session->{items} ];
+     $c->stash->{items_to_display} = $c->session->{items};
 
   }
 
