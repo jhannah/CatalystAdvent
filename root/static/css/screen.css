@@ -129,3 +129,29 @@ h2 {
 a img {
     border: 0;
 }
+
+#pager {
+    border-top: 1px solid #e0e0e0;
+    list-style-type: none;
+    margin-left: 0;
+    padding: 0.4em;
+    position: relative;
+    width: 100%;
+}
+
+#pager li {
+    color: #c0c0c0;
+}
+
+#pager .next {
+    position: absolute;
+    right: 0.4em;
+    text-align: right;
+    width: 33%;
+}
+
+#pager .previous {
+    left: 0.4em;
+    position: absolute;
+    width: 33%;
+}
