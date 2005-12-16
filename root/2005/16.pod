@@ -37,11 +37,11 @@ this:
 
         # Process the entries
         while( my $entry=$c->stash->{entries}->next ) {
-            my $entry = XML::Feed::Entry->new('RSS');
-            $entry->title($entry->title);
-            $entry->link( $c->uri_for($entry->link) );
-            $entry->issued( DateTime->from_epoch(epoch   => $entry->created) );
-            $feed->add_entry($entry);
+            my $feed_entry = XML::Feed::Entry->new('RSS');
+            $feed_entry->title($entry->title);
+            $feed_entry->link( $c->uri_for($entry->link) );
+            $feed_entry->issued( DateTime->from_epoch(epoch   => $entry->created) );
+            $feed->add_entry($feed_entry);
         }
         $c->res->body( $feed->as_xml );
    }
