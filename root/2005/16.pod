@@ -1,0 +1,61 @@
+=head1 Catalyst Advent - Day 15 - RSS feed.
+
+Adding RSS feeds to your stuff in Catalyst is really simple. I'll show two
+different aproaches here, but the basic premise is that you forward to the
+normal view action first to get the objects, then handle the output differntly
+
+=head2 Using TT templates.
+
+This is the aproach we chose in Agave (L<http://dev.rawmode.org/>).
+
+    sub rss : Local {
+        my ($self,$c) = @_;
+        $c->forward('view');
+        $c->stash->{template}='rss.tt';
+    }
+
+Then you need a template. Here's the one from Agave: 
+L<http://svn.rawmode.org/repos/Agave/trunk/root/base/blog/rss.tt>
+
+As you can see, it's pretty simple. 
+
+=head2 Using XML::Feed
+
+However, a more robust solution is to use XML::Feed, as we've done in this 
+Advent Calendar. Then the code would look something like this:
+
+    sub rss : Local {
+        my ($self,$c) = @_;
+        $c->forward('view'); # get the entries
+        my $feed = XML::Feed->new('RSS');
+        $feed->title( $c->config->{name} . ' RSS Feed' );
+        $feed->link( $c->req->base ); # link to the site.
+        $feed->description('Catalyst advent calendar'); Some description
+        while( my $entry=$c->stash->{entries}->next ) {
+            my $entry = XML::Feed::Entry->new('RSS');
+            $entry->title($entry->title);
+            $entry->link( $c->uri_for($entry->link) );
+            $entry->issued( DateTime->from_epoch(epoch   => $entry->created) );
+            $feed->add_entry($entry);
+        }
+        $c->res->body( $feed->as_xml );
+   }
+
+
+A little more code in the controller, but with this approach your pretty sure
+to get something that validates. One little note regarding that tho, for both
+of the above aproaches, you'll need to set the content type like this:
+
+    $c->res->content_type('application/rss+xml');
+
+=head2 Final words.
+
+Note that you could generalize the second variant easily by replacing 'RSS' 
+with a variable, so you can generate Atom feeds with the same code.
+
+Now, go ahead and make RSS feeds for all your stuff. The world *needs* updates
+on your goldfish!
+
+-- Marcus Ramberg
+
+=cut
