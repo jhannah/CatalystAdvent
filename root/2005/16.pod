@@ -1,4 +1,4 @@
-=head1 Catalyst Advent - Day 15 - Adding RSS feeds 
+=head1 Catalyst Advent - Day 16 - Adding RSS feeds 
 
 Adding RSS feeds to your stuff in Catalyst is really simple. I'll show two
 different aproaches here, but the basic premise is that you forward to the
@@ -42,7 +42,7 @@ Advent Calendar. Then the code would look something like this:
    }
 
 
-A little more code in the controller, but with this approach your pretty sure
+A little more code in the controller, but with this approach you're pretty sure
 to get something that validates. One little note regarding that tho, for both
 of the above aproaches, you'll need to set the content type like this:
 
