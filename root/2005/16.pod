@@ -1,10 +1,10 @@
-=head1 Catalyst Advent - Day 15 - RSS feed.
+=head1 Catalyst Advent - Day 15 - Adding RSS feeds to your appliation
 
 Adding RSS feeds to your stuff in Catalyst is really simple. I'll show two
 different aproaches here, but the basic premise is that you forward to the
-normal view action first to get the objects, then handle the output differntly
+normal view action first to get the objects, then handle the output differently
 
-=head2 Using TT templates.
+=head2 Using TT templates
 
 This is the aproach we chose in Agave (L<http://dev.rawmode.org/>).
 
@@ -48,7 +48,7 @@ of the above aproaches, you'll need to set the content type like this:
 
     $c->res->content_type('application/rss+xml');
 
-=head2 Final words.
+=head2 Final words
 
 Note that you could generalize the second variant easily by replacing 'RSS' 
 with a variable, so you can generate Atom feeds with the same code.
