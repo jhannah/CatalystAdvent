@@ -1,4 +1,4 @@
-=head1 Catalyst Advent - Day 15 - Adding RSS feeds to your appliation
+=head1 Catalyst Advent - Day 15 - Adding RSS feeds 
 
 Adding RSS feeds to your stuff in Catalyst is really simple. I'll show two
 different aproaches here, but the basic premise is that you forward to the
