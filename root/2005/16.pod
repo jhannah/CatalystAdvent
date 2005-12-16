@@ -22,15 +22,20 @@ As you can see, it's pretty simple.
 =head2 Using XML::Feed
 
 However, a more robust solution is to use XML::Feed, as we've done in this 
-Advent Calendar. Then the code would look something like this:
+Advent Calendar. Assuming we have a 'view' action that populates 'entries' 
+with some DBIx::Class/Class::DBI iterator, the code would look something like 
+this:
 
     sub rss : Local {
         my ($self,$c) = @_;
         $c->forward('view'); # get the entries
+
         my $feed = XML::Feed->new('RSS');
         $feed->title( $c->config->{name} . ' RSS Feed' );
         $feed->link( $c->req->base ); # link to the site.
         $feed->description('Catalyst advent calendar'); Some description
+
+        # Process the entries
         while( my $entry=$c->stash->{entries}->next ) {
             my $entry = XML::Feed::Entry->new('RSS');
             $entry->title($entry->title);
