@@ -1,0 +1,106 @@
+=head1 Catalyst Advent - Day 17 - FastCGI Deployment
+
+As a companion to Day 7's mod_perl article, today's article is about
+production FastCGI deployment.
+
+=head2 Pros
+
+=head3 Speed
+
+FastCGI performs equally as well as mod_perl.  Don't let the 'CGI' fool you;
+your app runs as multiple persistent processes ready to receive connections
+from the web server.
+
+=head3 App Server
+
+When using external FastCGI servers, your application runs as a standalone
+application server.  It may be restarted independently from the web server.
+This allows for a more robust environment and faster reload times when
+pushing new app changes.  The frontend server can even be configured to
+display a friendly "down for maintenance" page while the application is
+restarting.
+
+=head3 Load-balancing
+
+You can launch your application on multiple backend servers and allow the
+frontend web server to load-balance between all of them.  And of course, if
+one goes down, your app continues to run fine.
+
+=head3 Multiple versions of the same app
+
+Each FastCGI application is a separate process, so you can run different
+versions of the same app on a single server.
+
+=head3 Can run with threaded Apache
+
+Since your app is not running inside of Apache, the faster mpm_worker module
+can be used without worrying about the thread safety of your application.
+
+=head2 Cons
+
+=head3 More complex environment
+
+With FastCGI, there are more things to monitor and more processes running
+than when using mod_perl.
+
+=head2 Setup
+
+=head3 1. Install Apache with mod_fastcgi
+
+mod_fastcgi for Apache is a third party module, and can be found at
+L<http://www.fastcgi.com/>.  It is also packaged in many distributions, for
+example, libapache2-mod-fastcgi in Debian.
+
+=head3 2. Configure your application
+
+    # Serve static content directly
+    DocumentRoot  /var/www/MyApp/root
+    Alias /static /var/www/MyApp/root/static
+
+    FastCgiServer /var/www/MyApp/script/myapp_fastcgi.pl -processes 3
+    Alias /myapp/ /var/www/MyApp/script/myapp_fastcgi.pl/
+    
+    # Or, run at the root
+    Alias / /var/www/MyApp/script/myapp_fastcgi.pl/
+    
+The above commands will launch 3 app processes and make the app available at
+/myapp/
+
+=head2 Standalone server mode
+
+While not as easy as the previous method, running your app as an external
+server gives you much more flexibility.
+
+First, launch your app as a standalone server listening on a socket.
+
+    script/myapp_fastcgi.pl -l /tmp/myapp.socket -n 5 -p /tmp/myapp.pid -d
+    
+You can also listen on a TCP port if your web server is not on the same
+machine.
+
+    script/myapp_fastcgi.pl -l :8080 -n 5 -p /tmp/myapp.pid -d
+    
+You will probably want to write an init script to handle starting/stopping
+of the app using the pid file.
+
+Now, we simply configure Apache to connect to the running server.
+
+    # 502 is a Bad Gateway error, and will occur if the backend server is down
+    # This allows us to display a friendly static page that says "down for
+    # maintenance"
+    Alias /_errors /var/www/MyApp/root/error-pages
+    ErrorDocument 502 /_errors/502.html
+
+    FastCgiExternalServer /tmp/myapp -socket /tmp/myapp.socket
+    Alias /myapp/ /tmp/myapp/
+    
+    # Or, run at the root
+    Alias / /tmp/myapp/
+    
+=head2 More Info
+
+Lots more information is available in the new and expanded FastCGI docs that
+will be part of Catalyst 5.62.  For now you may read them here:
+L<http://dev.catalyst.perl.org/file/trunk/Catalyst/lib/Catalyst/Engine/FastCGI.pm>
+
+--Andy Grundman
