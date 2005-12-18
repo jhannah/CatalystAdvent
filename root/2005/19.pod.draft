@@ -8,7 +8,7 @@ C<Catalyst::Test> makes it possible to run the same tests both locally
 
 =head3 Tests
 
-Lets examine a skeleton application's C<t/> directory:
+Let's examine a skeleton application's C<t/> directory:
 
     mundus:~/MyApp chansen$ ls -l t/
     total 24
@@ -20,7 +20,7 @@ Lets examine a skeleton application's C<t/> directory:
 
 =item C<01app.t>
 
-Verifies that application loads, compiles, and returns a successful
+Verifies that the application loads, compiles, and returns a successful
 response.
 
 =item C<02pod.t>
@@ -47,7 +47,7 @@ The first line declares how many tests we are going to run, in this case
 two. The second line tests and loads our application in test mode. The
 fourth line verifies that our application returns a successful response.
 
-C<Catalyst::Test> exports two functions, C<request> and C<get>. Both can 
+C<Catalyst::Test> exports two functions, C<request> and C<get>. Each can
 take three different arguments:
 
 =over 4
@@ -85,7 +85,7 @@ will see debug logs between tests.
 C<TEST_POD=1> enables POD checking and coverage.
 
 C<prove> A command-line tool that makes it easy to run tests. You can
-find out more about it in links below.
+find out more about it from the links below.
 
 =head3 Running tests remotely
 
