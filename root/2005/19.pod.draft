@@ -1,6 +1,6 @@
 =head1 Catalyst Advent - Day 19 - Testing
 
-Catalyst provides a convenient way of testing you application during 
+Catalyst provides a convenient way of testing your application during 
 development and before deployment in a real environment.
 
 C<Catalyst::Test> makes it possible to run the same tests both locally 
@@ -20,16 +20,17 @@ Lets examine a skeleton application's C<t/> directory:
 
 =item C<01app.t>
 
-Verifies that application loads, compiles and returns a successful response.
+Verifies that application loads, compiles, and returns a successful
+response.
 
 =item C<02pod.t>
 
-Verifies that all POD are free from errors. Only executed if C<TEST_POD> 
+Verifies that all POD is free from errors. Only executed if the C<TEST_POD> 
 environment variable is true.
 
 =item C<03podcoverage.t>
 
-Verifies that all methods/functions has POD coverage. Only executed if 
+Verifies that all methods/functions have POD coverage. Only executed if the
 C<TEST_POD> environment variable is true.
 
 =back
@@ -42,31 +43,31 @@ C<TEST_POD> environment variable is true.
     3
     4  ok( request('/')->is_success );
 
-First line declares how many tests we are going to run, in this case two. Second 
-line tests and loads our application in test mode. Fourth line verifies that our 
-application returns a successful response.
+The first line declares how many tests we are going to run, in this case
+two. The second line tests and loads our application in test mode. The
+fourth line verifies that our application returns a successful response.
 
 C<Catalyst::Test> exports two functions, C<request> and C<get>. Both can 
 take three different arguments:
 
 =over 4
 
-=item A string which is a relative or absolute URI
+=item A string which is a relative or absolute URI.
 
     request('/my/path');
     request('http://www.host.com/my/path');
 
-=item A instance of C<URI>.
+=item An instance of C<URI>.
 
     request( URI->new('http://www.host.com/my/path') );
 
-=item A instance of C<HTTP::Request>.
+=item An instance of C<HTTP::Request>.
 
     request( HTTP::Request->new( GET => 'http://www.host.com/my/path') );
 
 =back
 
-C<request> returns a instance of C<HTTP::Response> and C<get> returns the 
+C<request> returns an instance of C<HTTP::Response> and C<get> returns the 
 content (body) of the response.
 
 =head3 Running tests locally
@@ -78,13 +79,13 @@ content (body) of the response.
     All tests successful.
     Files=3, Tests=4,  2 wallclock secs ( 1.60 cusr +  0.36 csys =  1.96 CPU)
  
-C<CATALYST_DEBUG=0> ensures that debugging is off, if it's enabled you will see 
-debug logs between tests.
+C<CATALYST_DEBUG=0> ensures that debugging is off; if it's enabled you
+will see debug logs between tests.
 
 C<TEST_POD=1> enables POD checking and coverage.
 
-C<prove> A command-line tool that makes it easy running tests. You can find out 
-more about it in links below.
+C<prove> A command-line tool that makes it easy to run tests. You can
+find out more about it in links below.
 
 =head3 Running tests remotely
 
