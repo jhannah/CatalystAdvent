@@ -24,6 +24,10 @@ h1 {
     text-align: center;
 }
 
+dt {
+    margin: 0.5em 0 0.5em 0;
+}
+
 #content, #note{
     font-size: 0.9em;
     padding: 8px 20px;
