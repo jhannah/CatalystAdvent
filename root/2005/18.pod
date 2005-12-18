@@ -14,7 +14,7 @@ Catalyst::View::TT provides two different helpers for use to use: TT and TTSite.
 
 Create a basic Template Toolkit View using the provided helper script:
 
-    /scripts/myapp_create.pl view MyView TT
+    script/myapp_create.pl view MyView TT
 
 This will create lib/MyApp/View/MyView.pm, which is going to be pretty empty to start. However, it sets everything up that you need to get started. You can now define which template you want and forward to your view. For instance:
 
@@ -34,7 +34,7 @@ Although the TT helper does create a functional, working view, you may find your
 
 Once again, you can use the helper script:
 
-    /scripts/myapp_create.pl view myView TTSite
+    script/myapp_create.pl view myView TTSite
 
 This time, the helper sets several options for us in the generated View.
 
