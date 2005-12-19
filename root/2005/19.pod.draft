@@ -98,6 +98,21 @@ C<CATALYST_SERVER=http://localhost:3000/> is the absolute deployment URI of
 your application. In C<CGI> or C<FastCGI> it should be the host and path 
 to the script.
 
+=head3 C<Test::WWW::Mechanize> and Catalyst
+
+Be sure to check out C<Test::WWW::Mechanize::Catalyst>. It makes it easy to
+test HTML, forms and links. A short example of usage:
+
+    use Test::More tests => 6;
+    use_ok( Test::WWW::Mechanize::Catalyst, 'MyApp' );
+
+    my $mech = Test::WWW::Mechanize::Catalyst->new;
+    $mech->get_ok("http://localhost/", 'Got index page');
+    $mech->title_like( qr/^MyApp on Catalyst/, 'Got right index title' );
+    ok( $mech->find_link( text_regex => qr/^Wiki/i ), 'Found link to Wiki' );
+    ok( $mech->find_link( text_regex => qr/^Mailing-List/i ), 'Found link to Mailing-List' );
+    ok( $mech->find_link( text_regex => qr/^IRC channel/i ), 'Found link to IRC channel' );
+
 =head3 Further Reading
 
 =over 4
