@@ -109,8 +109,7 @@ the name of a role to check, and it returns true if the user is a member.
      my ( $self, $c ) = @_;
 
      $c->detach("unauthorized")
-       unless $c->user_exists
-       and $c->user->extra_info() eq "admin";
+       unless $c->check_roles( "admin" );
 
      # do something restricted here
   }
