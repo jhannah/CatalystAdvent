@@ -171,7 +171,7 @@ is visited.
 
 =item auto
 
-Last but not least, the auto action is magic in that B<every> auto action in
+Lastly, the auto action is magic in that B<every> auto action in
 the chain of paths up to and including the ending namespace, will be
 called. (In contrast, only one of the begin/end/default actions will be
 called, the relevant one).
