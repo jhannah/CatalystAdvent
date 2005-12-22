@@ -145,11 +145,12 @@ becomes
 
 The begin action is called at the beginning of every request involving this
 namespace directly, before other matching actions are called. It can be used
-to set up variables/data for this particular part of your app.
+to set up variables/data for this particular part of your app. A single begin
+action is called, its always the one most relevant to the current namespace.
 
  sub begin : Private { .. }
 
-is always called when 
+is called once when 
 
  http://localhost:3000/bucket/(anything)?
 
@@ -159,11 +160,13 @@ is visited.
 
 Like begin, this action is always called for the namespace it is in, after
 every other action has finished. It is commonly used to forward processing to
-the View component.
+the View component. A single end action is called, its always the one most
+relevant to the current namespace. 
+
 
  sub end : Private { .. }
 
-is always called after any actions when
+is called once after any actions when
 
  http://localhost:3000/bucket/(anything)?
 
@@ -200,6 +203,8 @@ in a Controller module.
 =head2 More Information
 
 L<http://search.cpan.org/author/SRI/Catalyst-5.61/lib/Catalyst/Manual/Intro.pod>
+
+L<http://dev.catalyst.perl.org/wiki/FlowChart>
 
   --castaway
 
