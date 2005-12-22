@@ -1,4 +1,4 @@
-=head1 Action Types
+=head1 Catalyst Advent - Day 22 - Action Types
 
 =head2 Introduction
 
@@ -47,7 +47,7 @@ becomes
 
 When using a Local attribute, no parameters are needed, instead, the name of
 the action is matched in the URL. The namespaces created by the name of the
-controller package is always included.
+controller package is always part of the URL.
 
  sub my_handles : Local { .. }
 
