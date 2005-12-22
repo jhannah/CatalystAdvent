@@ -75,7 +75,7 @@ these values.
 
 =head1 Checking roles
 
-Role checking is done by using the C<< $c->check_roles >> method, this will
+Role checking is done by using the C<< $c->check_user_roles >> method, this will
 check using the currently logged in user (via C<< $c->user >>). You pass it
 the name of a role to check, and it returns true if the user is a member.
 
@@ -109,7 +109,7 @@ the name of a role to check, and it returns true if the user is a member.
      my ( $self, $c ) = @_;
 
      $c->detach("unauthorized")
-       unless $c->check_roles( "admin" );
+       unless $c->check_user_roles( "admin" );
 
      # do something restricted here
   }
