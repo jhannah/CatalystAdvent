@@ -207,4 +207,3 @@ L<http://search.cpan.org/author/SRI/Catalyst-5.61/lib/Catalyst/Manual/Intro.pod>
 L<http://dev.catalyst.perl.org/wiki/FlowChart>
 
   --castaway
-

@@ -84,4 +84,3 @@ L<http://search.cpan.org/dist/Catalyst-Plugin-Session-Store-DBI>
 
 
   --castaway
-

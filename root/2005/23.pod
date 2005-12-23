@@ -67,7 +67,3 @@ relative to the include_path dirs will also be ignored:
 L<http://search.cpan.org/dist/Catalyst-Plugin-Static-Simple/>
 
  --castaway
-
-
-
-

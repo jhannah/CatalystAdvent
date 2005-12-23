@@ -115,4 +115,3 @@ and of course, you can find support on irc.perl.org#catalyst and
 irc.perl.org#dbix-class.
 
 --phaylon
-
