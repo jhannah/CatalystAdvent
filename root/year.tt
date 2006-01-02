@@ -31,7 +31,10 @@
 </tr>
 [% END %]
 </table>
+[% TRY %]
 <div id="notes">
-[% INCLUDE "notes/${year}.tt" %]
+    [% INCLUDE "notes/${year}.tt" %]
 </div>
+[% CATCH %]
+[% END %]
 <p class="rss">[<a href="[% c.uri_for('/rss', year) %]">RSS</a>]</p>

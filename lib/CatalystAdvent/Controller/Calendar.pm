@@ -34,7 +34,12 @@ Detaches to the "year" display for the current year.
 
 sub index : Private {
     my ( $self, $c ) = @_;
-    $c->detach( 'year', [ $c->stash->{now}->year ] );
+    opendir DIR, $c->path_to('root') or die "Error opening root: $!";
+    my @years = sort grep { /\d{4}/ } readdir DIR;
+    closedir DIR;
+
+    my $year = pop @years || $c->stash->{now}->year;
+    $c->forward( 'year', [$year] );
 }
 
 =head2 year
