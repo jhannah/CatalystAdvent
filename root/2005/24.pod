@@ -11,7 +11,7 @@ do.
 
 Under role based access control each user is allowed to perform any number of
 roles. For example, at a zoo no one but specially trained personnel can enter
-the moose cage (Mynd you, møøse bites kan be pretty nasti!). For example: 
+the moose cage (Mynd you, moose bites kan be pretty nasti!). For example: 
 
     package Zoo::Controller::MooseCage;
 
@@ -38,7 +38,7 @@ And now our action should look like this:
     sub feed_moose : Local {
         my ( $self, $c ) = @_;
 
-        if ( $c->check_roles( "moose_feeder" ) ) {
+        if ( $c->check_user_roles( "moose_feeder" ) ) {
             $c->model( "Moose" )->eat( $c->req->param("food") );
         } else {
             $c->stash->{error} = "unauthorized";
@@ -48,8 +48,8 @@ And now our action should look like this:
 This checks C<< $c->user >>, and only if the user has B<all> the roles in the
 list, a true value is returned.
 
-C<check_roles> has a sister method, C<assert_roles>, which throws an exception
-if any roles are missing.
+C<check_user_roles> has a sister method, C<assert_user_roles>, which throws an
+exception if any roles are missing.
 
 Some roles that might actually make sense in, say, a forum application:
 
@@ -79,14 +79,15 @@ C<moose_feeder> from the entire C<MooseCage> controller:
 
     Zoo->deny_access_unless( "/moose_cage", [qw/moose_feeder/] );
 
-The role list behaves in the same way as C<check_roles>. However, the ACL
+The role list behaves in the same way as C<check_user_roles>. However, the ACL
 plugin isn't limited to just interacting with the Roles plugin. We can use a
 code reference instead. For example, to allow either moose trainers or moose
 feeders into the moose cage, we can create a more complex check:
 
     Zoo->deny_access_unless( "/moose_cage", sub {
         my $c = shift;
-        $c->check_roles( "moose_trainer" ) || $c->check_roles( "moose_feeder" );
+        $c->check_user_roles( "moose_trainer" ) ||
+		$c->check_user_roles( "moose_feeder" );
     });
 
 The more specific a role, the earlier it will be checked. Let's say moose
