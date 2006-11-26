@@ -28,6 +28,11 @@ together a Catalyst advent calendar to complement the excellent perl one.
 
 =head1 METHODS
 
+You know the methods should be moved to Controller::Root for
+modernisation purposes, but seeing as we've maintained backwards
+compatibility, and auth is via svn, we don't actually need to in this
+case.
+
 =head2 default
 
 Detaches you to the calendar index if no other path is a match.
