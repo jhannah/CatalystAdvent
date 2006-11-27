@@ -14,9 +14,9 @@ approach, it's powerful dispatcher (controller logic) and model and
 view agnosticism is what accounts for its power.
 
 As a result of this architecture, a simple catalyst application has a
-well defined structure, and has quite a lot of files by default.  This
+well defined structure, and contains quite a lot of files by default.  This
 makes using version control from the start very important.  Here's how
-that's done with subversion
+to do this with subversion
 
 =over 4
 
@@ -47,7 +47,7 @@ that's done with subversion
 And we have a version controlled skeleton application all ready for
 use.
 
-=head2 Modify the controller root to have more sensible default behaviour.
+=head2 Modify the root controller to have more sensible default behaviour.
 
 By default catalyst.pl makes the default action of the root controller
 a hello world screen.  We're going to change this so that the index
