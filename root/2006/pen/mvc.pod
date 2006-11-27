@@ -1,0 +1,307 @@
+=head1 Catalyst Advent - Day 1
+
+Model View Controller and a work flow for Catalyst
+
+=head2 Getting Started
+
+Catalyst ships with all the tools you need to get started with web
+application programming.  As you should know it uses the Model View
+Controller paradigm to separate the application logic, data storage
+and display logic from each other.  This is a standard technique first
+popularised by the L<Gang of 4 book|http://xrl.us/tg3y> and is an
+excellent antidote to "spaghetti code".  Catalyst's use of this
+approach, it's powerful dispatcher (controller logic) and model and
+view agnosticism is what accounts for its power.
+
+As a result of this architecture, a simple catalyst application has a
+well defined structure, and has quite a lot of files by default.  This
+makes using version control from the start very important.  Here's how
+that's done with subversion
+
+=over 4
+
+=item First create a new subversion repository to put your code in
+
+ $ svnadmin create /usr/local/src/xmas
+
+=item Then we want to put some files in there
+
+ $ cd /tmp
+ $ mkdir xmas && cd xmas
+ $ mkdir tags trunk branches
+ $ svn import file:///usr/local/src/xmas -m 'initial import'
+
+=item Next up is to check out a working copy
+
+ $ svn co file:///usr/local/src/xmas/trunk xmas && cd xmas
+
+=item and we're ready to create and check in our skeleton application
+
+ $ catalyst.pl Cheer
+ $ svn add Cheer
+ $ svn ci Cheer -m 'initial import of skeleton catalyst application'
+ $ cd Cheer # this is where we'll be for the rest of this calendar entry
+
+=back
+
+And we have a version controlled skeleton application all ready for
+use.
+
+=head2 Modify the controller root to have more sensible default behaviour.
+
+By default catalyst.pl makes the default action of the root controller
+a hello world screen.  We're going to change this so that the index
+action provides the hello world screen and the default action returns
+a 404 not found error code.
+
+I'm going to do this to my local copy, then provide a svn diff which
+you can use to patch your local copy.  Back in a sec.
+
+OK, that took me a couple of minutes.  First I check that my code
+actually compiles:
+
+ $ script/cheer_server.pl
+ [output snipped]
+ You can connect to your server at http://localhost:3000
+ [control-c]
+ $ svn diff
+ Index: lib/Cheer/Controller/Root.pm
+ ===================================================================
+ --- lib/Cheer/Controller/Root.pm        (revision 2)
+ +++ lib/Cheer/Controller/Root.pm        (working copy)
+ @@ -28,9 +28,17 @@
+ 
+  sub default : Private {
+      my ( $self, $c ) = @_;
+ +    $c->res->status(404);
+ +    $c->response->body( '404 not found' );
+ +}
+  
+ -    # Hello World
+ -    $c->response->body( $c->welcome_message );
+ +=head2 index
+ +
+ +=cut
+ +
+ +sub index : Private {
+ +    my ($self, $c) = @_;
+ +    $c->res->body('Hello world!');
+  }
+ 
+  =head2 end
+
+You can copy and paste the above code (from the line below svn diff
+above to =head2 end) into a file - cheer.patch - I'm going to put it
+in /tmp/, but I need to undo my local modifications first.  Again I'm
+in the root dir for my application:
+
+ $ svn revert lib/Cheer/Controller/Root.pl
+
+and patch the source from my patch at /tmp/cheer.patch.  Make sure
+that if you're following along at home that you get rid of all leading
+spaces from the patch.  The following perl one-liner will do that
+(followed by the invocation to patch):
+
+ $ perl -p -i -e 's/^\s+//' /tmp/cheer.patch
+ $ patch -p0 < /tmp/cheer.patch
+
+now I can commit the changes:
+
+ $ svn ci -m 'Updated root controller to give more sensible default behaviour'
+
+Note that I don't have to specify a file or directory if I want all
+changes below my current directory to be committed to the repository
+in this change set.
+
+=head2 Adding a view
+
+We're going to use the TT view for this example. So we issue the
+following command from the application root (in my case ~/Cheer):
+
+ $ script/cheer_create view TT TT
+
+this creates a couple of new file which we can add to the version
+control repository in the following way:
+
+ $ find . -name '*TT.*' | xargs svn add
+ $ svn ci -m 'created skeleton view'
+
+Often, this is all you need to create the view.  Note all you have to
+do to create your own view ( from your own templating system for
+example) is to provide a process subroutine in your application as
+documented in L<Catalyst::View> (although a render sub is also rather
+useful).
+
+I'm going to update the root controller to use the Template Toolkit
+now, and add a template.  Here's the patch:
+
+ Index: root/404.tt
+ ===================================================================
+ --- root/404.tt	(revision 0)
+ +++ root/404.tt	(revision 0)
+ @@ -0,0 +1,3 @@
+ +<html><head><title>404 error!</title></head>
+ +<body>Error:  [% c.req.path %] not found</body>
+ +</html>
+ Index: root/hi_there.tt
+ ===================================================================
+ --- root/hi_there.tt	(revision 0)
+ +++ root/hi_there.tt	(revision 0)
+ @@ -0,0 +1,3 @@
+ +<html><head><title>Happy winter solstice</title></head>
+ +<body>And best regards for the new year!</body>
+ +</html>
+ Index: lib/Cheer/Controller/Root.pm
+ ===================================================================
+ --- lib/Cheer/Controller/Root.pm	(revision 3)
+ +++ lib/Cheer/Controller/Root.pm	(working copy)
+ @@ -29,7 +29,7 @@
+  sub default : Private {
+      my ( $self, $c ) = @_;
+      $c->res->status(404);
+ -    $c->response->body( '404 not found' );
+ +    $c->stash->{template}='404.tt';
+  }
+  
+  =head2 index
+ @@ -38,7 +38,7 @@
+  
+  sub index : Private {
+      my ($self, $c) = @_;
+ -    $c->res->body('Hello world!');
+ +    $c->stash->{template} = 'hi_there.tt';
+  }
+  
+  =head2 end
+
+
+Because I added a couple of files to the application, this time I had
+to add them to my working copy before creating the patch.  This is
+what I did (from the application root):
+
+ $ svn add root/*tt
+ $ svn diff > /tmp/tt.patch
+
+This time it's up to you to figure out how to apply it - remember to
+strip leading spaces first.
+
+=head2 A (very) simple model.
+
+As I said at the beginning, Catalyst is agnostic to the model and view
+you use.  This gives us an opportunity to show you a very simple
+example.  Most commonly the model will be used to talk to some kind of
+a database, and Catalyst applications most commonly use L<DBIx::Class>.
+However, here we're going to grab data from the system clock instead.
+
+First, create a new model (from the application root) and commit it to
+the subversion repository.
+
+ $ script/cheer_create.pl model Now
+ $ find . -name '*Now.*' | xargs svn add
+ $ svn ci -m 'added skeleton Now model'
+
+I'm going to go and update the model to tell us the number of days to
+Xmas in the index actoin in the root controller.  Again I'll provide
+this as a patch.  We're going to use a couple of new modules from CPAN
+this time, so I'll also update the Makefile.PL so that you're
+automatically told about dependencies from CPAN when you run 'perl
+Makefile.PL' from the application root as well.  Here's the patch:
+
+ Index: root/hi_there.tt
+ ===================================================================
+ --- root/hi_there.tt	(revision 4)
+ +++ root/hi_there.tt	(working copy)
+ @@ -1,3 +1,4 @@
+  <html><head><title>Happy winter solstice</title></head>
+ -<body>And best regards for the new year!</body>
+ +<body>And best regards for the new year!  There are [% c.stash.days_till_xmas %]
+ +days left until santa comes.  </body>
+  </html>
+ Index: lib/Cheer/Model/Now.pm
+ ===================================================================
+ --- lib/Cheer/Model/Now.pm	(revision 5)
+ +++ lib/Cheer/Model/Now.pm	(working copy)
+ @@ -3,7 +3,9 @@
+  use strict;
+  use warnings;
+  use base 'Catalyst::Model';
+ +use Date::Calc qw(:all);
+  
+ +
+  =head1 NAME
+  
+  Cheer::Model::Now - Catalyst Model
+ @@ -12,6 +14,21 @@
+  
+  Catalyst Model.
+  
+ +=head2 days_till_xmas
+ +
+ +Tells us how many days there are until xmas
+ +
+ +=cut
+ +
+ +sub days_till_xmas {
+ +    my ($self) = @_;
+ +    my ($year, $month, $day) = Today();
+ +    my ($xmas_day, $xmas_month) = qw/25 12/;
+ +    my $days_till_xmas =
+ +        Delta_Days($year, $month, $day, $year, $xmas_month, $xmas_day);
+ +    return $days_till_xmas;
+ +}
+ +
+  =head1 AUTHOR
+  
+  Kieren Diment
+ Index: lib/Cheer/Controller/Root.pm
+ ===================================================================
+ --- lib/Cheer/Controller/Root.pm	(revision 4)
+ +++ lib/Cheer/Controller/Root.pm	(working copy)
+ @@ -38,6 +38,7 @@
+  
+  sub index : Private {
+      my ($self, $c) = @_;
+ +    $c->stash->{days_till_xmas} = $c->model('Now')->days_till_xmas();
+      $c->stash->{template} = 'hi_there.tt';
+  }
+  
+ Index: Makefile.PL
+ ===================================================================
+ --- Makefile.PL	(revision 2)
+ +++ Makefile.PL	(working copy)
+ @@ -7,6 +7,7 @@
+  requires 'Catalyst::Plugin::ConfigLoader';
+  requires 'Catalyst::Plugin::Static::Simple';
+  requires 'Catalyst::Action::RenderView';
+ +requires 'Date::Calc';
+  requires 'YAML'; # This should reflect the config file format you've chosen
+                   # See Catalyst::Plugin::ConfigLoader for supported formats
+  catalyst;
+ 
+
+=head2 Wrap up.
+
+So I've shown you how to use Catalyst with subversion, touched briefly
+on the View, and showed you how to use a custom model that leverages
+some features available from CPAN.  If you don't know Catalyst, we
+recommend that you go through the excellent tutorials from
+L<Catalyst::Manual::Tutorial> which go into quite a lot more detail.
+For more details on SVN, and particularly the function of the tags
+trunk and branches directory which we created, see the excellent free
+ L<Subversion Book|http://svnbook.red-bean.com>.
+
+You can obtain the code from this advent calendar entry from the
+catalyst subversion repository by issuing the following command:
+
+ $ svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Cheer
+
+=head3 AUTHOR
+
+Kieren Diment <diment@gmail.com>
+
+=head3 COPYRIGHT.
+
+Copyright 2006 Kieren Diment.  This document can be freely
+redistributed and can be modified and re-distributed under the same
+conditions as Perl itself.
+
