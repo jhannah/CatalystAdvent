@@ -4,14 +4,28 @@ Taming legacy websites with Catalyst and wget.
 
 =head2 The problem
 
-I was asked to update a rather old website which has traditionally been
-maintained with Dreamweaver, and uses nested tables to provide the
-layout.  I needed to draw from a variety of sources - my own and outside
-databases, and data gathered from screen scrapers, RSS feeds, and so on.
-So my models were a mess, my employer was completely inflexible about
-the tools used to do the job, and in any case the same tools are due to
-be replaced with a new (expensive) content management system in a couple
-of months' time.
+I was asked to update a rather old website which has traditionally
+been maintained with Dreamweaver, and uses nested tables to provide
+the layout.  I needed to draw from a variety of sources - my own and
+outside databases, and data gathered from screen scrapers, RSS feeds,
+and so on.  So my models were a mess, my employer was completely
+inflexible about the tools used to do the job, and in any case the
+same tools are due to be replaced with a new (expensive) content
+management system in a couple of months' time.  To ease maintenance
+headaches, and to be able to leverage Catalyst's ability to use any
+model you like, I took the following approach:
+
+=over 4
+
+=item *
+
+Create a catalyst appliation for running with the built in server.
+
+=item *
+
+Make a static mirror of the application with C<wget>.
+
+=back
 
 =head2 Stage 1 - Deciphering the templating system.
 
@@ -81,7 +95,9 @@ There are two parts to this process:
 
 =over 4
 
-=item In C<MyApp::Controller::Root-E<gt>auto>
+=item *
+
+In C<MyApp::Controller::Root-E<gt>auto>
 
  if ($c->req->path && $c->req->path !~ /\/$/ && ! $c->req->param) {
      $c->res->redirect('/' . $c->req->path . '/', 301);
@@ -92,7 +108,9 @@ This forces requests without a trailing slash and with no POST or GET
 parameters to redirect to a url with a trailing slash.  This makes
 C<wget> behave in the expected manner.
 
-=item Run C<wget> to make a static mirror
+=item *
+
+Run C<wget> to make a static mirror
 
  $ wget -r -k http://localhost:3000
 
@@ -107,6 +125,8 @@ in which case the below should be a very powerful tool (after
 appropriate and careful testing):
 
  $ find . -name '*html' | xargs perl -p -i -e 's/something/somethang/g'
+
+=back
 
 =head2 Wrap up
 

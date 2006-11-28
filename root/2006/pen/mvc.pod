@@ -20,22 +20,30 @@ to do this with subversion
 
 =over 4
 
-=item First create a new subversion repository to put your code in
+=item *
+
+First create a new subversion repository to put your code in
 
  $ svnadmin create /usr/local/src/xmas
 
-=item Then we want to put some files in there
+=item *
+
+Then we want to put some files in there
 
  $ cd /tmp
  $ mkdir xmas && cd xmas
  $ mkdir tags trunk branches
  $ svn import file:///usr/local/src/xmas -m 'initial import'
 
-=item Next up is to check out a working copy
+=item *
+
+Next up is to check out a working copy
 
  $ svn co file:///usr/local/src/xmas/trunk xmas && cd xmas
 
-=item and we're ready to create and check in our skeleton application
+=item *
+
+and we're ready to create and check in our skeleton application
 
  $ catalyst.pl Cheer
  $ svn add Cheer
