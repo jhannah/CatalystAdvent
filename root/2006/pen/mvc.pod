@@ -9,30 +9,30 @@ application programming. It uses the Model-View-Controller (MVC)
 paradigm to separate the application logic, data storage, and display
 logic from one another.  This is a standard pattern, taken from the
 Smalltalk programming language and popularised by the L<Gang of 4
-book|http://xrl.us/tg3y>, and is an excellent antidote to "spaghetti
-code".  Catalyst's use of this approach, its powerful dispatcher
-(controller logic), and its model and view agnosticism is what accounts
-for L<its power|Catalyst::Manual::About>.
+book|http://xrl.us/tg3y>.  MVC coding is an excellent antidote to
+"spaghetti code".  Catalyst's use of this approach, its powerful
+dispatcher (controller logic), and its model and view agnosticism is
+what accounts for L<its power|Catalyst::Manual::About>.
 
 For the first day of Catalyst Advent 2006, I'll keep it traditional:
 we'll write a complete, if basic, sample application that shows several
 aspects of Catalyst. Our application, called C<Cheer>, will display the
 number of days remaining until Christmas - how seasonally appropriate!
 I'll also show the use of version control, which is not usually
-demonstrated in such examples, but which is crucial for the development
+demonstrated in such examples, but which is crucial in the development
 process for any serious application.
 
-As a result of the MVC architecture, a typical Catalyst application has
-a well-defined structure, and contains quite a lot of files.  This makes
-using version control from the start very important. For this example
-I'll use Subversion, a powerful version-control system that grew out of
-CVS (which is in extremely wide use, but has many limitations). Many
-Catalyst developers use C<svk>, itself based on Subversion.
+As a result of the MVC architecture, a typical Catalyst application
+has a well-defined structure, and contains quite a lot of files.  This
+makes using version control from the start very important. For this
+example I'll use L<Subversion|http://subversion.tigris.org/>, a
+powerful version-control system that grew out of CVS (which is in
+extremely wide use, but has many limitations). Many Catalyst
+developers use C<svk>, itself based on Subversion.
 
-You can obtain the code from this Advent Calendar entry from the
-Catalyst Subversion repository by issuing the following command:
-
- $ svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Cheer
+The example application here is available from the Catalyst subversion
+repository.  Instructions for obtaining it are given at the end off
+this article.
 
 =over 4
 
@@ -73,6 +73,14 @@ and we're ready to create and check in our skeleton application:
 
 And we have a version-controlled skeleton application all ready for
 use.
+
+The purpose of the trunk tags and branches directories are beyond the
+scope of this tutorial, however we are working exclusively out of the
+trunk of the repository.  The branches directory is for separate lines
+of development, for example branches can be used for addition of
+substantial new features, or significant refactoring.  Once the branch
+is complete it can be merged back to trunk.  The tags directory should
+contain project snapshots.
 
 =head2 Modify the Root Controller to have More Sensible Default
 Behavior
@@ -155,14 +163,18 @@ control repository in the following way:
  $ find . -name '*TT.*' | xargs svn add
  $ svn ci -m 'created skeleton view'
 
-Often, this is all you need to create the view. The only thing you have
-to do to create your own view (from your own templating system, for
-example) is to provide a C<process> method in your application, as
+Often, this is all you need to create the view. The only thing you
+have to do to create your own view (from your own templating system,
+for example) is to provide a C<process> method in your application, as
 documented in L<Catalyst::View> (although a C<render> method is also
-rather useful).
+rather useful).  There are quite a lot of L<other
+views|http://search.cpan.org/search?query=catalyst%3A%3Aview&mode=module>
+available for catalyst, but the L<Template> Toolkit is by far the most
+popular.  L<HTML::Mason> the next most popular option.
 
-I'm going to update the root controller to use Template Toolkit
-now, and add a template.  Here's the patch:
+I'm going to update the root controller to use the Template Toolkit
+now, and add a template.  Here's the patch which includes changes to
+the controller code and the addition of a couple of templates:
 
  Index: root/404.tt
  ===================================================================
@@ -232,10 +244,17 @@ commit it to the Subversion repository.
 
 I'm going to go and update the model to tell us the number of days to
 Christmas in the index action in the root controller.  Again I'll
-provide this as a patch.  We're going to use a couple of new modules
-from CPAN this time, so I'll also update the Makefile.PL so that you're
-automatically told about dependencies from CPAN when you run 'perl
-Makefile.PL' from the application root as well.  Here's the patch:
+provide this as a patch.  We're going to use the L<Date::Calc> module
+from CPAN this time, so I'll also update the Makefile.PL so that
+you're automatically told about dependencies from CPAN when you run
+'perl Makefile.PL' from the application root.  Some applications also
+have actions defined for C<make installdeps> so that if you run C<perl
+Makefile.PL> and then C<make installdeps> cpan is started and all the
+missing dependencies are installed.  However, this is not done
+automatically (yet?).
+
+
+Here's the patch:
 
  Index: root/hi_there.tt
  ===================================================================
@@ -312,13 +331,13 @@ Makefile.PL' from the application root as well.  Here's the patch:
 =head2 Wrap up.
 
 So I've shown you how to use Catalyst with Subversion, touched briefly
-on the View, and showed you how to use a custom model that leverages
-some features available from CPAN.  If you don't know Catalyst, we
-recommend that you go through the tutorials from
-L<Catalyst::Manual::Tutorial> which go into quite a lot more detail.
-For more details on Subversion, and particularly the function of the
-tags, trunk, and branches directory structure which we created, see the
-excellent free L<Subversion Book|http://svnbook.red-bean.com>.
+on the View, and showed you how to use a custom model that uses a
+non-catalyst L<CPAN> module.  If you don't know Catalyst, we recommend
+that you go through the tutorials from L<Catalyst::Manual::Tutorial>
+which go into quite a lot more detail.  For more details on
+Subversion, and particularly the function of the tags, trunk, and
+branches directory structure which we created, see the excellent free
+L<Subversion Book|http://svnbook.red-bean.com>.
 
 You can obtain the code from this Advent Calendar entry from the
 Catalyst Subversion repository by issuing the following command:
