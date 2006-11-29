@@ -43,7 +43,7 @@ set of subclasses for doing Cart/Order/Checkout operations inside and
 outside of Catalyst, as well as all of the templates, models and
 controllers needed to use them.
 
-The create 'the full shebang', call the Handel helper and pass in
+To create 'the full shebang', call the Handel helper and pass in
 the dsn/user/password where the database will be located:
 
     $ cd MyApp
