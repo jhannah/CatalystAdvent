@@ -1,68 +1,88 @@
 =head1 Catalyst Advent - Day 1
 
-Model View Controller and a work flow for Catalyst
+Getting Started with Catalyst and Version Control
 
 =head2 Getting Started
 
 Catalyst ships with all the tools you need to get started with web
-application programming.  As you should know it uses the Model View
-Controller paradigm to separate the application logic, data storage
-and display logic from each other.  This is a standard technique first
-popularised by the L<Gang of 4 book|http://xrl.us/tg3y> and is an
-excellent antidote to "spaghetti code".  Catalyst's use of this
-approach, it's powerful dispatcher (controller logic) and model and
-view agnosticism is what accounts for its power.
+application programming. It uses the Model-View-Controller (MVC)
+paradigm to separate the application logic, data storage, and display
+logic from one another.  This is a standard pattern, taken from the
+Smalltalk programming language and popularised by the L<Gang of 4
+book|http://xrl.us/tg3y>, and is an excellent antidote to "spaghetti
+code".  Catalyst's use of this approach, its powerful dispatcher
+(controller logic), and its model and view agnosticism is what accounts
+for L<its power|Catalyst::Manual::About>.
 
-As a result of this architecture, a simple catalyst application has a
-well defined structure, and contains quite a lot of files by default.  This
-makes using version control from the start very important.  Here's how
-to do this with subversion
+For the first day of Catalyst Advent 2006, I'll keep it traditional:
+we'll write a complete, if basic, sample application that shows several
+aspects of Catalyst. Our application, called C<Cheer>, will display the
+number of days remaining until Christmas - how seasonally appropriate!
+I'll also show the use of version control, which is not usually
+demonstrated in such examples, but which is crucial for the development
+process for any serious application.
+
+As a result of the MVC architecture, a typical Catalyst application has
+a well-defined structure, and contains quite a lot of files.  This makes
+using version control from the start very important. For this example
+I'll use Subversion, a powerful version-control system that grew out of
+CVS (which is in extremely wide use, but has many limitations). Many
+Catalyst developers use C<svk>, itself based on Subversion.
+
+You can obtain the code from this Advent Calendar entry from the
+Catalyst Subversion repository by issuing the following command:
+
+ $ svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Cheer
 
 =over 4
 
 =item *
 
-First create a new subversion repository to put your code in
+First create a new Subversion repository to put your code in
 
  $ svnadmin create /usr/local/src/xmas
 
 =item *
 
-Then we want to put some files in there
+Then we want to put some files in there:
 
  $ cd /tmp
- $ mkdir xmas && cd xmas
+ $ mkdir xmas 
+ $ cd xmas
  $ mkdir tags trunk branches
  $ svn import file:///usr/local/src/xmas -m 'initial import'
 
 =item *
 
-Next up is to check out a working copy
+Next up is to check out a working copy:
 
- $ svn co file:///usr/local/src/xmas/trunk xmas && cd xmas
+ $ svn co file:///usr/local/src/xmas/trunk xmas 
+ $ cd xmas
 
 =item *
 
-and we're ready to create and check in our skeleton application
+and we're ready to create and check in our skeleton application:
 
  $ catalyst.pl Cheer
+ [output snipped]
  $ svn add Cheer
- $ svn ci Cheer -m 'initial import of skeleton catalyst application'
+ $ svn ci Cheer -m 'initial import of skeleton Catalyst application'
  $ cd Cheer # this is where we'll be for the rest of this calendar entry
 
 =back
 
-And we have a version controlled skeleton application all ready for
+And we have a version-controlled skeleton application all ready for
 use.
 
-=head2 Modify the root controller to have more sensible default behaviour.
+=head2 Modify the Root Controller to have More Sensible Default
+Behavior
 
-By default catalyst.pl makes the default action of the root controller
-a hello world screen.  We're going to change this so that the index
-action provides the hello world screen and the default action returns
-a 404 not found error code.
+By default C<catalyst.pl> makes the default action of the root
+controller a "hello world" screen.  We're going to change this so that
+the index action provides the "hello world" screen and the default
+action returns a C<404 not found> error code.
 
-I'm going to do this to my local copy, then provide a svn diff which
+I'm going to do this to my local copy, then provide a C<svn diff> which
 you can use to patch your local copy.  Back in a sec.
 
 OK, that took me a couple of minutes.  First I check that my code
@@ -98,49 +118,50 @@ actually compiles:
  
   =head2 end
 
-You can copy and paste the above code (from the line below svn diff
-above to =head2 end) into a file - cheer.patch - I'm going to put it
-in /tmp/, but I need to undo my local modifications first.  Again I'm
-in the root dir for my application:
+You can copy and paste the above code (from the line below "svn diff"
+above to "=head2 end") into a file - C<cheer.patch> - I'm going to put
+it in C</tmp/>, but I need to undo my local modifications first.  Again
+I'm in the root dir for my application:
 
  $ svn revert lib/Cheer/Controller/Root.pl
 
-and patch the source from my patch at /tmp/cheer.patch.  Make sure
+and patch the source from my patch at C</tmp/cheer.patch>.  Make sure
 that if you're following along at home that you get rid of all leading
-spaces from the patch.  The following perl one-liner will do that
+spaces from the patch.  The following Perl one-liner will do that
 (followed by the invocation to patch):
 
  $ perl -p -i -e 's/^\s+//' /tmp/cheer.patch
  $ patch -p0 < /tmp/cheer.patch
 
-now I can commit the changes:
+Now I can commit the changes:
 
- $ svn ci -m 'Updated root controller to give more sensible default behaviour'
+ $ svn ci -m 'Updated root controller to give more sensible default behavior'
 
 Note that I don't have to specify a file or directory if I want all
 changes below my current directory to be committed to the repository
 in this change set.
 
-=head2 Adding a view
+=head2 Adding a View
 
-We're going to use the TT view for this example. So we issue the
-following command from the application root (in my case ~/Cheer):
+We're going to use the Template Toolkit (TT) view for this example. So
+we issue the following command from the application root (in my case
+~/Cheer):
 
  $ script/cheer_create view TT TT
 
-this creates a couple of new file which we can add to the version
+this creates a couple of new files which we can add to the version
 control repository in the following way:
 
  $ find . -name '*TT.*' | xargs svn add
  $ svn ci -m 'created skeleton view'
 
-Often, this is all you need to create the view.  Note all you have to
-do to create your own view ( from your own templating system for
-example) is to provide a process subroutine in your application as
-documented in L<Catalyst::View> (although a render sub is also rather
-useful).
+Often, this is all you need to create the view. The only thing you have
+to do to create your own view (from your own templating system, for
+example) is to provide a C<process> method in your application, as
+documented in L<Catalyst::View> (although a C<render> method is also
+rather useful).
 
-I'm going to update the root controller to use the Template Toolkit
+I'm going to update the root controller to use Template Toolkit
 now, and add a template.  Here's the patch:
 
  Index: root/404.tt
@@ -193,25 +214,26 @@ what I did (from the application root):
 This time it's up to you to figure out how to apply it - remember to
 strip leading spaces first.
 
-=head2 A (very) simple model.
+=head2 A (very) Simple Model.
 
 As I said at the beginning, Catalyst is agnostic to the model and view
 you use.  This gives us an opportunity to show you a very simple
-example.  Most commonly the model will be used to talk to some kind of
-a database, and Catalyst applications most commonly use L<DBIx::Class>.
-However, here we're going to grab data from the system clock instead.
+example.  Most commonly the model will be used to talk to some kind of a
+database, and Catalyst developers usually favor L<DBIx::Class> as their
+database mapping layer.  However, here we're going to grab data from the
+system clock instead.
 
-First, create a new model (from the application root) and commit it to
-the subversion repository.
+First, create a new model called "Now" (from the application root), and
+commit it to the Subversion repository.
 
  $ script/cheer_create.pl model Now
  $ find . -name '*Now.*' | xargs svn add
  $ svn ci -m 'added skeleton Now model'
 
 I'm going to go and update the model to tell us the number of days to
-Xmas in the index actoin in the root controller.  Again I'll provide
-this as a patch.  We're going to use a couple of new modules from CPAN
-this time, so I'll also update the Makefile.PL so that you're
+Christmas in the index action in the root controller.  Again I'll
+provide this as a patch.  We're going to use a couple of new modules
+from CPAN this time, so I'll also update the Makefile.PL so that you're
 automatically told about dependencies from CPAN when you run 'perl
 Makefile.PL' from the application root as well.  Here's the patch:
 
@@ -223,7 +245,7 @@ Makefile.PL' from the application root as well.  Here's the patch:
   <html><head><title>Happy winter solstice</title></head>
  -<body>And best regards for the new year!</body>
  +<body>And best regards for the new year!  There are [% c.stash.days_till_xmas %]
- +days left until santa comes.  </body>
+ +days left until Santa comes.  </body>
   </html>
  Index: lib/Cheer/Model/Now.pm
  ===================================================================
@@ -245,7 +267,7 @@ Makefile.PL' from the application root as well.  Here's the patch:
   
  +=head2 days_till_xmas
  +
- +Tells us how many days there are until xmas
+ +Tells us how many days there are until Christmas
  +
  +=cut
  +
@@ -289,17 +311,17 @@ Makefile.PL' from the application root as well.  Here's the patch:
 
 =head2 Wrap up.
 
-So I've shown you how to use Catalyst with subversion, touched briefly
+So I've shown you how to use Catalyst with Subversion, touched briefly
 on the View, and showed you how to use a custom model that leverages
 some features available from CPAN.  If you don't know Catalyst, we
-recommend that you go through the excellent tutorials from
+recommend that you go through the tutorials from
 L<Catalyst::Manual::Tutorial> which go into quite a lot more detail.
-For more details on SVN, and particularly the function of the tags
-trunk and branches directory which we created, see the excellent free
- L<Subversion Book|http://svnbook.red-bean.com>.
+For more details on Subversion, and particularly the function of the
+tags, trunk, and branches directory structure which we created, see the
+excellent free L<Subversion Book|http://svnbook.red-bean.com>.
 
-You can obtain the code from this advent calendar entry from the
-catalyst subversion repository by issuing the following command:
+You can obtain the code from this Advent Calendar entry from the
+Catalyst Subversion repository by issuing the following command:
 
  $ svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Cheer
 
