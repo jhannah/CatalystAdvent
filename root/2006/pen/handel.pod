@@ -1,0 +1,326 @@
+=head1 Catalyst Advent - Day X
+
+Handel 1.0 and Catalyst: Closer than ever
+
+=head2 Introduction
+
+Just over a year ago, Handel made its way out unto the world as a basic framework for cart/order/checkout
+operations complete with basic Catalyst integration using helpers. Since that time, Handel has undergone a
+lengthy rewrite to make it easier to customize and integration into Catalyst has never been easier.
+
+=head2 Getting Started
+
+Before we get started, you will need to install the following requirements:
+
+=over
+
+=item Catalyst 5.7+
+
+=item Handel 1.0 (or 0.99_15+)
+
+=back
+
+It would also be a good time to check out the original Handel article on Perl.com:
+
+L<http://www.perl.com/pub/a/2005/11/17/handel.html>
+
+=head2 Create a new Catalyst application
+
+First, we need to create a new Catalyst application:
+
+    $ catalyst.pl MyApp
+    
+    created "MyApp"
+    created "MyApp\script"
+    created "MyApp\lib"
+    created "MyApp\root"
+    created "MyApp\root\static"
+    created "MyApp\root\static\images"
+    created "MyApp\t"
+    created "MyApp\lib\MyApp"
+    created "MyApp\lib\MyApp\Model"
+    created "MyApp\lib\MyApp\View"
+    created "MyApp\lib\MyApp\Controller"
+    created "MyApp\myapp.yml"
+    created "MyApp\lib\MyApp.pm"
+    created "MyApp\lib\MyApp\Controller\Root.pm"
+    created "MyApp/README"
+    created "MyApp/Changes"
+    created "MyApp\t/01app.t"
+    created "MyApp\t/02pod.t"
+    created "MyApp\t/03podcoverage.t"
+    created "MyApp\root\static\images\catalyst_logo.png"
+    created "MyApp\root\static\images\btn_120x50_built.png"
+    created "MyApp\root\static\images\btn_120x50_built_shadow.png"
+    created "MyApp\root\static\images\btn_120x50_powered.png"
+    created "MyApp\root\static\images\btn_120x50_powered_shadow.png"
+    created "MyApp\root\static\images\btn_88x31_built.png"
+    created "MyApp\root\static\images\btn_88x31_built_shadow.png"
+    created "MyApp\root\static\images\btn_88x31_powered.png"
+    created "MyApp\root\static\images\btn_88x31_powered_shadow.png"
+    created "MyApp\root\favicon.ico"
+    created "MyApp/Makefile.PL"
+    created "MyApp\script/myapp_cgi.pl"
+    created "MyApp\script/myapp_fastcgi.pl"
+    created "MyApp\script/myapp_server.pl"
+    created "MyApp\script/myapp_test.pl"
+    created "MyApp\script/myapp_create.pl"
+
+=head2 Add the Handel bits
+
+Now that we have a new application, we need to have Handel create cart/order/checkout bits for us.
+The Handel helper will create a full set of subclasses for doing Cart/Order/Checkout operations inside and
+outside of Catalyst, as well as all of the templates, models and controllers needed to use them.
+
+The create 'the full shebang', called the Handel helper and pass in the dsn/user/password where the database
+will be located:
+
+    $ cd MyApp
+    $ script/myapp_create.pl Handel dbi:SQLite:data/handel.db
+    
+    created "C:\MyApp\data"
+     exists "C:\MyApp\lib\MyApp"
+    created "C:\MyApp\lib\MyApp\Cart.pm"
+    created "C:\MyApp\lib\MyApp\Cart"
+    created "C:\MyApp\lib\MyApp\Cart\Item.pm"
+    created "C:\MyApp\lib\MyApp\Storage"
+    created "C:\MyApp\lib\MyApp\Storage\Cart.pm"
+    created "C:\MyApp\lib\MyApp\Storage\Cart"
+    created "C:\MyApp\lib\MyApp\Storage\Cart\Item.pm"
+     exists "C:\MyApp\lib\MyApp"
+    created "C:\MyApp\lib\MyApp\Order.pm"
+    created "C:\MyApp\lib\MyApp\Order"
+    created "C:\MyApp\lib\MyApp\Order\Item.pm"
+     exists "C:\MyApp\lib\MyApp\Storage"
+    created "C:\MyApp\lib\MyApp\Storage\Order.pm"
+    created "C:\MyApp\lib\MyApp\Storage\Order"
+    created "C:\MyApp\lib\MyApp\Storage\Order\Item.pm"
+     exists "C:\MyApp\lib\MyApp"
+    created "C:\MyApp\lib\MyApp\Checkout.pm"
+    created "C:\MyApp\script\myapp_handel.pl"
+     exists "C:\MyApp\lib\MyApp\View"
+     exists "C:\MyApp\t"
+    created "C:\MyApp\lib\MyApp\View\TT.pm"
+    created "C:\MyApp\t\view_TT.t"
+     exists "C:\MyApp\lib\MyApp\Model"
+     exists "C:\MyApp\t"
+    created "C:\MyApp\lib\MyApp\Model\Cart.pm"
+    created "C:\MyApp\t\model_Cart.t"
+     exists "C:\MyApp\lib\MyApp\Model"
+     exists "C:\MyApp\t"
+    created "C:\MyApp\lib\MyApp\Model\Order.pm"
+    created "C:\MyApp\t\model_Order.t"
+     exists "C:\MyApp\lib\MyApp\Controller"
+     exists "C:\MyApp\t"
+    created "C:\MyApp\root\cart"
+    created "C:\MyApp\lib\MyApp\Controller\Cart.pm"
+    created "C:\MyApp\root\cart\default"
+    created "C:\MyApp\root\cart\list"
+    created "C:\MyApp\root\cart\errors"
+    created "C:\MyApp\root\cart\profiles.yml"
+    created "C:\MyApp\root\cart\messages.yml"
+    created "C:\MyApp\root\static\products.htm"
+    created "C:\MyApp\t\controller_Cart.t"
+     exists "C:\MyApp\lib\MyApp\Controller"
+     exists "C:\MyApp\t"
+    created "C:\MyApp\root\order"
+    created "C:\MyApp\lib\MyApp\Controller\Order.pm"
+    created "C:\MyApp\root\order\default"
+    created "C:\MyApp\root\order\view"
+    created "C:\MyApp\root\order\errors"
+    created "C:\MyApp\root\order\profiles.yml"
+    created "C:\MyApp\root\order\messages.yml"
+    created "C:\MyApp\t\controller_Order.t"
+     exists "C:\MyApp\lib\MyApp\Controller"
+     exists "C:\MyApp\t"
+    created "C:\MyApp\root\checkout"
+    created "C:\MyApp\lib\MyApp\Controller\Checkout.pm"
+    created "C:\MyApp\root\checkout\default"
+    created "C:\MyApp\root\checkout\billing"
+     exists "C:\MyApp\root\checkout\billing"
+    created "C:\MyApp\root\checkout\preview"
+    created "C:\MyApp\root\checkout\payment"
+    created "C:\MyApp\root\checkout\complete"
+    created "C:\MyApp\root\checkout\errors"
+    created "C:\MyApp\root\checkout\profiles.yml"
+    created "C:\MyApp\root\checkout\messages.yml"
+    created "C:\MyApp\t\controller_Checkout.t"
+
+=head2 Installing the database schema
+
+Now that we have a basic cart/order/checkout application, we need a place to store our data. If you would
+like to make any schema changes, now is a great time to do it. The installed schema is based on the storage
+classes created above.
+
+For example, if you want to change the name of the table the carts are stored in, or add a column, simply
+change the appropriate options in C<MyApp::Storage::Cart>:
+
+    __PACKAGE__->table_name('mycarttable');
+    __PACKAGE__->add_column('mynewfield' => {
+        data_type   => 'VARCHAR',
+        size        => 25,
+        is_nullable => 1
+    });
+
+To install the schema into an existing database, or create a new database (SQLite), simply run the provided
+handel script, passing it the same information you supplied above:
+
+    $ script/myapp_handel.pl schema --install --dsn dbi:SQLite:data/handel.db
+    
+    Installed/created database schema
+
+If you are installing the schema into a database other than SQLite, make sure the database exists and the
+user/password supplied has permission to create tables and indexes.
+
+=head2 Houston, we need sessions!
+
+The one thing the helper doesn't do for you is load session support needed for Handel to function. To do that,
+add the session store/state modules of your choosing to MyApp.pm:
+
+    use Catalyst qw/
+        -Debug
+        ConfigLoader
+        Session
+        Session::State::Cookie
+        Session::Store::File
+        Static::Simple
+    /;
+
+=head2 Fire it up
+
+Now the moment of truth! Start your new app:
+
+    $ script/myapp_server.pl
+    
+    [debug] Debug messages enabled
+    [debug] Loaded plugins:
+    .----------------------------------------------------------------------------.
+    | Catalyst::Plugin::ConfigLoader  0.13                                       |
+    | Catalyst::Plugin::Session  0.12                                            |
+    | Catalyst::Plugin::Session::State::Cookie  0.05                             |
+    | Catalyst::Plugin::Session::Store::File  0.09                               |
+    | Catalyst::Plugin::Static::Simple  0.14                                     |
+    '----------------------------------------------------------------------------'
+    
+    [debug] Loaded dispatcher "Catalyst::Dispatcher"
+    [debug] Loaded engine "Catalyst::Engine::HTTP"
+    [debug] Found home "C:\MyApp"
+    [debug] Loaded Config "C:\MyApp\myapp.yml"
+    [debug] Loaded components:
+    .-----------------------------------------------------------------+----------.
+    | Class                                                           | Type     |
+    +-----------------------------------------------------------------+----------+
+    | MyApp::Controller::Cart                                         | instance |
+    | MyApp::Controller::Checkout                                     | instance |
+    | MyApp::Controller::Order                                        | instance |
+    | MyApp::Controller::Root                                         | instance |
+    | MyApp::Model::Cart                                              | instance |
+    | MyApp::Model::Order                                             | instance |
+    | MyApp::View::TT                                                 | instance |
+    '-----------------------------------------------------------------+----------'
+    
+    [debug] Loaded Private actions:
+    .----------------------+--------------------------------------+--------------.
+    | Private              | Class                                | Method       |
+    +----------------------+--------------------------------------+--------------+
+    | /default             | MyApp::Controller::Root              | default      |
+    | /end                 | MyApp::Controller::Root              | end          |
+    | /order/create        | MyApp::Controller::Order             | create       |
+    | /order/default       | MyApp::Controller::Order             | default      |
+    | /order/view          | MyApp::Controller::Order             | view         |
+    | /order/load          | MyApp::Controller::Order             | load         |
+    | /order/validate      | MyApp::Controller::Order             | validate     |
+    | /cart/add            | MyApp::Controller::Cart              | add          |
+    | /cart/clear          | MyApp::Controller::Cart              | clear        |
+    | /cart/restore        | MyApp::Controller::Cart              | restore      |
+    | /cart/save           | MyApp::Controller::Cart              | save         |
+    | /cart/load           | MyApp::Controller::Cart              | load         |
+    | /cart/destroy        | MyApp::Controller::Cart              | destroy      |
+    | /cart/validate       | MyApp::Controller::Cart              | validate     |
+    | /cart/list           | MyApp::Controller::Cart              | list         |
+    | /cart/create         | MyApp::Controller::Cart              | create       |
+    | /cart/default        | MyApp::Controller::Cart              | default      |
+    | /cart/delete         | MyApp::Controller::Cart              | delete       |
+    | /cart/update         | MyApp::Controller::Cart              | update       |
+    | /checkout/payment    | MyApp::Controller::Checkout          | payment      |
+    | /checkout/default    | MyApp::Controller::Checkout          | default      |
+    | /checkout/end        | MyApp::Controller::Checkout          | end          |
+    | /checkout/preview    | MyApp::Controller::Checkout          | preview      |
+    | /checkout/load       | MyApp::Controller::Checkout          | load         |
+    | /checkout/validate   | MyApp::Controller::Checkout          | validate     |
+    | /checkout/render     | MyApp::Controller::Checkout          | render       |
+    | /checkout/complete   | MyApp::Controller::Checkout          | complete     |
+    | /checkout/billing    | MyApp::Controller::Checkout          | billing      |
+    '----------------------+--------------------------------------+--------------'
+    
+    [debug] Loaded Path actions:
+    .-------------------------------------+--------------------------------------.
+    | Path                                | Private                              |
+    +-------------------------------------+--------------------------------------+
+    | /cart/add                           | /cart/add                            |
+    | /cart/clear                         | /cart/clear                          |
+    | /cart/delete                        | /cart/delete                         |
+    | /cart/destroy                       | /cart/destroy                        |
+    | /cart/list                          | /cart/list                           |
+    | /cart/restore                       | /cart/restore                        |
+    | /cart/save                          | /cart/save                           |
+    | /cart/update                        | /cart/update                         |
+    | /checkout/billing                   | /checkout/billing                    |
+    | /checkout/complete                  | /checkout/complete                   |
+    | /checkout/payment                   | /checkout/payment                    |
+    | /checkout/preview                   | /checkout/preview                    |
+    | /order/view                         | /order/view                          |
+    '-------------------------------------+--------------------------------------'
+    
+    [info] MyApp powered by Catalyst 5.7006
+    You can connect to your server at http://np5660:3000
+
+In your browser, navigate to the static products page:
+
+    http://localhost:3000/static/products.htm
+
+Pick the product of your choosing and hit [Add To Cart]. You should now have yourself a nice shiny new
+shopping cart page. Try saving and restoring your cart..checking out...viewing previous orders. Enjoy!
+
+=head2 Where to go from here
+
+Now that you have a nice new shiny cart/order/checkout application the real fun begins. The new version of
+Handel allows you to store carts and orders in seperate databases or in completely different stores like XML,
+Text, LDAP, or even things like Google Checkout; once someone writes the glue. :-)
+
+Because all of the necessary subclasses have been created, the only changes required to do such magic
+comes down to changing the MyApp::Storage::* classes:
+
+    MyApp::Storage::Cart;
+    __PACKAGE__->storage_class('Handel::Storage::LDAP');
+    __PACKAGE__->set_ldap_options(...);
+    1;
+
+That's it. The cart class MyApp::Cart works the same. And speaking of subclasses, keep in mind that you can
+use your classes outside of Catalyst too, like in a command line application:
+
+    #!/usr/bin/perl -w
+    use strict;
+    use warnings;
+    use MyApp::Cart;
+    
+    $ENV{'HandelDBIDSN'} = '/home/me/MyApp/data/handel.db';
+    
+    my $cart = MyApp::Carts->search({id => $ARG[0])->first;
+    print "Total: ", $cart->subtotal;
+    ...
+
+Happy carting!
+
+I<NOTE:> The default cart code makes no attempt to verify the price of the part submitted. Please take
+the time to change MyApp::Controller::Cart to get the pricing information from your products/inventory
+database.
+
+=head3 SEE ALSO
+
+L<Handel::Manual::QuickStart>, L<Handel::Manual::Intro>, L<Handel::Storage>,
+L<Handel::Storage::DBIC>, L<Handel::Manual::Cookbook::WritingCustomStorage>
+
+=head3 AUTHOR
+
+Christopher H. Laco <claco@chrislaco.com>
