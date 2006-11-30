@@ -80,7 +80,7 @@ BindLex also provides C<Session>, C<Sessioned>, C<Flash> and C<Flashed>
 attributes to use lexicals in C<< $c->session >> or C<< $c->flash >> 
 respectively.
 
-However that some people view this module as a "Bad Thing" due to the 
+However some people view this module as a "Bad Thing" due to the 
 modules it uses, namely L<PadWalker>, L<Array::RefElem>, 
 L<Devel::Caller>, L<Devel::LexAlias> and L<attributes>. Personnaly I've
 not had any problems with it.
