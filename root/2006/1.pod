@@ -31,7 +31,7 @@ extremely wide use, but has many limitations). Many Catalyst
 developers use C<svk>, itself based on Subversion.
 
 The example application here is available from the Catalyst subversion
-repository.  Instructions for obtaining it are given at the end off
+repository.  Instructions for obtaining it are given at the end of
 this article.
 
 =over 4
