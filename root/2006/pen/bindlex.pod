@@ -5,7 +5,7 @@ Tidying up controllers with BindLex
 =head2 The Problem
 
 If you've done any development with Catalyst, you are almost guaranteed
-to need to put things in the stash. This isn't so much of a problem, but
+to need to put data in the stash. This isn't so much of a problem, but
 it can make the code appear... unwieldy If you are using chained 
 actions you will likely want to pull things out of the stash from 
 previous actions. 
@@ -22,8 +22,9 @@ C<load_group> is called first, and then C<members> is called next.)
                   PathPart('groups') 
                   CaptureArgs(1) {
    my ($self, $c, $gid) = @_;
-   
-   my $group = ... # load group from Model here
+  
+   # Load group from Model
+   my $group = $c->model('DBIC::Group')->find($gid);
    
    $c->stash->{group} = $group;
  }
@@ -56,7 +57,8 @@ It enables us do the following:
                  CaptureArgs(1) {
    my ($self, $c, $gid) = @_;
    
-   my $group :Stashed = ... # load group from Model here
+   # Load group from Model
+   my $group : Stashed = $c->model('DBIC::Group')->find($gid);
  }
  
  sub members :Chained('load_group')
@@ -70,18 +72,18 @@ It enables us do the following:
  }
  
 That's right! You give a lexical variable (i.e. C<my $var>) an attribute
-of C<Stashed> (or C<Stash>), and it will automatically be in the stash,
-and whenever you update the value of said lexical, it updates the value
+of C<Stashed> (or C<Stash>), and it will automatically be in the stash.
+And whenever you update the value of said lexical, it updates the value
 in the stash.
 
 BindLex also provides C<Session>, C<Sessioned>, C<Flash> and C<Flashed>
 attributes to use lexicals in C<< $c->session >> or C<< $c->flash >> 
 respectively.
 
-It has to be said however that some people view this module as a bad
-thing due to the modules it uses L<PadWalker>, L<Array::RefElem>, 
-L<Devel::Caller>, L<Devel::LexAlias> and L<attributes>. However I've not
-had any problems with it.
+However that some people view this module as a "Bad Thing" due to the 
+modules it uses, namely L<PadWalker>, L<Array::RefElem>, 
+L<Devel::Caller>, L<Devel::LexAlias> and L<attributes>. Personnaly I've
+not had any problems with it.
 
 =head3 AUTHOR
 
