@@ -173,7 +173,7 @@ available for catalyst, but the L<Template> Toolkit is by far the most
 popular.  L<HTML::Mason> the next most popular option.
 
 I'm going to update the root controller to use the Template Toolkit
-now, and add a template.  Here's the patch which includes changes to
+now.  Here's the patch which includes changes to
 the controller code and the addition of a couple of templates:
 
  Index: root/404.tt
