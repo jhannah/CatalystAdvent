@@ -73,7 +73,7 @@ It enables us do the following:
  
 That's right! You give a lexical variable (i.e. C<my $var>) an attribute
 of C<Stashed> (or C<Stash>), and it will automatically be in the stash.
-And whenever you update the value of said lexical, it updates the value
+Whenever you update the value of said lexical, it updates the value
 in the stash.
 
 BindLex also provides C<Session>, C<Sessioned>, C<Flash> and C<Flashed>
