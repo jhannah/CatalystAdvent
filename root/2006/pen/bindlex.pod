@@ -10,36 +10,33 @@ it can make the code appear... unwieldy If you are using chained
 actions you will likely want to pull things out of the stash from 
 previous actions. 
 
-Consider the following example code. (If you don't know
-how chained actions work, when a URL such as C</groups/5> is visited, 
-C<load_group> is called first, and then C<members> is called next.)
+Lets say, for the sake of argument, that you want to store the results of a multi-page process (for example a quiz) in the session. Normally you would do something like the following example
 
- package MyApp::C::Groups;
+ package MyApp::C::MyQuiz;
  
  use base 'Catalyst::Controller';
 
- sub load_group : Chained('/')
-                  PathPart('groups') 
-                  CaptureArgs(1) {
-   my ($self, $c, $gid) = @_;
-  
-   # Load group from Model
-   my $group = $c->model('DBIC::Group')->find($gid);
-   
-   $c->stash->{group} = $group;
- }
- 
- sub members : Chained('load_group')
- 						   PathPart('')
- 						   Args(0) {
+ sub take : Local {
    my ($self, $c) = @_;
-   
-   my $group = $c->stash->{group};
-   $c->stash->{members} = { %{ $group->members } };
+
+   # Get existing state
+   my $state = $c->session->{quiz_state};
+
+   # Merge current state with new params - In a real app you'd do something
+   # more substantial here.
+   $state = { %$state, %{$c->req->params} };
+   $state->{q_id}++;
+
+   # Put question in stash for display
+   $c->stash->{question} = 
+     $c->model('DBIC::Quiz')->find( $state->{q_id} );
+
+   # And save the updated state back in the session
+   $c->session->{quiz_state} = $state;
  }
  
-Although the above example is (slightly) contrived, it illustrates the 
-problem - all the instances of C<< $c->stash->{ >> make the code messier
+The above code snippet illustrates the problem - all the instances of 
+C<< $c->stash->{ >> and C<< $c->session->{ >> make the code messier
 than it needs to be.
 
 =head2 The Solution
@@ -47,42 +44,40 @@ than it needs to be.
 Luckily L<Catalyst::Controller::BindLex|BindLex> comes to the rescue! 
 It enables us do the following:
 
- package MyApp::C::Groups;
+ package MyApp::C::MyQuiz;
  
- # NOTE: New base class
- use base 'Catalyst::Controller::BindLex'; 
+ # NOTE: new base class;
+ use base 'Catalyst::Controller::BindLex';
 
- sub load_group :Chained('/')
-                 PathPart('groups') 
-                 CaptureArgs(1) {
-   my ($self, $c, $gid) = @_;
-   
-   # Load group from Model
-   my $group : Stashed = $c->model('DBIC::Group')->find($gid);
- }
- 
- sub members :Chained('load_group')
- 						  PathPart('')
- 						  Args(0) {
+ sub take : Local {
    my ($self, $c) = @_;
-   
-   my $group :Stashed;
-   # Works with hashes too - this will DWYM
-   my %members :Stashed = %{ $group->members };
+
+   # Get existing state
+   my %quiz_state : Session;
+
+   # Merge current state with new params - In a real app you'd do something
+   # more substanatial here.
+   %state = ( %state, %{$c->req->params} );
+   $state{q_id}++;
+
+   # Put question in stash for display
+   my $question : Stashed 
+     = $c->model('DBIC::Quiz')->find( $state{q_id} );
  }
- 
-That's right! You give a lexical variable (i.e. C<my $var>) an attribute
-of C<Stashed> (or C<Stash>), and it will automatically be in the stash.
-Whenever you update the value of said lexical, it updates the value
-in the stash.
 
-BindLex also provides C<Session>, C<Sessioned>, C<Flash> and C<Flashed>
-attributes to use lexicals in C<< $c->session >> or C<< $c->flash >> 
-respectively.
+Looks a bit tidier this way, doesn't it? When you give a lexical variable, C<my %quiz_state> in the above example, an attribute of C<Session>, it is connected
+to  C<< $c->session->{quiz_state} >>, so that it will have the same value as in
+the session, and when you change something in the hash it will also be updated 
+in the session. In fact as far as Perl is concerned, they are the same.
 
-However some people view this module as a "Bad Thing" due to the 
-modules it uses, namely L<PadWalker>, L<Array::RefElem>, 
-L<Devel::Caller>, L<Devel::LexAlias> and L<attributes>. Personnaly I've
+BindLex provides C<Session>, C<Sessioned>, C<Stash>, C<Stashed>, C<Flash> and
+C<Flashed> attributes to connect lexicals to C<< $c->session >>, 
+C<< $c->stash >> or C<< $c->flash >> respectively. BindLex also has the ability
+to use your own custom attributes - see the docs for details of how to do this.
+
+It should be noted that some people view this module as a "Bad Thing" due 
+to the modules it uses, namely L<PadWalker>, L<Array::RefElem>, 
+L<Devel::Caller>, L<Devel::LexAlias> and L<attributes>. Personally I've
 not had any problems with it.
 
 =head3 AUTHOR
