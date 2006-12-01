@@ -80,6 +80,22 @@ to the modules it uses, namely L<PadWalker>, L<Array::RefElem>,
 L<Devel::Caller>, L<Devel::LexAlias> and L<attributes>. Personally I've
 not had any problems with it.
 
+=head2 Current Limitations
+
+The only know current limitation of BindLex is that you cannot lexically bind
+any variable that is declared in more than one scope in a sub due to the 
+specifics of perl's internals. In other words an attempt to use any BindLex
+attribute on C<$foo> in the example below will cause an error
+
+ sub dummy {
+   my ($self, $c) = @_;
+   my $foo; # First scoped here
+
+   if ($c->req->arguments) {
+     my $foo; # Scoped again here
+   }
+ }
+
 =head3 AUTHOR
 
 Ash Berlin <ash@cpan.org>
