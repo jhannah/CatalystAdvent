@@ -1,4 +1,4 @@
-=head1 Catalyst Advent - Day X
+=head1 Catalyst Advent - Day 2 - Handel
 
 Handel 1.0 and Catalyst: Closer than ever
 
