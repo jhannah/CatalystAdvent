@@ -131,7 +131,7 @@ above to "=head2 end") into a file - C<cheer.patch> - I'm going to put
 it in C</tmp/>, but I need to undo my local modifications first.  Again
 I'm in the root dir for my application:
 
- $ svn revert lib/Cheer/Controller/Root.pl
+ $ svn revert lib/Cheer/Controller/Root.pm
 
 and patch the source from my patch at C</tmp/cheer.patch>.  Make sure
 that if you're following along at home that you get rid of all leading
