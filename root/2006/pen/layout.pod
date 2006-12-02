@@ -2,31 +2,47 @@
 
 Layout of a Catalyst Application
 
+=head2 catalyst.pl MyApp
+
+When you run the catalyst helper as above, it creates quite a lot of
+files which provide you a skeleton application.  It does this with the
+help of the L<Template> Toolkit. The skeleton application provides a
+single "Hello World" screen which is what you get regardless of what
+url you visit.
+
+The base application is created with the L<Catalyst::Helper> package,
+which can be sub classed to provide more sophisticated code
+generators.  L<Catalyst::Example::InstantCRUD> (a generator of
+traditional form based database applications) provides an extension
+to the base helper with L<Catalyst::Helper::InstantCRUD>.
+
+Below we outline the basic anatomy of a Catalyst application, and
+explain what the files and directories are for.
+
 =head2 The Makefile.PL
 
-  Location: YourApp/Makefile.PL
+Location: MyApp/Makefile.PL
 
 It might not look important, but you should never remove this file
-from your applications base directory. Catalyst needs it to auto-find
-it's root. Besides for this reason, it is the key to build a 
-distribution, a PAR package or just to simply collect your
-applications dependencies. Catalyst uses C<Module-Install> for
+from your applications base directory. Catalyst needs it to
+automatically it's location on your computer's file system.  As well
+as this, it is the required in order to build a distribution (e.g. for
+uploading to L<CPAN>), a L<PAR> package or just to simply collect your
+applications dependencies. Catalyst uses L<Module::Install> for
 Makefile and installation handling. If you'd like to add, for example,
-a dependency on C<DBIx-Class>' current version, you'd add
+a dependency on the  current version of L<DBIx::Class>, you'd add
 
   requires 'DBIx::Class' => '0.07003';
 
-to it. This will alert you of a missing module or wrong version by
-simply running the Makefile.PL through perl.
+to it. This will alert you of a missing module or wrong version when
+you run C<perl Makefile.PL>.
 
 =head2 The Tests
 
-  Location: YourApp/t
+  Location: MyApp/t
 
 This is the location to put your application's tests into. CPAN has
 a rich set of library to assist you in creating live and unit tests:
-
-  Dists put here by people who know better than me.
 
 Usually, Perl tests have the format C<00-name.t>, where the C<00> is
 a number that shows the order of the tests, and C<name> being the
@@ -37,9 +53,10 @@ first being an indicator on what will be tested. As an example:
   203-schema_category.t
 
 Where the C<2> prefixes all tests for my DBIx-Class schema classes,
-and the C<03> being the running number showing their order. You can
-use many ways and tools to run your tests. The widely known approach
-would be through your applications Makefile:
+and the C<03> being the running number showing their order. There are
+several ways to run tests, and a wide choice of tools which can be
+used.  When installing a L<CPAN> module manually, usually we use the
+following approach:
 
   perl Makefile.PL      # This creates the Makefile and test for
                         # your applications dependencies, if you
@@ -77,65 +94,70 @@ variable:
 
   CATALYST_DEBUG=1 perl -Ilib t/203-schema_category.t
 
+If you want to run your tests through the perl
+debugger (i.e. C<perl -d> ) you can use the C<pler> utility which is
+part of the L<Devel::Pler> package available from L<CPAN>.
+
 =head2 The root
 
-  Location: YourApp/root
+  Location: MyApp/root
 
-This is the place for your non-perl files. By default, you will get
-some nice graphics and logos shipped with Catalyst. But it's usually
-also the place for all other static files, and also your applications
-templates. Due to Catalysts advanced configurability, the layout of
-this directory can be changed completely to fit your needs.
+This is the place for non-perl files. By default, some nice graphics
+and logos shipped with Catalyst are included. However it's usually
+also the place for all templates, and static files. Due to Catalysts
+advanced configurability, the layout of this directory can be changed
+completely to fit your needs.
 
 =head2 The Configuration File
 
-  Location: YourApp/yourapp.yml
+  Location: MyApp/myapp.yml
 
 By default, C<catalyst.pl> will create a C<YAML> configuration file
 for you. But you're not limited to that. At the time of writing this
-article, C<Catalyst-Plugin-ConfigLoader> supports YAML, JSON,
-XML, INI and Perl config files. Your configuration file gives you
-control over any of your components C<config> options. For example,
-let's assume you created a TT view named C<YourApp::View::TT>. This
-would set C<.html> as the default template extension:
+article, C<Catalyst::Plugin::ConfigLoader> supports L<YAML>, JSON,
+XML, INI, raw Perl and L<Config::General> (apache-like) file
+formats. The configuration file gives you control over any of your
+components C<config> options. For example the L<YAML> snippet below
+sets C<.tt2> as the default template extension for a view class called
+C<MyApp::View::TT>.
 
-  # yourapp.yml
+  # myapp.yml
   # ...
   View::TT:
-      TEMPLATE_EXTENSION: ".html"
+      TEMPLATE_EXTENSION: ".tt2"
 
 =head2 The Perl Modules
 
-  Location: YourApp/lib
+  Location: MyApp/lib
 
-This is were the code of your application actually lives. After
+This is were the code for your application actually lives. After
 creating a new Catalyst project, you will have this initial setup of
 Perl modules:
 
 =head3 The Application Class
 
-  Location: YourApp/lib/YourApp.pm
+  Location: MyApp/lib/MyApp.pm
 
 This is were you specify which plugins to load, and where you can
 implement methods which will be available through your context object
 (C<$c>, as it's usually called). Note however, that it is recommended
-to use controller base classes if you don't need to affect or act upon
-Catalyts request or startup lifecycles.
+to use controller base classes if you don't need access to Catalyt's
+start up or request cycle.
 
 =head3 The MVC Directories
 
-  Locations: YourApp/lib/YourApp/Controller
-             YourApp/lib/YourApp/Model
-             YourApp/lib/YourApp/View
+  Locations: MyApp/lib/MyApp/Controller
+             MyApp/lib/MyApp/Model
+             MyApp/lib/MyApp/View
 
-Catalyst follows the MVC principle, and therefore these directories are
-provided by default, as most people will need them. Nothing hinders you
-to put other modules for your applicaton in there as well. For example
-a C<YourApp/Schema/*> or a C<YourApp/Base/Controller>.
+Catalyst follows the Model View Controller principle of application
+design. Therefore these directories are provided by default, as almost
+everyone will need them. You can also add auxilliary modules here as
+well (which might work independently of the Catalyst application).  For example  C<MyApp/Schema/*> or C<MyApp/Base/Controller>.
 
 =head3 The Root Controller
 
-  Location: YourApp/lib/Controller/Root.pm
+  Location: MyApp/lib/Controller/Root.pm
 
 Most application will want to do something when your root index (C</>)
 is requested. The place for those actions is the root controller.
@@ -147,7 +169,7 @@ Typical examples are a default handler for 404 pages
     $c->response->status(404);
   }
 
-and the forementioned index action:
+and the index action:
 
   sub index : Private {
     my ($self, $c) = @_;
@@ -156,17 +178,13 @@ and the forementioned index action:
     # ...
   }
 
-If you would like to have a language prefix for your application, you
-might want to put a Chained action in there to tie your other actions
-on to.
-
 =head2 The Scripts
 
-  Location: YourApp/script
+  Location: MyApp/script
 
 These are used to run your application. But note that there are other
-ways too, depending on the Catalyst engine you want to use. There are,
-for example, mod_perl and POE engines which don't need a script to run.
+ways too, depending on the Catalyst engine you want to use.  In
+particular L<mod_perl> and L<POE> engines don't need a script to run.
 
 =head3 The Creation Helper Script
 
@@ -174,23 +192,24 @@ This is simply used to create new components in your application, if
 they provide helpers. You might want to look up their documentation to
 find out if they do, and what arguments they take. Here are some examples:
 
-  script/yourapp_create.pl controller Foo::Bar
+  script/myapp_create.pl controller Foo::Bar
 
-creates a C<YourApp::Controller::Foo::Bar> module in 
-C<lib/YourApp/Controller/Foo/Bar.pm>. Another common thing might be a
+creates a C<MyApp::Controller::Foo::Bar> module in 
+C<lib/MyApp/Controller/Foo/Bar.pm>. Another common thing might be a
 view:
 
-  script/yourapp_create.pl view TT TT
+  script/myapp_create.pl view TT TT
 
-for a C<YourApp::View::TT>.
+for a C<MyApp::View::TT> (see L<Catalyst::View::TT> for details).
 
 =head3 The Development Server
 
-During your applications development phase, it is not needed to actually
-deploy your application to mod_perl, FastCGI or something else to test it.
-This is thanks to Catalyst being engine agnostic. The line
+During your applications development phase, it is not needed to
+actually deploy your application to a standalone web server for
+testing.  mod_perl, FastCGI or something else to test it.  This is
+thanks to Catalyst being engine agnostic. The line
 
-  script/yourapp_server.pl -d -p 2050 -r
+  script/myapp_server.pl -d -p 2050 -r
 
 Would run your application in debugging mode with proper output (C<-d>)
 on port 2050 (C<-p 2050>) and restart if one of your components changes
@@ -201,27 +220,36 @@ on port 2050 (C<-p 2050>) and restart if one of your components changes
 This simple script does nothing more than start up your app, make a 
 request, and print it's body to STDOUT. For example:
 
-  script/yourapp_test.pl /foo/bar
+  script/myapp_test.pl /foo/bar
 
 would show you the output of the C</foo/bar> action.
 
 =head3 The Engine Scripts
 
-And then there are C<yourapp_cgi.pl> and C<yourapp_fastcgi.pl>. These
-are for use of Catalyst within persistant environments like C<pperl>, 
-C<SpeedyCGI> or C<FastCGI>.
+Finally there are C<myapp_cgi.pl> and C<myapp_fastcgi.pl>.  While
+Catalyst will run under plain CGI, this is not recommended as the
+application has to start afresh for every request, and thus will be very
+slow.  However this script can be used in persistent environments like
+L<CGI::SpeedyCGI>.  The FastCGI script is for use with the L<FastCGI>
+or L<fcgid|http://fastcgi.coremail.cn/> persistent environments.
+Please note that at present, L<FastCGI> is the most common deployment
+route for Catalyst applications.
 
-=head2 Wrap up.
+=head2 Wrap up
 
-TODO
+So that's what happens when you type C<catalyst.pl> at the command
+line.  We hope that this article means that Catalyst users can
+understand the structure of their application a bit better now.  While
+it may seem daunting at first, the architecture of a Catalyst
+application is simple and intuitive.
 
-=head3 AUTHOR
+=head3 AUTHORS
 
 Robert 'phaylon' Sedlacek C<E<lt>rs@474.atE<gt>>
+Kieren Diment C<E<lt>diment@gmail.comE<gt>>
 
 =head3 COPYRIGHT.
 
-Copyright 2006 Robert Sedlacek.  This document can be freely
-redistributed and can be modified and re-distributed under the same
-conditions as Perl itself.
+Copyright 2006 Robert Sedlacek.  This document can be modified and
+re-distributed under the same conditions as Perl itself.
 
