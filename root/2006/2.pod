@@ -72,7 +72,7 @@ To install the schema into an existing database, or create a new
 database (SQLite), simply run the provided handel script, passing it
 the same information you supplied above:
 
-    $ script/myapp_createdb.pl schema --install --dsn dbi:SQLite:data/handel.db
+    $ script/myapp_createdb.pl --default
     
     Installed/created database schema
 
