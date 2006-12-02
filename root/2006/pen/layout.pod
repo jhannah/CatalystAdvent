@@ -25,7 +25,7 @@ Location: MyApp/Makefile.PL
 
 It might not look important, but you should never remove this file
 from your applications base directory. Catalyst needs it to
-automatically it's location on your computer's file system.  As well
+automatically find it's location on your computer's file system. As well
 as this, it is the required in order to build a distribution (e.g. for
 uploading to L<CPAN>), a L<PAR> package or just to simply collect your
 applications dependencies. Catalyst uses L<Module::Install> for
@@ -153,7 +153,8 @@ start up or request cycle.
 Catalyst follows the Model View Controller principle of application
 design. Therefore these directories are provided by default, as almost
 everyone will need them. You can also add auxilliary modules here as
-well (which might work independently of the Catalyst application).  For example  C<MyApp/Schema/*> or C<MyApp/Base/Controller>.
+well (which might work independently of the Catalyst application).  For 
+example  C<MyApp/Schema/*> or C<MyApp/Base/Controller>.
 
 =head3 The Root Controller
 
