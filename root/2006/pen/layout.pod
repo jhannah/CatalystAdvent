@@ -1,6 +1,6 @@
-=head1 Day X
+=head1 Day 3 - The Layout of a Catalyst Application
 
-Layout of a Catalyst Application
+The structure and organisation behind a catalyst application.
 
 =head2 catalyst.pl MyApp
 
@@ -8,47 +8,49 @@ When you run the catalyst helper as above, it creates quite a lot of
 files which provide you a skeleton application.  It does this with the
 help of the L<Template> Toolkit. The skeleton application provides a
 single "Hello World" screen which is what you get regardless of what
-url you visit.
+url you visit within your application.
 
 The base application is created with the L<Catalyst::Helper> package,
-which can be sub classed to provide more sophisticated code
-generators.  L<Catalyst::Example::InstantCRUD> (a generator of
+which can be sub-classed to provide more sophisticated code
+generators.  For example L<Catalyst::Example::InstantCRUD> (a generator of
 traditional form based database applications) provides an extension
 to the base helper with L<Catalyst::Helper::InstantCRUD>.
 
 Below we outline the basic anatomy of a Catalyst application, and
 explain what the files and directories are for.
 
-=head2 The Makefile.PL
+=head2 Makefile.PL
 
-Location: MyApp/Makefile.PL
+Location: C<MyApp/Makefile.PL>
 
 It might not look important, but you should never remove this file
-from your applications base directory. Catalyst needs it to
-automatically find it's location on your computer's file system. As well
-as this, it is the required in order to build a distribution (e.g. for
-uploading to L<CPAN>), a L<PAR> package or just to simply collect your
-applications dependencies. Catalyst uses L<Module::Install> for
-Makefile and installation handling. If you'd like to add, for example,
-a dependency on the  current version of L<DBIx::Class>, you'd add
+from your application's base directory. Catalyst needs it to
+automatically find it's location on your computer's file system. As
+well as this, it is the required in order to build a distribution
+(e.g. for uploading to L<CPAN>), a L<PAR> package or just to simply
+collect your applications dependencies. Catalyst uses
+L<Module::Install> for Makefile and installation handling. If you'd
+like to add a dependency on the current version of L<DBIx::Class>, for
+example, you'd add
 
   requires 'DBIx::Class' => '0.07003';
 
-to it. This will alert you of a missing module or wrong version when
-you run C<perl Makefile.PL>.
+to C<Makefile.PL>. This will alert you of a missing module or wrong
+version when you run C<perl Makefile.PL>.
 
 =head2 The Tests
 
-  Location: MyApp/t
+Location: C<MyApp/t>
 
-This is the location to put your application's tests into. CPAN has
+This is the location where your application's tests go. CPAN has
 a rich set of library to assist you in creating live and unit tests:
 
-Usually, Perl tests have the format C<00-name.t>, where the C<00> is
-a number that shows the order of the tests, and C<name> being the
-topic of the test file. You're not forced to do it this way, of
-course. Personally, I sometimes use three digits instead of two, the
-first being an indicator on what will be tested. As an example:
+Usually, Perl tests have the format C<00-name.t>, where the C<00> is a
+number that shows the order of the tests, and C<name> being the topic
+of the test file. Naturally you're not forced to do it this way. For
+example, sometimes it's appropriate to use three digits instead of
+two, the first being an indicator of what will be tested. To
+illustrate:
 
   203-schema_category.t
 
@@ -65,47 +67,46 @@ following approach:
                         # uses of 'make'. For example 'make install'
   make test             # Runs your distributions test suite.
 
-You don't need to do all of that to run your tests, of course.
-Especially during development, you can simply run your test suite
-by using C<prove>:
+You don't need to do all of that to run your tests, of course.  During
+development, you can simply run your test suite by using C<prove>:
 
   prove -l t/*.t
 
-As you might see, this allows a far more fine grained control on
-what parts of the test suites to run. Taking the example from above,
-This would run the schema test files:
+This allows a far more fine grained control on what parts of the test
+suites to run. Taking the example from above, This would run the
+schema test files:
 
   prove -l t/2*.t
 
 The C<prove> command line utility is part of the C<Test-Harness>
 distribution, which you should find shipped with your Perl 5
-distribution. You might want to read up it's manpage for all of it's
-possibilities.
+distribution. You might want to read up it's documentation to explore
+the possibilities.
 
-But let's say you want details on one single test file. Nothings
+Let's say you want to run a single test file. Nothings
 easier than that, since every C<.t> file is just a perl script:
 
-  perl -Ilib t/203-schema_category.t
+  $ perl -Ilib t/203-schema_category.t
 
 Will show you details on every test in the file. If you have taken
 out the C<-Debug> flag of your application, but want to see its
 debug output during this run, use the C<CATALYST_DEBUG> environment
 variable:
 
-  CATALYST_DEBUG=1 perl -Ilib t/203-schema_category.t
+  $ CATALYST_DEBUG=1 perl -Ilib t/203-schema_category.t
 
-If you want to run your tests through the perl
-debugger (i.e. C<perl -d> ) you can use the C<pler> utility which is
-part of the L<Devel::Pler> package available from L<CPAN>.
+If you want to run your tests through the Perl debugger (i.e. C<perl
+-d> ) you can use the C<pler> utility which is part of the
+L<Devel::Pler> package available from L<CPAN>.
 
 =head2 The root
 
   Location: MyApp/root
 
 This is the place for non-perl files. By default, some nice graphics
-and logos shipped with Catalyst are included. However it's usually
-also the place for all templates, and static files. Due to Catalysts
-advanced configurability, the layout of this directory can be changed
+and logos shipped with Catalyst are included. It's also usually the
+place for all templates, and static files. Due to Catalyst's advanced
+configurability, the layout of this directory can be changed
 completely to fit your needs.
 
 =head2 The Configuration File
@@ -115,7 +116,7 @@ completely to fit your needs.
 By default, C<catalyst.pl> will create a C<YAML> configuration file
 for you. But you're not limited to that. At the time of writing this
 article, C<Catalyst::Plugin::ConfigLoader> supports L<YAML>, JSON,
-XML, INI, raw Perl and L<Config::General> (apache-like) file
+XML, INI, raw Perl and L<Config::General> (Apache like) file
 formats. The configuration file gives you control over any of your
 components C<config> options. For example the L<YAML> snippet below
 sets C<.tt2> as the default template extension for a view class called
@@ -125,6 +126,7 @@ C<MyApp::View::TT>.
   # ...
   View::TT:
       TEMPLATE_EXTENSION: ".tt2"
+  # ...
 
 =head2 The Perl Modules
 
@@ -141,7 +143,7 @@ Perl modules:
 This is were you specify which plugins to load, and where you can
 implement methods which will be available through your context object
 (C<$c>, as it's usually called). Note however, that it is recommended
-to use controller base classes if you don't need access to Catalyt's
+to use controller base classes if you don't need access to Catalyst's
 start up or request cycle.
 
 =head3 The MVC Directories
@@ -152,7 +154,7 @@ start up or request cycle.
 
 Catalyst follows the Model View Controller principle of application
 design. Therefore these directories are provided by default, as almost
-everyone will need them. You can also add auxilliary modules here as
+everyone will need them. You can also add auxiliary modules here as
 well (which might work independently of the Catalyst application).  For 
 example  C<MyApp/Schema/*> or C<MyApp/Base/Controller>.
 
@@ -205,16 +207,15 @@ for a C<MyApp::View::TT> (see L<Catalyst::View::TT> for details).
 
 =head3 The Development Server
 
-During your applications development phase, it is not needed to
-actually deploy your application to a standalone web server for
-testing.  mod_perl, FastCGI or something else to test it.  This is
+During your application's development phase, you don't need to deploy
+your application to a standalone web server for testing.  This is
 thanks to Catalyst being engine agnostic. The line
 
   script/myapp_server.pl -d -p 2050 -r
 
-Would run your application in debugging mode with proper output (C<-d>)
-on port 2050 (C<-p 2050>) and restart if one of your components changes
-(C<-r>).
+Would run your application with full debugging output
+(C<-d>) on port 2050 (C<-p 2050>) and restart if one of your
+components changes (C<-r>).
 
 =head3 Running a Test Request
 
@@ -223,18 +224,26 @@ request, and print it's body to STDOUT. For example:
 
   script/myapp_test.pl /foo/bar
 
-would show you the output of the C</foo/bar> action.
+would show you the output of the C</foo/bar> action.  You could pipe
+this to the L<lynx|http://lynx.browser.org/> for a quick look at the
+generated html for example:
+
+  $ script/myapp_test.pl /foo/bar | lynx -stdin
+
+or:
+
+  $ script/myapp_test.pl /foo/bar | lynx -dump -stdin | less
 
 =head3 The Engine Scripts
 
-Finally there are C<myapp_cgi.pl> and C<myapp_fastcgi.pl>.  While
-Catalyst will run under plain CGI, this is not recommended as the
-application has to start afresh for every request, and thus will be very
-slow.  However this script can be used in persistent environments like
-L<CGI::SpeedyCGI>.  The FastCGI script is for use with the L<FastCGI>
-or L<fcgid|http://fastcgi.coremail.cn/> persistent environments.
-Please note that at present, L<FastCGI> is the most common deployment
-route for Catalyst applications.
+Finally there are C<myapp_cgi.pl> and C<myapp_fastcgi.pl> scripts.
+While Catalyst will run under plain CGI, this is not recommended as
+the application has to start afresh for every request, and thus will
+be very slow.  However this script can be used in persistent
+environments like L<CGI::SpeedyCGI>.  The FastCGI script is for use
+with the L<FastCGI> or L<fcgid|http://fastcgi.coremail.cn/> persistent
+environments.  Please note that at present, L<FastCGI> is the most
+common deployment route for Catalyst applications.
 
 =head2 Wrap up
 
