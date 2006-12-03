@@ -9,7 +9,7 @@ use DateTime;
 use Calendar::Simple;
 use File::stat;
 use XML::Feed;
-use Pod::Xhtml;
+use CatalystAdvent::Pod;
 
 =head1 NAME
 
@@ -81,7 +81,7 @@ sub day : Regex('^(\d{4})/(\d\d?)$') {
     my $mtime      = ( stat $file )->mtime;
     my $cached_pod = $c->cache->get("$file $mtime");
     if ( !$cached_pod ) {
-        my $parser = Pod::Xhtml->new(
+        my $parser = CatalystAdvent::Pod->new(
             StringMode   => 1,
             FragmentOnly => 1,
             MakeIndex    => 0,
@@ -102,14 +102,16 @@ Generates an rss feed of tips for the given year.
 
 sub rss : Global {
     my ( $self, $c, $year ) = @_;
-    my $feed = XML::Feed->new('RSS');
     $year ||= $c->stash->{now}->year;
-    $feed->title( $c->config->{name} . ' RSS Feed' );
-    $feed->link( $c->req->base );
-    $feed->description('Catalyst advent calendar');
     $year ||= $c->req->snippets->[0];
     $c->res->redirect( $c->uri_for('/') )
         unless ( -e $c->path_to( 'root', $year ) );
+
+    my $feed = XML::Feed->new('Atom');
+    $feed->link( $c->req->base );
+    $feed->description('Catalyst advent calendar');
+    $feed->title( "Catalyst Advent Calendar $year Atom Feed" );
+
     $c->stash->{year} = $year;
     my ( $day, $entries ) = ( 24, 0 );
     my $feed_mtime = 0;
@@ -120,12 +122,19 @@ sub rss : Global {
             my $mtime = $stat->mtime;
             my $ctime = $stat->ctime;
             $feed_mtime = $mtime if $mtime > $feed_mtime;
-            my $entry = XML::Feed::Entry->new('RSS');
+            my $entry = XML::Feed::Entry->new('Atom');
             $entry->title("Calendar entry for day $day.");
             $entry->link( $c->uri_for("/$year/$day") );
             $entry->issued( DateTime->from_epoch( epoch   => $ctime ) );
             $entry->modified( DateTime->from_epoch( epoch => $mtime ) );
-
+	    my $parser = CatalystAdvent::Pod->new(
+						  StringMode   => 1,
+						  FragmentOnly => 1,
+						  MakeIndex    => 0,
+						  TopLinks     => 0
+						 );
+	    $parser->parse_from_file("$file");
+	    $entry->content($parser->first_paragraph);
             $feed->add_entry($entry);
             $entries++;
         }
@@ -133,7 +142,7 @@ sub rss : Global {
     }
     $feed->modified( DateTime->from_epoch( epoch => $feed_mtime ) );
     $c->res->body( $feed->as_xml );
-    $c->res->content_type('application/rss+xml');
+    $c->res->content_type('application/atom+xml');
 }
 
 =head1 AUTHORS

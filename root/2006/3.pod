@@ -170,6 +170,8 @@ controller actions; these should go into the root controller.
 
 Typical examples are 
 
+=over 4
+
 =item A default handler for 404 pages
 
   sub default : Private {
@@ -205,6 +207,8 @@ Typical examples are
    # User found, so return 1 to continue with processing 
    return 1;
  }
+
+=back
 
 =head2 The Scripts
 
