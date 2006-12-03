@@ -1,4 +1,4 @@
-=head1 Day 4 - FastCGI deployment with bells on
+=head1 Day 4 - FastCGI Deployment with Bells on
 
 Deploying a Catalyst application with FastCGI and PAR
 
@@ -22,21 +22,20 @@ written to help you get started with daemontools.  This tutorial
 assumes that you have C<svscan> (daemontools) set up and working on
 your system.
 
-If you have daemontools properly setup, you should have a C</service>
-directory.  Subdirectories of here represent daemons that you want
+If you have daemontools properly set up, you should have a C</service>
+directory.  Subdirectories of this represent daemons that you want
 to be managed for you by daemontools.  Each subdirectory contains a C<run>
-script, that tells daemontools how to start your server (and restart
-it if it fails).  Optionally, a C<log> subdirectory can contains
+script that tells daemontools how to start your server (and restart
+it if it fails).  Optionally, a C<log> subdirectory can contain
 commands to start the logging program as though it were itself a
 daemon.
 
 To monitor the status of a daemon, use the C<svstat> command:
 
-    % svstat /service/*
+    # svstat /service/*
 
-You should see something like this; a line for each daemon that
-daemontools controls.  A typical system might look something like
-this:
+You should see something like this - a line for each daemon that
+daemontools controls:
     
     /service/authdaemon: up (pid 21856) 2474300 seconds
     /service/imap-ssl: up (pid 9336) 2474300 seconds
@@ -45,19 +44,20 @@ this:
     /service/sshd: up (pid 13641) 2474300 seconds
     
 Note that you need to be root for this to work.  (We'll assume that
-you're root for the rest of this article, except where a C<$> prompt
-appears.)
+you're root for the rest of this article and will use the C<#> prompt to
+show this; the C<$> prompt will indicate commands that can be run as
+a non-root user.)
 
 To manage individual daemons, use the C<svc> utility:
 
-    % svc -d /service/apache  # bring down apache
-    % svc -t /service/myapp   # send myapp a SIGTERM (and restart it)
-    % svc -u /service/qmail   # start qmail 
+    # svc -d /service/apache  # bring down apache
+    # svc -t /service/myapp   # send myapp a SIGTERM (and restart it)
+    # svc -u /service/qmail   # start qmail 
 
 Finally, if something's not working, you can see if C<readproctitle>
 has logged any error messages:
 
-    % ps wwwaux | grep readproctitle
+    # ps wwwaux | grep readproctitle
 
 You should see something like:
 
@@ -77,17 +77,18 @@ The first step to deploying your application as a L<PAR> is to build your
 application as a L<PAR>.  This is very simple -- just add a line that
 says C<catalyst_par()> to your application's C<Makefile.PL>, and type:
 
-    % perl Makefile.PL
-    % make catalyst_par
+    # perl Makefile.PL
+    # make catalyst_par
 
 After you do that, you should have a "myapp.par" file in the root
 directory of your application - If this didn't work, make sure you've
 installed the L<PAR> package from CPAN).  For more details see
-L<Catalyst::Manual::Cookbook>
+L<Catalyst::Manual::Cookbook>, under "Quick deployment: Building PAR
+Packages".
 
 You can make sure the L<PAR> works properly by running:
 
-    % parl myapp.par myapp_server.pl -d
+    # parl myapp.par myapp_server.pl -d
 
 And then connecting to your server at the usual
 C<http://localhost:3000> address.
@@ -97,8 +98,8 @@ file contains your whole application.  L<PAR> can even include your
 application's dependencies, if you want.  Check out the L<PAR>
 documentation.  In fact the L<pp> (perl packager) can bundle the whole
 shebang into a binary executable as well, making your application
-deployable on systems where no perl, or the wrong version of perl is
-installed without having to tax your system administrator excessively.
+deployable on systems where no perl, or the wrong version of perl, is
+installed, without having to tax your system administrator excessively.
 
 =head2 Environment Setup
 
@@ -117,20 +118,20 @@ applications, or the web server itself).
 
 So, let's create a user for MyApp:
 
-    % adduser _myapp # add a _myapp user to the system
+    # adduser _myapp # add a _myapp user to the system
 
 This should create a _myapp user and a _myapp group on your system.
 If you'd like to admister MyApp without becoming root, you can add
 yourself to this group:
 
-    % adduser me _myapp # add me to the _myapp group
+    # adduser me _myapp # add me to the _myapp group
     
 Now that we have some accounts, let's create a place for our
 application to live:
 
-    % mkdir /var/www-apps/myapp
-    % chown _myapp:_myapp /var/www-apps/myapp
-    % chmod 770 /var/www-apps/myapp
+    # mkdir /var/www-apps/myapp
+    # chown _myapp:_myapp /var/www-apps/myapp
+    # chmod 770 /var/www-apps/myapp
 
 This will create a directory that anyone in the _myapp group can write
 to, and is where myapp.par will live.
@@ -141,25 +142,25 @@ Now that myapp.par has a home, let's copy it over there:
 
 Finally, let's create a directory for logfiles to be stored:
 
-    % mkdir /var/www-apps/myapp/log
-    % chown _myapp:_myapp /var/www-apps/myapp/log
-    % chmod 750 /var/www-apps/myapp/log
+    # mkdir /var/www-apps/myapp/log
+    # chown _myapp:_myapp /var/www-apps/myapp/log
+    # chmod 750 /var/www-apps/myapp/log
 
 =head2 Telling daemontools to manage MyApp
 
 Now that our application has a permanent home, we need to tell
 daemontools to manage it.  We do this by creating a C</service/myapp>
-directory, and then populating it will some shell scripts.
+directory, and then populating it with some shell scripts.
 
 Since daemontools will immediately start any application that it sees
 in the C</service> directory, we'll need to work outside of the
 service directory, and then symlink the C<myapp> directory into
 C</service> when we're ready.
 
-    % mkdir /var/www-apps/myapp/service
+    # mkdir /var/www-apps/myapp/service
 
 The first script we need to create is the C<service/myapp/run>
-script, that runs our application.  This is pretty simple:
+script, which runs our application.  This is pretty simple:
 
     #!/bin/sh
     export MYAPP_DEBUG=1
@@ -171,7 +172,7 @@ script, that runs our application.  This is pretty simple:
          -l 127.0.0.1:3010
 
 The script starts by turning debugging on for MyApp.  We then change
-to the /var/www-apps/myapp directory (so that core files, etc. will be
+to the /var/www-apps/myapp directory (so that core files, etc., will be
 created there).  We then redirect STDERR to STDOUT, since STDERR is
 sent to C<readproctitle> instead of C<multilog>.  Finally, we start
 C<myapp_fastcgi.pl>.  The C<setuidgid> command comes with daemontools
@@ -232,26 +233,26 @@ Now that you have a complete service directory inside
 C</var/www-apps/myapp>, you can link that directory into the system's
 service directory:
 
-    % ln -sf /var/www-apps/myapp/service /service/myapp
+    # ln -sf /var/www-apps/myapp/service /service/myapp
 
 C<svscan> will then start your application (and a logging process)
 within five seconds!  If all is well, then:
 
-    % svstat /service/myapp
+    # svstat /service/myapp
 
 Will print something like:
 
     /service/svnserve: up (pid 13579) 6 seconds
 
-If the it says 0 or 1 seconds (and the PID keeps changing), then
+If it says 0 or 1 seconds (and the PID keeps changing), then
 something is wrong.  You can check C<readproctitle> for errors
 executing your scripts, and check the multilog log for any other
 errors (or messages):
 
-    % tail -f /var/www-apps/myapp/log/current | tai64nlocal
+    # tail -f /var/www-apps/myapp/log/current | tai64nlocal
 
-Multilog stores the most recent log file in a file called current
-(actually, current is just a link to the current log file, which has a
+Multilog stores the most recent log file in a file called C<current>
+(actually, C<current> is just a link to the current log file, which has a
 name based on the time when it was created).  C<tail -f> will follow
 the output of the file as long as it exists (beware of rotation,
 though).  Finally, the C<tai64nlocal> command will translate
@@ -310,8 +311,8 @@ With all of this in place, updating your application in the future
 will be very simple:
 
     $ make catalyst_par
-    % cp myapp.par /var/www-apps/myapp
-    % svc -t /service/myapp
+    # cp myapp.par /var/www-apps/myapp
+    # svc -t /service/myapp
 
 That's it.  You now have a deployment method that is very simple to
 maintain, and that is more secure than C<mod_perl> or a fastcgi server
