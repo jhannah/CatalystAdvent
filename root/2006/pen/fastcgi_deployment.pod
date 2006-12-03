@@ -1,4 +1,8 @@
-=head1 Deploying your Catalyst application with FastCGI and PAR
+=head1 Day 4 - FastCGI deployment with bells on
+
+Deploying a Catalyst application with FastCGI and PAR
+
+=head2 Introduction
 
 Securely deploying an application into a production environment can be
 tricky.  This article will give you some tips on how to make this
@@ -7,42 +11,41 @@ messing with permissions, and restarting your web server, we'll take a
 different approach.  Instead of a directory, our application will be
 stored in the form of a L<PAR|PAR> -- a single executable file that
 contains your application.  We will employ C<daemontools> to launch a
-fastcgi server from the PAR and handle logging with C<multilog>.
+fastcgi server from the L<PAR> and handle logging with C<multilog>.
 We'll then configure your web server to connect to the fastcgi server.
 
 =head2 C<daemontools>
 
 The first step is to download daemontools and multilog from
-L<http://cr.yp.to/daemontools.html>.  There are a number of howtos
+L<http://cr.yp.to/daemontools.html>.  There are a number of HOWTOs
 written to help you get started with daemontools.  This tutorial
 assumes that you have C<svscan> (daemontools) set up and working on
 your system.
 
-If you have daemontools properly setup, you should have a
-C</service> directory.  Subdirectories inside this directory represent
-daemons that you want daemontools to manage for you.  Each
-subdirectory contains a C<run> script, that tells daemontools how to
-start your server (and restart it if it fails).  Optionally, a C<log>
-subdirectory can contains commands to start the logging program as
-though it were itself a daemon.
+If you have daemontools properly setup, you should have a C</service>
+directory.  Subdirectories of here represent daemons that you want
+to be managed for you by daemontools.  Each subdirectory contains a C<run>
+script, that tells daemontools how to start your server (and restart
+it if it fails).  Optionally, a C<log> subdirectory can contains
+commands to start the logging program as though it were itself a
+daemon.
 
 To monitor the status of a daemon, use the C<svstat> command:
 
     % svstat /service/*
 
 You should see something like this; a line for each daemon that
-daemontools controls:
+daemontools controls.  A typical system might look something like
+this:
     
     /service/authdaemon: up (pid 21856) 2474300 seconds
     /service/imap-ssl: up (pid 9336) 2474300 seconds
     /service/qmail-send: up (pid 28877) 2474300 seconds
     /service/qmail-smtpd: up (pid 5262) 2474300 seconds
-    /service/spamassassin: up (pid 8881) 2474300 seconds
     /service/sshd: up (pid 13641) 2474300 seconds
-    /service/svnserve: up (pid 11296) 757826 seconds
     
 Note that you need to be root for this to work.  (We'll assume that
-you're root for the rest of the tutorial, except where a C<$> prompt
+you're root for the rest of this article, except where a C<$> prompt
 appears.)
 
 To manage individual daemons, use the C<svc> utility:
@@ -70,18 +73,19 @@ We don't need these commands just yet, but we'll find them useful later.
 
 =head2 Building your application
 
-The first step to deploying your application as a PAR is to build your
-application as a PAR.  This is very simple -- just add a line that
+The first step to deploying your application as a L<PAR> is to build your
+application as a L<PAR>.  This is very simple -- just add a line that
 says C<catalyst_par()> to your application's C<Makefile.PL>, and type:
 
     % perl Makefile.PL
     % make catalyst_par
 
 After you do that, you should have a "myapp.par" file in the root
-directory of your application.  (If it didn't work, make sure you've
-installed the PAR package from CPAN.)
+directory of your application - If this didn't work, make sure you've
+installed the L<PAR> package from CPAN).  For more details see
+L<Catalyst::Manual::Cookbook>
 
-You can make sure the PAR works properly by running:
+You can make sure the L<PAR> works properly by running:
 
     % parl myapp.par myapp_server.pl -d
 
@@ -89,9 +93,12 @@ And then connecting to your server at the usual
 C<http://localhost:3000> address.
 
 This myapp.par file is now the application that you'll deploy.  One
-file contains your whole application.  (You can even have PAR include
-your application's dependencies, if you want.  Check out the PAR
-documentation.)
+file contains your whole application.  L<PAR> can even include your
+application's dependencies, if you want.  Check out the L<PAR>
+documentation.  In fact the L<pp> (perl packager) can bundle the whole
+shebang into a binary executable as well, making your application
+deployable on systems where no perl, or the wrong version of perl is
+installed without having to tax your system administrator excessively.
 
 =head2 Environment Setup
 
@@ -188,18 +195,19 @@ Listen for FastCGI connections on the loopback address on port 3010.
 You can specify a file on the filesystem instead, if you want to use
 UNIX sockets instead of TCP sockets.  The advantage of TCP sockets is
 that you can run the frontend web server on a different machine, and
-that you don't have to worry about file permissions (which is helpful
-when using a chroot httpd).  The disadvantage is that any user on the
-system can connect to the FastCGI server and bypass any access
-restrictions that your webserver may provide.  Feel free to use
-whatever it best for your situation.
+that you don't have to worry about file permissions (for example, this
+is helpful when using a chroot httpd).  The disadvantage is that any
+user on the system can connect to the FastCGI server and bypass any
+access restrictions that your webserver may provide.  Feel free to use
+whatever suits your situation best.
 
 =back
 
-daemontools comes with other utilities like C<setuidgid> that you may
+Daemontools comes with other utilities such as C<setuidgid> that you may
 find helpful.  See the daemontools website for more information.
 
-When you're done editing this script, be sure to make it executable.
+When you're finished editing this script, be sure to make it
+executable.
 
 =head3 The C<log> script
 
@@ -285,7 +293,7 @@ host to point to this application.
 
 The only tricky bit here is the C<Alias /static> line.  Although your
 application's static content can be served by your application from
-within the PAR file, this isn't very efficient.  As a compromise, we
+within the L<PAR> file, this isn't very efficient.  As a compromise, we
 copy the static content from MyApp into the server's docroot and tell
 the server to serve it directly.  A cleaner solution might be to
 configure C<mod_cache> to cache responses for C</static>, and then let
