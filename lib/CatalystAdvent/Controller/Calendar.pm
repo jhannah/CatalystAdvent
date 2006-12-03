@@ -142,7 +142,7 @@ sub rss : Global {
     }
     $feed->modified( DateTime->from_epoch( epoch => $feed_mtime ) );
     $c->res->body( $feed->as_xml );
-    $c->res->content_type('application/atom+xml');
+    $c->res->content_type('application/xml+atom');
 }
 
 =head1 AUTHORS
