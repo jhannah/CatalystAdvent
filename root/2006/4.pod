@@ -276,7 +276,7 @@ this:
 	DocumentRoot /var/www/htdocs/myapp
 	
 	Alias /static /var/www/htdocs/myapp/static
-	Alias / /fcgi-myapp/
+	Alias / /var/www/htdocs/myapp.fcgi/
 	
 	<Location />
             Allow from all
@@ -292,11 +292,10 @@ FastCGI to bind the server at C<127.0.0.1:3010> the Apache C<Location>
 C</fcgi-myapp>.  Finally, we configure our C<www.myapp.com> virtual
 host to point to this application.
 
-Note that, at least for my server, the fcgi app has to be inside the
-DocumentRoot, and it has to end in C<.fcgi>.
-
-Note that, at least for my server, the fcgi app has to be inside the
-DocumentRoot, and it has to end in C<.fcgi>.
+Note that, at least for my server, the virtual path to the fastcgi
+application has to be inside the DocumentRoot, and it has to end in
+C<.fcgi>.  If you're using lighttpd or Apache 2.0+ and C<mod_fcgid>,
+you should be able to choose any name you like.
 
 The only tricky bit here is the C<Alias /static> line.  Although your
 application's static content can be served by your application from
@@ -341,24 +340,16 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
 
-=over 2
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
 
-=item 1.
+2. Distributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
 
-Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-
-=item 2.
-
-Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-
-=item 3.
-
-Neither the name 'Catalyst' nor the names of its contributors
-   may be used to endorse or promote products derived from this documentation
-   without specific prior written permission.
+3. Neither the name 'Catalyst' nor the names of its contributors may be
+used to endorse or promote products derived from this documentation
+without specific prior written permission.
 
 THIS DOCUMENTATION IS PROVIDED BY THE CONTRIBUTORS ``AS IS'' AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
