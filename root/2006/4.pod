@@ -268,7 +268,7 @@ this:
     NameVirtualHost *
 
     LoadModule fastcgi_module /usr/lib/apache/modules/mod_fastcgi.so
-    FastCgiExternalServer /fcgi-myapp -host 127.0.0.1:3010
+    FastCgiExternalServer /var/www/htdocs/myapp.fcgi -host 127.0.0.1:3010
 
     <VirtualHost *>
         ServerName www.myapp.com
@@ -291,6 +291,12 @@ your package manager when you install mod_fastcgi).  Next, we tell
 FastCGI to bind the server at C<127.0.0.1:3010> the Apache C<Location>
 C</fcgi-myapp>.  Finally, we configure our C<www.myapp.com> virtual
 host to point to this application.
+
+Note that, at least for my server, the fcgi app has to be inside the
+DocumentRoot, and it has to end in C<.fcgi>.
+
+Note that, at least for my server, the fcgi app has to be inside the
+DocumentRoot, and it has to end in C<.fcgi>.
 
 The only tricky bit here is the C<Alias /static> line.  Although your
 application's static content can be served by your application from
@@ -334,12 +340,23 @@ rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
 are met:
-1. Redistributions of source code must retain the above copyright
+
+=over 2
+
+=item 1.
+
+Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
+
+=item 2.
+
+Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-3. Neither the name 'Catalyst' nor the names of its contributors
+
+=item 3.
+
+Neither the name 'Catalyst' nor the names of its contributors
    may be used to endorse or promote products derived from this documentation
    without specific prior written permission.
 
