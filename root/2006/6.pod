@@ -1,4 +1,4 @@
-=head1 Catalyst Advent - Day X
+=head1 Catalyst Advent - Day 6 
 
 Tidying up controllers with BindLex
 
