@@ -1,0 +1,140 @@
+=head1 Day X
+
+An example of how to use L<Catalyst::DispatchType::Chained>.
+
+=head2  A basic introduction to Chained actions with Catalyst.
+
+Frequently when building web applications there is a chain of
+dependency along the url path.  That is, the controller logic has a
+close relationship to the data you want to draw from the model.
+Chained dispatch types provide an easy way to encapsulate this logic
+within your Catalyst controllers.
+
+This entry is associated with a complete example application which
+shows how to use chained actions to provide this logic.  The example
+application is available from the Catalyst subversion repository by
+issuing the following command:
+
+ $ svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/ChainedEg
+
+Please get a copy of this code before you proceed.  The application is
+a very simple proof-of-concept application which will work with a
+basic L<Catalyst|Catalyst::Runtime>.  There is no model, and the view
+is handled in the Root controller's end action
+(i.e. C<Controller::Root-E<gt>end>.
+
+As an interesting aside, with appropriate introspection, by using
+L<Class::Inspector> for example it would be possible fairly
+straightforward to develop a custom view based on this end action to
+provide skeleton output during application development.
+
+=head2 The C<LoadModel> base controller
+
+The package L<ChainedEg::ControllerBase::LoadModel>
+
+=head2 Getting started.
+
+Before we look at our application in any detail, first, let's run the
+example application.  Check out the code as shown above, and then
+issue the following command from the application root:
+
+ $ script/chained_server.pl
+ [ snipped the early part of the output ]
+ [debug] Loaded Chained actions:
+ .-------------------------------------+--------------------------------------.
+ | Path Spec                           | Private                              |
+ +-------------------------------------+--------------------------------------+
+ |                                     | /app_root                            |
+ | /*/bar                              | /language (1)                        |
+ |                                     | -> /bar/base (0)                     |
+ |                                     | -> /bar/resultset (0)                |
+ |                                     | => /bar/list                         |
+ | /*/bar/*/something                  | /language (1)                        |
+ |                                     | -> /bar/base (0)                     |
+ |                                     | -> /bar/load_model (1)               |
+ |                                     | => /bar/something                    |
+ | /*/foo/*/edit                       | /language (1)                        |
+ |                                     | -> /foo/base (0)                     |
+ |                                     | -> /foo/load_model (1)               |
+ |                                     | => /foo/edit_foo                     |
+ | /*/foo                              | /language (1)                        |
+ |                                     | -> /foo/base (0)                     |
+ |                                     | -> /foo/resultset (0)                |
+ |                                     | => /foo/list                         |
+ | /*/foo/*                            | /language (1)                        |
+ |                                     | -> /foo/base (0)                     |
+ |                                     | -> /foo/load_model (1)               |
+ |                                     | => /foo/show_foo                     |
+ '-------------------------------------+--------------------------------------'
+ 
+ [info] ChainedEg powered by Catalyst 5.7005
+ You can connect to your server at http://localhost:3000
+
+Looking at the debug output from the application above, it is a little
+different from a standard catalyst application.  
+
+=head2 Visiting the application root
+
+L<http://localhost:3000> displays a message and a collection of URLs
+which the application accesses.  For now we'll use a standard C<index>
+action for this, but will come back later and convert it to a Chained
+action.  Let's visit the first link on that page.
+
+=head2 L<http://localhost:3000/en/foo>
+
+This produces the following output:
+
+ $VAR1 = {
+           'language' => 'en',
+           'list' => 'Showing a list from the Resultset',
+           'resultset' => 'Foo called with no trailing arguments'
+         };
+
+If we change the url slightly to L<http://localhost:3000/de/foo> the
+first line of output changes subtly:
+
+ 'language' => 'de'
+         
+The line of code responsible for doing this in the C<Foo> Controller
+is this:
+
+ sub base : Chained('/language') PathPart('foo') CaptureArgs(0) { }
+
+which is an empty subroutine.  What's happening here?
+
+Well, the attribute C<Chained('/language')> is telling the C<Foo>
+controller to use the root (C</>) controllers private method
+C<language> first.  Following this, if the next part of the url path
+is C<foo> (C<PathPart('foo')>) then to pass all remaining arguments to
+the current controller class (C<Controller::Foo>) for further
+processing.  In this case, two further subroutines are called from
+this controller.  Within the file C<lib/Controller/Foo> C<resultset>
+which populates C<$cE<gt>stashE<gt>resultset with the text 'Foo called
+with no trailing arguments'.
+
+The second subroutine is one inherited from
+C<ChainedEg::ControllerBase::LoadModel> which provides the list method
+under the same circumstances as the C<resultset> sub in
+c<Controller::Foo>.  So both actions are called, and both actions
+populate $cE<gt>stash.  Looking at the subroutine declaration for the C<resultset> and C<list> subroutines:
+
+ sub resultset : Chained('base')      PathPart('') CaptureArgs(0) {
+ sub list      : Chained('resultset') PathPart('') Args(0) {
+
+OK THESE ARE BEING CALLED AS PART OF THE SAME ACTION BUT WHY? ...
+
+
+=head2 Capturing more arguments in a chained action.
+
+
+
+
+
+
+
+
+
+
+
+
+
