@@ -2,27 +2,28 @@
 
 Adding built in tests for an external web server to your application.
 
-=head2 The problem
+=head2 The Problem
 
 In some cases you might want your Catalyst application to be
-deployable in a number of different situations, so to be comprehensive
+deployable in a number of different situations.  To be comprehensive
 you need to build a test environment that will test your deployment in
 each environment.  Here's how to do this so that you can test
 simultaneously with the built in server, Apache and Lighttpd, and
-includes how to deploy from the root of the web server or a
-sub directory. 
+includes how to deploy from the root of the web server or a sub
+directory.
 
 =head2 Catalyst Testing
 
-The advent calendar entry showed you how to set up
-L<Test::WWW::Mechanize::Catalyst> and run tests using the build in web
-server.  Basically the aim of testing is to assess that your
-application behaves in the expected manner.  By default
-L<Test::WWW::Mechanize::Catalyst> uses the same environment as
-catalyst test, but along with L<Catalyst::Test> it can be used to test
-with an external web server.
-
-Fore example, if I fire up a server for my application with :
+Essentially the aim of testing is to assess that your application
+behaves in the expected manner. L<Catalyst::Test> and
+L<Test::WWW::Mechanize::Catalyst> provides the methods to test your
+catalyst applications.  These are based on L<lwp> and
+L<Test::WWW::Mechanize> respectively.  Bu default these two Catalyst
+test modules use the catalyst dispatcher directly to test your
+application.  This way you avoid having to use an server process
+during development.  However you can also use an external server to
+run your tests as well by setting the C<CATALYST_SERVER> environment
+variable.  For example :
 
  $ script/myapp_server.pl
  [ snipped output]
@@ -43,7 +44,8 @@ deployment, for example the following:
 And you run your tests on the external server.
 
 Another approach is to automatically configure a catalyst application
-running on your local computer.
+running on an external server your local computer.  The rest of this
+entry explores this.
 
 =head2 Automating testing with a local lighttpd installation
 
@@ -72,7 +74,7 @@ code:
  plan tests => 1;
 
 Place any application specific configuration you need here, to for
-example make a version of your application configuration which suits a
+example create a version of your  configuration which suits a
 testing environment (i.e. you can nuke the tests after the
 installation).
 
@@ -178,15 +180,22 @@ C<optional_lighttpd-fastcgi-non-root.pl>.
   
 =head3 Running the tests
 
-to run these tests 
+To run these tests just issue the following command from the
+application root:
+
+ $ perl -ilib t/optional_lighttpd-fastcgi.pl
   
 =head2 Apache
 
 Apache is a little more complicated in some ways.  This time we use
 the L<Apache::Test> module to help us build a local instance of the
-installed apache.  It requires creating a few more files and
-directories.  Also the configuration for root and non-root deployments
-needs to be in the same config file.
+installed apache.  This is because L<Apache::Test> automatically
+discovers information about your local Apache installation which is a
+complicated job to do manually.  It requires creating a few more files
+and directories than the lighttpd test harness.  It seems that the
+configuration for root and non-root deployments needs to be in the
+same config file due to limitations with L<Apache::Test> (please
+correct me if I'm wrong here).
 
 Here's start of  the C<optional_apache-fastcgi.pl> script:
 
@@ -222,10 +231,10 @@ extra.conf in the directory t/conf.  That will look something like
 this:
 
  <IfModule mod_fastcgi.c>
-     FastCgiIpcDir /Users/kd/Desktop/dev/Colabr8/trunk/FSCMS/t/tmp/tmp
-     FastCgiServer /Users/kd/Desktop/dev/Colabr8/trunk/FSCMS/t/tmp/lib/FSCMS/script/fscms_fastcgi.pl -idle-timeout 300 -processes 1
-      ScriptAlias / /Users/kd/Desktop/dev/Colabr8/trunk/FSCMS/t/tmp/lib/FSCMS/script/fscms_fastcgi.pl/
-     ScriptAlias /fastcgi/ /Users/kd/Desktop/dev/Colabr8/trunk/FSCMS/t/tmp/lib/FSCMS/script/fscms_fastcgi.pl/
+     FastCgiIpcDir /path/to/MyApp/t/tmp/tmp
+     FastCgiServer /path/to/MyApp/script/fscms_fastcgi.pl -idle-timeout 300 -processes 1
+      ScriptAlias / /path/to/MyApp/t/tmp/lib/FSCMS/script/fscms_fastcgi.pl/
+     ScriptAlias /fastcgi/ /path/to/MyApp/script/myapp_fastcgi.pl/
  </IfModule>
 
 for deployment on both root and non-root locations.  Tweak the value
