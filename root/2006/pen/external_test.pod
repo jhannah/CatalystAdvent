@@ -232,8 +232,8 @@ this:
 
  <IfModule mod_fastcgi.c>
      FastCgiIpcDir /path/to/MyApp/t/tmp/tmp
-     FastCgiServer /path/to/MyApp/script/fscms_fastcgi.pl -idle-timeout 300 -processes 1
-      ScriptAlias / /path/to/MyApp/t/tmp/lib/FSCMS/script/fscms_fastcgi.pl/
+     FastCgiServer /path/to/MyApp/script/myapp_fastcgi.pl -idle-timeout 300 -processes 1
+      ScriptAlias / /path/to/MyApp/t/tmp/lib/MyApp/script/myapp_fastcgi.pl/
      ScriptAlias /fastcgi/ /path/to/MyApp/script/myapp_fastcgi.pl/
  </IfModule>
 
