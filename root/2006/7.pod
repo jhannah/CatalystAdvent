@@ -1,4 +1,4 @@
-=head1 Day VII
+=head1 Catalyst Advent - Day 7
 
 Adding built in tests for an external web server to your application.
 
