@@ -146,7 +146,7 @@ sub rss : Global {
         }
         $day--;
     }
-    $c->res->body( $feed->print);
+    $c->res->body( $feed->as_string);
     $c->res->content_type('application/atom+xml');
 }
 
