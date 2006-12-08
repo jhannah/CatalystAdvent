@@ -151,7 +151,7 @@ sub rss : Global {
 }
 
 sub format_date {
-    return strftime('T%Y-%m-%dT%H:%M:%SZ', $_[0]);
+    return strftime('%Y-%m-%dT%H:%M:%SZ', gmtime($_[0]));
 }
 
 =head1 AUTHORS
