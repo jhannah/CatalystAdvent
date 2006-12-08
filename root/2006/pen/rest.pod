@@ -14,7 +14,7 @@ source for which is available at the end of this article.
 REST stands for Representational State Transfer.  It describes an architectural style for building systems on the Web.  REST sees every web application as a
 set of I<resources> (such as L<http://dev.catalyst.perl.org>) which represent
 a particular I<state> of an application.  When you access a resource, you are
-I<transfering> it; and thus possibly changing it's I<state>.
+I<transferring> it; and thus possibly changing it's I<state>.
 
 (For a longer, much more accurate description of REST, see the links at the end
 of this entry.  The proceeding paragraph owes quite a bit to the article
@@ -53,10 +53,10 @@ Delete) acronym common in databases.
 
 =item B<Content Types>
 
-The final peice of the REST puzzle are Content Types.  These are used to
+The final piece of the REST puzzle are Content Types.  These are used to
 describe the format of a resource; how the various parts of our machine should
 process it.  In practice, we specify the Content Type to ensure that the
-representation we recieve of a given resource is the one we are best suited 
+representation we receive of a given resource is the one we are best suited 
 to process. (C<text/xml> for XML, C<text/x-yaml> for YAML, C<text/x-json> for JSON, etc.)
 
 =back
@@ -83,7 +83,7 @@ Truthfully, Catalyst already helps you here.  It's incredibly flexible dispatch 
 
 =item B<How it helps with Verbs>
 
-L<Catlayst::Action::REST> helps you deal with the different verbs by extending
+L<Catalyst::Action::REST> helps you deal with the different verbs by extending
 the dispatcher.  When you declare a sub like this:
 
    sub cat :Path('/cat') :Args(1) :ActionClass('REST') {}
@@ -111,7 +111,7 @@ as well.
 Support for different Content Types is provided by
 L<Catalyst::Action::Serialize> and L<Catalyst::Acton::Deserialize>.  Together,
 these two Actions allow you to send serialized data back to clients
-(L<Catalyst::Action::Serialize>) and to deserialize data recieved from them
+(L<Catalyst::Action::Serialize>) and to deserialize data received from them
 (L<Catalyst::Action::Deserialize>).  11 different content-types are currently
 supported (including YAML, JSON, XML, and Data::Dumper) and adding new ones
 is easy.
@@ -139,7 +139,7 @@ the content type most preferred by the client.
 
 =item B<How it helps with HTTP>
 
-Creating the proper HTTP responses to clients makes everyones lives easier.
+Creating the proper HTTP responses to clients makes every-ones lives easier.
 L<Catalyst::Controller::REST> provides I<status helpers>, which can
 be used to easily create well-formed HTTP responses.  For example,
 a C<200 OK> should include an HTTP Body that matches the requested content-type.
@@ -292,7 +292,7 @@ L<DBIx::Class::Schema>, and L<DBIx::Class::ResultSource> documentation.
 We still need to have a Catalyst model for our database.  
 L<Catalyst::Model::DBIC::Schema> comes with one we can use, so lets do that:
 
-   $ ./script/adventrest_create.pl model DB DBIC::Schema AventREST::Schema
+   $ ./script/adventrest_create.pl model DB DBIC::Schema AdventREST::Schema
 
 Connecting our new Database model to the SQLite database we created earlier is
 easy.  Just edit the C<adventrest.yml> file:
@@ -325,7 +325,7 @@ controller, which was created as C<lib/AdventREST/Controller/User.pm>.
    use base 'Catalyst::Controller::REST';
 
 Since this is a REST controller, we want to inherit from
-C<Catalyst::Controller::REST> instead of the regular C<Catlayst::Controller>.
+C<Catalyst::Controller::REST> instead of the regular C<Catalyst::Controller>.
 This sets things up to automatically handle Content-Type negotiation and
 provides the status helpers I mentioned earlier. 
 
@@ -365,8 +365,8 @@ resources..
 
 Note that this routine is different from C<user_list>, in that it's 
 not empty.  It will be executed before any of the _METHOD subroutines
-are invoked, letting you pre-populate any data that is neccessary 
-in each method.  In this case, we lookup the user specified in our
+are invoked, letting you pre-populate any data that is necessary 
+in each method.  In this case, we look up the user specified in our
 URL in the database, and stick it in the stash for later.
 
 Since we need to create users before we can retrieve them, we'll
@@ -535,7 +535,7 @@ Lets get a list of all the users we have created so far:
    --- 
    adam: http://localhost:3000/user/adam
 
-I love monkies as much as the next guy, but even I balk at having it in my
+I love monkeys as much as the next guy, but even I balk at having it in my
 description!  So lets change it to something else.  This time, create a file
 called C<update-user.datadumper>, and stick some Perl in there:
 
@@ -582,7 +582,7 @@ A pretty concise, well structured introduction to REST.
 
 =item L<http://en.wikipedia.org/wiki/Representational_State_Transfer>
 
-The almighty Wikipedia has a slightly rambling, but ultimatley useful
+The almighty Wikipedia has a slightly rambling, but ultimately useful
 entry on REST.
 
 =item L<http://rest.blueoxen.net/cgi-bin/wiki.pl>
