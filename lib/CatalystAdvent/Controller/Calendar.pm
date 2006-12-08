@@ -9,7 +9,7 @@ use DateTime;
 use Calendar::Simple;
 use File::stat;
 use XML::Atom::SimpleFeed;
-use HTTP::Date;
+use POSIX qw(strftime);
 use CatalystAdvent::Pod;
 
 =head1 NAME
@@ -139,8 +139,8 @@ sub rss : Global {
 			      content  => $parser->asString,
 			      link     => $c->uri_for("/$year/$day"),
 			      id       => $c->uri_for("/$year/$day"),
-			      published=> time2str( $ctime ),
-			      updated  => time2str( $mtime ),
+			      published=> format_date( $ctime ),
+			      updated  => format_date( $mtime ),
 			    );
             $entries++;
         }
@@ -148,6 +148,10 @@ sub rss : Global {
     }
     $c->res->body( $feed->as_string);
     $c->res->content_type('application/atom+xml');
+}
+
+sub format_date {
+    return strftime('T%Y-%m-%dT%H:%M:%SZ', $_[0]);
 }
 
 =head1 AUTHORS
