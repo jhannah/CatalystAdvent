@@ -12,6 +12,13 @@ videos with your Catalyst application.
 
 The video is available at L<http://www.catalystframework.org/videos/CatTube_Screencast.avi>
 
+If you are unable to view the video, please try to use VLC or mplayer.  We'll be
+re-encoding the videos shortly.  It is encoded in h.264 now.
+
+VLC is available from L<http://www.videolan.org/vlc>
+
+MPlayer is available from L<http://www.mplayerhq.hu>
+
 =head2 Getting prepared
 
 We're going to build a simple AJAX-based YouTube search application.  Lets begin
