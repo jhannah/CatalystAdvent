@@ -8,7 +8,8 @@ use base qw( Catalyst::Controller );
 use DateTime;
 use Calendar::Simple;
 use File::stat;
-use XML::Feed;
+use XML::Atom::SimpleFeed;
+use HTTP::Date;
 use CatalystAdvent::Pod;
 
 =head1 NAME
@@ -107,41 +108,45 @@ sub rss : Global {
     $c->res->redirect( $c->uri_for('/') )
         unless ( -e $c->path_to( 'root', $year ) );
 
-    my $feed = XML::Feed->new('Atom');
-    $feed->link( $c->req->base );
-    $feed->description('Catalyst advent calendar');
-    $feed->title( "Catalyst Advent Calendar $year Atom Feed" );
-
+    my $feed = XML::Atom::SimpleFeed->new( title => "Catalyst Advent Calendar $year Feed",
+					   link  => $c->req->base,
+					   link  => {rel => 'self',
+						     href => $c->uri_for("/rss/$year")
+						    },
+					   id    => $c->uri_for("/rss/$year"),
+					 );
     $c->stash->{year} = $year;
     my ( $day, $entries ) = ( 24, 0 );
     my $feed_mtime = 0;
 
     while ( $day > 0 && $entries < 5 ) {
         if ( -e ( my $file = $c->path_to( 'root', $year, "$day.pod" ) ) ) {
-            my $stat = stat $file;
-            my $mtime = $stat->mtime;
-            my $ctime = $stat->ctime;
-            $feed_mtime = $mtime if $mtime > $feed_mtime;
-            my $entry = XML::Feed::Entry->new('Atom');
-            $entry->title("Calendar entry for day $day.");
-            $entry->link( $c->uri_for("/$year/$day") );
-            $entry->issued( DateTime->from_epoch( epoch   => $ctime ) );
-            $entry->modified( DateTime->from_epoch( epoch => $mtime ) );
+            my $stat   = stat $file;
+            my $mtime  = $stat->mtime;
+            my $ctime  = $stat->ctime;
+	    $feed_mtime= $mtime > $feed_mtime ? $mtime : $feed_mtime;
 	    my $parser = CatalystAdvent::Pod->new(
 						  StringMode   => 1,
 						  FragmentOnly => 1,
 						  MakeIndex    => 0,
 						  TopLinks     => 0
 						 );
+			      
 	    $parser->parse_from_file("$file");
-	    $entry->content($parser->first_paragraph);
-            $feed->add_entry($entry);
+	    
+	    $feed->add_entry( title    => $parser->first_paragraph,
+			      author   => $parser->author,
+			      content  => $parser->asString,
+			      link     => $c->uri_for("/$year/$day"),
+			      id       => $c->uri_for("/$year/$day"),
+			      published=> time2str( $ctime ),
+			      updated  => time2str( $mtime ),
+			    );
             $entries++;
         }
         $day--;
     }
-    $feed->modified( DateTime->from_epoch( epoch => $feed_mtime ) );
-    $c->res->body( $feed->as_xml );
+    $c->res->body( $feed->print);
     $c->res->content_type('application/atom+xml');
 }
 

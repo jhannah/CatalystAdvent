@@ -16,10 +16,27 @@ sub textblock {
     my $self   = shift;
     my ($text) = @_;
     $self->{_first_paragraph} ||= $text;
+
+    if($self->{_in_author_block}){
+	$text =~ /((?:[\w.]+\s+)+)/;
+	$self->{_author} = $1;
+	$self->{_in_author_block} = 0; # not anymore
+    }
+
     return $self->SUPER::textblock(@_);
 }
 
-sub first_paragraph { return $_[0]->{_first_paragraph} }
+sub command {
+    my $self = shift;
+    my ($command, $paragraph, $pod_para) = @_;
+    
+    $self->{_in_author_block} = 1
+      if $paragraph =~ /AUTHOR/ && $command =~ /^head/;
 
+    return $self->SUPER::command(@_);
+}
+
+sub first_paragraph { return $_[0]->{_first_paragraph} }
+sub author { return $_[0]->{_author} };
 1;
 

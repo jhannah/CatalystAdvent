@@ -15,7 +15,8 @@ requires( 'DateTime' );
 requires( 'File::stat' );
 requires( 'Pod::Xhtml' );
 requires( 'Calendar::Simple' );
-requires( 'XML::Feed' );
+requires( 'XML::Atom::SimpleFeed' );
+requires( 'HTTP::Date' );
 
 catalyst_files();
 
