@@ -1,5 +1,9 @@
 =head1 Day IIX
 
+Creating a Catalyst application that integrates the YouTube webservice.
+
+=head2 CatTube
+
 For today's entry, we have a screencast to accompany the write-up.
 Unfortunately there is no audio right now, but we'll update it with audio
 shortly.
@@ -131,4 +135,8 @@ using Catalyst.
 You can download this application from our Subversion repository at:
 
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/CatTube/>
+
+=head3 AUTHOR
+
+J. Shirley <jshirley@gmail.com>
 
