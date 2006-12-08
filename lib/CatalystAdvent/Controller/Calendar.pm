@@ -136,7 +136,7 @@ sub rss : Global {
 	    
 	    $feed->add_entry( title    => $parser->first_paragraph,
 			      author   => $parser->author,
-			      content  => $parser->asString,
+			      content  => {type => 'xhtml', content => $parser->asString},
 			      link     => $c->uri_for("/$year/$day"),
 			      id       => $c->uri_for("/$year/$day"),
 			      published=> format_date( $ctime ),
