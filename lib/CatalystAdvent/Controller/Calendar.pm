@@ -112,10 +112,11 @@ sub rss : Global {
 
     $c->stash->{year} = $year;
 
-    my $feed;
     my @entries = # get 5 most recent entires that actually exist on disk
-      (grep {-e} map {$c->path_to('root', $year, "$_.pod")} 1 .. 24)[-5..-1]; 
-
+      reverse 
+	((grep {-e} map {$c->path_to('root', $year, "$_.pod")} 1 .. 24)
+	 [-5..-1]); 
+    
     my @stats = map { stat "$_" } @entries;
     
     my $latest_mtime = max map { $_->mtime } @stats;
@@ -157,9 +158,9 @@ sub rss : Global {
         );
 
         $parser->parse_from_file( "$entry" );
-	my $day = ($entry->basename =~ /^(\d+).pod$/);
-
+	my ($day) = ($entry->basename =~ /^(\d+).pod$/);
 	my $stat = shift @stats;
+
         $feed->add_entry(
             title    => { type => 'text', content => $parser->summary },
             content  => { type => 'xhtml', content => $parser->asString },
