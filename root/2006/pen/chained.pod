@@ -1,6 +1,6 @@
-=head1 Day 10
+=head1 Day 10 - The Chained Dispatch Type
 
-An example of how to use L<Catalyst::DispatchType::Chained>.
+A complete example of how to use L<Catalyst::DispatchType::Chained>.
 
 =head2  A basic introduction to Chained actions with Catalyst.
 
