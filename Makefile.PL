@@ -17,6 +17,7 @@ requires( 'Pod::Xhtml' );
 requires( 'Calendar::Simple' );
 requires( 'XML::Atom::SimpleFeed' );
 requires( 'HTTP::Date' );
+requires( 'List::Util' );
 
 catalyst_files();
 
