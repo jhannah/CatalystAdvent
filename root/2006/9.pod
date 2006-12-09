@@ -169,8 +169,8 @@ response is:
 
 Often the best way to learn about something is by doing, so let's
 build a simple REST web service with Catalyst.  You can follow along
-here, or download the tarball from
-L<http://dev.catalyst.perl.org/foo>.
+here, or download the source with subversion from
+L<http://dev.catalyst.perl.org/repos/Catalyst/examples/AdventREST>.
 
 Our example application will be a simple User database that tracks
 User ID's, Full Names, and Descriptions of users.
