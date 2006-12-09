@@ -116,7 +116,7 @@ sub rss : Global {
     my %path = map { $_ => $c->path_to( 'root', $year, "$_.pod" ) } @entry;
     @entry = grep -e $path{ $_ }, @entry;
     splice @entry, 5; # only keep the newest five entries
-    my %stat = map { $_ => stat "$path{ $_ }" } @entry;
+    my %stat = map { $_ => stat ''. $path{ $_ } } @entry;
     
     my $latest_mtime = max map { $_->mtime } values %stat;
     my $last_mod = time2str( $latest_mtime );
@@ -128,12 +128,14 @@ sub rss : Global {
     my $cond_date = $c->req->header( 'If-Modified-Since' );
     my $cond_etag = $c->req->header( 'If-None-Match' );
     if( $cond_date || $cond_etag ) {
+
         # if both headers are present, both must match
         my $do_send_304 = 1;
-        if( $cond_date ) { $do_send_304 = 
-			     (str2time($cond_date) >= $latest_mtime) }
-        if( $cond_etag ) { $do_send_304 &&= 
-			     ($cond_etag eq qq'"$last_mod"') }
+	$do_send_304 = (str2time($cond_date) >= $latest_mtime)
+	  if( $cond_date );
+	$do_send_304 &&= ($cond_etag eq qq{"$last_mod"})
+	  if( $cond_etag );
+	
         if( $do_send_304 ) {
             $c->res->status( 304 );
             return;
