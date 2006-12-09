@@ -112,14 +112,12 @@ sub rss : Global {
     $c->stash->{year} = $year;
 
     my $feed;
+    my @entries = # get 5 most recent entires that actually exist on disk
+      (grep {-e} map {$c->path_to('root', $year, "$_.pod")} 1 .. 24)[-5..-1]; 
 
-    my @entry = reverse 1 .. 24;
-    shift @entry until -e $c->path_to( 'root', $year, "$entry[ 0 ].pod" );
-    pop @entry while @entry > 5;
-
-    my %path = map +{ $_ => $c->path_to( 'root', $year, "$_.pod" ) }, @entry;
-    my %stat = map +{ $_ => stat $path{ $_ } }, @entry;
-    my $latest_mtime = max map $_->mtime, values %stat;
+    my @stats = map { stat "$_" } @entries;
+    
+    my $latest_mtime = max map { $_->mtime } @stats;
     my $last_mod = format_date_rfc822( $latest_mtime );
 
     $c->res->header( 'Last-Modified' => $last_mod );
@@ -147,7 +145,7 @@ sub rss : Global {
         updated => format_date_w3cdtf( $latest_mtime ),
     );
 
-    for my $day ( @entry ) {
+    for my $entry ( @entries ) {
         my $parser = CatalystAdvent::Pod->new(
             StringMode   => 1,
             FragmentOnly => 1,
@@ -155,8 +153,10 @@ sub rss : Global {
             TopLinks     => 0
         );
 
-        $parser->parse_from_file( $path{ $day } );
+        $parser->parse_from_file( "$entry" );
+	my $day = ($entry->basename =~ /^(\d+).pod$/);
 
+	my $stat = shift @stats;
         $feed->add_entry(
             title    => { type => 'text', content => $parser->title },
             summary  => { type => 'text', content => $parser->summary },
@@ -164,8 +164,8 @@ sub rss : Global {
             author   => { name => $parser->author, email => $parser->email },
             link     => $c->uri_for( "/$year/$day" ),
             id       => $c->uri_for( "/$year/$day" ),
-            published=> format_date_w3cdtf( $stat{ $day }->ctime ),
-            updated  => format_date_w3cdtf( $stat{ $day }->mtime ),
+            published=> format_date_w3cdtf( $stat->ctime ),
+            updated  => format_date_w3cdtf( $stat->mtime ),
         );
     }
 
@@ -193,3 +193,4 @@ it under the same terms as Perl itself.
 =cut
 
 1;
+
