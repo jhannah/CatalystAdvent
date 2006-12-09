@@ -1,4 +1,4 @@
-=head1 Day 9
+=head1 Day 10
 
 An example of how to use L<Catalyst::DispatchType::Chained>.
 
@@ -242,14 +242,3 @@ Code:   Robert 'phaylon' Sedlacek C<< <rs@474.at> >>
 
 Copyright 2006 Robert Sedlacek.  This document can be modified and
 re-distributed under the same conditions as Perl itself.
-
-
-
-
-
-
-
-
-
-
-
