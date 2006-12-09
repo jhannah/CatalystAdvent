@@ -130,8 +130,10 @@ sub rss : Global {
     if( $cond_date || $cond_etag ) {
         # if both headers are present, both must match
         my $do_send_304 = 1;
-        if( $cond_date ) { $do_send_304 = str2time($cond_date) <= $latest_mtime }
-        if( $cond_etag ) { $do_send_304 &&= $cond_etag eq qq'"$last_mod"' }
+        if( $cond_date ) { $do_send_304 = 
+			     (str2time($cond_date) >= $latest_mtime) }
+        if( $cond_etag ) { $do_send_304 &&= 
+			     ($cond_etag eq qq'"$last_mod"') }
         if( $do_send_304 ) {
             $c->res->status( 304 );
             return;
