@@ -10,6 +10,7 @@ use Calendar::Simple;
 use File::stat;
 use XML::Atom::SimpleFeed;
 use POSIX qw(strftime);
+use List::Util qw(max);
 use CatalystAdvent::Pod;
 
 =head1 NAME
@@ -108,51 +109,71 @@ sub rss : Global {
     $c->res->redirect( $c->uri_for('/') )
         unless ( -e $c->path_to( 'root', $year ) );
 
-    my $feed = XML::Atom::SimpleFeed->new( title => "Catalyst Advent Calendar $year Feed",
-					   link  => $c->req->base,
-					   link  => {rel => 'self',
-						     href => $c->uri_for("/rss/$year")
-						    },
-					   id    => $c->uri_for("/rss/$year"),
-					 );
     $c->stash->{year} = $year;
-    my ( $day, $entries ) = ( 24, 0 );
-    my $feed_mtime = 0;
 
-    while ( $day > 0 && $entries < 5 ) {
-        if ( -e ( my $file = $c->path_to( 'root', $year, "$day.pod" ) ) ) {
-            my $stat   = stat $file;
-            my $mtime  = $stat->mtime;
-            my $ctime  = $stat->ctime;
-	    $feed_mtime= $mtime > $feed_mtime ? $mtime : $feed_mtime;
-	    my $parser = CatalystAdvent::Pod->new(
-						  StringMode   => 1,
-						  FragmentOnly => 1,
-						  MakeIndex    => 0,
-						  TopLinks     => 0
-						 );
-			      
-	    $parser->parse_from_file("$file");
-	    
-	    $feed->add_entry( title    => $parser->first_paragraph,
-			      author   => $parser->author,
-			      content  => {type => 'xhtml', content => $parser->asString},
-			      link     => $c->uri_for("/$year/$day"),
-			      id       => $c->uri_for("/$year/$day"),
-			      published=> format_date( $ctime ),
-			      updated  => format_date( $mtime ),
-			    );
-            $entries++;
+    my $feed;
+
+    my @entry = reverse 1 .. 24;
+    shift @entry until -e $c->path_to( 'root', $year, "$entry[ 0 ].pod" );
+    pop @entry while @entry > 5;
+
+    my %path = map +{ $_ => $c->path_to( 'root', $year, "$_.pod" ) }, @entry;
+    my %stat = map +{ $_ => stat $path{ $_ } }, @entry;
+    my $latest_mtime = max map $_->mtime, values %stat;
+    my $last_mod = format_date_rfc822( $latest_mtime );
+
+    $c->res->header( 'Last-Modified' => $last_mod );
+    $c->res->header( 'ETag' => qq'"$last_mod"' );
+    $c->res->content_type( 'application/atom+xml' );
+
+    my $cond_date = $c->req->header( 'If-Modified-Since' );
+    my $cond_etag = $c->req->header( 'If-None-Match' );
+    if( $cond_date or $cond_etag ) {
+        # if both headers are present, both must match
+        my $do_send_304 = 1;
+        if( $cond_date ) { $do_send_304 = $cond_date eq $last_mod }
+        if( $cond_etag ) { $do_send_304 &&= $cond_etag eq qq'"$last_mod"' }
+        if( $do_send_304 ) {
+            $c->res->status( 304 );
+            return;
         }
-        $day--;
     }
-    $c->res->body( $feed->as_string);
-    $c->res->content_type('application/atom+xml');
+
+    my $feed = XML::Atom::SimpleFeed->new(
+        title   => "Catalyst Advent Calendar $year",
+        link    => $c->req->base,
+        link    => { rel => 'self', href => $c->uri_for("/rss/$year") },
+        id      => $c->uri_for("/rss/$year"),
+        updated => format_date_w3cdtf( $latest_mtime ),
+    );
+
+    for my $day ( @entry ) {
+        my $parser = CatalystAdvent::Pod->new(
+            StringMode   => 1,
+            FragmentOnly => 1,
+            MakeIndex    => 0,
+            TopLinks     => 0
+        );
+
+        $parser->parse_from_file( $path{ $day } );
+
+        $feed->add_entry(
+            title    => { type => 'text', content => $parser->title },
+            summary  => { type => 'text', content => $parser->summary },
+            content  => { type => 'xhtml', content => $parser->asString },
+            author   => { name => $parser->author, email => $parser->email },
+            link     => $c->uri_for( "/$year/$day" ),
+            id       => $c->uri_for( "/$year/$day" ),
+            published=> format_date_w3cdtf( $stat{ $day }->ctime ),
+            updated  => format_date_w3cdtf( $stat{ $day }->mtime ),
+        );
+    }
+
+    $c->res->body( $feed->as_string );
 }
 
-sub format_date {
-    return strftime('%Y-%m-%dT%H:%M:%SZ', gmtime($_[0]));
-}
+sub format_date_w3cdtf { strftime '%Y-%m-%dT%H:%M:%SZ', gmtime $_[0] }
+sub format_date_rfc822 { strftime '%a, %d %b  %Y %H:%M:%S +0000', gmtime $_[0] }
 
 =head1 AUTHORS
 

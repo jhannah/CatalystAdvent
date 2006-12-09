@@ -18,8 +18,8 @@ sub textblock {
     $self->{_first_paragraph} ||= $text;
 
     if($self->{_in_author_block}){
-	$text =~ /((?:[\w.]+\s+)+)/;
-	$self->{_author} = $1;
+	$text =~ /((?:[\w.]+\s+)+)/ and $self->{_author} = $1;
+	$text =~ /<([^<>@\s]+@[^<>\s]+)>/ and $self->{_email} = $1;
 	$self->{_in_author_block} = 0; # not anymore
     }
 
@@ -29,14 +29,19 @@ sub textblock {
 sub command {
     my $self = shift;
     my ($command, $paragraph, $pod_para) = @_;
+
+    $self->{_title} = $paragraph
+        if $command eq 'head1' and not defined $self->{_title};
     
     $self->{_in_author_block} = 1
-      if $paragraph =~ /AUTHOR/ && $command =~ /^head/;
+        if $command =~ /^head/ and $paragraph =~ /AUTHOR/;
 
     return $self->SUPER::command(@_);
 }
 
-sub first_paragraph { return $_[0]->{_first_paragraph} }
-sub author { return $_[0]->{_author} };
+sub title   { $_[0]->{_title} }
+sub summary { $_[0]->{_first_paragraph} }
+sub author  { $_[0]->{_author} }
+sub email   { $_[0]->{_email} }
 1;
 
