@@ -158,8 +158,7 @@ sub rss : Global {
 
 	my $stat = shift @stats;
         $feed->add_entry(
-            title    => { type => 'text', content => $parser->title },
-            summary  => { type => 'text', content => $parser->summary },
+            title    => { type => 'text', content => $parser->summary },
             content  => { type => 'xhtml', content => $parser->asString },
             author   => { name => $parser->author, email => $parser->email },
             link     => $c->uri_for( "/$year/$day" ),
