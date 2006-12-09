@@ -150,6 +150,8 @@ sub rss : Global {
     );
 
     for my $entry ( @entries ) {
+	next if !defined $entry;
+	
         my $parser = CatalystAdvent::Pod->new(
             StringMode   => 1,
             FragmentOnly => 1,
