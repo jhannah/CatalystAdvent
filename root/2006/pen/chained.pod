@@ -193,8 +193,8 @@ is in the L<Controller:Foo> package:
 which as we can see by the use of C<Args> rather than C<CaptureArgs>
 is the end point.
 
-The edit action is somewhat similar.  By this point you can that there
-is a pattern developing. The edit_foo endpoint is called from
+The edit action is somewhat similar.  By this point you can see that
+there is a pattern developing. The edit_foo endpoint is called from
 C<Controller::Foo> after the load_model subroutine from the base
 controller class (code above).
 
