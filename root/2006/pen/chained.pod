@@ -32,7 +32,7 @@ not yet able to provide data for it.
 
 =head2 The C<LoadModel> base controller
 
-The package L<ChainedEg::ControllerBase::LoadModel>
+The package L<MyAdvApp::ControllerBase::LoadModel>
 
 =head2 Getting started.
 
@@ -69,18 +69,22 @@ issue the following command from the application root:
  |                                     | => /foo/show_foo                     |
  '-------------------------------------+--------------------------------------'
  
- [info] ChainedEg powered by Catalyst 5.7005
+ [info] MyAdvApp powered by Catalyst 5.7005
  You can connect to your server at http://localhost:3000
 
 Looking at the debug output from the application above. It is a little
-different from a standard catalyst application.  
+different from a standard catalyst application - we're using a Chained
+dispatch type.  This alters the behaviour of the arguments and
+dispatch chain compared to a standard Catalyst application.
 
 =head2 Visiting the application root
 
 L<http://localhost:3000> displays a message and a collection of URLs
-which the application accesses.  For now we'll use a standard C<index>
-action for this, but will come back later and convert it to a Chained
-action.  Let's visit the first link on that page.
+which the application accesses.  This page is in itself a Chained
+action.  By the end of this article, hopefully you will understand the
+equivalent Chained code that provides the eqivalent of a C< index :
+Private > action for the root controller action.  Let's visit the
+first link on that page.
 
 =head2 L<http://localhost:3000/en/foo>
 
@@ -115,7 +119,7 @@ C<resultset>, which populates C<< $c->stash->resultset >> with the text
 'Foo called with no trailing arguments'.
 
 The second subroutine is one inherited from
-C<ChainedEg::ControllerBase::LoadModel> which provides the C<list>
+C<MyAdvApp::ControllerBase::LoadModel> which provides the C<list>
 method under the same circumstances as the C<resultset> sub in
 C<Controller::Foo>.  So both actions are called, and both actions
 populate C<< $c->stash >>.  Looking at the subroutine declaration for the
@@ -148,7 +152,6 @@ localisation via the language subroutine in C<Controller::Root> and
 when nothing is in the path after the name of the controller, we
 exectute the C<list> method.
 
-
 =head2 We've done "list", what about showing a single item?
 
 Visiting L<http://localhost:3000/en/foo/23> takes us to the following
@@ -169,7 +172,7 @@ Replace "23" with "something%20else" and we get:
 The code responsible for this is as follows.  In the L<ControllerBase>
 package, which is a base class for L<Controller::Foo> (C<use base
 'MyAdvApp::ControllerBase::LoadModel'>) provides the following method:
- 
+
  sub load_model : Chained('base') PathPart('') CaptureArgs(1) {
      my ($self, $c, $item_id) = @_;
      $c->stash->{loaded_item_id} = $item_id;
@@ -214,14 +217,15 @@ used in this module is a "proof of concept" view, and is mainly for
 illustrative purposes.  A useful exercise to understand the Chained
 dispatch type would be to use the database model presented in
 L<DBIx::Class::Manual::Example> and the L<Template> Toolkit to flesh
-out the application presented here into a working example.  You would
-put the C<MyDatabase> directory in your application's C<lib> directory
-(or anywhere else in C<@INC>).  Assuming that you put the SQLite database
-C<example.db> in the application root you could create the Catalyst
-model via calling a helper in the following way:
+out the application presented here into a working, database driven
+example.  You would put the C<MyDatabase> directory in your
+application's C<lib> directory (or anywhere else in C<@INC>).
+Assuming that you put the SQLite database C<example.db> in the
+application root you could create the Catalyst model via calling a
+helper in the following way:
 
  $ script/myadvapp_create.pl model MyCatalystModel DBIC::Schema MyDatabase dbi:SQLite:example.db
- 
+
 From there it's up to you.
 
 =head2 Wrap Up
