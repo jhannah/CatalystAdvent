@@ -112,14 +112,13 @@ sub rss : Global {
 
     $c->stash->{year} = $year;
 
-    my @entries = # get 5 most recent entires that actually exist on disk
-      grep { defined $_ } reverse 
-	((grep {-e} map {$c->path_to('root', $year, "$_.pod")} 1 .. 24)
-	 [-5..-1]); 
+    my @entry = reverse 1 .. 24;
+    my %path = map { $_ => $c->path_to( 'root', $year, "$_.pod" ) } @entry;
+    @entry = grep -e $path{ $_ }, @entry;
+    splice @entry, 5; # only keep the newest five entries
+    my %stat = map { $_ => stat "$path{ $_ }" } @entry;
     
-    my @stats = map { stat "$_" } @entries;
-    
-    my $latest_mtime = max map { $_->mtime } @stats;
+    my $latest_mtime = max map { $_->mtime } values %stat;
     my $last_mod = time2str( $latest_mtime );
 
     $c->res->header( 'Last-Modified' => $last_mod );
@@ -149,8 +148,7 @@ sub rss : Global {
         updated => format_date_w3cdtf( $latest_mtime ),
     );
 
-    for my $entry ( @entries ) {
-
+    for my $day ( @entry ) {
         my $parser = CatalystAdvent::Pod->new(
             StringMode   => 1,
             FragmentOnly => 1,
@@ -158,9 +156,7 @@ sub rss : Global {
             TopLinks     => 0
         );
 
-        $parser->parse_from_file( "$entry" );
-	my ($day) = ($entry->basename =~ /^(\d+).pod$/);
-	my $stat = shift @stats;
+        $parser->parse_from_file( ''. $path{ $day } );
 
         $feed->add_entry(
             title    => { type => 'text', content => $parser->summary },
@@ -170,8 +166,8 @@ sub rss : Global {
 				    'catalyst@lists.rawmode.org') },
             link     => $c->uri_for( "/$year/$day" ),
             id       => $c->uri_for( "/$year/$day" ),
-            published=> format_date_w3cdtf( $stat->ctime ),
-            updated  => format_date_w3cdtf( $stat->mtime ),
+            published=> format_date_w3cdtf( $stat{ $day }->ctime ),
+            updated  => format_date_w3cdtf( $stat{ $day }->mtime ),
         );
     }
 
