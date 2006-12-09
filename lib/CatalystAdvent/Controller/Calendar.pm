@@ -115,9 +115,11 @@ sub rss : Global {
     my @entry = reverse 1 .. 24;
     my %path = map { $_ => $c->path_to( 'root', $year, "$_.pod" ) } @entry;
     @entry = grep -e $path{ $_ }, @entry;
-    splice @entry, 5; # only keep the newest five entries
-    my %stat = map { $_ => stat ''. $path{ $_ } } @entry;
     
+    # only keep the newest five entries
+    splice @entry, (@entry > 5) ? 5 : scalar @entry; 
+    
+    my %stat = map { $_ => stat ''. $path{ $_ } } @entry;
     my $latest_mtime = max map { $_->mtime } values %stat;
     my $last_mod = time2str( $latest_mtime );
 
@@ -147,7 +149,7 @@ sub rss : Global {
         link    => $c->req->base,
         link    => { rel => 'self', href => $c->uri_for("/rss/$year") },
         id      => $c->uri_for("/rss/$year"),
-        updated => format_date_w3cdtf( $latest_mtime ),
+        updated => format_date_w3cdtf( $latest_mtime || 0 ),
     );
 
     for my $day ( @entry ) {
