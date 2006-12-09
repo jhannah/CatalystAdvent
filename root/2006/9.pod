@@ -510,7 +510,8 @@ delete the user if they exist.
 
 =head2 Fire it up!
 
-To test your new REST application, we'll just use the good old C<curl> command. You can get a copy of c<curl> at L<http://curl.haxx.se/>.  
+To test your new REST application, we'll just use the good old C<curl> command.
+You can get a copy of C<curl> at L<http://curl.haxx.se/>.  
 
 First off, we start up our Catalyst test server:
 
