@@ -21,13 +21,13 @@ Please get a copy of this code before you proceed.  The application is
 a very simple proof-of-concept application which will work with a
 basic L<Catalyst|Catalyst::Runtime>.  There is no model, and the view
 is handled in the Root controller's end action
-(i.e. C<Controller::Root-E<gt>end>.
+(i.e. C<< Controller::Root->end >>).
 
 As an interesting aside, with appropriate introspection, by using
-L<Class::Inspector> for example it would be relatively straightforward
+L<Class::Inspector> for example, it would be relatively straightforward
 to develop a custom view based on this end action to provide skeleton
 output during application development.  For instance, you might want
-to use this in a situation where you have a preexisting model but are
+to use this in a situation where you have a pre-existing model but are
 not yet able to provide data for it.
 
 =head2 The C<LoadModel> base controller
@@ -72,7 +72,7 @@ issue the following command from the application root:
  [info] ChainedEg powered by Catalyst 5.7005
  You can connect to your server at http://localhost:3000
 
-Looking at the debug output from the application above, it is a little
+Looking at the debug output from the application above. It is a little
 different from a standard catalyst application.  
 
 =head2 Visiting the application root
@@ -105,26 +105,26 @@ is this:
 which is an empty subroutine.  What's happening here?
 
 Well, the attribute C<Chained('/language')> is telling the C<Foo>
-controller to use the root (C</>) controllers private method
+controller to use the root (C</>) controller's private method
 C<language> first.  Following this, if the next part of the url path
-is C<foo> (C<PathPart('foo')>) then to pass all remaining arguments to
+is C<foo> (C<PathPart('foo')>) then pass all remaining arguments to
 the current controller class (C<Controller::Foo>) for further
 processing.  In this case, two further subroutines are called from
-this controller.  Within the file C<lib/Controller/Foo> C<resultset>
-which populates C<$cE<gt>stashE<gt>resultset with the text 'Foo called
-with no trailing arguments'.
+this controller.  The first is within the file C<lib/Controller/Foo>:
+C<resultset>, which populates C<< $c->stash->resultset >> with the text
+'Foo called with no trailing arguments'.
 
 The second subroutine is one inherited from
 C<ChainedEg::ControllerBase::LoadModel> which provides the C<list>
 method under the same circumstances as the C<resultset> sub in
 C<Controller::Foo>.  So both actions are called, and both actions
-populate $cE<gt>stash.  Looking at the subroutine declaration for the
+populate C<< $c->stash >>.  Looking at the subroutine declaration for the
 C<resultset> and C<list> subroutines:
 
  sub resultset : Chained('base')      PathPart('') CaptureArgs(0) {
  sub list      : Chained('resultset') PathPart('') Args       (0) {
 
-Note the difference in the declaration.  c<list> uses the C<Args>
+Note the difference in the declaration.  C<list> uses the C<Args>
 attribute, whereas C<resultset> uses the C<CaptureArgs> attribute.
 What's the difference?
 
@@ -132,24 +132,24 @@ C<CaptureArgs> indicates that this is not an endpoint and the
 dispatcher should look for more more subroutines to run before
 proceeding to the appropriate C<end> action (which usually renders the
 view).  So this means when we visit L<http://localhost:3000/en/foo>
-the C<resultset> action is called, and does not use capture any
-arguments into C<$c-E<gt>request-E<gt>path> (this will make more sense
+the C<resultset> action is called, and does not capture any
+arguments into C<< $c->request->captures >> (this will make more sense
 in the next section).
 
-On the other hand, the list declares has C<Args> as an attribute.
-This means that it's an end point, and after the subroutine is
+On the other hand, the C<list> declaration has C<Args> as an attribute.
+This means that it's an endpoint, and after the subroutine is
 executed, the appropriate C<end> action is called.  Note that the
 expected number of arguments (in this case none) are put into
-C<$c-E<gt>request-E<gt>path> by the Catalyst dispatcher.
+C<< $c->request->args >> by the Catalyst dispatcher.
 
-The result of this code is that when we call our application from it's
+The result of this code is that when we call our application from its
 base path with the additional path C</en/foo/> we can easily provide
 localisation via the language subroutine in C<Controller::Root> and
 when nothing is in the path after the name of the controller, we
 exectute the C<list> method.
 
 
-=head2 We've done "list" what about showing a single item?
+=head2 We've done "list", what about showing a single item?
 
 Visiting L<http://localhost:3000/en/foo/23> takes us to the following
 display:
@@ -168,21 +168,19 @@ Replace "23" with "something%20else" and we get:
 
 The code responsible for this is as follows.  In the L<ControllerBase>
 package, which is a base class for L<Controller::Foo> (C<use base
-'MyAdvApp::ControllerBase::LoadModel>) provides the following method:
-
+'MyAdvApp::ControllerBase::LoadModel'>) provides the following method:
  
  sub load_model : Chained('base') PathPart('') CaptureArgs(1) {
-     my ($self, $c, $item_id)        = @_;
-         $c->stash->{loaded_item_id} = $item_id;
-         $c->stash->{loaded_model}   = $self->config->{model};
+     my ($self, $c, $item_id) = @_;
+     $c->stash->{loaded_item_id} = $item_id;
+     $c->stash->{loaded_model}   = $self->config->{model};
  }
 
-It takes 1 argument for internal use by the controller (placed into
+It takes one argument for internal use by the controller (placed into
 the variable $item_id in the first line of the sub) and uses this to
-populate the stash
- 
-COME TO THINK OF IT, I DON'T GET WHY THERE'S THE 'BASE' PART ARG TO
-THE CHAINED ATTRIB
+populate the stash. No additional PathPart is added before the argument
+(if we added one, say 'bar', it would match /en/foo/bar/23 instead of
+/en/foo/23).
 
 The code responsible for the 'message' portion of the data structure
 is in the L<Controller:Foo> package:
@@ -232,12 +230,12 @@ That's it.  Simple use of the Chained dispatch type.  See the
 C<Catalyst::DispatchType::Chained> documentation for more details.  As
 someone said on the mailing list (I'm paraphrasing here), "Chained is
 a bit challenging to get your head around initially, but it's well
-worth doing so.  It's like built in information architecture".
+worth doing so.  It's like built in information architecture."
 
 =head3 AUTHORS
 
-Words:  Kieren Diment C<E<lt>diment@gmail.comE<gt>>
-Code:   Robert 'phaylon' Sedlacek C<E<lt>rs@474.atE<gt>>
+Words:  Kieren Diment C<< <diment@gmail.com> >>
+Code:   Robert 'phaylon' Sedlacek C<< <rs@474.at> >>
 
 
 =head3 COPYRIGHT
