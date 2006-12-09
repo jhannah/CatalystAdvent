@@ -113,7 +113,7 @@ sub rss : Global {
     $c->stash->{year} = $year;
 
     my @entries = # get 5 most recent entires that actually exist on disk
-      reverse 
+      grep { defined $_ } reverse 
 	((grep {-e} map {$c->path_to('root', $year, "$_.pod")} 1 .. 24)
 	 [-5..-1]); 
     
@@ -150,8 +150,7 @@ sub rss : Global {
     );
 
     for my $entry ( @entries ) {
-	next if !defined $entry;
-	
+
         my $parser = CatalystAdvent::Pod->new(
             StringMode   => 1,
             FragmentOnly => 1,
