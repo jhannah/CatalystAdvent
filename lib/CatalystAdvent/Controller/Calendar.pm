@@ -186,6 +186,10 @@ Andy Grundman, <andy@hybridized.org>
 
 Marcus Ramberg, <mramberg@cpan.org>
 
+Jonathan Rockway, <jrockway@cpan.org>
+
+Aristotle Pagaltzis, <pagaltzis@gmx.de>
+
 =head1 LICENSE
 
 This library is free software, you can redistribute it and/or modify
