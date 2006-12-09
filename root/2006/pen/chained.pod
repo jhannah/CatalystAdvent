@@ -1,12 +1,12 @@
-=head1 Day X
+=head1 Day 9
 
 An example of how to use L<Catalyst::DispatchType::Chained>.
 
 =head2  A basic introduction to Chained actions with Catalyst.
 
 Frequently when building web applications there is a chain of
-dependency along the url path.  That is, the controller logic has a
-close relationship to the data you want to draw from the model.
+dependency along the url path.  That is, the controller dispatch logic
+has a close relationship to the data you want to draw from the model.
 Chained dispatch types provide an easy way to encapsulate this logic
 within your Catalyst controllers.
 
@@ -24,9 +24,11 @@ is handled in the Root controller's end action
 (i.e. C<Controller::Root-E<gt>end>.
 
 As an interesting aside, with appropriate introspection, by using
-L<Class::Inspector> for example it would be possible fairly
-straightforward to develop a custom view based on this end action to
-provide skeleton output during application development.
+L<Class::Inspector> for example it would be relatively straightforward
+to develop a custom view based on this end action to provide skeleton
+output during application development.  For instance, you might want
+to use this in a situation where you have a preexisting model but are
+not yet able to provide data for it.
 
 =head2 The C<LoadModel> base controller
 
@@ -113,19 +115,135 @@ which populates C<$cE<gt>stashE<gt>resultset with the text 'Foo called
 with no trailing arguments'.
 
 The second subroutine is one inherited from
-C<ChainedEg::ControllerBase::LoadModel> which provides the list method
-under the same circumstances as the C<resultset> sub in
-c<Controller::Foo>.  So both actions are called, and both actions
-populate $cE<gt>stash.  Looking at the subroutine declaration for the C<resultset> and C<list> subroutines:
+C<ChainedEg::ControllerBase::LoadModel> which provides the C<list>
+method under the same circumstances as the C<resultset> sub in
+C<Controller::Foo>.  So both actions are called, and both actions
+populate $cE<gt>stash.  Looking at the subroutine declaration for the
+C<resultset> and C<list> subroutines:
 
  sub resultset : Chained('base')      PathPart('') CaptureArgs(0) {
- sub list      : Chained('resultset') PathPart('') Args(0) {
+ sub list      : Chained('resultset') PathPart('') Args       (0) {
 
-OK THESE ARE BEING CALLED AS PART OF THE SAME ACTION BUT WHY? ...
+Note the difference in the declaration.  c<list> uses the C<Args>
+attribute, whereas C<resultset> uses the C<CaptureArgs> attribute.
+What's the difference?
+
+C<CaptureArgs> indicates that this is not an endpoint and the
+dispatcher should look for more more subroutines to run before
+proceeding to the appropriate C<end> action (which usually renders the
+view).  So this means when we visit L<http://localhost:3000/en/foo>
+the C<resultset> action is called, and does not use capture any
+arguments into C<$c-E<gt>request-E<gt>path> (this will make more sense
+in the next section).
+
+On the other hand, the list declares has C<Args> as an attribute.
+This means that it's an end point, and after the subroutine is
+executed, the appropriate C<end> action is called.  Note that the
+expected number of arguments (in this case none) are put into
+C<$c-E<gt>request-E<gt>path> by the Catalyst dispatcher.
+
+The result of this code is that when we call our application from it's
+base path with the additional path C</en/foo/> we can easily provide
+localisation via the language subroutine in C<Controller::Root> and
+when nothing is in the path after the name of the controller, we
+exectute the C<list> method.
 
 
-=head2 Capturing more arguments in a chained action.
+=head2 We've done "list" what about showing a single item?
 
+Visiting L<http://localhost:3000/en/foo/23> takes us to the following
+display:
+
+ $VAR1 = {
+          'language' => 'en',
+          'loaded_model' => 'DBIC::Foo',
+          'loaded_item_id' => '23',
+          'message' => 'Showing a Foo'
+        };
+
+Replace "23" with "something%20else" and we get:
+
+ [other output snipped]
+ 'loaded_item_id' => 'something else',
+
+The code responsible for this is as follows.  In the L<ControllerBase>
+package, which is a base class for L<Controller::Foo> (C<use base
+'MyAdvApp::ControllerBase::LoadModel>) provides the following method:
+
+ 
+ sub load_model : Chained('base') PathPart('') CaptureArgs(1) {
+     my ($self, $c, $item_id)        = @_;
+         $c->stash->{loaded_item_id} = $item_id;
+         $c->stash->{loaded_model}   = $self->config->{model};
+ }
+
+It takes 1 argument for internal use by the controller (placed into
+the variable $item_id in the first line of the sub) and uses this to
+populate the stash
+ 
+COME TO THINK OF IT, I DON'T GET WHY THERE'S THE 'BASE' PART ARG TO
+THE CHAINED ATTRIB
+
+The code responsible for the 'message' portion of the data structure
+is in the L<Controller:Foo> package:
+
+ sub show_foo : Chained('load_model') PathPart('') Args(0) {
+     my ($self, $c) = @_;
+     $c->stash->{message} = 'Showing a Foo';
+ }
+
+which as we can see by the use of C<Args> rather than C<CaptureArgs>
+is the end point.
+
+The edit action is somewhat similar.  By this point you can that there
+is a pattern developing. The edit_foo endpoint is called from
+C<Controller::Foo> after the load_model subroutine from the base
+controller class (code above).
+
+ sub edit_foo : Chained('load_model') PathPart('edit') Args(0) {
+     my ($self, $c) = @_;
+     $c->stash->{message} = 'Editing a Foo';
+ }
+
+=head2 The C<Bar> Controller and Going Further.
+
+Working this out is left as an exercise to the reader.  Examine the
+example code and ensure that you understand how the same base
+controller is being used to provide results for a different package.
+
+As we mentioned in the beginning of this discussion, the end action
+used in this module is a "proof of concept" view, and is mainly for
+illustrative purposes.  A useful exercise to understand the Chained
+dispatch type would be to use the database model presented in
+L<DBIx::Class::Manual::Example> and the L<Template> Toolkit to flesh
+out the application presented here into a working example.  You would
+put the C<MyDatabase> directory in your application's C<lib> directory
+(or anywhere else in C<@INC>).  Assuming that you put the SQLite database
+C<example.db> in the application root you could create the Catalyst
+model via calling a helper in the following way:
+
+ $ script/myadvapp_create.pl model MyCatalystModel DBIC::Schema MyDatabase dbi:SQLite:example.db
+ 
+From there it's up to you.
+
+=head2 Wrap Up
+
+That's it.  Simple use of the Chained dispatch type.  See the
+C<Catalyst::DispatchType::Chained> documentation for more details.  As
+someone said on the mailing list (I'm paraphrasing here), "Chained is
+a bit challenging to get your head around initially, but it's well
+worth doing so.  It's like built in information architecture".
+
+=head3 AUTHORS
+
+Words:  Kieren Diment C<E<lt>diment@gmail.comE<gt>>
+Code:   Robert 'phaylon' Sedlacek C<E<lt>rs@474.atE<gt>>
+
+
+=head3 COPYRIGHT
+
+Copyright 2006 Robert Sedlacek.  This document can be modified and
+re-distributed under the same conditions as Perl itself.
 
 
 
