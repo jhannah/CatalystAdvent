@@ -1,4 +1,4 @@
-=head1 Day XX - Web Services with Catalyst::Action::REST
+=head1 Day 9 - Web Services with Catalyst::Action::REST
 
 Building RESTful Web Services with Catalyst::Action::REST.
 
@@ -11,30 +11,35 @@ source for which is available at the end of this article.
 
 =head2 What is REST?
 
-REST stands for Representational State Transfer.  It describes an architectural style for building systems on the Web.  REST sees every web application as a
-set of I<resources> (such as L<http://dev.catalyst.perl.org>) which represent
-a particular I<state> of an application.  When you access a resource, you are
+REST stands for Representational State Transfer.  It describes an
+architectural style for building systems on the World Wide Web.  REST
+sees every web application as a set of I<resources> (such as
+L<http://dev.catalyst.perl.org>) which represent a particular I<state>
+of an application.  When you access a resource, you are
 I<transferring> it; and thus possibly changing it's I<state>.
 
-(For a longer, much more accurate description of REST, see the links at the end
-of this entry.  The proceeding paragraph owes quite a bit to the article
-at L<http://www.xfront.com/REST-Web-Services.html>)
+(For a longer, much more accurate description of REST, see the links
+at the end of this article.  The proceeding paragraph owes quite a bit
+to the article at L<http://www.xfront.com/REST-Web-Services.html>)
 
-In practice, REST is a method for designing web services using three things:
+In practice, REST is a method for designing web services using three
+things:
 
 =over 4
 
 =item B<Nouns, or Resources>
 
-A noun is a thing (or set of things) that describe the actors in your system.
-They are represented as URIs, and should be descriptive.  A good example of a
-noun (which we will be using in our example later on) would be
-L<http://example.com/user>, or L<http://example.com/user/adam>.  
+A noun is a thing (or set of things) that describe the actors in your
+system.  They are represented as URIs, and should be descriptive.  A
+good example of a noun (which we will be using in our example later
+on) would be L<http://example.com/user>, or
+L<http://example.com/user/adam>.
 
 =item B<Verbs, or Actions>
 
-Verbs in REST are the various actions you can apply to a Noun.  These are 
-typically the same as HTTP Methods.  The four most common verbs in REST are:
+Verbs in REST are the various actions you can apply to a Noun.  These
+are typically the same as HTTP Methods.  The four most common verbs in
+REST are:
 
 =over 2
 
@@ -48,16 +53,17 @@ typically the same as HTTP Methods.  The four most common verbs in REST are:
 
 =back
 
-Notice that they correspond quite neatly to the CRUD (Create, Retrieve, Update,
-Delete) acronym common in databases.
+Notice that they correspond quite neatly to the CRUD (Create,
+Retrieve, Update, Delete) acronym common in databases.
 
 =item B<Content Types>
 
-The final piece of the REST puzzle are Content Types.  These are used to
-describe the format of a resource; how the various parts of our machine should
-process it.  In practice, we specify the Content Type to ensure that the
-representation we receive of a given resource is the one we are best suited 
-to process. (C<text/xml> for XML, C<text/x-yaml> for YAML, C<text/x-json> for JSON, etc.)
+The final piece of the REST puzzle are Content Types.  These are used
+to describe the format of a resource; how the various parts of our
+machine should process it.  In practice, we specify the Content Type
+to ensure that the representation we receive of a given resource is
+the one we are best suited to process. (C<text/xml> for XML,
+C<text/x-yaml> for YAML, C<text/x-json> for JSON, etc.)
 
 =back
 
@@ -65,7 +71,7 @@ These three things (Nouns, Verbs, and Content Types) form what's called the
 I<REST Triangle>.  Once you understand the interaction between these three
 things, you've got 95% of everything you need to know about REST.  
 
-What's the remaining 5%?  It's understanding HTTP 1.1; knowing when to 
+What's the remaining 5%?  It's understanding HTTP 1.1; knowing when to
 return different status codes, what headers should be set, etc.
 
 =head2 Catalyst::Action::REST
@@ -79,17 +85,19 @@ HTTP, while you're at it.)
 
 =item B<How it helps with Nouns>
 
-Truthfully, Catalyst already helps you here.  It's incredibly flexible dispatch system is perfect for creating RESTful URIs.  
+Truthfully, Catalyst already helps you here.  It's incredibly flexible
+dispatch system is perfect for creating RESTful URIs.
 
 =item B<How it helps with Verbs>
 
-L<Catalyst::Action::REST> helps you deal with the different verbs by extending
-the dispatcher.  When you declare a sub like this:
+L<Catalyst::Action::REST> helps you deal with the different verbs by
+extending the dispatcher.  When you declare a sub like this:
 
    sub cat :Path('/cat') :Args(1) :ActionClass('REST') {}
 
-We will automatically re-dispatch to subroutines that have the current method
-appended with an C<_>.  So, for the above example, we might have:
+We will automatically re-dispatch to subroutines that have the current
+method appended with an C<_>.  So, for the above example, we might
+have:
 
    sub cat_GET {
        ... returns a particular cat ...
@@ -99,25 +107,25 @@ appended with an C<_>.  So, for the above example, we might have:
        ... creates a new cat...
    }
 
-When a reference is asked for using a method you have not implemented, 
-L<Catalyst::Action::REST> will automatically generate a proper C<405 Not
-Implemented> response.  The C<Allow> header will contain a list of
-all the implemented methods.  (In this case, it would containing GET and
-PUT.) Similarly, support for OPTIONS requests are dynamically generated
-as well.
+When a reference is asked for using a method you have not implemented,
+L<Catalyst::Action::REST> will automatically generate a proper C<405
+Not Implemented> response.  The C<Allow> header will contain a list of
+all the implemented methods.  (In this case, it would containing GET
+and PUT.) Similarly, support for OPTIONS requests are dynamically
+generated as well.
 
 =item B<How it helps with Content Types>
 
 Support for different Content Types is provided by
-L<Catalyst::Action::Serialize> and L<Catalyst::Acton::Deserialize>.  Together,
-these two Actions allow you to send serialized data back to clients
-(L<Catalyst::Action::Serialize>) and to deserialize data received from them
-(L<Catalyst::Action::Deserialize>).  11 different content-types are currently
-supported (including YAML, JSON, XML, and Data::Dumper) and adding new ones
-is easy.
+L<Catalyst::Action::Serialize> and L<Catalyst::Acton::Deserialize>.
+Together, these two Actions allow you to send serialized data back to
+clients (L<Catalyst::Action::Serialize>) and to deserialize data
+received from them (L<Catalyst::Action::Deserialize>).  11 different
+content-types are currently supported (including YAML, JSON, XML, and
+Data::Dumper) and adding new ones is easy.
 
-We evaluate which content-type to use by evaluating the following things
-on a per-request basis:
+We evaluate which content-type to use by evaluating the following
+things on a per-request basis:
 
 =over 2
 
@@ -127,23 +135,26 @@ If the client provides a Content-Type header, we will honor it first.
 
 =item B<The value of the content-type parameter>.
 
-For GET requests, you can manually set the content-type with a query parameter.
-Calling a resource like C<< http://example.com/user/adam?content-type=text/x-json >> would return a JSON structure.
+For GET requests, you can manually set the content-type with a query
+parameter.  Calling a resource like C<<
+http://example.com/user/adam?content-type=text/x-json >> would return
+a JSON structure.
 
 =item B<Parsing the Accept HTTP header>
 
-If none of these have been provided, we will parse the Accept header, selecting
-the content type most preferred by the client.
+If none of these have been provided, we will parse the Accept header,
+selecting the content type most preferred by the client.
 
 =back
 
 =item B<How it helps with HTTP>
 
-Creating the proper HTTP responses to clients makes every-ones lives easier.
-L<Catalyst::Controller::REST> provides I<status helpers>, which can
-be used to easily create well-formed HTTP responses.  For example,
-a C<200 OK> should include an HTTP Body that matches the requested content-type.
-Using a status helper, generating the proper response is:
+Creating the proper HTTP responses to clients makes every-ones lives
+easier.  L<Catalyst::Controller::REST> provides I<status helpers>,
+which can be used to easily create well-formed HTTP responses.  For
+example, a C<200 OK> should include an HTTP Body that matches the
+requested content-type.  Using a status helper, generating the proper
+response is:
 
      $self->status_ok(
        $c,
@@ -156,15 +167,16 @@ Using a status helper, generating the proper response is:
 
 =head2 REST by Example
 
-Often the best way to learn about something is by doing, so let's build a
-simple REST web service with Catalyst.  You can follow along here, or
-download the tarball from L<http://dev.catalyst.perl.org/foo>.
+Often the best way to learn about something is by doing, so let's
+build a simple REST web service with Catalyst.  You can follow along
+here, or download the tarball from
+L<http://dev.catalyst.perl.org/foo>.
 
 Our example application will be a simple User database that tracks
-User ID's, Full Names, and Descriptions of users.  
+User ID's, Full Names, and Descriptions of users.
 
-So lets start be determining what our Nouns will be, and what Verbs are 
-valid for them:
+So lets start be determining what our Nouns will be, and what Verbs
+are valid for them:
 
 =over 4
 
@@ -225,7 +237,9 @@ To follow along with this tutorial, you will need to have installed:
 
 =back
 
-Or, you can download the source from L<http://dev.catalyst.perl.org/foo>. 
+A reference implementation will appear on the Catalyst subversion
+respository in due course.  This article will be updated with the url
+when this is finished.
 
 =head2 Create the Application
 
@@ -271,14 +285,9 @@ should have:
 The "user" table from above gets it's own class as well, in
 C<lib/AdventREST/Schema/User.pm>. 
 
-    #
-    # AdventREST::Schema::User.pm
-    #
-
     package AdventREST::Schema::User;
 
     use base qw/DBIx::Class/;
-
     __PACKAGE__->load_components(qw/Core/);
     __PACKAGE__->table('user');
     __PACKAGE__->add_columns(qw/user_id fullname description/);
@@ -286,8 +295,9 @@ C<lib/AdventREST/Schema/User.pm>.
 
     1;
 
-For more details on what these classes are doing, refer to the L<DBIx::Class>,
-L<DBIx::Class::Schema>, and L<DBIx::Class::ResultSource> documentation.
+To understand what this code does, refer to the L<DBIx::Class>,
+L<DBIx::Class::Schema>, and L<DBIx::Class::ResultSource>
+documentation.
 
 We still need to have a Catalyst model for our database.  
 L<Catalyst::Model::DBIC::Schema> comes with one we can use, so lets do that:
@@ -331,10 +341,10 @@ provides the status helpers I mentioned earlier.
 
    sub user_list : Path('/user') :Args(0) : ActionClass('REST') { }
 
-The C<sub user_list> handles the L<http://example.com/user> noun.  Remember
-that the various actions (verbs) are dealt with in different subroutines.
-The actual list of users should only be generated on GET requests, so we
-create:
+The C<sub user_list> handles the L<http://example.com/user> noun.
+Remember that the various actions (verbs) are dealt with in different
+subroutines.  The actual list of users should only be generated on GET
+requests, so we create:
 
    sub user_list_GET {
        my ( $self, $c ) = @_;
@@ -462,7 +472,8 @@ retrieve an individual user.
                     description => $user->description,
                 }
             );
-        } else {
+        }
+        else {
             $self->status_not_found( $c,
                 message => "Could not find User $user_id!" );
         }
@@ -505,9 +516,10 @@ First off, we start up our Catalyst test server:
 
    $ ./script/adventrest_server
 
-Next, we need to put some data together to populate our User service.  (If you
-are following along from the tarball, these files exist in the "data"
-directory) Lets start with some yaml.  Create a file called C<new-user.yml>:
+Next, we need to put some data together to populate our User service.
+(If you are following along from the reference implementation, these
+files exist in the "data" directory) Lets start with some yaml.
+Create a file called C<new-user.yml>:
 
     ---
     user_id: adam
@@ -528,8 +540,9 @@ You will get back:
     fullname: Adam Jacob
     user_id: adam
 
-Note that the order of the fields may be random, since we're serializing a hash. 
-Lets get a list of all the users we have created so far:
+Note that the order of the fields will be (sort of) random, since
+we're serializing a hash.  Lets get a list of all the users we have
+created so far:
 
    $ curl -X GET -H 'Content-Type: text/x-yaml' http://localhost:3000/user
    --- 
