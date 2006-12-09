@@ -12,6 +12,7 @@ use XML::Atom::SimpleFeed;
 use POSIX qw(strftime);
 use List::Util qw(max);
 use CatalystAdvent::Pod;
+use HTTP::Date;
 
 =head1 NAME
 
@@ -118,25 +119,25 @@ sub rss : Global {
     my @stats = map { stat "$_" } @entries;
     
     my $latest_mtime = max map { $_->mtime } @stats;
-    my $last_mod = format_date_rfc822( $latest_mtime );
+    my $last_mod = time2str( $latest_mtime );
 
     $c->res->header( 'Last-Modified' => $last_mod );
     $c->res->header( 'ETag' => qq'"$last_mod"' );
     $c->res->content_type( 'application/atom+xml' );
-
+    
     my $cond_date = $c->req->header( 'If-Modified-Since' );
     my $cond_etag = $c->req->header( 'If-None-Match' );
-    if( $cond_date or $cond_etag ) {
+    if( $cond_date || $cond_etag ) {
         # if both headers are present, both must match
         my $do_send_304 = 1;
-        if( $cond_date ) { $do_send_304 = $cond_date eq $last_mod }
+        if( $cond_date ) { $do_send_304 = str2time($cond_date) <= $latest_mtime }
         if( $cond_etag ) { $do_send_304 &&= $cond_etag eq qq'"$last_mod"' }
         if( $do_send_304 ) {
             $c->res->status( 304 );
             return;
         }
     }
-
+    
     my $feed = XML::Atom::SimpleFeed->new(
         title   => "Catalyst Advent Calendar $year",
         link    => $c->req->base,
@@ -172,7 +173,6 @@ sub rss : Global {
 }
 
 sub format_date_w3cdtf { strftime '%Y-%m-%dT%H:%M:%SZ', gmtime $_[0] }
-sub format_date_rfc822 { strftime '%a, %d %b  %Y %H:%M:%S +0000', gmtime $_[0] }
 
 =head1 AUTHORS
 
