@@ -164,7 +164,9 @@ sub rss : Global {
         $feed->add_entry(
             title    => { type => 'text', content => $parser->summary },
             content  => { type => 'xhtml', content => $parser->asString },
-            author   => { name => $parser->author, email => $parser->email },
+            author   => { name => $parser->author||'Catalyst', 
+			  email => ($parser->email||
+				    'catalyst@lists.rawmode.org') },
             link     => $c->uri_for( "/$year/$day" ),
             id       => $c->uri_for( "/$year/$day" ),
             published=> format_date_w3cdtf( $stat->ctime ),
