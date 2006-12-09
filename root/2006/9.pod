@@ -16,7 +16,7 @@ architectural style for building systems on the World Wide Web.  REST
 sees every web application as a set of I<resources> (such as
 L<http://dev.catalyst.perl.org>) which represent a particular I<state>
 of an application.  When you access a resource, you are
-I<transferring> it; and thus possibly changing it's I<state>.
+I<transferring> it; and thus possibly changing its I<state>.
 
 (For a longer, much more accurate description of REST, see the links
 at the end of this article.  The proceeding paragraph owes quite a bit
@@ -237,10 +237,6 @@ To follow along with this tutorial, you will need to have installed:
 
 =back
 
-A reference implementation will appear on the Catalyst subversion
-respository in due course.  This article will be updated with the url
-when this is finished.
-
 =head2 Create the Application
 
 First off, we need to create our new Catalyst application.
@@ -282,7 +278,7 @@ should have:
 
     1;
 
-The "user" table from above gets it's own class as well, in
+The "user" table from above gets its own class as well, in
 C<lib/AdventREST/Schema/User.pm>. 
 
     package AdventREST::Schema::User;
@@ -606,7 +602,7 @@ The REST wiki provides all sorts of information about REST.
 =item L<http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm>
 
 This is Roy Fielding's Doctoral thesis that first coined the term REST,
-and lays out it's fundamental principles. 
+and lays out its fundamental principles. 
 
 =back
 
