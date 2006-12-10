@@ -1,4 +1,4 @@
-=head1 Day VII
+=head1 Day 8 - A YouTube Catalyst Application 
 
 Creating a Catalyst application that integrates the YouTube webservice.
 

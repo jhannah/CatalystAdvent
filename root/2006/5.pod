@@ -1,4 +1,4 @@
-=head1 Day 5
+=head1 Day 5 - Taming legacy websites with Catalyst and wget
 
 Taming legacy websites with Catalyst and wget.
 
