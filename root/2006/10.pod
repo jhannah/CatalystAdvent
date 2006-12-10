@@ -40,7 +40,7 @@ Before we look at our application in any detail, first, let's run the
 example application.  Check out the code as shown above, and then
 issue the following command from the application root:
 
- $ perl script/myadvapp.pl
+ $ perl script/myadvapp_server.pl
  [ snipped the early part of the output ]
  [debug] Loaded Chained actions:
  .-------------------------------------+--------------------------------------.
