@@ -30,7 +30,7 @@ lines in, you will end up with a small PDF file. Easy wasn't it?
 So now that you know LaTeX (*cough*) we can go on and produce PDF documents
 from inside Catalyst. You could simply do a C<system('pdflatex')> call, except
 for the fact that TeX and LaTeX really don't like taking data from from stdin -
-I guess stdin was so common back in the 1970's when TeX was first written.
+I guess stdin wasn't so common back in the 1970's when TeX was first written.
 
 So rather than going through the hassle of creating a temporary directory,
 saving the .tex file, parsing the output log and getting the output file 
@@ -58,7 +58,7 @@ C<lib/PDFTest/Controller/Root.pm> add the following code:
 
  }
 
-Now lets create the temple. Create a new file in your editor of choice, and
+Now let's create the temple. Create a new file in your editor of choice, and
 save it as C<root/pdf> with the following contents:
 
  [%- USE Latex;
@@ -77,13 +77,13 @@ data nicely placed inside your wrapper.)
 =head2 Testing It Out
 
 Great, we've created a template that uses the LaTeX filter, and an action that
-will cause it to be rendered. Lets test it!
+will cause it to be rendered. Let's test it!
 
   $ perl ./script/pdftest_server.pl
   <output snipped>
   You can connect to your server at http://localhost:3000
 
-Since we called our action pdf, lets visit L<http://localhost:3000/pdf>. Now
+Since we called our action pdf, let's visit L<http://localhost:3000/pdf>. Now
 with any luck your browser should display the PDF inline or prompt you to save
 what to do with a file called "PDFTest.pdf". However if you are using 
 Catalyst::Runtime version 5.7006 (which is the latest at the time of writing)
@@ -93,8 +93,8 @@ then you will be seeing an error like the following:
  "
 
 This is caused by a bug in the standalone server only (version 5.7006 - 
-hopefully this will be fixed in newer versions) there all system calls return
--1. Hmm so we could use one of the other server modes, but they make developing
+hopefully this will be fixed in newer versions) where all system calls return
+-1. Hmm, so we could use one of the other server modes, but they make developing
 harder. So instead lets use a dirty hack to get round the problem.
 
 WARNING: This is very dirty and prone to break for different versions, but it
