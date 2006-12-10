@@ -13,9 +13,9 @@ come with Catalyst.
 
 If you don't already have 
 L<Catalyst::Log::Log4perl|Catalyst::Log::Log4perl>
-and it's dependencies installed, do so now with:
+and its dependencies installed, do so now with:
 
-    perl -MCPAN -e 'Catalyst::Log::Log4perl'
+    perl -MCPAN -e 'install Catalyst::Log::Log4perl'
 
 Answer C<y> to any prompts about dependencies.
 
