@@ -1,0 +1,174 @@
+=head1 Day X - Adding Custom Headers
+
+Adding Headers to help with Search Engine Results
+
+=head2 Headers and Google
+
+A while ago we noticed our site was slipping from Google after we switched 
+over to Catalyst. Strange. Nothing had changed much content wise, but we 
+realised that our headers had. 
+
+We also have a few other domains pointing to our main site, so changing them 
+to B<301> Redirects, and not B<302>, plus with the help of our new headers, 
+we were soon back to where we were before (if not better).
+
+Let's tell you how!
+
+=head2 $c-E<gt>res-E<gt>headers-E<gt>header()
+
+C<$c-E<gt>res-E<gt>headers-E<gt>header()> is the main method we'll be adding to, so what 
+do we need?
+
+Well, we looked around at some of the bigger sites like http://www.bbc.co.uk, 
+http://www.redhat.com etc. and did:
+
+    HEAD -S http://www.bbc.co.uk
+
+Then we copied! Simple as that (well, after finding out what they all meant) ;-)
+
+You'll notice that most sites mix in B<HTTP 1.1> tags and B<HTTP 1.0>, so we 
+copied that too.
+
+Here's what our site looks like now:
+
+    HEAD http://www.suretecsystems.com --> 200 OK
+    Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0
+    Connection: close
+    Date: Sun, 10 Dec 2006 20:41:47 GMT
+    Pragma: no-cache, nocache
+    Accept-Ranges: bytes
+    ETag: "3e4afd2236058a617d41a09fff3bb59193256a68"
+    Server: Apache
+    Content-Length: 11342
+    Content-Type: text/html; charset=utf-8
+    Expires: Sun, 10 Dec 2006 20:41:47 GMT
+    Last-Modified: Sun, 01 Oct 2006 19:24:00 GMT
+    Client-Date: Sun, 10 Dec 2006 20:41:47 GMT
+    Client-Peer: 212.13.201.240:80
+    Client-Response-Num: 1
+    X-Powered-By: Catalyst/5.7001
+    X-Toddler-Time: The big hand is on the eight and the little hand is on the nine
+
+From above, we added:
+
+    Last-Modified
+    Cache-Control
+    Pragma
+    Accept-Ranges
+    ETag
+    Expires
+    X-Toddler-Time
+    X-Powered-By
+
+We'll leave you to do searches on Google etc. for the above to see what they 
+mean and why you'd want them
+
+=head2 Last-Modified
+
+As our site is a mixture of static and random content, we decided to 
+use the last time our *.tt templates we modified, as this is the static text. 
+
+Adding the B<Last-Modified> header is quite easy using the power of Template 
+Toolkit.
+
+In every content template, simply C<USE> the date plugin e.g.:
+
+    [% PROCESS base/header.tt %]
+    [% USE date %] 
+
+    <h1>My Content PagC</h1> 
+
+    [% PROCESS base/footer.tt %]    
+
+Then in your footer:
+
+    [% SET lastmod = date.format(template.modtime,
+                                 format => '%a, %d %b %Y %H:%M:%S GMT',
+                                 locale => en_GB, ) %] 	
+
+    [% c.stash.modtime = lastmod %]                 
+
+    <p class="updated">Page Last Updated: [% lastmod %]</p>                 
+    <!-- footer END --> 
+
+You can see we are using the B<date> plugin in the content template, which pulls 
+in the C<modtime> from that template and not the B<footer.tt> or B<header.tt>, 
+then we set up our stash to use in our B<Root.pm> Controller.
+
+=head2 The rest of the Headers
+
+The rest are easy and don't really need much explaining. Put this in your
+B<Root.pm>:
+
+    =head2 end
+
+    =cut
+
+    sub end : ActionClass('RenderView') {
+        my ( $self, $c ) = @_;
+
+        # Forward to View unless response body is already defined
+        $c->forward( $c->view('TT') )
+          unless $c->response->body
+          || $c->response->status =~ /^3\d\d$/;
+
+        # Set our headers. Some just for fun and some needed for
+        # better Google Rankings
+
+        # Create Expires and Last-Modified
+        my $dt_format =
+          DateTime::Format::Strptime->new( pattern => '%a, %d %b %Y %H:%M:%S GMT' );
+        my $now     = DateTime->now( formatter => $dt_format );
+        my $modtime = $c->stash->{modtime};
+
+        # Create Etag
+        my $sha1 = Digest::SHA1->new;
+        $sha1->add($modtime);
+        my $etag = $sha1->hexdigest;
+
+        # Toddler time ;-)
+        my $ttime = babytime;
+
+        $c->res->headers->header(
+            'X-Toddler-Time' => $ttime,
+            'X-Powered-By'  => "Catalyst/" . Catalyst->version,
+            'Last-Modified' => $modtime,
+            'Cache-Control' =>
+    'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0',
+            'Pragma'        => 'no-cache, nocache',
+            'Accept-Ranges' => 'bytes',
+            'ETag'          => "\"$etag\"",
+            'Expires'       => $now,
+        );
+    }
+
+
+B<X-Toodler-Time> is for fun and comes from B<Acme::Time::Baby>. 
+
+B<ETag> is just a C<sha1> of our B<Last-Modified> time from the template, 
+which is unique, but consistent for each template.
+
+B<Expires> is just a pre-defined time format, whic we set as B<now>.
+
+Simple!
+
+We hope that's given you some things to think about. Have fun! ;-)
+
+=head2 Warning
+
+Please make sure you understand what these headers do before implementing
+them. If in doubt, use a search engine. Thanks!
+
+=head3 AUTHOR
+
+Gavin Henry B<ghenry@suretecsystems.com>
+
+=head3 COPYRIGHT
+
+Copyright 2006 Suretec Systems Ltd. - http://www.suretecsystems.com
+
+This document can be freely redistributed and can be modified and 
+re-distributed under the same conditions as Perl itself.
+
+=cut
+
