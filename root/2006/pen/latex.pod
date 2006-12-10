@@ -4,12 +4,13 @@ Using Template::Latex to produce PDFs in Catalyst
 
 =head2 LaTeX
 
-LaTeX (pronounced lay-tek by those in the know) is a typesetting language that
-can be used to DVI ("DeVice Independant"), PS or PDF files. However the main
-problem is that LaTeX (and TeX upon which LaTeX is based) is one of those "easy
-to learn, hard to master languages".  If you don't know LaTeX and are 
-interested, there are a numerous tutorials around the web - hit Google. For the
-sake of completeness I will show a minimal example of a LaTeX file:
+LaTeX (pronounced lay-tek by those in the know) is a typesetting
+language that can be used to produce DVI ("Device Independent"),
+Postscript or PDF files. However the main problem is that LaTeX (and
+TeX upon which LaTeX is based) is one of those "easy to learn, hard to
+master languages".  If you don't know LaTeX and are interested, there
+are a numerous tutorials around the web - hit Google. For the sake of
+completeness I will show a minimal example of a LaTeX file:
 
  \documentclass[a4paper]{article}
 
