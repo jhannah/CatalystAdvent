@@ -148,7 +148,7 @@ B<X-Toodler-Time> is for fun and comes from B<Acme::Time::Baby>.
 B<ETag> is just a C<sha1> of our B<Last-Modified> time from the template, 
 which is unique, but consistent for each template.
 
-B<Expires> is just a pre-defined time format, whic we set as B<now>.
+B<Expires> is just a pre-defined time format, which we set as B<now>.
 
 Simple!
 
