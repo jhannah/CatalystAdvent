@@ -1,4 +1,4 @@
-=head1 Day ## - Using Catalyst with Log4perl
+=head1 Day 11 - Using Catalyst with Log4perl
 
 Using Catalyst with Log4perl
 
