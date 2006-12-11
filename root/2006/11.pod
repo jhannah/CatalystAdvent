@@ -11,8 +11,8 @@ come with Catalyst.
 
 =head2 Installation
 
-If you don't already have 
-L<Catalyst::Log::Log4perl|Catalyst::Log::Log4perl>
+If you don't already have
+L<Catalyst::Log::Log4perl>
 and its dependencies installed, do so now with:
 
     perl -MCPAN -e 'install Catalyst::Log::Log4perl'
@@ -118,16 +118,16 @@ C<catalyst.pl> helper).  Enter the following text:
     log4perl.appender.LOGFILE.layout=PatternLayout
     log4perl.appender.LOGFILE.layout.ConversionPattern=[%d] [myapp] [%p] %m%n
 
-We are using the L<Log::Log4perl::Appender::File|Log::Log4perl::Appender::File>
+We are using the L<Log::Log4perl::Appender::File>
 appender to send the log output to a file.  See the documentation on 
-L<Log::Log4perl::Appender::File|Log::Log4perl::Appender::File> for a 
+L<Log::Log4perl::Appender::File> for a 
 full list of the options available for this appender.
 
 A C<PatternLayout> can be used to format the output of your logging 
 messages (the C<PatternLayout> formatting is common across all 
 appenders).  Here is a quick list of the formatting options supported by 
 C<PatternLayout> (see 
-L<Log::Log4perl::Layout::PatternLayout|Log::Log4perl::Layout::PatternLayout> 
+L<Log::Log4perl::Layout::PatternLayout> 
 for more detail):
 
     %c Category of the logging event.
@@ -280,7 +280,7 @@ mail logs for evidence of the attempt to send an email).
 =head2 Sending Logging Output To the Screen
 
 Use can use 
-L<Log::Log4perl::Appender::Screen|Log::Log4perl::Appender::Screen> 
+L<Log::Log4perl::Appender::Screen> 
 to also send the log messages to STDERR or STDOUT of the window running 
 the development server. To do this, edit the C<Log4perl.conf> file and 
 modify it to match the following (only the top and bottom few lines have 
