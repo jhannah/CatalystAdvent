@@ -1,4 +1,4 @@
-=head1 Day X - Producing PDFs with Template::Latex
+=head1 Day 12 - Producing PDFs with Template::Latex
 
 Using Template::Latex to produce PDFs in Catalyst
 
@@ -18,13 +18,14 @@ completeness I will show a minimal example of a LaTeX file:
 
  Look at me! I was typeset using \LaTeX
 
- And I'm a second paragraph that 
+ And I'm a second paragraph that
  is split over two source lines.
 
  \end{document}
 
-If you run C<pdflatex> (assuming you have it installed) and type those five
-lines in, you will end up with a small PDF file. Easy wasn't it?
+If you run C<pdflatex> (assuming you have it installed) and type those
+five lines in, you will end up with a small, beautifully presented PDF
+file. Easy wasn't it?
 
 =head2 Template::Latex
 
@@ -33,19 +34,19 @@ from inside Catalyst. You could simply do a C<system('pdflatex')> call, except
 for the fact that TeX and LaTeX really don't like taking data from from stdin -
 I guess stdin wasn't so common back in the 1970's when TeX was first written.
 
-So rather than going through the hassle of creating a temporary directory,
-saving the .tex file, parsing the output log and getting the output file 
-ourselves, we will use the Template::Latex module by Andy Wardley which handles
-all of this for us. Great!
+So rather than going through the hassle of creating a temporary
+directory, saving the .tex file, parsing the output log and getting
+the output file ourselves, we will use the L<Template::Latex> module
+by Andy Wardley which handles all of this for us. Great!
 
 Once you've installed Template::Latex (and the LaTeX system itself if you 
-didn't already have it installed) its time to create a Catalyst application:
+don't already have it installed) it's time to create a Catalyst application:
 
   $ catalyst.pl PDFTest
   $ cd PDFTest
   $ perl ./script/pdftest_create.pl view TT TT
 
-Now we need to create our action that will generate our PDF. In 
+Now we need to create our action that will generate the PDF file. In
 C<lib/PDFTest/Controller/Root.pm> add the following code:
 
  sub pdf : Local {
@@ -59,8 +60,8 @@ C<lib/PDFTest/Controller/Root.pm> add the following code:
 
  }
 
-Now let's create the temple. Create a new file in your editor of choice, and
-save it as C<root/pdf> with the following contents:
+Now let's create the template. Create a new file in your editor of
+choice, and save it as C<root/pdf> with the following contents:
 
  [%- USE Latex;
      FILTER latex("pdf") %]
@@ -71,14 +72,14 @@ save it as C<root/pdf> with the following contents:
  \end[document}
  [% END -%]
 
-(If you are using this in an existing application nd you are using a wrapper,
+(If you are using this in an existing application and you are using a wrapper,
 make sure that this template isn't wrapped, else you will get the binary PDF
 data nicely placed inside your wrapper.)
 
 =head2 Testing It Out
 
-Great, we've created a template that uses the LaTeX filter, and an action that
-will cause it to be rendered. Let's test it!
+We've created a template that uses the LaTeX filter, and an action
+that will cause it to be rendered. Let's test it!
 
   $ perl ./script/pdftest_server.pl
   <output snipped>
@@ -98,9 +99,10 @@ hopefully this will be fixed in newer versions) where all system calls return
 -1. Hmm, so we could use one of the other server modes, but they make developing
 harder. So instead lets use a dirty hack to get round the problem.
 
-WARNING: This is very dirty and prone to break for different versions, but it
-worked for me with pdfeTeX 3.141592-1.21a-2.2 (Web2C 7.5.4) and 
-Template::Latex 2.17.
+WARNING: This is very dirty and prone to break for different versions,
+but it worked for me with pdfeTeX 3.141592-1.21a-2.2 (Web2C 7.5.4) and
+Template::Latex 2.17.  B<Don't use this in production code.  Use it
+for development only.  You have been warned.>
 
 The way this hack works is be defining a C<system> sub in the 
 C<Template::Latex> package that will get called instead of Perl's built-in
@@ -116,7 +118,7 @@ what the C<pdf> sub should look like:
      my ($self, $c) = @_;
 
      {
-       no warnings 'redefine';
+       no warnings 'redefine';  # right here, you can tell bad things will happen
        local *Template::Latex::system = sub {
          
          my $ret = system(@_);
@@ -144,10 +146,10 @@ what the C<pdf> sub should look like:
 
 =head2 Caveat
 
-Hacks like the one detailed above are generally a really bad idea, since it 
-means you are messing with the internals of another package, which is just
-asking for trouble at the drop of a pin. But this wouldn't be much of an 
-example if it didn't work.
+Hacks like the one detailed above are generally B<a really bad idea>,
+because you are messing with the internals of another package.  This
+is asking for trouble. It's included so that B<you> can make a working
+example with the development server under Catalyst 5.006 - the bug should be fixed in subsequent versions.
 
 =head3 AUTHOR
 
