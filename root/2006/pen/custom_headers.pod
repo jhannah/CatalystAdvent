@@ -80,7 +80,7 @@ Now we need to get this into your B<Root.pm>:
         my $modtime = $c->stash->{modtime};
 
         $c->res->headers->header(
-            'X-Powered-By'  => "Catalyst/" . Catalyst->version,
+            'X-Powered-By'  => "Catalyst/" . Catalyst->VERSION,
             'Last-Modified' => $modtime,
         );
     }
