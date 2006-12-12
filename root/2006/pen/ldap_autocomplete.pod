@@ -1,0 +1,55 @@
+=head1 Day X - LDAP Autocomplete 
+
+Creating an LDAP Autocomplete field with B<Catalyst::Plugin::Prototype>
+
+=head2 Introduction
+
+We've all heard and used Google's Suggest Searches, and to be honest, they are
+cool!
+
+So in your admin/client web applications, why not create the same thing using 
+the power of Open Source to help find that username quickly.
+
+Read on to find out how.
+
+=head2 Grabbing the Plugins and Enabling
+
+=head2 Adding an LDAP Model
+
+=head2 Creating the LDAP configuration
+
+=head2 Creating your Autocomplete template
+
+=head2 Creating your LDAP Autocomplete Controller
+
+=head2 Putting it all together
+
+=head2 Conclusion
+
+=head2 Warning
+
+The above example doesn't limit the amount of LDAP users returned, so please
+implement that yourself. 
+
+If you are running B<OpenLDAP>, then you can enforce the amount of entries 
+returning per search (C<man slapd.conf(5)> ):
+
+    sizelimit size[.{soft|hard|unchecked}]=<integer> [...]
+              Specify the maximum number of entries to return from a search 
+              operation. The default size limit is 500. 
+
+If in doubt speak to the Catalyst Team via the Lists or IRC. Thanks!
+
+=head3 AUTHOR
+
+Gavin Henry B<ghenry@suretecsystems.com>
+
+=head3 COPYRIGHT
+
+Copyright 2006 Suretec Systems Ltd. - http://www.suretecsystems.com
+
+This document can be freely redistributed and can be modified and 
+re-distributed under the same conditions as Perl itself.
+
+=cut
+
