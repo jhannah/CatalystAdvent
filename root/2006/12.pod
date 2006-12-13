@@ -4,10 +4,10 @@ Using Template::Latex to produce PDFs in Catalyst
 
 =head2 LaTeX
 
-LaTeX (pronounced lay-tek by those in the know) is a typesetting
+LaTeX (pronounced "lay-tek" by those in the know) is a typesetting
 language that can be used to produce DVI ("Device Independent"),
-Postscript or PDF files. However the main problem is that LaTeX (and
-TeX upon which LaTeX is based) is one of those "easy to learn, hard to
+Postscript, or PDF files. However the main problem is that LaTeX (and
+TeX, upon which LaTeX is based) is one of those "easy to learn, hard to
 master languages".  If you don't know LaTeX and are interested, there
 are a numerous tutorials around the web - hit Google. For the sake of
 completeness I will show a minimal example of a LaTeX file:
@@ -31,8 +31,8 @@ file. Easy wasn't it?
 
 So now that you know LaTeX (*cough*) we can go on and produce PDF documents
 from inside Catalyst. You could simply do a C<system('pdflatex')> call, except
-for the fact that TeX and LaTeX really don't like taking data from from stdin -
-I guess stdin wasn't so common back in the 1970's when TeX was first written.
+for the fact that TeX and LaTeX really don't like taking data from STDIN -
+I guess STDIN wasn't so common back in the 1970's when TeX was first written.
 
 So rather than going through the hassle of creating a temporary
 directory, saving the .tex file, parsing the output log and getting
@@ -52,7 +52,7 @@ C<lib/PDFTest/Controller/Root.pm> add the following code:
  sub pdf : Local {
    my ($self, $c) = @_;
 
-   if ($c->forward( 'PDFTest::View::TT') ) {
+   if ($c->forward( 'PDFTest::View::TT' ) ) {
      # Only set the content type if we sucessfully processed the template
      $c->response->content_type('application/pdf');
      $c->response->header('Content-Disposition', "attachment; filename=PDFTest.pdf")
@@ -73,7 +73,7 @@ choice, and save it as C<root/pdf> with the following contents:
  [% END -%]
 
 (If you are using this in an existing application and you are using a wrapper,
-make sure that this template isn't wrapped, else you will get the binary PDF
+make sure that this template isn't wrapped, or you will get the binary PDF
 data nicely placed inside your wrapper.)
 
 =head2 Testing It Out
@@ -95,9 +95,9 @@ then you will be seeing an error like the following:
  "
 
 This is caused by a bug in the standalone server only (version 5.7006 - 
-hopefully this will be fixed in newer versions) where all system calls return
+this will be fixed in newer versions) where all system calls return
 -1. Hmm, so we could use one of the other server modes, but they make developing
-harder. So instead lets use a dirty hack to get round the problem.
+harder. So instead let's use a dirty hack to get round the problem.
 
 WARNING: This is very dirty and prone to break for different versions,
 but it worked for me with pdfeTeX 3.141592-1.21a-2.2 (Web2C 7.5.4) and
@@ -149,7 +149,7 @@ what the C<pdf> sub should look like:
 Hacks like the one detailed above are generally B<a really bad idea>,
 because you are messing with the internals of another package.  This
 is asking for trouble. It's included so that B<you> can make a working
-example with the development server under Catalyst 5.006 - the bug should be fixed in subsequent versions.
+example with the development server under Catalyst 5.7006 - the bug should be fixed in subsequent versions.
 
 =head3 AUTHOR
 
