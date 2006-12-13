@@ -1,4 +1,4 @@
-﻿=head1 Catalyst Advent - Day 6
+﻿=head1 Catalyst Advent - Job Queue
 
 Running a job queue
 
@@ -44,11 +44,12 @@ This will make the job queue render the job responses to the application log.
 
 It's time to create a job. Edit the F<crontab> file and uncomment the last
 line (the one with the many "*"). Each uncommented line represents a job. The
-first 6 elements will determine how often your job will be run (it's 
-L<http://www.adminschoice.com/docs/crontab.htm#Crontab%20file|crontab syntax>
-). The next one is unused for now, so you can ignore it. The last
-one represents the request that the job will send to your application. It's an
-URL. Your job looks like this:
+first 6 elements will determine how often your job will be run (it's in
+crontab syntax,
+L<http://www.adminschoice.com/docs/crontab.htm#Crontab file>). The next one
+is unused for now, so you can ignore it. The last one represents the request
+that the job will send to your application. It's an URL. Your job looks like
+this:
 
   *   *   *   *   *   *   root   /test/job
 
@@ -56,7 +57,7 @@ This means that each minute the job queue will make a request for C</test/job>
 
 =head2 Run the JobQueue
 
-Now run the jobqueue with:
+You can now run the job queue with:
   
   $ perl script/jobqueueapp_jobqueue.pl
 
@@ -92,15 +93,50 @@ queue or else your inbox might fill pretty quick.
 
 =head2 Write a useful job 
 
-=head2 Draw the conclusions
+Now let's actually do something useful with the job. We'll setup a controller
+which will tell us the system load. The URL for this info will be
+C</system/load>.
 
-The engine is not yet production quality and not recommended for running
-critical jobs. But as you could see, you can run any action from your
-controllers and have the results mailed to you and/or logged.
+First create the controller:
+
+  $ script/jobqueueapp_create.pl controller System
+  <... some "created"/"exists" messages>
+
+Then edit F<lib/JobQueueApp/Controller/System.pm> and add this
+code: 
+
+  sub load : Local {
+    my ( $self, $c ) = @_;
+    my @output = `w`;
+    $c->response->body("Load: $output[0]");
+  }
+
+I<IMPORTANT> This will work only if you have access to the C<w> command line
+application. Under Windows or in restricted environment you might get any
+information.
+
+Now edit your F<crontab> file so that the line you uncommented earlier looks
+like this:
+
+  */5   *   *   *   *   *   root   /system/load
+
+and in your application configuration file change the C<to: [email]> line to
+C<to: [log, email]>.
+
+Now start the job queue and every 5 minutes the uptime, user count and load
+averages will be logged as well as sent to you by mail.
+
+=head2 Summary
+
+As you have seen you can setup the job queue to run any action from your
+controllers and have the results logged and/or mailed to you.
+
+Keep in mind though that the engine is not yet production quality and not
+recommended for running critical jobs.
 
 =head3 AUTHOR
 
-Grün Christian-Rolf (kixx) <kiki@bsdro.org>
+Gruen Christian-Rolf (kixx) <kiki@bsdro.org>
 
 =head3 COPYRIGHT.
 
