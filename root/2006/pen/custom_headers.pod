@@ -93,7 +93,7 @@ We hope that's given you some things to think about. Have fun! ;-)
 
 Please make sure you understand what headers do before implementing, and what 
 your site needs. If in doubt, use a search engine or speak to the Catalyst
-Team. Thanks!
+community. Thanks!
 
 =head3 AUTHOR
 
