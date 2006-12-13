@@ -55,7 +55,7 @@ job will be run (it's in crontab syntax,
 L<http://www.adminschoice.com/docs/crontab.htm#Crontab file>). The
 next one is unused for now, so you can ignore it. The last one
 represents the request that the job will send to your application:
-It's a relative URL. Your job looks like this:
+It's the path part of a URL. Your job looks like this:
 
   *   *   *   *   *   *   root   /test/job
 
