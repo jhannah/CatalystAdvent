@@ -5,18 +5,19 @@ Adding Headers to help with Search Engine Results
 =head2 Headers and Google
 
 A while ago we noticed our site was slipping from Google after we switched 
-over to Catalyst. Strange. Nothing had changed much content wise, but we 
+over to Catalyst. Strange. Nothing had changed much content-wise, but we 
 realised that our headers had. 
 
-We also have a few other domains pointing to our main site, so changing them 
-to B<301> Redirects, and not B<302>, plus with the help of our new headers, 
-we were soon back to where we were before (if not better).
+We also have a few other domains pointing to our main site, so after
+changing them to B<301> Redirects (and not B<302>), and with the help
+of our new headers, we were soon back to where we were before (if not
+better).
 
 Let's tell you how!
 
-=head2 $c-E<gt>res-E<gt>headers-E<gt>header()
+=head2 $c-E<gt>response-E<gt>headers-E<gt>header()
 
-C<$c-E<gt>res-E<gt>headers-E<gt>header()> is the main method we'll be adding 
+C<< $c->response->headers->header() >> is the main method we'll be adding 
 to, so what do we need?
 
 Well, we looked around at some of the bigger sites like http://www.bbc.co.uk, 
@@ -54,9 +55,10 @@ Then in your C<footer.tt>:
     <p class="updated">Page Last Updated: [% lastmod %]</p>                 
     <!-- footer END --> 
 
-You can see we are using the B<date> plugin in the content template, which 
-pulls in the C<modtime> from that template and not the B<footer.tt> or 
-B<header.tt>, then we set up our stash to use in our B<Root.pm> Controller.
+You can see we are using the B<date> plugin in the content template,
+which pulls in the C<modtime> from I<that> template, and not the
+B<footer.tt> or B<header.tt>. Then, from within the template, we put
+this value into our stash to use in our B<Root.pm> Controller.
 
 =head2 Adding the Header
 
@@ -74,12 +76,12 @@ Now we need to get this into your B<Root.pm>:
           unless $c->response->body
           || $c->response->status =~ /^3\d\d$/;
 
-        # Set our headers.
+        # Set our headers
 
         # Last-Modified
-        my $modtime = $c->stash->{modtime};
+        my $modtime = $c->stash->{modtime}; # set in template
 
-        $c->res->headers->header(
+        $c->response->headers->header(
             'X-Powered-By'  => "Catalyst/" . Catalyst->VERSION,
             'Last-Modified' => $modtime,
         );
@@ -91,9 +93,9 @@ We hope that's given you some things to think about. Have fun! ;-)
 
 =head2 Warning
 
-Please make sure you understand what headers do before implementing, and what 
-your site needs. If in doubt, use a search engine or speak to the Catalyst
-community. Thanks!
+Please make sure you understand what headers do before implementing this
+technique, and what your site needs. If in doubt, use a search engine or
+speak to the Catalyst community. Thanks!
 
 =head3 AUTHOR
 
