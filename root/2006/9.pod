@@ -5,7 +5,7 @@ Building RESTful Web Services with Catalyst::Action::REST.
 =head2 What are we going to do today?
 
 This article will serve as a brief introduction to the REST architectural
-style, specifically as it relates to Web Services.  It will walk you through
+style, specifically as it relates to web services.  It will walk you through
 a constructing a sample application using L<Catalyst::Controller::REST>, the
 source for which is available at the end of this article.
 
@@ -19,7 +19,7 @@ of an application.  When you access a resource, you are
 I<transferring> it; and thus possibly changing its I<state>.
 
 (For a longer, much more accurate description of REST, see the links
-at the end of this article.  The proceeding paragraph owes quite a bit
+at the end of this article.  The preceding paragraph owes quite a bit
 to the article at L<http://www.xfront.com/REST-Web-Services.html>)
 
 In practice, REST is a method for designing web services using three
@@ -54,38 +54,39 @@ REST are:
 =back
 
 Notice that they correspond quite neatly to the CRUD (Create,
-Retrieve, Update, Delete) acronym common in databases.
+Retrieve, Update, Delete) acronym common in discussions of database
+actions.
 
 =item B<Content Types>
 
-The final piece of the REST puzzle are Content Types.  These are used
-to describe the format of a resource; how the various parts of our
-machine should process it.  In practice, we specify the Content Type
-to ensure that the representation we receive of a given resource is
-the one we are best suited to process. (C<text/xml> for XML,
-C<text/x-yaml> for YAML, C<text/x-json> for JSON, etc.)
+The final piece of the REST puzzle is Content Types.  These are used to
+describe the format of a resource: how the various parts of our machine
+should process the resource.  In practice, we specify the Content Type
+to ensure that the representation we receive of a given resource is the
+one we are best suited to process (C<text/xml> for XML, C<text/x-yaml>
+for YAML, C<text/x-json> for JSON, etc.)
 
 =back
 
 These three things (Nouns, Verbs, and Content Types) form what's called the
-I<REST Triangle>.  Once you understand the interaction between these three
+I<REST Triangle>.  Once you understand the interactions among these three
 things, you've got 95% of everything you need to know about REST.  
 
 What's the remaining 5%?  It's understanding HTTP 1.1; knowing when to
-return different status codes, what headers should be set, etc.
+return different status codes, what headers to be set, etc.
 
 =head2 Catalyst::Action::REST
 
-To make building RESTful Web Services easy, we've created
-L<Catalyst::Action::REST>.   It's comprised of several pieces, each of which 
-help you to implement a portion of the REST triangle (and to help wrangle
+To make building RESTful web services easy, we've created
+L<Catalyst::Action::REST>.   It's composed of several pieces, each of which 
+helps you to implement a portion of the REST triangle (and to help wrangle
 HTTP, while you're at it.)  
 
 =over 2
 
 =item B<How it helps with Nouns>
 
-Truthfully, Catalyst already helps you here.  It's incredibly flexible
+Truthfully, Catalyst already helps you here.  Its incredibly flexible
 dispatch system is perfect for creating RESTful URIs.
 
 =item B<How it helps with Verbs>
@@ -95,7 +96,7 @@ extending the dispatcher.  When you declare a sub like this:
 
    sub cat :Path('/cat') :Args(1) :ActionClass('REST') {}
 
-We will automatically re-dispatch to subroutines that have the current
+we will automatically re-dispatch to subroutines that have the current
 method appended with an C<_>.  So, for the above example, we might
 have:
 
@@ -107,24 +108,24 @@ have:
        ... creates a new cat...
    }
 
-When a reference is asked for using a method you have not implemented,
+When a reference is requested using a method you have not implemented,
 L<Catalyst::Action::REST> will automatically generate a proper C<405
 Not Implemented> response.  The C<Allow> header will contain a list of
-all the implemented methods.  (In this case, it would containing GET
+all the implemented methods.  (In this case, it would contain GET
 and PUT.) Similarly, support for OPTIONS requests are dynamically
 generated as well.
 
 =item B<How it helps with Content Types>
 
 Support for different Content Types is provided by
-L<Catalyst::Action::Serialize> and L<Catalyst::Acton::Deserialize>.
+L<Catalyst::Action::Serialize> and L<Catalyst::Action::Deserialize>.
 Together, these two Actions allow you to send serialized data back to
 clients (L<Catalyst::Action::Serialize>) and to deserialize data
-received from them (L<Catalyst::Action::Deserialize>).  11 different
-content-types are currently supported (including YAML, JSON, XML, and
+received from them (L<Catalyst::Action::Deserialize>).  Eleven different
+content types are currently supported (including YAML, JSON, XML, and
 Data::Dumper) and adding new ones is easy.
 
-We evaluate which content-type to use by evaluating the following
+We evaluate which content type to use by evaluating the following
 things on a per-request basis:
 
 =over 2
@@ -135,7 +136,7 @@ If the client provides a Content-Type header, we will honor it first.
 
 =item B<The value of the content-type parameter>.
 
-For GET requests, you can manually set the content-type with a query
+For GET requests, you can manually set the content type with a query
 parameter.  Calling a resource like C<<
 http://example.com/user/adam?content-type=text/x-json >> would return
 a JSON structure.
@@ -149,11 +150,11 @@ selecting the content type most preferred by the client.
 
 =item B<How it helps with HTTP>
 
-Creating the proper HTTP responses to clients makes every-ones lives
+Creating the proper HTTP responses to clients makes everyone's lives
 easier.  L<Catalyst::Controller::REST> provides I<status helpers>,
 which can be used to easily create well-formed HTTP responses.  For
 example, a C<200 OK> should include an HTTP Body that matches the
-requested content-type.  Using a status helper, generating the proper
+requested content type.  Using a status helper, generating the proper
 response is:
 
      $self->status_ok(
@@ -175,7 +176,7 @@ L<http://dev.catalyst.perl.org/repos/Catalyst/examples/AdventREST>.
 Our example application will be a simple User database that tracks
 User ID's, Full Names, and Descriptions of users.
 
-So lets start be determining what our Nouns will be, and what Verbs
+So let's start by determining what our Nouns will be, and what Verbs
 are valid for them:
 
 =over 4
@@ -195,14 +196,14 @@ We want to be able to GET a list of users from the system.
 =item Noun 2 - L<http://example.com/user/user_id>
 
 These nouns will represent individual users in our system.  Each user
-gets a URL based on his User ID.
+gets a URL based on his or her User ID.
 
 =over 2
 
 =item Verb - I<PUT> (create)
 
 We need to be able to create new users by sending a PUT request to an
-individual users URL.
+individual user's URL.
 
 =item Verb - I<GET> (retrieve)
 
@@ -220,7 +221,7 @@ And sadly, sometimes we need to delete a user entirely.
 
 =back
 
-So, now that we have our architecture laid out, lets get down to business.
+So, now that we have our architecture laid out, let's get down to business.
 To follow along with this tutorial, you will need to have installed:
 
 =over 4
@@ -243,11 +244,12 @@ First off, we need to create our new Catalyst application.
 
   $ catalyst.pl AdventREST
 
-All the commands in this tutorial are from the base of your new application.
+The remaining commands in this tutorial are from the base of this new
+application.
 
 =head2 Create the Database, and the DBIx::Class Schema
 
-We need to have somewhere to store all our lovely users, so lets start with
+We need to have somewhere to store all our lovely users, so let's start with
 that.  A couple of directories need to get made:
 
    $ mkdir db lib/AdventREST/Schema
@@ -296,7 +298,7 @@ L<DBIx::Class::Schema>, and L<DBIx::Class::ResultSource>
 documentation.
 
 We still need to have a Catalyst model for our database.  
-L<Catalyst::Model::DBIC::Schema> comes with one we can use, so lets do that:
+L<Catalyst::Model::DBIC::Schema> comes with one we can use, so let's do that:
 
    $ ./script/adventrest_create.pl model DB DBIC::Schema AdventREST::Schema
 
@@ -312,12 +314,12 @@ easy.  Just edit the C<adventrest.yml> file:
             - ""
             - ""
 
-That makes our Database ready for use with Catalyst.  Now, lets create our
+That makes our Database ready for use with Catalyst.  Now, let's create our
 Controller.
 
 =head2 Creating the User Controller.
 
-Using the C<adventrest_create.pl> command, lets create a User controller:
+Using the C<adventrest_create.pl> command, let's create a User controller:
 
    $ ./script/adventrest_create.pl controller User
 
@@ -355,12 +357,12 @@ requests, so we create:
    }
 
 It starts by doing a search of our database, populating a hash
-(C<%user_list>) with the C<user_id> and their resource URI.  We then pass that
+(C<%user_list>) with the C<user_id> and its resource URI.  We then pass that
 hash to the C<status_ok> I<status helper>, which returns the C<%user_list>
 serialized into a supported content-type.
 
 Since GET is the only verb we care about for L<http://example.com/user>,
-lets move on to creating the L<http://example.com/user/adam> style
+let's move on to creating the L<http://example.com/user/adam> style
 resources..
 
     sub single_user : Path('/user') : Args(1) : ActionClass('REST') {
@@ -501,7 +503,7 @@ Last thing left to be done: deleting a user.
         }
     }
 
-It's only a one line difference from our _GET routine; we just
+It's only a one-line difference from our _GET routine; we just
 delete the user if they exist.
 
 =head2 Fire it up!
@@ -515,7 +517,7 @@ First off, we start up our Catalyst test server:
 
 Next, we need to put some data together to populate our User service.
 (If you are following along from the reference implementation, these
-files exist in the "data" directory) Lets start with some yaml.
+files exist in the "data" directory.) Let's start with some yaml.
 Create a file called C<new-user.yml>:
 
     ---
@@ -525,7 +527,7 @@ Create a file called C<new-user.yml>:
 
 This will create a user just like me! :)
 
-Ok, lets use curl to update our web service:
+Ok, let's use curl to update our web service:
 
    $ curl -X PUT -H 'Content-Type: text/x-yaml' -T new-user.yml \
        http://localhost:3000/user/adam
@@ -545,9 +547,10 @@ created so far:
    --- 
    adam: http://localhost:3000/user/adam
 
-I love monkeys as much as the next guy, but even I balk at having it in my
-description!  So lets change it to something else.  This time, create a file
-called C<update-user.datadumper>, and stick some Perl in there:
+I love monkeys as much as the next guy, but even I balk at having it in
+my description!  So let's change it to something else.  This time,
+create a file called C<update-user.datadumper>, and stick some Perl in
+there:
 
     {
         user_id => "adam",
@@ -588,7 +591,7 @@ resources for you:
 
 =item L<http://www.xfront.com/REST-Web-Services.html>
 
-A pretty concise, well structured introduction to REST.
+A pretty concise, well-structured introduction to REST.
 
 =item L<http://en.wikipedia.org/wiki/Representational_State_Transfer>
 
@@ -601,7 +604,7 @@ The REST wiki provides all sorts of information about REST.
 
 =item L<http://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm>
 
-This is Roy Fielding's Doctoral thesis that first coined the term REST,
+This is Roy Fielding's doctoral thesis that first coined the term REST,
 and lays out its fundamental principles. 
 
 =back
