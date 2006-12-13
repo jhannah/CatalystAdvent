@@ -99,11 +99,22 @@ sub day : Regex('^(\d{4})/(\d\d?)$') {
 
 =head2 rss
 
-Generates an rss feed of tips for the given year.
+Forwards to the "feed" URI to maintain compatibility with bookmarked aggregators
 
 =cut
 
 sub rss : Global {
+    my ( $self, $c, $year ) = @_;
+    $c->forward('feed', [ $year ] );
+}
+
+=head2 feed 
+
+Generates an XML feed (Atom) of tips for the given year.
+
+=cut
+
+sub feed : Global {
     my ( $self, $c, $year ) = @_;
     $year ||= $c->stash->{now}->year;
     $year ||= $c->req->snippets->[0];
@@ -147,8 +158,8 @@ sub rss : Global {
     my $feed = XML::Atom::SimpleFeed->new(
         title   => "Catalyst Advent Calendar $year",
         link    => $c->req->base,
-        link    => { rel => 'self', href => $c->uri_for("/rss/$year") },
-        id      => $c->uri_for("/rss/$year"),
+        link    => { rel => 'self', href => $c->uri_for("/feed/$year") },
+        id      => $c->uri_for("/feed/$year"),
         updated => format_date_w3cdtf( $latest_mtime || 0 ),
     );
 

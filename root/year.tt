@@ -37,4 +37,4 @@
 </div>
 [% CATCH %]
 [% END %]
-<p class="rss">[<a href="[% c.uri_for('/rss', year) %]">RSS</a>]</p>
+<p class="rss">[<a href="[% c.uri_for('/feed', year) %]">XML Feed</a>]</p>
