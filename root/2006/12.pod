@@ -69,7 +69,7 @@ choice, and save it as C<root/pdf> with the following contents:
  \documentclass{article}
  \begin{document}
  I'm a doument created from [% name %]
- \end[document}
+ \end{document}
  [% END -%]
 
 (If you are using this in an existing application and you are using a wrapper,
