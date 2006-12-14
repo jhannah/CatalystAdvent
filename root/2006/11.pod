@@ -216,7 +216,7 @@ to:
 
     log4perl.rootLogger=WARN, LOGFILE
 
-If you restart your browser and reload the L<http://127.0.0.1:3000/test> 
+If you restart your server and reload the L<http://127.0.0.1:3000/test> 
 URL in your browser, you should notice that the DEBUG and INFO-level 
 messages have been suppressed from the output.  This is obviously a very 
 useful feature when moving an application into production.  (Note that 
