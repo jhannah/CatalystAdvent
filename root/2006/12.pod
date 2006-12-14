@@ -91,7 +91,7 @@ what to do with a file called "PDFTest.pdf". However if you are using
 Catalyst::Runtime version 5.7006 (which is the latest at the time of writing)
 then you will be seeing an error like the following:
 
- Coldn't render template "latex error - pdflatex exited with errors:
+ Couldn't render template "latex error - pdflatex exited with errors:
  "
 
 This is caused by a bug in the standalone server only (version 5.7006 - 
