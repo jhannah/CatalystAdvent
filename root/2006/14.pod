@@ -1,4 +1,4 @@
-﻿=head1 Catalyst Advent - Job Queue
+=head1 Catalyst Advent - Job Queue
 
 Running a job queue
 
