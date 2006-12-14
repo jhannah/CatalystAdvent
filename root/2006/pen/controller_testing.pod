@@ -1,0 +1,72 @@
+=head1 Testing Catalyst Controllers
+
+=head2 Introduction
+Any non-trivial project needs solid QA, and most Catalyst projects are non trivial.
+This article will guide through some specific way to test your controllers.
+
+General Perl testing is beyond the scope of this discussion, but you can read about it
+in Test::Tutorial, Test::Simple, Test::More, and chromatic's great book, Testing Perl.
+
+=head2 Think outside the box with Test::WWW::Mechanize::Catalyst
+
+Test::WWW::Mechanize::Catalyst will give you an outside view of your system. 
+You may want to write acceptance tests that cover all the project specs. A set 
+of Mechanize tests can even be the basis of a contract with your client.
+
+For example, T::W::M::C tests will answers questions like: Can I click this link?
+What does this page contain? If I submit this form, will the content be updated?
+ 
+It is also nice for testing complex user scenarios. 
+
+1. the user logs in, 2. the user menu is correctly displayed, 3. the user clicks 
+the 'catalog icon', 4. the catalog is displayed, 5. the user clicks the 'add to 
+cart button' 6. the cart now contains the selected item, etc.
+
+A minimum level of implementation knowledge is needed: just the form input names, 
+what are the URLs, what is the expected output of one action. These could be 
+easily described even before starting the implementation.
+
+A good way to bootstrap your mechanized tests is passing B<-mechanize> to the
+controller helper:
+ script/myapp_create.pl -mechanize controller Foo
+
+Since we already have the Root controller, we need to create the test file manually:
+
+ t/controller_root.t
+
+ use strict;
+ use warnings;
+ use Test::More;
+ 
+ eval "use Test::WWW::Mechanize::Catalyst 'Cheer'";
+ plan $@
+     ? ( skip_all => 'Test::WWW::Mechanize::Catalyst required' )
+     : ( tests => 2 );
+ 
+ ok( my $mech = Test::WWW::Mechanize::Catalyst->new, 'Created mech object' );
+ 
+ $mech->get_ok( 'http://localhost/' );
+
+For a cleaner output I always disable -Debug (in lib/Cheer.pm). You can enable
+the debug mode when needed by setting the CHEER_DEBUG environment variable: 
+
+ CHEER_DEBUG=1 script/cheer_server.pl -r
+
+get_ok will just examine if you got a 2xx HTTP status. Let's see if the page actually contains what we want:
+
+
+=head2 Chuck Norris tests his Catalyst controllers with Test::More
+
+=head3 AUTHOR
+
+Bogdan Lucaciu B<bogdan@sns.ro>
+
+=head3 COPYRIGHT
+
+Copyright 2006 System & Network Solutions - http://www.sns.ro
+
+This document can be freely redistributed and can be modified and 
+re-distributed under the same conditions as Perl itself.
+
+=cut
+

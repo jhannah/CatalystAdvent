@@ -1,0 +1,23 @@
+=head1 Day X - HTML::Widget tricks
+
+How to generate custom markup from your widget using a custom container,
+and some notes about adding custom elements to your forms.
+
+=head2 Don't like the markup? Build a custom container
+
+=head2 Add custom tags in your labels and forms
+
+
+=head3 AUTHOR
+
+Bogdan Lucaciu B<bogdan@sns.ro>
+
+=head3 COPYRIGHT
+
+Copyright 2006 System & Network Solutions - http://www.sns.ro
+
+This document can be freely redistributed and can be modified and 
+re-distributed under the same conditions as Perl itself.
+
+=cut
+

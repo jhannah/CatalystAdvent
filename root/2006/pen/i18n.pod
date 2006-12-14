@@ -1,0 +1,26 @@
+=head1 Day X - I18N
+
+Catalyst I18N and L10N using B<Catalyst::Plugin::I18N>
+
+=head2 Introduction
+
+=head2 Setting the URLs , using chained actions
+
+=head2 I18N with $c->loc
+
+=head2 L10N with a little help from xgettext.pl
+
+
+=head3 AUTHOR
+
+Bogdan Lucaciu B<bogdan@sns.ro>
+
+=head3 COPYRIGHT
+
+Copyright 2006 System & Network Solutions - http://www.sns.ro
+
+This document can be freely redistributed and can be modified and 
+re-distributed under the same conditions as Perl itself.
+
+=cut
+
