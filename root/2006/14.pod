@@ -6,8 +6,8 @@ Running a job queue
 
 A Job Queue enables you to run code at a fixed time interval (like
 C<cron> does on Unix, C<launchd> on Mac OS X and "Scheduled Tasks" on
-Windows). In this example, job is run as a HTTP request, so you can
-reuse you Catalyst application code.
+Windows). The job in this example runs as a HTTP request, so
+you can reuse you Catalyst application code.
 
 =head2 Get Started
 
@@ -40,7 +40,7 @@ Generate a new Catalyst application in another directory:
   <... a few "created" messages>
   
 Now you have all you need to run the job queue, let's configure
-it. Add the following configuration values to your F<jobqueueapp.yml>
+it. Add the following configuration values to the F<jobqueueapp.yml>
 configuration file:
 
   Catalyst::Engine::JobQueue::POE:
@@ -55,11 +55,11 @@ This will make the job queue render the job responses to the application log.
 It's time to create a job. Edit the F<crontab> file in the application
 root and uncomment the last line (the one with the many "*"). Each
 uncommented line represents a job. The first 6 elements will determine
-how often your job will be run (it's in crontab syntax,
+how often the job will be run (it's in crontab syntax,
 L<http://www.adminschoice.com/docs/crontab.htm#Crontab file>). The
 next one is unused for now, so you can ignore it. The last one
-represents the request that the job will send to your application:
-It's the path part of a URL. Your job looks like this:
+represents the request that the job will send to the application:
+It's the path part of a URL. The job looks like this:
 
   *   *   *   *   *   *   root   /test/job
 
@@ -75,9 +75,9 @@ You can now run the job queue with:
 You should see the typical Catalyst debug output. If you now wait for
 60 seconds, you will see some more debug info (indicating that a
 request is being processed) along with the HTML source of the default
-Catalyst welcome page. It's the same output your browser would receive
-if you'd start the Catalyst web server and point it at your server and
-the C</test/job> URL.
+Catalyst welcome page. It's the same output that your browser would
+receive if you'd start the Catalyst web server and point it at the
+server and the C</test/job> URL.
 
 =head2 Getting mail
 
@@ -91,12 +91,10 @@ underneath:
 
 Pay attention to the YAML alignment (C<email> should be vertically
 aligned with C<to: [log]>).  Put your email address on the C<to> line
-and the address that you want to see the mail report coming from on the
-C<from> line. I<IMPORTANT> For this feature, your development server
-should be able to send emails, if not add a line like this to your
-config:
-     
-      smtp: mail.myserver.com
+and the address that you want to see the mail report coming from on
+the C<from> line. I<IMPORTANT> For this feature, the development
+machine should be able to send emails by direct SMTP, if not add a
+line like this to the config: smtp: mail.myserver.com
 
 Again C<smtp> should be vertically aligned with C<to:
 user@myserver.com>. Put your SMTP server on this line.
@@ -128,12 +126,12 @@ I<IMPORTANT> This will only work if you have access to the C<w>
 command line application. Under Windows or in restricted environment
 you might not get any information.
 
-Now edit your F<crontab> file so that the line you uncommented earlier
+Now edit the F<crontab> file so that the line you uncommented earlier
 looks like this:
 
   */5   *   *   *   *   *   root   /system/load
 
-and in your application configuration file change the C<to: [email]>
+and in the application configuration file change the C<to: [email]>
 line to C<to: [log, email]>.
 
 Now start the job queue and every 5 minutes the uptime, user count and
@@ -142,7 +140,7 @@ load averages will be logged as well as sent to you by mail.
 =head2 Summary
 
 As you have seen you can setup the job queue to run any action from
-your controllers and have the results logged and/or mailed to you.
+the controllers and have the results logged and/or mailed to you.
 
 Keep in mind though that the engine is not yet production quality and
 not recommended for running critical jobs.  However expect a CPAN
