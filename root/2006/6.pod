@@ -60,12 +60,12 @@ It enables us do the following:
 
    # Merge current state with new params - in a real app you'd do 
    # something more substantial here
-   %state = ( %state, %{$c->req->params} );
-   $state{q_id}++;
+   %quiz_state = ( %quiz_state, %{$c->req->params} );
+   $quiz_state{q_id}++;
 
    # Put question in stash for display
    my $question : Stashed 
-     = $c->model('DBIC::Quiz')->find( $state{q_id} );
+     = $c->model('DBIC::Quiz')->find( $quiz_state{q_id} );
  }
 
 Looks a bit tidier this way, doesn't it? When you give an attribute of
