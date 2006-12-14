@@ -134,7 +134,7 @@ what the C<pdf> sub should look like:
 
          return 0 if $line =~ /^Output written on ${filename}.pdf \(\d+ pages?, \d+ bytes?\).$/;
          return $ret;
-       } if $c->engine eq 'Catalyst::Engine::HTTP';
+       } if $c->engine =~ /^Catalyst::Engine::HTTP/;
 
        if ($c->forward( 'PDFTest::View::TT')) {
          $c->response->content_type('application/pdf');
