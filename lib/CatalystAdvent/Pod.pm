@@ -12,6 +12,13 @@ package CatalystAdvent::Pod;
 use base 'Pod::Xhtml';
 use strict;
 
+sub new {
+    my $class = shift;
+    $Pod::Xhtml::SEQ{L} = \&seqL;
+
+    $class->SUPER::new(@_);
+}
+
 sub textblock {
     my $self   = shift;
     my ($text) = @_;
@@ -37,6 +44,25 @@ sub command {
         if $command =~ /^head/ and $paragraph =~ /AUTHOR/;
 
     return $self->SUPER::command(@_);
+}
+
+sub seqL {
+    my ($self, $link) = @_;
+    $self->{LinkParser}->parse($link);
+    my $page = $self->{LinkParser}->page;
+    my $kind = $self->{LinkParser}->type;
+    my $targ = $self->{LinkParser}->node;
+    my $text = $self->{LinkParser}->text;
+    
+    if ($kind eq 'hyperlink'){
+	return $self->SUPER::seqL($link);
+    }
+    
+    $targ ||= $text;
+    $text = Pod::Xhtml::_htmlEscape($text);
+    $targ = Pod::Xhtml::_htmlEscape($targ);
+    
+    return qq{<a href="http://search.cpan.org/perldoc?$targ">$text</a>};
 }
 
 sub title   { $_[0]->{_title} }
