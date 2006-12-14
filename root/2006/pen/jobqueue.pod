@@ -4,10 +4,10 @@ Running a job queue
 
 =head2 What's a job queue?
 
-A Job Queue helps you to run some code at a fixed time interval (like
+A Job Queue enables you to run code at a fixed time interval (like
 C<cron> does on Unix, C<launchd> on Mac OS X and "Scheduled Tasks" on
-Windows). The job is run as a HTTP request, so you can reuse you
-Catalyst application code.
+Windows). In this example, job is run as a HTTP request, so you can
+reuse you Catalyst application code.
 
 =head2 Get Started
 
@@ -15,6 +15,10 @@ Export the L<Catalyst::Engine::JobQueue::POE> source into a working
 directory:
 
   $ svn export http://dev.catalyst.perl.org/repos/Catalyst/trunk/Catalyst-Engine-JobQueue-POE
+
+We use C< svn export > instead of C< svn checkout > so that you don't
+clutter up a working copy with the files created in the module build
+process.
 
 Build and install the engine:
 
@@ -48,10 +52,10 @@ This will make the job queue render the job responses to the application log.
 
 =head2 Create your first job
 
-It's time to create a job. Edit the F<crontab> file and uncomment the
-last line (the one with the many "*"). Each uncommented line
-represents a job. The first 6 elements will determine how often your
-job will be run (it's in crontab syntax,
+It's time to create a job. Edit the F<crontab> file in the application
+root and uncomment the last line (the one with the many "*"). Each
+uncommented line represents a job. The first 6 elements will determine
+how often your job will be run (it's in crontab syntax,
 L<http://www.adminschoice.com/docs/crontab.htm#Crontab file>). The
 next one is unused for now, so you can ignore it. The last one
 represents the request that the job will send to your application:
@@ -87,15 +91,15 @@ underneath:
 
 Pay attention to the YAML alignment (C<email> should be vertically
 aligned with C<to: [log]>).  Put your email address on the C<to> line
-and some address you wish to see the mail report coming from on the
+and the address that you want to see the mail report coming from on the
 C<from> line. I<IMPORTANT> For this feature, your development server
 should be able to send emails, if not add a line like this to your
 config:
      
       smtp: mail.myserver.com
 
-Again C<smtp> should be vertically aligned with C<to: user@myserver.com>. Put
-your SMTP server on this line.
+Again C<smtp> should be vertically aligned with C<to:
+user@myserver.com>. Put your SMTP server on this line.
 
 Re-run the job queue. This time, you should receive an email with the
 default Catalyst page shortly after the full minute). Don't forget to
@@ -141,7 +145,8 @@ As you have seen you can setup the job queue to run any action from
 your controllers and have the results logged and/or mailed to you.
 
 Keep in mind though that the engine is not yet production quality and
-not recommended for running critical jobs.
+not recommended for running critical jobs.  However expect a CPAN
+release for the job queue engine soon.
 
 =head3 AUTHOR
 
