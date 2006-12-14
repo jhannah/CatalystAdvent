@@ -7,7 +7,7 @@ Running a job queue
 A Job Queue enables you to run code at a fixed time interval (like
 C<cron> does on Unix, C<launchd> on Mac OS X and "Scheduled Tasks" on
 Windows). The job in this example runs as a HTTP request, so
-you can reuse you Catalyst application code.
+you can reuse your Catalyst application code.
 
 =head2 Get Started
 
