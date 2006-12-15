@@ -38,8 +38,8 @@ purposes.
 
 =head3 AUTHOR
 
-Streaming Server:  Andy Grundman, <andy@hybridized.org>
-This short article: Kieren Diment, <diment@gmail.com>
+Kieren Diment, <diment@gmail.com>
+Andy Grundman, <andy@hybridized.org> (streaming server)
 
 =head3 COPYRIGHT.
 
