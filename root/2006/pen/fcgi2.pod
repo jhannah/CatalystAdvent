@@ -1,46 +1,39 @@
-=head2 Entry 16 FastCGI, second visit
+=head1 Day 16 - FastCGI, second visit
 
-Here's a simple, newbie perspective on FastCGI deployment.
+A simple, newbie perspective on FastCGI deployment.
 
-=head2 Introduction
+=head2 Deploying with FastCGI
 
 Deployment can be tricky for any environment.  Catalyst is no
 exception.  Each server can have its own idiosyncrasies, and there are
 gotchas at every corner.  Here is a guide to getting your application
-live deployed using FastCGI on Apache.
+live deployed using FastCGI and Apache, on a pretty "uncooperative" server.
 
-Because deployment is dependent on many things external to Catalyst,
-we're particularly interested in feedback on deployment.  If you
-experience issues, the #catalyst irc channel on irc.perl.org or the
-Catalyst mailing list (see the end of this article for details) should
-be your first port of call.
-
-FastCGI is a recommended deployment route because it offers the
-similar speed to mod_perl, but allows you to restart your app without
-restarting the whole Apache server (FastCGI doesn't just limit you to
-Apache either).  FastCGI also allows you to run multiple versions of
-the same application with the same web server.
+We took the FastCGI route because it offers nearly the same speed as
+mod_perl, but allows you to restart your app without restarting the whole
+Apache server. FastCGI also allows you to run multiple versions of the same
+application with the same web server.
 
 There are three ways to go FastCGI: static, dynamic and external.
 External is the most flexible and the simplest way to restart your app
 without restarting the entire server.
 
-You can use the external server with sockets (a file which facilitates
-inter-process communication), or with a tcp connection.  Tcp offers the
-most flexibility in the end (the application can easily run on a
-different machine to the server), so this is the way we are going.
+Apache can communicate with the external server via a socket, or via
+a TCP connection.  TCP offers the most flexibility in the end (the
+application can easily run on a different machine from the server),
+so this is the way we are going.
 
-To configure your web server, adapt the  following for use in your server's
+To configure your web server, adapt the following for use in your server's
 httpd.conf:
 
- FastCgiExternalServer
- /path/to/myapp/script/myapp_fastcgi.pl -host 127.0.0.1:55900
- Alias / /path/to/myapp/script/myapp_fastcgi.pl/
- # or Alias /myapp/ /path/to/myapp/script/myapp_fastcgi.pl/ to run as non root
+  FastCgiExternalServer
+  /path/to/myapp/script/myapp_fastcgi.pl -host 127.0.0.1:55900
+  Alias / /path/to/myapp/script/myapp_fastcgi.pl/
+  # or Alias /myapp/ /path/to/myapp/script/myapp_fastcgi.pl/ to run as non root
 
 Launch your application as
 
- script/myapp_fastcgi.pl -e -l 127.0.0.1:55900 -p /tmp/myapp.pid
+  $ script/myapp_fastcgi.pl -e -l 127.0.0.1:55900 -p /tmp/myapp.pid
 
 The -e switch causes your application's STDERR output to go to the
 screen, instead of ending up in Apache's error log.  Launch
@@ -48,74 +41,74 @@ myapp_fastcgi.pl --help and check if its usage displays the "-e"
 parameter. If not, you need to have the latest version of
 "Catalyst::Devel" (version 1.02 at the time of writing):
 
- perl -MCPAN -e "install Catalyst::Devel"
+  $ perl -MCPAN -e "install Catalyst::Devel"
 
 You also need to regenerate the helper scripts. You can do this by launching
 
- catalyst.pl -force myapp
+  $ catalyst.pl -force myapp
 
-=head2 Writing a start-stop  daemon
+=head2 Writing a start/stop daemon
 
 Once you've finished development, you will probably want to be able to
 start your FastCGI server non-interactively when your web server
 starts or when your operating system boots.  For this, it's most
-efficient to write a start-stop daemon.  Here's a sample start-stop
+efficient to write a start/stop daemon.  Here's a sample start/stop
 daemon, tested using the bash shell on FreeBSD:
 
 
- #!/bin/bash
- myapp = mycoolapp
- myapp_path = /path/to/myapp
- port2Apache = 55900
-  
- function start {
-     echo "Restarting... Press Ctrl+Z, then type: 'bg', Enter"
-     # the "-d" switch to myapp_fastcgi.pl should save us from asking the user
-     # to run 'bg', but unfortunately it doesn't work in all instances
+  #!/bin/bash
+  myapp = mycoolapp
+  myapp_path = /path/to/myapp
+  port2Apache = 55900
+ 
+  function start {
+    echo "Restarting... Press Ctrl+Z, then type: 'bg', Enter"
+    # the "-d" switch to myapp_fastcgi.pl should save us from asking the user
+    # to run 'bg', but unfortunately it doesn't work in all instances
+    # nohup also doesn't work because myapp_fastcgi terminates when this script terminates
+    ${myapp_path}/script/${myapp}_fastcgi.pl -e -l 127.0.0.1:$port2Apache -p /tmp/${myapp}.pid 2> ${myapp_path}/${myapp}_stderr.log
+  }
+ 
+  function stop {
+    echo -n "Waiting for existing connections to finish..."
+    while [[ `netstat | grep $port2Apache | grep ESTABLISHED` ]]; do
+    sleep 1
+    echo -n "."
+    done
 
-     ${myapp_path}/script/${myapp}_fastcgi.pl -e -l 127.0.0.1:$port2Apache -p /tmp/${myapp}.pid 2> ${myapp_path}/${myapp}_stderr.log
- }
-  
- function stop {
-      echo -n "Waiting for existing connections to finish..."
-     while [[ `netstat | grep $port2Apache | grep ESTABLISHED` ]]; do
-     sleep 1
-     echo -n "."
-     done
-
-     echo " OK."
-     echo -n "Terminating existing instance..."
-  
-     if [[ -r /tmp/ ${myapp} . pid ]]; then
-         kill `cat /tmp/${myapp}.pid` 2 > /dev/null;
-         while [[ -r /tmp/${myapp}.pid ]]; do
-             echo -n "."
-             sleep 1
-             rm /tmp/$myapp.pid 2> /dev/null
-         done
-     fi
-     echo " OK."
- }
-  
- case $1 in
- 'start' )
-   start;;
+    echo " OK."
+    echo -n "Terminating existing instance..."
+ 
+    if [[ -r /tmp/ ${myapp} . pid ]]; then
+      kill `cat /tmp/${myapp}.pid` 2 > /dev/null;
+      while [[ -r /tmp/${myapp}.pid ]]; do
+        echo -n "."
+        sleep 1
+        rm /tmp/$myapp.pid 2> /dev/null
+      done
+    fi
+    echo " OK."
+  }
+ 
+  case $1 in
+  'start' )
+    start;;
   'stop' )
-   stop;;
+    stop;;
   'restart' )
-   stop
-   start;;
- esac
+    stop
+    start;;
+  esac
 
 
 =head2 Wrap up
 
 This is a nice simple step by step deployment guide for FastCGI on
 Apache.  Please report any problems you have with this guide to the
-L<Catalsyt Mailing List|http://lists.rawmode.org/mailman/listinfo/catalyst>.
+Catlyst Mailing List (L<http://lists.rawmode.org/mailman/listinfo/catalyst>).
 
 For further information, please see the L<Catalyst::Engine::FastCGI>
-and <Catalyst::Cookbook> documentation.
+and L<Catalyst::Cookbook> documentation.
 
 =head3 AUTHOR
 
@@ -124,6 +117,6 @@ Kieren Diment <diment@gmail.com>
 
 =head3 COPYRIGHT
 
-Copyright 2006 Vlad Dan Dascalescu.  This document can be freely
+Copyright 2006 Dan Dascalescu.  This document can be freely
 redistributed and can be modified and re-distributed under the same
 conditions as Perl itself.
