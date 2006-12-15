@@ -12,6 +12,11 @@ Catalyst which you can obtain by issuing the command:
 
  svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Streaming
 
+In simple terms a streaming server is a web server that dynamically
+throttles the deliver of large media blobs on a per user basis.  This
+server is really a proof of concept which shows you the basic
+technique to get started with that task.
+
 Because it's relatively old (by Catalyst standards) there is no
 C< Controller::Root > - the root controller is in C< Streaming.pm >.
 
