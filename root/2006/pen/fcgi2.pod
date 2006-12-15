@@ -79,7 +79,7 @@ daemon, tested using the bash shell on FreeBSD:
     echo " OK."
     echo -n "Terminating existing instance..."
  
-    if [[ -r /tmp/ ${myapp} . pid ]]; then
+    if [[ -r /tmp/${myapp}.pid ]]; then
       kill `cat /tmp/${myapp}.pid` 2 > /dev/null;
       while [[ -r /tmp/${myapp}.pid ]]; do
         echo -n "."
