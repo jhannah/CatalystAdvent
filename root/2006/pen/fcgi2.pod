@@ -29,7 +29,7 @@ httpd.conf:
   FastCgiExternalServer
   /path/to/myapp/script/myapp_fastcgi.pl -host 127.0.0.1:55900
   Alias / /path/to/myapp/script/myapp_fastcgi.pl/
-  # or Alias /myapp/ /path/to/myapp/script/myapp_fastcgi.pl/ to run as non root
+  # or Alias /myapp/ /path/to/myapp/script/myapp_fastcgi.pl/ to run at a non root location
 
 Launch your application as
 
