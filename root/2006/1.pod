@@ -12,7 +12,7 @@ Smalltalk programming language and popularised by the L<Gang of 4
 book|http://xrl.us/tg3y>.  MVC coding is an excellent antidote to
 "spaghetti code".  Catalyst's use of this approach, its powerful
 dispatcher (controller logic), and its model and view agnosticism is
-what accounts for L<its power|Catalyst::Manual::About>.
+what accounts for L<its power|http://search.cpan.org/dist/Catalyst-Manual/lib/Catalyst/Manual/About.pod>.
 
 For the first day of Catalyst Advent 2006, I'll keep it traditional:
 we'll write a complete, if basic, sample application that shows several
@@ -333,7 +333,7 @@ Here's the patch:
 So I've shown you how to use Catalyst with Subversion, touched briefly
 on the View, and showed you how to use a custom model that uses a
 non-catalyst L<CPAN> module.  If you don't know Catalyst, we recommend
-that you go through the tutorials from L<Catalyst::Manual::Tutorial>
+that you go through the tutorials from L<Catalyst::Manual::Tutorial|http://search.cpan.org/dist/Catalyst-Manual/lib/Catalyst/Manual/Tutorial.pod>
 which go into quite a lot more detail.  For more details on
 Subversion, and particularly the function of the tags, trunk, and
 branches directory structure which we created, see the excellent free
