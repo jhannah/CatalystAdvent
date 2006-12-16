@@ -147,9 +147,11 @@ for more detail):
     %r Number of milliseconds elapsed from program start to logging 
        event   
     %T A stack trace of functions called
-    %x The topmost NDC (see below)
-    %X{key} The entry 'key' of the MDC (see below)
     %% A literal percent (%) sign
+
+Note that C<%F>, C<%l>, C<%L>, C<%M>, and C<%T> are relative to 
+Catalyst.pm versus your code, and are therefore less useful in Catalyst 
+applications.
 
 Then tell the Log4perl constructor to read the configuration from the 
 file created above by opening C<lib/MyApp.pm> and changing this line:
@@ -325,6 +327,25 @@ changed):
 
 Logging to STDERR is now added to the output previously seen on the 
 LOGFILE and EMAIL appenders.
+
+
+=head2 Logging Perl's Warnings
+
+You can also have Catalyst send warnings in other parts of the code
+to your logs.  To enable this, edit C<lib/MyApp.pm> and add the
+following lines:
+
+    # Handle warnings from Perl as fatal log messages
+    $SIG{__WARN__} = sub { __PACKAGE__->log->fatal(@_); };
+
+Then add the following somewhere inside the C<index> method of
+C<lib/MyApp/Controller/Test.pm>:
+
+    warn "Test warning";
+
+If you then restart the development server and reload your browser you 
+should see a FATAL log message that corresponds to the testing warnings 
+added above.  (Thanks to Dan Dascalescu for suggesting this tip.)
 
 
 =head2 More Information
