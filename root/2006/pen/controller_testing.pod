@@ -84,6 +84,39 @@ Ok, now that we have a way to fake time, we can test other scenarios as well.
 Let's see what happens if it's already Christmas (December 25th) or we just
 passed Christmas (December 26th):
 
+ {no warnings; *Cheer::Model::Now::Today = sub { return 2006,12,25};}
+ $mech->get_ok( 'http://localhost/' , 'Requested page');
+ $mech->content_like(qr/It's already Christmas, go check your presents!/, 'Christmas day');
+ 
+ {no warnings; *Cheer::Model::Now::Today = sub { return 2006,12,27};}
+ $mech->get_ok( 'http://localhost/' , 'Requested page');
+ $mech->content_like(qr/You just missed it, but there's one next year too!/, 'post Christmas');
+
+Don't forget to update your plan, you have 7 tests now. Let's run it:
+
+ $ perl -Ilib t/controller_root.t
+ 1..7
+ ok 1 - Created mech object
+ ok 2 - Requested page
+ ok 3 - Checked content
+ ok 4 - Requested page
+ not ok 5 - Christmas day
+ #   Failed test 'Christmas day'
+ #   in t/controller_root.t at line 19.
+ #          got: "<html><head><title>Happy winter solstice</title></"...
+ #       length: 156
+ #     doesn't match '(?-xism:It's already Christmas, go check your presents!)'
+ ok 6 - Requested page
+ not ok 7 - post Christmas
+ #   Failed test 'post Christmas'
+ #   in t/controller_root.t at line 23.
+ #          got: "<html><head><title>Happy winter solstice</title></"...
+ #       length: 157
+ #     doesn't match '(?-xism:You just missed it, but there's one next year too!)'
+ # Looks like you failed 2 tests of 7.
+
+
+
 =head2 Chuck Norris tests his Catalyst controllers with Test::More
 
 =head3 AUTHOR
