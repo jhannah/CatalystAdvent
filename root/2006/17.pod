@@ -1,31 +1,38 @@
 =head1 Day 17 - Testing Catalyst Controllers
 
+Unit testing and acceptance testing for Catalyst.
+
 =head2 Introduction
 
-Any non-trivial project needs solid QA, and most Catalyst projects are not 
-trivial. This article will guide through some specific way to test your 
-controllers.
+Any non-trivial project needs solid QA, and most Catalyst projects are
+not trivial. This article will guide through some specific way to test
+your controllers.
 
-General Perl testing is beyond the scope of this discussion, but you can read 
-about it in Test::Tutorial, Test::Simple, Test::More, and chromatic's great 
-book, Testing Perl.
+General Perl testing is beyond the scope of this discussion, but you
+can read about it in L<Test::Tutorial>, L<Test::Simple>,
+L<Test::More>, and the <Perl Testing
+Notebook|http://www.oreilly.com/catalog/perltestingadn/> which is
++highly recommended..
 
 =head2 Think outside the box with Test::WWW::Mechanize::Catalyst
 
-Test::WWW::Mechanize::Catalyst will give you an outside view of your system. 
-You may want to write acceptance tests that cover all the project specs. A set 
-of Mechanize tests can even be the basis of a contract with your client.
+Test::WWW::Mechanize::Catalyst will give you an outside view of your
+system.  You may want to write acceptance tests that cover all the
+project specs. A set of Mechanize tests can even be the basis of a
+contract with your client.
 
-For example, T::W::M::C tests will answers questions like: Can I click this 
-link? What does this page contain? If I submit this form, will the content be 
-updated? It is also nice for testing complex user scenarios. 
+For example, T::W::M::C tests will answers questions like: Can I click
+this link? What does this page contain? If I submit this form, will
+the content be updated? It is also nice for testing complex user
+scenarios.
 
-A good way to bootstrap your mechanized tests is passing B<-mechanize> to the
-controller helper:
+A good way to bootstrap your mechanized tests is passing B<-mechanize>
+to the controller helper:
 
  script/myapp_create.pl -mechanize controller Foo
 
-Since we already have the Root controller, we need to create the test file manually:
+Since we already have the Root controller, we need to create the test
+file manually:
 
  t/controller_root.t
 
@@ -42,12 +49,14 @@ Since we already have the Root controller, we need to create the test file manua
  
  $mech->get_ok( 'http://localhost/' , 'Requested page');
 
-For a cleaner output I always disable -Debug (in lib/Cheer.pm). You can enable
-the debug mode when needed by setting the CHEER_DEBUG environment variable: 
+For a cleaner output I always disable -Debug (in lib/Cheer.pm). You
+can enable the debug mode when needed by setting the CHEER_DEBUG
+environment variable:
 
- CHEER_DEBUG=1 script/cheer_server.pl -r
+ CHEER_DEBUG=1 script/cheer_server.pl
 
-get_ok will just examine if you got a 2xx HTTP status. Let's see if the page actually contains what we want:
+get_ok will just examine if you got a 2xx HTTP status. Let's see if
+the page actually contains what we want:
 
  $mech->content_like(qr/And best regards for the new year!  There are \d+
  days left until santa comes/, 'Checked content');
@@ -64,10 +73,10 @@ we should get:
  ok 3 - Checked content
 
 
-Because we don't use an external http server, we can use any kind of magick to 
-alter our app's environment. A good way to test if the number of days is ok
-is faking Today() in Cheer::Model::Now, using magick of course. Let's just 
-replace the tests like this:
+Because we're not using an external http server, we can use any kind
+of magic to alter our app's environment. A good way to test if the
+number of days is ok is faking Today() in Cheer::Model::Now.  Modify
+the tests with the following code:
 
  {no warnings; *Cheer::Model::Now::Today = sub { return 2006,12,5};}
  
@@ -77,12 +86,12 @@ replace the tests like this:
 
 All tests successful :)
 
-Note we could have done something cleaner using Time::Warp or Test::MockTime if
-Date::Calc was written in pure Perl.
+Note we could have done something cleaner using Time::Warp or
+Test::MockTime if Date::Calc was written in pure Perl.
 
-Ok, now that we have a way to fake time, we can test other scenarios as well. 
-Let's see what happens if it's already Christmas (December 25th) or we just
-passed Christmas (December 27th):
+Ok, now that we have a way to fake time, we can test other scenarios
+as well.  Let's see what happens if it's already Christmas (December
+25th) or we just passed Christmas (December 27th):
 
  {no warnings; *Cheer::Model::Now::Today = sub { return 2006,12,25};}
  $mech->get_ok( 'http://localhost/' , 'Requested page');
@@ -115,8 +124,9 @@ Don't forget to update your plan, you have 7 tests now. Let's run it:
  #     doesn't match '(?-xism:You just missed it, but there's one next year too!)'
  # Looks like you failed 2 tests of 7.
 
-Oops, apparently our app is not ready for these exceptional cases. Let's fix 
-it and pass the tests. Here's the diff for our template:
+Oops, apparently our app is not ready for these exceptional
+cases. Let's fix it and pass the tests. Here's the diff for our
+template:
 
  --- root/hi_there.tt    (revision 5693)
  +++ root/hi_there.tt    (working copy)
@@ -143,18 +153,18 @@ it and pass the tests. Here's the diff for our template:
  
 All tests successful again :)
 
-This concludes our example, but remember we're just scratching the surface of
-Test::WWW::Mechanize::Catalyst. You can submit forms, authenticate using
-cookies, please explore this further:
+This concludes our example, but remember we're just scratching the
+surface of Test::WWW::Mechanize::Catalyst. You can submit forms,
+authenticate using cookies, please explore this further:
 
 L<Test::WWW::Mechanize::Catalyst>, L<Test::WWW::Mechanize>,
 L<WWW::Mechanize>, L<LWP::UserAgent>.
 
 =head2 Chuck Norris tests his Catalyst controllers with Test::More
 
-While testing your app from outside is very useful to check if your features 
-are implemented as planned, more rigurous testing is needed to ensure the
-B<corectness of your code>.
+While testing your app from outside is very useful to check if your
+features are implemented as planned, more rigurous testing is needed
+to ensure the B<corectness of your code>.
 
 When testing controllers you basically want to fake their context, run the 
 action and check the stash.
@@ -178,15 +188,16 @@ Let's do just that. Open a new file, t/controller_root_unit.t:
  Cheer::Controller::Root::index( undef, $context );
  is_deeply ($context->stash, {'template' => 'hi_there.tt','days_till_xmas' => 5}, 'checked stash');
 
-You have there a fake model that always gives 5 days till xmas, and a fake
-context that returns the fake model. 
+You have there a fake model that always gives 5 days till xmas, and a
+fake context that returns the fake model.
 
-Later on, after the action is ran, you can pick up the results from the fake 
-context's stash.
+Later on, after the action is ran, you can pick up the results from
+the fake context's stash.
 
-When unit testing controllers, just make sure you provide all the needed 
-objects in the action's argument list. Make sure every method your code calls 
-has predictable results. And then, just check the stash and you're done.
+When unit testing controllers, just make sure you provide all the
+needed objects in the action's argument list. Make sure every method
+your code calls has predictable results. And then, just check the
+stash and you're done.
 
 =head3 AUTHOR
 
@@ -196,6 +207,6 @@ Bogdan Lucaciu B<bogdan@sns.ro>
 
 Copyright 2006 System & Network Solutions - http://www.sns.ro
 
-This document can be freely redistributed and can be modified and 
+This document can be freely redistributed and can be modified and
 re-distributed under the same conditions as Perl itself.
 
