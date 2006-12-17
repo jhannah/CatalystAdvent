@@ -4,6 +4,10 @@ Catalyst I18N and L10N using B<Catalyst::Plugin::I18N>
 
 =head2 Introduction
 
+The task is fairly simple: Allow the user to specify his language of choice,
+replace all translatable messages with function calls to a translation module,
+and write translations for every language you want. The last part (L10N) can 
+
 =head2 Setting the URLs , using chained actions
 
 =head2 I18N with $c->loc
