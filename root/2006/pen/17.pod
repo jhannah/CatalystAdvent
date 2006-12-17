@@ -178,10 +178,11 @@ Let's do just that. Open a new file, t/controller_root_unit.t:
  Cheer::Controller::Root::index( undef, $context );
  is_deeply ($context->stash, {'template' => 'hi_there.tt','days_till_xmas' => 5}, 'checked stash');
 
-You have there a fake model that always has 5 days till xmas, and a fake
-context that returns our fake model. 
+You have there a fake model that always gives 5 days till xmas, and a fake
+context that returns the fake model. 
 
-Later on, after the action is ran, you can pick up the results from the fake context's stash.
+Later on, after the action is ran, you can pick up the results from the fake 
+context's stash.
 
 When unit testing controllers, just make sure you provide all the needed 
 objects in the action's argument list. Make sure every method your code calls 
