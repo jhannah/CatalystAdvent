@@ -10,9 +10,9 @@ your controllers.
 
 General Perl testing is beyond the scope of this discussion, but you
 can read about it in L<Test::Tutorial>, L<Test::Simple>,
-L<Test::More>, and the <Perl Testing
-Notebook|http://www.oreilly.com/catalog/perltestingadn/> which is
-+highly recommended..
+L<Test::More>, and the 
+L<Perl Testing Notebook|http://www.oreilly.com/catalog/perltestingadn> 
+which is highly recommended.
 
 =head2 Think outside the box with Test::WWW::Mechanize::Catalyst
 
@@ -71,7 +71,6 @@ we should get:
  ok 1 - Created mech object
  ok 2 - Requested page
  ok 3 - Checked content
-
 
 Because we're not using an external http server, we can use any kind
 of magic to alter our app's environment. A good way to test if the
@@ -183,7 +182,6 @@ Let's do just that. Open a new file, t/controller_root_unit.t:
  *FakeContext::stash = sub {return shift->{stash}};
  }
  my $context = bless { stash=> {} } , 'FakeContext';
- 
  
  Cheer::Controller::Root::index( undef, $context );
  is_deeply ($context->stash, {'template' => 'hi_there.tt','days_till_xmas' => 5}, 'checked stash');
