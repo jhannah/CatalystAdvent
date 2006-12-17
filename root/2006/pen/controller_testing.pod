@@ -1,11 +1,14 @@
 =head1 Testing Catalyst Controllers
 
 =head2 Introduction
-Any non-trivial project needs solid QA, and most Catalyst projects are non trivial.
-This article will guide through some specific way to test your controllers.
 
-General Perl testing is beyond the scope of this discussion, but you can read about it
-in Test::Tutorial, Test::Simple, Test::More, and chromatic's great book, Testing Perl.
+Any non-trivial project needs solid QA, and most Catalyst projects are not 
+trivial. This article will guide through some specific way to test your 
+controllers.
+
+General Perl testing is beyond the scope of this discussion, but you can read 
+about it in Test::Tutorial, Test::Simple, Test::More, and chromatic's great 
+book, Testing Perl.
 
 =head2 Think outside the box with Test::WWW::Mechanize::Catalyst
 
@@ -13,21 +16,13 @@ Test::WWW::Mechanize::Catalyst will give you an outside view of your system.
 You may want to write acceptance tests that cover all the project specs. A set 
 of Mechanize tests can even be the basis of a contract with your client.
 
-For example, T::W::M::C tests will answers questions like: Can I click this link?
-What does this page contain? If I submit this form, will the content be updated?
- 
-It is also nice for testing complex user scenarios. 
-
-1. the user logs in, 2. the user menu is correctly displayed, 3. the user clicks 
-the 'catalog icon', 4. the catalog is displayed, 5. the user clicks the 'add to 
-cart button' 6. the cart now contains the selected item, etc.
-
-A minimum level of implementation knowledge is needed: just the form input names, 
-what are the URLs, what is the expected output of one action. These could be 
-easily described even before starting the implementation.
+For example, T::W::M::C tests will answers questions like: Can I click this 
+link? What does this page contain? If I submit this form, will the content be 
+updated? It is also nice for testing complex user scenarios. 
 
 A good way to bootstrap your mechanized tests is passing B<-mechanize> to the
 controller helper:
+
  script/myapp_create.pl -mechanize controller Foo
 
 Since we already have the Root controller, we need to create the test file manually:
@@ -45,7 +40,7 @@ Since we already have the Root controller, we need to create the test file manua
  
  ok( my $mech = Test::WWW::Mechanize::Catalyst->new, 'Created mech object' );
  
- $mech->get_ok( 'http://localhost/' );
+ $mech->get_ok( 'http://localhost/' , 'Requested page');
 
 For a cleaner output I always disable -Debug (in lib/Cheer.pm). You can enable
 the debug mode when needed by setting the CHEER_DEBUG environment variable: 
@@ -54,6 +49,40 @@ the debug mode when needed by setting the CHEER_DEBUG environment variable:
 
 get_ok will just examine if you got a 2xx HTTP status. Let's see if the page actually contains what we want:
 
+ $mech->content_like(qr/And best regards for the new year!  There are \d+
+ days left until santa comes/, 'Checked content');
+
+Don't forget to update the plan ( tests=>3 ) , and let's run the test:
+ 
+ perl -Ilib t/controller_testing.t
+
+we should get:
+
+ 1..3
+ ok 1 - Created mech object
+ ok 2 - Requested page
+ ok 3 - Checked content
+
+
+Because we don't use an external http server, we can use any kind of magick to 
+alter our app's environment. A good way to test if the number of days is ok
+is faking Today() in Cheer::Model::Now, using magick of course. Let's just 
+replace the tests like this:
+
+ {no warnings; *Cheer::Model::Now::Today = sub { return 2006,12,5};}
+ 
+ $mech->get_ok( 'http://localhost/' , 'Requested page');
+ $mech->content_like(qr/And best regards for the new year!  There are 20
+ days left until santa comes/, 'Checked content');
+
+All tests successful :)
+
+Note we could have done something cleaner using Time::Warp or Test::MockTime if
+Date::Calc was written in pure Perl.
+
+Ok, now that we have a way to fake time, we can test other scenarios as well. 
+Let's see what happens if it's already Christmas (December 25th) or we just
+passed Christmas (December 26th):
 
 =head2 Chuck Norris tests his Catalyst controllers with Test::More
 
