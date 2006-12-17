@@ -188,16 +188,14 @@ When unit testing controllers, just make sure you provide all the needed
 objects in the action's argument list. Make sure every method your code calls 
 has predictable results. And then, just check the stash and you're done.
 
-=head1 AUTHOR
+=head3 AUTHOR
 
 Bogdan Lucaciu B<bogdan@sns.ro>
 
-=head1 COPYRIGHT
+=head3 COPYRIGHT
 
 Copyright 2006 System & Network Solutions - http://www.sns.ro
 
 This document can be freely redistributed and can be modified and 
 re-distributed under the same conditions as Perl itself.
-
-=cut
 
