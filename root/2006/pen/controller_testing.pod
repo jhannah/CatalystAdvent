@@ -115,15 +115,54 @@ Don't forget to update your plan, you have 7 tests now. Let's run it:
  #     doesn't match '(?-xism:You just missed it, but there's one next year too!)'
  # Looks like you failed 2 tests of 7.
 
+Oops, apparently our app is not ready for these exceptional cases. Let's fix 
+it and pass the tests. Here's the diff for our template:
 
+ --- root/hi_there.tt    (revision 5693)
+ +++ root/hi_there.tt    (working copy)
+ @@ -1,4 +1,17 @@
+  <html><head><title>Happy winter solstice</title></head>
+ -<body>And best regards for the new year!  There are [% c.stash.days_till_xmas %]
+ -days left until santa comes.  </body>
+ +<body>
+ +[% IF c.stash.days_till_xmas > 0 %]
+ +And best regards for the new year!  There are [% c.stash.days_till_xmas %]
+ +days left until santa comes.
+ +[% END %]
+ +
+ +[% IF c.stash.days_till_xmas == 0 %]
+ +It's already Christmas, go check your presents!
+ +[% END %]
+ +
+ +[% IF c.stash.days_till_xmas < 0 %]
+ +You just missed it, but there's one next year too!
+ +[% END %]
+ +
+ +</body>
+  </html>
+ 
+All tests successful again :)
+
+This concludes our example, but remember we're just scratching the surface of
+Test::WWW::Mechanize::Catalyst. You can submit forms, authenticate using
+cookies, please explore this further:
+
+L<Test::WWW::Mechanize::Catalyst>, L<Test::WWW::Mechanize>,
+L<WWW::Mechanize>, L<LWP::UserAgent>.
 
 =head2 Chuck Norris tests his Catalyst controllers with Test::More
 
-=head3 AUTHOR
 
-Bogdan Lucaciu B<bogdan@sns.ro>
+=head1 SEE ALSO
 
-=head3 COPYRIGHT
+
+
+
+=head1 AUTHOR
+
+Bogdan Lucio B<bogdan@sns.ro>
+
+=head1 COPYRIGHT
 
 Copyright 2006 System & Network Solutions - http://www.sns.ro
 
