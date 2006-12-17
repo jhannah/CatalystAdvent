@@ -82,7 +82,7 @@ Date::Calc was written in pure Perl.
 
 Ok, now that we have a way to fake time, we can test other scenarios as well. 
 Let's see what happens if it's already Christmas (December 25th) or we just
-passed Christmas (December 26th):
+passed Christmas (December 27th):
 
  {no warnings; *Cheer::Model::Now::Today = sub { return 2006,12,25};}
  $mech->get_ok( 'http://localhost/' , 'Requested page');
