@@ -1,6 +1,6 @@
 =head1 Day 18 - I18N
 
-Catalyst I18N and L10N using B<Catalyst::Plugin::I18N>
+Catalyst I18N and L10N using Catalyst::Plugin::I18N
 
 =head2 Introduction
 
