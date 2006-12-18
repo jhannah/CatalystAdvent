@@ -4,31 +4,34 @@ Catalyst I18N and L10N using B<Catalyst::Plugin::I18N>
 
 =head2 Introduction
 
-The task is fairly simple: 
+The task is fairly simple:
 
-=over 
+=over
 
-=item * allow the user to specify a language of choice,
+=item * Allow the user to specify a language of choice,
 
-=item * replace all messages with function calls to a translation module,
+=item * Replace all messages with function calls to a translation
+module,
 
-=item * write translations for every language you want. 
+=item * Write translations for every language you want.
 
-=back 
+=back
 
-The last part (L10N) should be very simple (using a graphical PO editor is 
-preffered) in order to allow non-technical people to localize your software.
+The last part (L10N) should be very simple (using a graphical PO
+editor is preferred) in order to allow non-technical people to
+localise your software.
 
 =head2 Setting the URLs , using chained actions
 
-For this exercise, let's just make our app available to both English and 
-Romanian viewers. 
+For this exercise, let's just make our app available to both English
+and Romanian viewers.
 
-http://localhost/en will greet English speakers, while 
-http://localhost/ro will greet Romanian speakers.
+L<http://localhost:3000/en> will greet English speakers, while
+L<http://localhost:3000/ro> will greet Romanian speakers.
 
-A nice way to setup URLs like that is using 
-L<chained actions|Catalyst::DispatchType::Chained>:
+A nice way to setup URLs like that is using
+L<Catalyst::DispatchType::Chained> (see L<day
+10|http://www.catalystframework.org/calendar/2006/10>:
 
  -=cut
  +sub language : PathPart('') Chained('/') CaptureArgs(1) {
@@ -38,7 +41,8 @@ L<chained actions|Catalyst::DispatchType::Chained>:
  -sub index : Private {
  +sub cheer : PathPart('') Chained('language') Args(0) {
 
-If you run the devel server with debug enabled, you should see the chain:
+If you run the development server with debug enabled, you should see
+the chain:
 
  [debug] Loaded Chained actions:
  .-------------------------------------+--------------------------------------.
@@ -63,12 +67,13 @@ Then let Catalyst know what is your preffered language is:
         $c->languages( [ $language ] );
  }
 
-Ok, that's it . Let's internationalize the messages now.
+OK, that's it . Let's internationalise the messages now.
 
 =head2 I18N with $c->loc
 
 Just replace your messages with calls to $c->loc. Replace your
-interpolated variabiles with [_1] , [_2] etc. Look:
+interpolated variables with [_1] , [_2] etc. The patch below
+illustrates:
 
  --- hi_there.tt
  +++ hi_there.tt
@@ -103,13 +108,13 @@ interpolated variabiles with [_1] , [_2] etc. Look:
   </html>
  
 
-Everything should still be working, but now we are ready to 
-localize it.
+Everything should still be working, but now we are ready to localise
+it.
 
 =head2 L10N with a little help from xgettext.pl
 
 xgettext.pl comes with the Locale::Maketext::Lexicon distribution.
-You just pass it a list of files and it collects all localized strings
+You just pass it a list of files and it collects all localised strings
 and dumps them in a po file.
 
 Catalyst::Plugin::I18N expects to find its messages in 
@@ -158,8 +163,7 @@ The file is generated:
 
 Of course, in a real project you have tons of files. Here's what I do:
 
- (find root/ -name '*.tt' ; find lib/MyApp/Controller -name '*.pm' ) | 
-  xargs /path/to/xgettext.pl -o lib/MyApp/I18N/ro.po
+C< (find root/ -name '*.tt' ; find lib/MyApp/Controller -name '*.pm' )| xargs /path/to/xgettext.pl -o lib/MyApp/I18N/ro.po >
 
 Let's just translate the messages and we're done:
 
@@ -197,7 +201,7 @@ Let's just translate the messages and we're done:
  +msgstr "Craciunul a trecut, dar mai e unul anul viitor!"
 
 Restart your server, http://localhost:3000/ro should give 
-you the localized version. Craciun fericit :)
+you the localised version. Craciun fericit :)
 
 =head3 AUTHOR
 
