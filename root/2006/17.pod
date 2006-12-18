@@ -203,7 +203,7 @@ Bogdan Lucaciu B<bogdan@sns.ro>
 
 =head3 COPYRIGHT
 
-Copyright 2006 System & Network Solutions - http://www.sns.ro
+Copyright 2006 System & Network Solutions - L<http://www.sns.ro>
 
 This document can be freely redistributed and can be modified and
 re-distributed under the same conditions as Perl itself.
