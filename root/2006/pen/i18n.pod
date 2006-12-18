@@ -1,16 +1,61 @@
-=head1 Day X - I18N
+=head1 Day 18 - I18N
 
 Catalyst I18N and L10N using B<Catalyst::Plugin::I18N>
 
 =head2 Introduction
 
-The task is fairly simple: Allow the user to specify his language of choice,
+The task is fairly simple: 
+
+allow the user to specify his language of choice,
+
 replace all translatable messages with function calls to a translation module,
-and write translations for every language you want. The last part (L10N) can 
+
+write translations for every language you want. 
+
+The last part (L10N) should be very simple (using a graphical PO editor is 
+preffered) in order to allow non-technical translators localize your software.
 
 =head2 Setting the URLs , using chained actions
 
+For this exercies, let's just make our app available to both English and 
+Romanian viewers. 
+
+http://localhost/en will greet English speakers, while 
+http://localhost/ro will greet Romanian speakers.
+
+A nice way to setup URLs like that is using 
+L<chained actions|Catalyst::DispatchType::Chained>:
+
+ -=cut
+ +sub language : PathPart('') Chained('/') CaptureArgs(1) {
+ +       my ($self , $c, $language )  =@_;
+ +       $c->stash->{language} = $language;
+ +}
+ 
+ -sub index : Private {
+ +sub cheer : PathPart('') Chained('language') Args(0) {
+
+If you run the devel server with debug enabled, you should see the chain:
+
+ [debug] Loaded Chained actions:
+ .-------------------------------------+--------------------------------------.
+ | Path Spec                           | Private                              |
+ +-------------------------------------+--------------------------------------+
+ | /*                                  | /language (1)                        |
+ |                                     | => /cheer                            |
+ '-------------------------------------+--------------------------------------'
+
+=head2 Setting up I18N
+
+First step, make sure you have Catalyst::Plugin::I18N installed and add it to
+your plugin list:
+
+ -use Catalyst qw/-Debug ConfigLoader Static::Simple/;
+ +use Catalyst qw/ConfigLoader Static::Simple I18N/;
+
 =head2 I18N with $c->loc
+
+
 
 =head2 L10N with a little help from xgettext.pl
 
