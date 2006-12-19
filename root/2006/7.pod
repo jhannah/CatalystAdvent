@@ -172,7 +172,7 @@ And replace this:
 
 with this:
 
-  $ENV{CATALYST_SERVER} = "http://localhost/myapp:$port";
+  $ENV{CATALYST_SERVER} = "http://localhost:$port/myapp";
 
 Of course you can do both.  I have one script which is
 C<optional_lighttpd-fastcgi.pl> and another which is
