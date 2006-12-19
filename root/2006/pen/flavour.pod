@@ -1,0 +1,125 @@
+=head1 Day XX - Catalyst::Plugin::Flavour
+
+Adding Sweet Flavours to Catalyst Controllers
+
+=head1 Introduction
+
+Have you ever thought about what smart way for handling multiple
+template (or view) in one controller?
+
+Plugin::Flavour provides it to you, as "flavour".
+
+If you use Flavour plugin, then request for
+
+    http://example.com/path/to/action.flavour
+
+This request is handled by /path/to/action and "flavour" is stored in
+$c->flavour.
+
+You can use multiple views in one controller like below code:
+
+    $c->forward( $c->view( $c->flavour ) );
+
+MAGIC!
+
+
+=head1 Simple tutoreal
+
+Load plugin:
+
+    use Catalyst qw/Flavour/;
+
+And config. If you use ConfigLoader, you edit yourapp.yml:
+
+    flavour:
+      default_flavour: html
+
+C< default_flavour > is used when request url has no flavour part.
+The default value is 'html', so you don't have to write it when you
+use 'html' as default_flavour.
+
+Before we forget, create View::TT! please run
+C< ./script/yourapp_create.pl view TT TT > before continuing.
+
+
+The next step is to write controllers.  In this case, I use an html and
+json flavour for example.
+
+Controller code:
+
+    # YourApp::Controller::Root
+    sub index : Private {
+        my ( $self, $c ) = @_;
+        $c->stash->{template} = 'index.' . $c->flavour;
+    }
+
+    sub end : ActionClass('RenderView') {}
+
+
+
+Then write two templates.
+
+index.html:
+
+    <html>
+    <head>
+    <title>This is HTML</title>
+    </head>
+    <body>
+    <h1>This is HTML!</h1>
+    </body>
+    </html>
+
+index.json:
+
+    {title:"This is JSON!"}
+
+Well done!
+
+This program is
+
+http://localhost:3000/index.html shows index.html,
+
+http://localhost:3000/index.json shows index.json,
+
+and http://localhost:3000/ shows index.html (default_flavour)
+
+
+=head1 Path to controller mapping
+
+Here is list of path to controller mapping used by Plugin::Flavour.
+
+=over 4
+
+=item / | /index | /index.html
+
+/index
+
+=item /action | /action.html
+
+/action
+
+=item /path/to/ | /path/to/index | /path/to/index.html
+
+/path/to/index
+
+=item /path/to | /path/to.html
+
+/path/to
+
+=back
+
+The last slash is important!  Suggestions and patchs are welcome for
+this mapping!
+
+
+=head1 Accessors for real path
+
+Plugin::Flavour replace $c->request->uri and $c->request->path for
+tricking the  Catalyst::Dispatcher.  It provides additional accessor $c->request->real_uri and $c->request->real_path for real uri and path.
+
+=head1 AUTHOR
+
+Daisuke Murase (typester) <typester@cpan.org>
+
+=cut
