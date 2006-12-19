@@ -7,10 +7,10 @@ Custom markup with HTML::Widget
 Today we'll show you how to generate custom markup  using a custom container, 
 and how to add custom elements to your forms.
 
-Let's add a simple feedback form to the Cheer project. First thing, add the 
-L<Catalyst::Plugin::HTML::Widget> in the plugin list, in Cheer.pm. It brings 
-some advantages, you can read all about it in the POD. Then open Root.pm and 
-type your form:
+Let's add a simple feedback form to our Cheer project. First thing,
+add the L<Catalyst::Plugin::HTML::Widget> (with documentation in
+L<HTML::Widget>) in the plugin list, in Cheer.pm. Then open Root.pm
+and type your form:
 
  sub feedback : Local {
  	my ($self, $c) = @_;
@@ -39,7 +39,7 @@ type your form:
 
 =head2 Don't like the markup? Build a custom container
 
-The generated markup is as follows (I added the whitespace for easy reading): 
+The generated markup is as follows (whitespace added for easy reading): 
 
  <form action="http://localhost:3000/feedback" id="feedback" method="post">
  <fieldset class="widget_fieldset">
@@ -64,12 +64,13 @@ The generated markup is as follows (I added the whitespace for easy reading):
  </fieldset>
  </form>
 
-This may not be exactly what you seek , and if you don't want to build the 
-form manually in the template, you'll have to build a custom container.
+This may not be exactly what you seek , and if you don't want to build
+the form manually in the template, you'll have to build a custom
+container.
 
-Let's just make a container that does nothing, but will allow us to continue
-further. Put this in lib/Cheer/Container.pm . The code is just copied 
-from HTML::Widget::Container, ready for our changes:
+Let's just make a container that does nothing, but will allow us to
+continue further. Put this in lib/Cheer/Container.pm . The code is
+just copied from HTML::Widget::Container, ready for our changes:
 
  package Cheer::Container;
  
@@ -168,8 +169,12 @@ Just remember the B<label> and B<Span> content is just pushed into the
 container element, so it can be a simple string, a HTML::Element object or a
 list of strings and/or objects.
 
-Also keep in mind that doing this in the Controller is a B<bad idea>, but
-with HTML::Widget it's pretty difficult to avoid.
+Also keep in mind that doing this in the Controller is a B<bad idea>,
+but with HTML::Widget it's pretty difficult to avoid.  This makes
+L<HTML::Widget> a poor choice for development teams with non-technical
+designers, and can lead to messy code for some projects. However for
+small to medium sized projects L<HTML::Widget> can be a good choice
+once you understand how to customise its output.
 
 =head3 AUTHOR
 
