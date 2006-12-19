@@ -189,7 +189,7 @@ We have a C<admin.pm> already, so we just need to add B<suggest_ldap_user>:
 	}
 
 The above was designed for a Samba application I am doing in my spare time (spare time!?!),
-so certain things won't apply.
+so certain things won't apply. (http://sosa.sf.net)
 
 =head2 Putting it all together
 
@@ -354,6 +354,8 @@ Now lets type a letter in our autocomplete input field and see what happens:
 	'----------------------------------------------------------------+-----------'
 
 Cool!	
+
+To see a screenshot of this in action, please see http://sosa.sourceforge.net/screenshot2-big.png
 
 =head2 Conclusion
 
