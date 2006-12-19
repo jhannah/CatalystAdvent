@@ -146,7 +146,7 @@ Just edit the container:
  +            : HTML::Element->new('div')->push_content($l,$element);
       }
 
-That's it! You can check the new output imediatly. For more funky edits,
+That's it! You can check the new output immediately. For more funky edits,
 you'll have to read the manual for L<HTML::Element>.
 
 =head2 Add custom tags in your labels and forms
@@ -168,7 +168,7 @@ Just remember the B<label> and B<Span> content is just pushed into the
 container element, so it can be a simple string, a HTML::Element object or a
 list of strings and/or objects.
 
-Also keep in mind that doing this in the Controller is a B<bad ideea>, but
+Also keep in mind that doing this in the Controller is a B<bad idea>, but
 with HTML::Widget it's pretty difficult to avoid.
 
 =head3 AUTHOR
