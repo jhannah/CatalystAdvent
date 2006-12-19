@@ -4,13 +4,13 @@ Custom markup with HTML::Widget
 
 =head2 Introduction
 
-Today we'll show you how to generate custom markup from your widget using a
-custom container, and how to add custom elements to your forms.
+Today we'll show you how to generate custom markup  using a custom container, 
+and how to add custom elements to your forms.
 
-Let's add a simple feedback form to our Cheer project. First thing, add the 
+Let's add a simple feedback form to the Cheer project. First thing, add the 
 L<Catalyst::Plugin::HTML::Widget> in the plugin list, in Cheer.pm. It brings 
-some advantages, you can read all about it in the POD. Then open your Root.pm
-and type your form:
+some advantages, you can read all about it in the POD. Then open Root.pm and 
+type your form:
 
  sub feedback : Local {
  	my ($self, $c) = @_;
@@ -69,7 +69,7 @@ form manually in the template, you'll have to build a custom container.
 
 Let's just make a container that does nothing, but will allow us to continue
 further. Put this in lib/Cheer/Container.pm . The code is just copied 
-from HTML::Widget::Container, ready for our customisations:
+from HTML::Widget::Container, ready for our changes:
 
  package Cheer::Container;
  
@@ -181,6 +181,4 @@ Copyright 2006 System & Network Solutions - L<http://www.sns.ro>
 
 This document can be freely redistributed and can be modified and 
 re-distributed under the same conditions as Perl itself.
-
-=cut
 
