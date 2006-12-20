@@ -1,11 +1,11 @@
-=head1 Day XX - Catalyst::Plugin::Flavour
+=head1 Day 20 - Catalyst::Plugin::Flavour
 
 Adding Sweet Flavours to Catalyst Controllers
 
 =head1 Introduction
 
-Have you ever thought about what smart way for handling multiple
-template (or view) in one controller?
+Have you ever thought about how to handle multiple
+templates (or views) from one controller?
 
 Plugin::Flavour provides it to you, as "flavour".
 
@@ -13,15 +13,14 @@ If you use Flavour plugin, then a request for
 
     http://example.com/path/to/action.flavour
 
-This request is handled by /path/to/action and "flavour" is stored in
-$c->flavour.
+is handled by C</path/to/action> and the "flavour" is stored in
+C<< $c->flavour >>.
 
-You can use multiple views in one controller like below code:
+Now you can use multiple views in one controller like this:
 
     $c->forward( $c->view( $c->flavour ) );
 
 MAGIC!
-
 
 =head1 Simple tutorial
 
@@ -37,13 +36,12 @@ myapp.yml:
 
 C< default_flavour > is used when request url has no flavour part.
 The default value is 'html', so you don't have to write it when you
-use 'html' as default_flavour.
+use 'html' as the C<default_flavour>.
 
-Before we forget, create View::TT.  Please run
+Before we forget, create L<Catalyst::View::TT|View::TT>.  Please run
 C< ./script/myapp_create.pl view TT TT > before continuing.
 
-
-The next step is to write controllers.  In this case, I use an html and
+The next step is to write controllers.  In this case, I'll have an html and
 a json flavour.
 
 Controller code:
@@ -56,19 +54,17 @@ Controller code:
 
     sub end : ActionClass('RenderView') {}
 
-
-
 Then write two templates.
 
 index.html:
 
     <html>
-    <head>
-    <title>This is HTML</title>
-    </head>
-    <body>
-    <h1>This is HTML!</h1>
-    </body>
+     <head>
+      <title>This is HTML</title>
+     </head>
+     <body>
+      <h1>This is HTML!</h1>
+     </body>
     </html>
 
 index.json:
@@ -77,7 +73,7 @@ index.json:
 
 Well done!
 
-This program is
+When you run this app in the development server,
 
 L<http://localhost:3000/index.html> shows index.html,
 
@@ -92,21 +88,21 @@ Here is list of path to controller mapping used by Plugin::Flavour.
 
 =over 4
 
-=item / | /index | /index.html
+=item C</> | C</index> | C</index.html>
 
-/index
+    /index
 
-=item /action | /action.html
+=item C</action> | C</action.html>
 
-/action
+    /action
 
-=item /path/to/ | /path/to/index | /path/to/index.html
+=item C</path/to/> | C</path/to/index> | C</path/to/index.html>
 
-/path/to/index
+    /path/to/index
 
-=item /path/to | /path/to.html
+=item C</path/to> | C</path/to.html>
 
-/path/to
+    /path/to
 
 =back
 
@@ -116,9 +112,9 @@ this mapping!
 
 =head1 Accessors for real path
 
-Plugin::Flavour replace C< $c->request->uri > and C< $c->request->path
-> for tricking the Catalyst dispatcher.  It provides additional
-accessor C< $c->request->real_uri > and C< $c->request->real_path >
+Plugin::Flavour replace C<< $c->request->uri >> and C<< $c->request->path >> 
+for tricking the Catalyst dispatcher.  It provides additional
+accessor C<< $c->request->real_uri >> and C<< $c->request->real_path >>
 for the actual uri and path.
 
 =head1 AUTHOR
