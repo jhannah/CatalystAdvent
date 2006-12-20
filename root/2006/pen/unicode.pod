@@ -10,7 +10,7 @@ will receive visits by people that don't want to interact with it in
 English.  They might want to use Japanese names, or perhaps tag an
 entry in Russian.  Unfortunately, most apps out there break completely
 when this happens.  While users of Ruby and PHP have to fight with
-their language to add (poor) support for multiple langauge (or more
+their language to add (poor) support for multiple languages (or more
 specifically, multiple character sets), perl has native support for
 unicode right in the language.
 
@@ -39,7 +39,7 @@ transmit, receive, or store I<octets>.
 By default, Perl thinks of everything as an octet, and hence won't
 handle unicode properly.  This is so that Perl can process binary data
 (a task equally important as handling text).  Since binary data isn't
-made up of characters, you have to explicitlty tell Perl that the
+made up of characters, you have to explicitly tell Perl that the
 incoming (or outgoing) data is text.  If you know the I<charset> that
 the text is encoded in, you can decode the "binary" data into textual
 Perl characters by using the L<Encode> module, and writing:
@@ -69,7 +69,7 @@ character strings internally as UTF-8.  Since most web browsers and
 terminal emulators also use UTF-8 as their native encodings, copying
 the data from a perl string to the terminal (via C<print>) or web
 browser will appear to work (and the reverse -- inputting UTF-8 data
-from the terminal or web broweser into perl -- will also appear to
+from the terminal or web browser into perl -- will also appear to
 work).  
 
 However, when you do this, you'll get a warning:
@@ -117,7 +117,7 @@ octets in the same string (the body of your page), will result in
 severe problems.  If you never decode anything, and everything is
 UTF-8, your site will probably work (but don't do this!).  If you
 decode some things, and then mix in un-decoded data, perl will
-interpert each octet of the un-decoded data as a full character.  When
+interpret each octet of the un-decoded data as a full character.  When
 you print this out, this "character" (which is really an octet
 representing different character) will be encoded into UTF-8 octets
 representing the character.  This is called double-encoding, and is
