@@ -1,5 +1,4 @@
-
-=head1 Day 20 - Unicode
+=head1 Day 21 - Unicode
 
 Handle and process multilingual data properly
 
@@ -11,8 +10,8 @@ English.  They might want to use Japanese names, or perhaps tag an
 entry in Russian.  Unfortunately, most apps out there break completely
 when this happens.  While users of Ruby and PHP have to fight with
 their language to add (poor) support for multiple languages (or more
-specifically, multiple character sets), perl has native support for
-unicode right in the language.
+specifically, multiple character sets), Perl has native support for
+Unicode right in the language.
 
 =head2 Terminology
 
@@ -27,17 +26,17 @@ string.  This intuitive if the string is something like C<"abcde">,
 but it also holds true for a string like C<???>.  What you think of as
 characters, Perl thinks of as characters.
 
-However, the problem arises when you confuse a I<byte> (or I<octet>)
-with a I<character>.  Although 'a' is both a character and an octet, a
-UTF-8 character can be made up of more than one octet.  This is where
-the problem begins because the Internet (and terminal emulators,
-filesystems, etc.) have no concept of a character -- they only
-transmit, receive, or store I<octets>.  
+However, the problem arises when you confuse a I<byte> (or an
+I<octet>) with a I<character>.  Although 'a' is both a character and
+an octet, a UTF-8 character can be made up of more than one octet.
+This is where the problem begins because the Internet (and terminal
+emulators, filesystems, etc.) have no concept of a character -- they
+only transmit, receive, or store I<octets>.
 
 =head1 Using Unicode Correctly
 
-By default, Perl thinks of everything as an octet, and hence won't
-handle unicode properly.  This is so that Perl can process binary data
+By default, Perl thinks of everything as an octet.  Therefore it won't
+handle Unicode properly.  This is so that Perl can process binary data
 (a task equally important as handling text).  Since binary data isn't
 made up of characters, you have to explicitly tell Perl that the
 incoming (or outgoing) data is text.  If you know the I<charset> that
@@ -88,40 +87,41 @@ manipulations the result will be an unreadable mess.)
 To help rid your program of this kind of problem, use the
 L<encoding::warnings> pragma.  When you load it and run your
 application, it will emit a warning message that shows you where
-you're misusing unicode.  From there, you can see (in the debugger,
-etc.) where the invalid data is coming from, and add a prople
-C<decode> or C<encode> statement.
+you're misusing Unicode.  From there, you can see (in the debugger,
+etc.) where the invalid data is coming from, and add a C<decode> or
+C<encode> statement.
 
 =head1 Unicode in Catalyst
 
 Catalyst can handle most of the details of this for you.  If you load
 L<Catalyst::Plugin::Unicode> into your application, Catalyst will
 C<decode> all incoming data into Perl characters, and C<encode>
-outgoing characters output to unicode (UTF-8) octets.  (Only the body
-is encoded -- you should avoid using non-ASCII characters in the
-headers.)
+outgoing characters output to Unicode (UTF-8) octets.  This applies to
+data coming from a C< Catalyst::Model >), or from C< $c->req->params >
+or example.  Only the body is encoded -- you should avoid using
+non-ASCII characters in the headers.
 
-This will work in most cases, but if you're using a legacy character
-encoding, you will have to do the conversion manually with the
-L<Encode> module (and explicitly specify what charset to use).
+In most cases this will work.  However if you're using a legacy
+character encoding, you will have to do the conversion manually with
+the L<Encode> module (and explicitly specify what charset to use).
 
 L<Catalyst::Plugin::Unicode> won't handle everything, though.  If
 you're using an external module that reads files or other data
-sources, verify that it handles the unicode conversion for you.
+sources, verify that it handles the Unicode conversion for you.
 (L<XML::RSS>, for example, won't; but L<YAML::Syck> will.)  Be
 especially aware that your database might not be storing data as
 Unicode.
 
-This us important to be careful about, because mixing characters and
+This is important to be careful about, because mixing characters and
 octets in the same string (the body of your page), will result in
 severe problems.  If you never decode anything, and everything is
-UTF-8, your site will probably work (but don't do this!).  If you
+UTF-8, your site will I<probably> work (but don't do this!).  If you
 decode some things, and then mix in un-decoded data, perl will
 interpret each octet of the un-decoded data as a full character.  When
 you print this out, this "character" (which is really an octet
 representing different character) will be encoded into UTF-8 octets
 representing the character.  This is called double-encoding, and is
-unfortunately the most frequently occurring unicode bug that I've seen
+unfortunately the most frequently occurring Unicode bug that I've seen
 (even L<http://search.cpan.org/~jrockway/> has this problem).  
 
 Perl will do the right thing, but only if you know what the right
@@ -156,7 +156,7 @@ the string, but C<utf8::*> does the conversion in-place.)
 
 =head1 Recipes 
 
-Now that you know how to use unicode, here are some things that you
+Now that you know how to use Unicode, here are some things that you
 can do in Perl that other languages just can't do!
 
 =head2 Make the first character of a string BIG
@@ -191,7 +191,7 @@ character operations would work correctly inside the while loop.
 =head1 SEE ALSO
 
 The C<perlunicode> and L<perllocale> manual pages contain even more
-information about unicode.
+information about Unicode.
 
 L<perlunicode>, L<perllocale>
 
