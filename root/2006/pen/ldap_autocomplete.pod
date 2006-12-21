@@ -1,50 +1,45 @@
-=head1 Day X - LDAP Autocomplete 
+=head1 Day  22 - LDAP Autocomplete 
 
 Creating an LDAP Autocomplete field with B<Catalyst::Plugin::Prototype>
 
 =head2 Introduction
 
-We've all heard and used Google's Suggest Searches, and to be honest, they are
-cool!
+We've all heard and used Google's Suggest Searches, and to be honest,
+they are cool!
 
-So in your admin/client web applications, why not create the same thing using 
-the power of Open Source to help find that username quickly.
+So in your admin/client web applications, why not create the same
+thing using the power of Open Source to help find that user name
+quickly.
 
 Read on to find out how.
 
-=head2 Grabbing the Plugins, Modules and Enabling
+=head2 Getting the Plugins and Modules 
 
-We could easily grab our own Prototype source from L<http://prototype.conio.net/>
-or the slightly a version based on it at L<http://script.aculo.us/downloads>, but
-we'll stick with the CPAN version B<Catalyst::Plugin::Prototype>.
+We could easily grab our own Prototype source from
+L<http://prototype.conio.net/> or the scriptaculous fork at
+L<http://script.aculo.us/downloads>, but we'll stick with the CPAN
+version B<Catalyst::Plugin::Prototype>.
 
 Also grab B<Catalyst::Model::LDAP>
 
 Install that as per any other CPAN module and include it your B<MyApp.pm>
 
- 	use Catalyst qw/
- 	    -Debug
- 	    StackTrace
- 	    Prototype
- 	/;
+ 	use Catalyst qw/Prototype/;
 
 =head2 Adding an LDAP Model
 
-Create the Model the usual way, but decide first if you want the configuration
-set in that Model, or in say C<myapp.yml>/C<Config.yml> e.g.
-	
-Saved in Model:
+Create the Model the usual way i.e.
 	
 	script/myapp_create.pl model User LDAP ldap.suretecsystems.com ou=Users,dc=suretecsystems,dc=com
 	
-Or just:
+Or to create a model to add config to later:
 
 	script/myapp_create.pl model User LDAP	
 
 =head2 Creating the LDAP configuration
 
-If you chose to set your configuration in the Model, you should now see something
-like:
+If you chose to set your configuration in the Model, you should now
+see something like:
 
     # lib/MyApp/Model/User.pm
     package MyApp::Model::User;
@@ -69,7 +64,7 @@ If you chose C<Config.yml>, set it up like:
 
  	# Model::LDAP config and search setting for admin auto
  	Model::User:
- 	  host: 127.0.0.1
+ 	  host: ldap.suretecsystems.com
  	  base: ou=Users,dc=suretecsystems,dc=com
  	  scope: one
  	  user_filter: (|(objectClass=sambaSamAccount)(objectclass=posixAccount))
@@ -188,8 +183,8 @@ We have a C<admin.pm> already, so we just need to add B<suggest_ldap_user>:
 	    $c->res->output( $c->prototype->auto_complete_result(\@ldap_users) );
 	}
 
-The above was designed for a Samba application I am doing in my spare time (spare time!?!),
-so certain things won't apply. (http://sosa.sf.net)
+The above was designed for a Samba application I am doing in my spare
+time (spare time!?!), so certain things won't apply. (L<http://sosa.sf.net>)
 
 =head2 Putting it all together
 
