@@ -95,11 +95,10 @@ C<encode> statement.
 
 Catalyst can handle most of the details of this for you.  If you load
 L<Catalyst::Plugin::Unicode> into your application, Catalyst will
-C<decode> all incoming data into Perl characters, and C<encode>
-outgoing characters output to Unicode (UTF-8) octets.  This applies to
-data coming from a C< Catalyst::Model >), or from C< $c->req->params >
-or example.  Only the body is encoded -- you should avoid using
-non-ASCII characters in the headers.
+C<decode> all incoming request data into Perl characters, and
+C<encode> outgoing characters output to Unicode (UTF-8) octets.  Only
+the body will be encoded -- you should avoid using non-ASCII
+characters in the headers.
 
 In most cases this will work.  However if you're using a legacy
 character encoding, you will have to do the conversion manually with
