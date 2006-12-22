@@ -188,7 +188,7 @@ time (spare time!?!), so certain things won't apply. (L<http://sosa.sf.net>)
 
 =head2 Putting it all together
 
-Lastly we need some CSS to make the dropdown look nice. Put this in
+Lastly we need some CSS to make the drop down look nice. Put this in
 one of your CSS files:
 
  	#ldap_user_auto_complete ul {
@@ -244,7 +244,7 @@ Now lets type a letter in our autocomplete input field and see what happens:
  [...]
  [debug] Checking first entry in search result array:
  [debug] Search term to auto_complete is g
- [debug] Looking through these users: fred wilma barney ghenry betty dino bart homer pebles lisa maggie
+ [debug] Looking through these users: fred wilma barney ghenry betty dino bart homer pebbles lisa maggie
  [debug] Found user/s ghenry as per your search. 
                       Sending results..
  [debug] 
@@ -256,7 +256,9 @@ L<http://sosa.sourceforge.net/screenshot2-big.png>
 
 =head2 Conclusion
 
-You don't need to use Protitype to use this, you could use Dojo, Jquery or YUI Javascript toolkits to name just three. The choice is yours.
+You don't need to use Prototype to use this, you could use Dojo,
+JQuery or YUI Javascript toolkits to name just three. The choice is
+yours.
 
 If you get stuck, come visit us on the lists or in IRC (see
 L<http://lists.rawmode.org/mailman/listinfo/catalyst> and on irc:
