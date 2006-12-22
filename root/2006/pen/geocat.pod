@@ -1,7 +1,7 @@
 =head1 Day 22 - Creating a Google Maps Mashup
 
-Create a Catalyst Application that queries Google Geocode Service and a
-build a searchable map.
+Create a Catalyst Application that queries Google Geocode Service and
+uses it to create a searchable map.
 
 =head2 Google Maps Mashups
 
@@ -63,8 +63,10 @@ Microsoft Live's mapping service
 
 Our application will simply display a Google Map, run geocoding queries through
 Catalyst, and run local queries through a JS engine.  The purpose of this 
-application is to show how to structure an application that has both client
-data requests (Google Local), and server requests (Geocoding).
+application is to show how to structure an application that has both
+client-based data requests via JavaScript (Google Maps), and server-based
+requests (Geocoding) handled via AJAX (using the Google Maps library for
+transport).
 
 It is a good combination of Chained actions and static content.
 
@@ -193,12 +195,11 @@ output, but for now it is pretty boring.
 
 GeoCat is a simple application, and as such only has a few templates.  Instead
 of pasting them in the writeup, you can fetch them along with the rest of GeoCat
-from the Catalyst subversion repository.  Here's the list of templates we'll
-use:
+from the Catalyst subversion repository.  We're only creating one template
+because we'll only be displaying one page, and then have the search data
+returned in JSON format.  
 
-=over
-
-=item root.tt
+=head3 root.tt
 
 The root action ("/") will automatically point to C<root.tt> as the template
 to render.  Catalyst figures this out by the final calling action, which can be 
@@ -210,26 +211,8 @@ C<GeoCat/root/root.tt>:
 
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/GeoCat/root/root.tt>
 
-=item search/root.tt
-
-The simple template that returns search results.  This is actually a JavaScript
-file and not HTML, but that doesn't matter for Template Toolkit nor Catalyst!
-
-To fetch this template, please look here and store it at
-C<GeoCat/root/search/root.tt>:
-
-L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/GeoCat/root/search/root.tt>
-
-=back
-
-The only other file is our beautification that comes in the form of CSS, which
-is loaded by the L<Catalyst::Plugin::Static::Simple> module.  You can fetch this
-from and store it at C<GeoCat/root/static/screen.css>:
-
-L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/GeoCat/root/static/screen.css>
-
-Please note the paths for each file to make sure GeoCat knows where to find
-them.
+Please note the paths for the template to make sure GeoCat knows where to find
+it.
 
 =head2 Defining our workflow
 
