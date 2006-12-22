@@ -15,10 +15,8 @@ Read on to find out how.
 
 =head2 Getting the Plugins and Modules 
 
-We could easily grab our own Prototype source from
-L<http://prototype.conio.net/> or the scriptaculous fork at
-L<http://script.aculo.us/downloads>, but we'll stick with the CPAN
-version B<Catalyst::Plugin::Prototype>.
+The easiest way to obtain Prototype for Catalyst is from L<CPAN>.
+Install L<Catalyst::Plugin::Prototype>.
 
 Also grab B<Catalyst::Model::LDAP>
 
@@ -28,7 +26,8 @@ Install that as per any other CPAN module and include it your B<MyApp.pm>
 
 =head2 Adding an LDAP Model
 
-Create the Model the usual way i.e.
+L<Catalyst::Helper::Model::LDAP> lets you generate a pre-rolled model
+with all your connection info included. Here's an example:
 	
 	script/myapp_create.pl model User LDAP ldap.suretecsystems.com ou=Users,dc=suretecsystems,dc=com
 	
@@ -38,7 +37,7 @@ Or to create a model to add config to later:
 
 =head2 Creating the LDAP configuration
 
-If you chose to set your configuration in the Model, you should now
+If you chose to set your configuration in the manually, you should now
 see something like:
 
     # lib/MyApp/Model/User.pm
@@ -74,14 +73,15 @@ If you chose C<Config.yml>, set it up like:
  	  options:
  	  
 
-In the above you can see that you can assign a filter to find your users. In 
-our example, we are looking for users that either have an account in Samba or
-a standard Unix/Linux account.
+In the above you can see that you can assign a filter to find your
+users. In our example, we are looking for users that either have an
+account in Samba or a standard Unix/Linux account.
 
 =head2 Creating your Autocomplete template
 
-In our example, we are going to use the Autocomplete features for when we are
-searching for a user to delete. So I'll create C<root/admin/users.tt>:
+In our example, we are going to use the Autocomplete features for when
+we are searching for a user to delete. So I'll create
+C<root/admin/users.tt>:
 
   <div id="deluser" height:80px;width:350px;">
  	      <div>
@@ -188,8 +188,8 @@ time (spare time!?!), so certain things won't apply. (L<http://sosa.sf.net>)
 
 =head2 Putting it all together
 
-Lastly we need some CSS to make the dropdown look nice. Stick this in one of your CSS files in 
-a C<header.tt> etc.:
+Lastly we need some CSS to make the dropdown look nice. Put this in
+one of your CSS files:
 
  	#ldap_user_auto_complete ul {
  	    border:1px solid #FFAF53;
@@ -215,150 +215,52 @@ a C<header.tt> etc.:
  	    padding:0;
  	}
 
-With that done, fire up your app and watch the debug screen! 
-(things need updated, so please excuse the old plugins and techniques)
+With that done, fire up the server, and watch the debug screen!
+(please note that this is an old-ish application, hence the lack of
+Controller::Root for example)
 
-	[ghenry@suretec SOSA]$ script/sosa_server.pl 
-	[debug] Debug messages enabled
-	[debug] Loaded plugins:
-	.----------------------------------------------------------------------------.
-	| Catalyst::Plugin::Authentication  0.07                                     |
-	| Catalyst::Plugin::Authentication::Credential::Password                     |
-	| Catalyst::Plugin::Authentication::Store::LDAP  0.04                        |
-	| Catalyst::Plugin::Authorization::ACL  0.08                                 |
-	| Catalyst::Plugin::Authorization::Roles  0.05                               |
-	| Catalyst::Plugin::DefaultEnd  0.05                                         |
-	| Catalyst::Plugin::Email::Page  0.26                                        |
-	| Catalyst::Plugin::FillInForm  0.06                                         |
-	| Catalyst::Plugin::FormValidator  0.02                                      |
-	| Catalyst::Plugin::Prototype  1.32                                          |
-	| Catalyst::Plugin::Session  0.10                                            |
-	| Catalyst::Plugin::Session::State::Cookie  0.04                             |
-	| Catalyst::Plugin::Session::Store::File  0.07                               |
-	| Catalyst::Plugin::StackTrace  0.06                                         |
-	| Catalyst::Plugin::Static::Simple  0.14                                     |
-	'----------------------------------------------------------------------------'
-
-	[debug] Loaded dispatcher "Catalyst::Dispatcher"
-	[debug] Loaded engine "Catalyst::Engine::HTTP"
-	[debug] Found home "/home/ghenry/catalyst-devel/SOSA"
-	[debug] Loaded components:
-	.-----------------------------------------------------------------+----------.
-	| Class                                                           | Type     |
-	+-----------------------------------------------------------------+----------+
-	| SOSA::Controller::About                                         | instance |
-	| SOSA::Controller::admin                                         | instance |
-	| SOSA::Controller::admin::configure                              | instance |
-	| SOSA::Controller::admin::groups                                 | instance |
-	| SOSA::Controller::admin::machines                               | instance |
-	| SOSA::Controller::admin::monitor                                | instance |
-	| SOSA::Controller::admin::restart                                | instance |
-	| SOSA::Controller::admin::test                                   | instance |
-	| SOSA::Controller::admin::users                                  | instance |
-	| SOSA::Controller::login                                         | instance |
-	| SOSA::Controller::user                                          | instance |
-	| SOSA::Model::User                                               | instance |
-	| SOSA::View::TT                                                  | instance |
-	'-----------------------------------------------------------------+----------'
-
-	[debug] Loaded Private actions:
-	.----------------------+--------------------------------------+--------------.
-	| Private              | Class                                | Method       |
-	+----------------------+--------------------------------------+--------------+
-	| /default             | SOSA                                 | default      |
-	| /end                 | SOSA                                 | end          |
-	| /auto                | SOSA                                 | auto         |
-	| /begin               | SOSA                                 | begin        |
-	| /login/logout        | SOSA::Controller::login              | logout       |
-	| /login/default       | SOSA::Controller::login              | default      |
-	| /login/login         | SOSA::Controller::login              | login        |
-	| /about/default       | SOSA::Controller::About              | default      |
-	| /admin/default       | SOSA::Controller::admin              | default      |
-	| /admin/suggest_ldap- | SOSA::Controller::admin              | suggest_lda- |
-	| _user                |                                      | p_user       |
-	| /admin/access_denied | SOSA::Controller::admin              | access_deni- |
-	|                      |                                      | ed           |
-	| /admin/graph         | SOSA::Controller::admin              | graph        |
-	| /admin/users/adduser | SOSA::Controller::admin::users       | adduser      |
-	| /admin/users/default | SOSA::Controller::admin::users       | default      |
-	| /admin/users/resetp- | SOSA::Controller::admin::users       | resetpass    |
-	| ass                  |                                      |              |
-	| /admin/users/deluser | SOSA::Controller::admin::users       | deluser      |
-	| /admin/monitor/defa- | SOSA::Controller::admin::monitor     | default      |
-	| ult                  |                                      |              |
-	| /user/default        | SOSA::Controller::user               | default      |
-	| /user/auto           | SOSA::Controller::user               | auto         |
-	| /user/changepass     | SOSA::Controller::user               | changepass   |
-	'----------------------+--------------------------------------+--------------'
-
-	[debug] Loaded Path actions:
-	.-------------------------------------+--------------------------------------.
-	| Path                                | Private                              |
-	+-------------------------------------+--------------------------------------+
-	| /admin/monitor/graph                | /admin/graph                         |
-	| /admin/suggest_ldap_user            | /admin/suggest_ldap_user             |
-	| /admin/users/adduser                | /admin/users/adduser                 |
-	| /admin/users/deluser                | /admin/users/deluser                 |
-	| /admin/users/resetpass              | /admin/users/resetpass               |
-	| /login                              | /login/login                         |
-	| /logout                             | /login/logout                        |
-	| /user/changepass                    | /user/changepass                     |
-	'-------------------------------------+--------------------------------------'
-
-	[info] SOSA powered by Catalyst 5.7006
-	You can connect to your server at http://blackhat:300
+ ghenry@suretec SOSA]$ script/sosa_server.pl 
+ [debug] Debug messages enabled
+ [debug] Loaded plugins:
+ .----------------------------------------------------------------------------.
+ | Catalyst::Plugin::Prototype  1.32                                          |
+ [snipped some output]
+ [info] SOSA powered by Catalyst 5.7006
+ You can connect to your server at http://blackhat:300
 	
 Now lets type a letter in our autocomplete input field and see what happens:
 
-	[info] *** Request 1 (0.003/s) [24084] [Tue Dec 19 23:34:46 2006] ***
-	[debug] Body Parameters are:
-	.-------------------------------------+--------------------------------------.
-	| Parameter                           | Value                                |
-	+-------------------------------------+--------------------------------------+
-	| _                                   |                                      |
-	| ldap_user                           | g                                    |
-	'-------------------------------------+--------------------------------------'
-	[debug] "POST" request for "admin/suggest_ldap_user" from "192.168.10.9"
-	[debug] Path is "admin/suggest_ldap_user"
-	[debug] Found sessionid "5e1b8d67b78a618eba4fc380b77a5074ea9d14a6" in cookie
-	[debug] Restored session "5e1b8d67b78a618eba4fc380b77a5074ea9d14a6"
-	[debug] running ACL rule CODE(0xa15a21c) defined at /home/ghenry/catalyst-devel/SOSA/script/../lib/SOSA.pm line 81 on admin/suggest_ldap_user
-	[debug] Role granted: Domain Admins
-	[debug] Reading config:
-	                                                ou=Users,ou=OxObjects,dc=suretecsystems,dc=com
-	                                                one
-	                                                (|(objectClass=sambaSamAccount)(objectclass=posixAccount))
-	                                                uid
-	[debug] Checking first entry in search result array:
-    	                                            mailadmin
-	[debug] 
-	[debug] Search term to auto_complete is g
-	[debug] 
-	[debug] Looking through these users: mailadmin root ghenry johnw GavinHenry GavinH GregH 
-	[debug] Found user/s ghenry as per your search. 
-	                     Sending results..
-	[debug] 
-	[info] Request took 0.290863s (3.438/s)
-	.----------------------------------------------------------------+-----------.
-	| Action                                                         | Time      |
-	+----------------------------------------------------------------+-----------+
-	| /begin                                                         | 0.000261s |
-	| /auto                                                          | 0.005759s |
-	| /admin/suggest_ldap_user                                       | 0.060008s |
-	| /end                                                           | 0.000810s |
-	'----------------------------------------------------------------+-----------'
+ [info] *** Request 1 (0.003/s) [24084] [Tue Dec 19 23:34:46 2006] ***
+ [debug] Body Parameters are:
+ .-------------------------------------+--------------------------------------.
+ | Parameter                           | Value                                |
+ +-------------------------------------+--------------------------------------+
+ | _                                   |                                      |
+ | ldap_user                           | g                                    |
+ '-------------------------------------+--------------------------------------'
+ [debug] "POST" request for "admin/suggest_ldap_user" from "192.168.10.9"
+ [debug] Path is "admin/suggest_ldap_user"
+ [debug] Reading config:  ou=Users,ou=OxObjects,dc=suretecsystems,dc=com
+ [...]
+ [debug] Checking first entry in search result array:
+ [debug] Search term to auto_complete is g
+ [debug] Looking through these users: fred wilma barney ghenry betty dino bart homer pebles lisa maggie
+ [debug] Found user/s ghenry as per your search. 
+                      Sending results..
+ [debug] 
+ [info] Request took 0.290863s (3.438/s)
+ [...snip...]
 
-Cool!	
-
-To see a screenshot of this in action, please see http://sosa.sourceforge.net/screenshot2-big.png
+To see a screenshot of this in action, please see
+L<http://sosa.sourceforge.net/screenshot2-big.png>
 
 =head2 Conclusion
 
-There is now also B<Dojo> for this (L<http://dojotoolkit.org>), so it's up to you
-which toolkit you go with.
+You don't need to use Protitype to use this, you could use Dojo, Jquery or YUI Javascript toolkits to name just three. The choice is yours.
 
-If you get stuck, come visit us on the lists or in IRC (see 
-http://lists.rawmode.org/mailman/listinfo/catalyst and #catalyst on http://irc.perl.org)
+If you get stuck, come visit us on the lists or in IRC (see
+L<http://lists.rawmode.org/mailman/listinfo/catalyst> and on irc:
+#catalyst@irc.perl.org
 
 We hope that's given you some things to think about. Have fun! ;-)
 
