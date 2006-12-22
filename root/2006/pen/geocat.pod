@@ -5,10 +5,11 @@ uses it to create a searchable map.
 
 =head2 Google Maps Mashups
 
-Since Google Maps was made public in July of 2005, hundreds of sites have joined
-up in combining the mapping API with innovative and helpful applications.  Many
-people are always wondering just how to get the maps on their sites, and this
-is a good method on how to do so with Catalyst.
+Since Google Maps was made public in July of 2005, hundreds of sites
+have joined up in combining the mapping API with innovative and
+helpful applications.  Many people are always wondering just how to
+get the maps on their sites, and this is a good method on how to do so
+with Catalyst.
 
 =head3 Installation Prerequisites
 
@@ -30,26 +31,29 @@ Any mapping application actually has two parts to managing the data:
 
 =item Geocoding
 
-Geocoding is the process of turning a human readable address ("1600 Pennsylvania
-Ave Washington DC") into a coordinate pair to dispaly on the map.  We'll cover
-this by using L<Catalyst::Model::Geocode>.
+Geocoding is the process of turning a human readable address ("1600
+Pennsylvania Ave Washington DC") into a coordinate pair to display on
+the map.  We'll cover this by using L<Catalyst::Model::Geocode>.
 
 =item Map Display
 
-There are several mapping APIs to choose from, the three most popular are:
+There are several mapping APIs to choose from, the three most popular
+are:
 
 =over 2
 
 =item Google Maps
 
-Google Maps is probably the most popular mapping solution out.  It incorporates
-a well-featured JavaScript API and is a combination of JavaScript and image
-tiles.  We'll be using this, since it has the simplest APIs available.
+Google Maps is probably the most popular mapping solution out.  It
+incorporates a well-featured JavaScript API and is a combination of
+JavaScript and image tiles.  We'll be using this, since it has the
+simplest APIs available.
 
 =item Yahoo Maps
 
-Yahoo Maps is another very popular mapping service that relies on Flash to
-display the map, and comes with a JavaScript API to customize.
+Yahoo Maps is another very popular mapping service that relies on
+Flash to display the map, and comes with a JavaScript API to
+customise.
 
 =item Microsoft Live
 
@@ -61,34 +65,36 @@ Microsoft Live's mapping service
 
 =head2 Application Overview
 
-Our application will simply display a Google Map, run geocoding queries through
-Catalyst, and run local queries through a JS engine.  The purpose of this 
-application is to show how to structure an application that has both
-client-based data requests via JavaScript (Google Maps), and server-based
-requests (Geocoding) handled via AJAX (using the Google Maps library for
-transport).
+Our application will simply display a Google Map, run geocoding
+queries through Catalyst, and run local queries through a JS engine.
+The purpose of this application is to show how to structure an
+application that has both client-based data requests via JavaScript
+(Google Maps), and server-based requests (Geocoding) handled via AJAX
+(using the Google Maps library for transport).
 
 It is a good combination of Chained actions and static content.
 
 =head2 Getting Started
 
-The first step for this application is the same with any Catalyst application,
-and that is to allow Catalyst to setup the application structure:
+The first step for this application is the same with any Catalyst
+application, and that is to allow Catalyst to setup the application
+structure:
 
     catalyst.pl GeoCat
 
-To access Google's services (the mapping API and the geocoding API) you must
-register your application with Google.  It's very simple to do so, just
-visit L<http://www.google.com/apis/maps/signup.html> to get an
-API key, and for the sake of this example we'll use the key provided for an
-application at "localhost".  The key for localhost is:
- 
+To access Google's services (the mapping API and the geocoding API)
+you must register your application with Google.  It's very simple to
+do so, just visit L<http://www.google.com/apis/maps/signup.html> to
+get an API key, and for the sake of this example we'll use the key
+provided for an application at "localhost".  The key for localhost is:
+
  ABQIAAAAh3LqwY1XU3ldEkDJBxe4hBT2yXp_ZAY8_ufC3CFXhHIE1NvwkxTz_vK_MxtAQetI990enKf6YEthTA
 
-To get access to this in our application, we'll put it in our applications
-configuration (currently in L<YAML> format, but in the future Catalyst will use
-L<Config::General> by default).  To keep it simple, we'll simply create a 
-config key called "google" and stick the api key in.
+To get access to this in our application, we'll put it in our
+applications configuration (currently in L<YAML> format, but in the
+future Catalyst will use L<Config::General> by default).  To keep it
+simple, we'll simply create a config key called "google" and stick the
+api key in.
 
 Open up the C<GeoCat/geocat.yml> file, and enter this information:
 
@@ -122,10 +128,11 @@ And the views:
 
 =head2 Setting the default actions
 
-We're using the Chained Dispatch type (L<Catalyst::DispatchType::Chained>) for
-our application, which has a different structure than what is typically used but
-is definitely the way forward for Catalyst applications.  The first step is
-to tell Catalyst exactly where to start the chain.
+We're using the Chained Dispatch type
+(L<Catalyst::DispatchType::Chained>) for our application, which has a
+different structure than what is typically used but is definitely the
+way forward for Catalyst applications.  The first step is to tell
+Catalyst exactly where to start the chain.
 
 =head3 Root.pm, The Beginning
 
@@ -214,19 +221,20 @@ L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/GeoCat/root/root.tt
 Please note the paths for the template to make sure GeoCat knows where to find
 it.
 
-=head2 Defining our workflow
+=head2 Defining our work flow
 
 The first root template simply defines our map based upon our API key given by
-Google.  
+Google.
 
 =head3 The Geocode Search
 
-All we're really doing is proxying the search results from Google's Geocoding
-service, but it is easy to extend these results to allow other features.  There
-are a couple steps to this.  The first is to setup the geocode object, which
-is done on a per-usage basis, and as such we'll hitch into the C<ACCEPT_CONTEXT>
-method, partially to access the application config structure, but to also create
-a Geocoder object if we need to.  The code for this is simply:
+All we're really doing is proxying the search results from Google's
+Geocoding service, but it is easy to extend these results to allow
+other features.  There are a couple steps to this.  The first is to
+setup the geocode object, which is done on a per-usage basis, and as
+such we'll hitch into the C<ACCEPT_CONTEXT> method, partially to
+access the application config structure, but to also create a Geocoder
+object if we need to.  The code for this is simply:
 
     sub ACCEPT_CONTEXT {
         my ( $self, $c ) = @_;
@@ -236,54 +244,56 @@ a Geocoder object if we need to.  The code for this is simply:
         return $self;
     }
 
-Now that the geocoder object itself is created, that means our geocode function
-is quite small:
+Now that the geocoder object itself is created, that means our geocode
+function is quite small:
 
-    sub geocode {
-        my ( $self, $location ) = @_;
-        return $self->{'.geocoder'}->geocode( location => $location );
-    }
+    sub geocode { my ( $self, $location ) = @_; return
+        $self->{'.geocoder'}->geocode( location => $location ); }
 
-The method for geocoding is to simply pass this back to the client, since
-Google returns JSON we will to, by using View::JSON.  This is handled in the
-controller C<GeoCat::Controller::Search>, under the root action we defined
-earlier:
+The method for geocoding is to simply pass this back to the client,
+since Google returns JSON we will to, by using View::JSON.  This is
+handled in the controller C<GeoCat::Controller::Search>, under the
+root action we defined earlier:
 
-    sub root : Chained('base') : PathPart('') : Args(0) {
-        my ( $self, $c ) = @_;
-        if ( $c->req->params->{location} ) {
-            $c->stash->{location} = $c->model('Geocode')
-                ->geocode( $c->req->params->{location});
-        }
-        $c->forward('View::JSON');
-     }
+    sub root : Chained('base') : PathPart('') : Args(0) { my ( $self,
+        $c ) = @_; if ( $c->req->params->{location} ) {
+        $c->stash->{location} = $c->model('Geocode') ->geocode(
+        $c->req->params->{location}); } $c->forward('View::JSON'); }
 
-Now you can test this by starting the server, and issuing a C<GET> command:
+Now you can test this by starting the server, and issuing a C<GET>
+command:
 
- $ GET http://caffei:3005/search?location=1600%20pennsylvania%20ave%washington%20DC
- {"location":{"AddressDetails":{"Country":{"AdministrativeArea":{"SubAdministrativeArea":{"SubAdministrativeAreaName":"District of Columbia","Locality":{"PostalCode":{"PostalCodeNumber":20004},"LocalityName":"Washington","Thoroughfare":{"ThoroughfareName":"1600 Pennsylvania Ave NW"}}},"AdministrativeAreaName":"DC"},"CountryNameCode":"US"},"Accuracy":8},"address":"1600 Pennsylvania Ave NW, Washington, DC 20004, USA","Point":{"coordinates":[-77.037691,38.898758,0]}}}
+ $ GET
+ http://caffei:3005/search?location=1600%20pennsylvania%20ave%washington%20DC
+ {"location":{"AddressDetails":{"Country":{"AdministrativeArea":{"SubAdministrativeArea":{"SubAdministrativeAreaName":"District
+ of
+ Columbia","Locality":{"PostalCode":{"PostalCodeNumber":20004},"LocalityName":"Washington","Thoroughfare":{"ThoroughfareName":"1600
+ Pennsylvania Ave
+ NW"}}},"AdministrativeAreaName":"DC"},"CountryNameCode":"US"},"Accuracy":8},"address":"1600
+ Pennsylvania Ave NW, Washington, DC 20004,
+ USA","Point":{"coordinates":[-77.037691,38.898758,0]}}}
 
 All that data means it is working!  The important point to note is the
 "coordinates" field in the result set.
 
-Now, if you'll notice the default action is returning JSON data.  This is
-because, by default, Catalyst will simply pick whichever view comes first unless
-instructed otherwise.  To pick TT as our default view, we simply need to insert
-the "default_view" key in our configuration file C<geocat.yml>:
+Now, if you'll notice the default action is returning JSON data.  This
+is because, by default, Catalyst will simply pick whichever view comes
+first unless instructed otherwise.  To pick TT as our default view, we
+simply need to insert the "default_view" key in our configuration file
+C<geocat.yml>:
 
-    ---
-    name: GeoCat
-    default_view: TT
+    --- name: GeoCat default_view: TT
 
-Now when you load GeoCat (make sure you restart the server) you'll get the
-proper view for each action.
+Now when you load GeoCat (make sure you restart the server) you'll get
+the proper view for each action.
 
 =head2 Putting it together
 
 Now, with the templates and the included JavaScript, you should have a
-functional Google Map search application.  The JavaScript in root.tt will
-query C</search?location=UserInput> in the search box, and then make requests
-to the Google Local search API without ever hitting your server.
+functional Google Map search application.  The JavaScript in root.tt
+will query C</search?location=UserInput> in the search box, and then
+make requests to the Google Local search API without ever hitting your
+server.
 
 =head3 AUTHOR
 
@@ -291,7 +301,7 @@ J. Shirley, <jshirley@gmail.com>
 
 =head3 COPYRIGHT.
 
-Copyright 2006 J. Shirley.  This document can be freely
-redistributed and can be modified and re-distributed under the same
-conditions as Perl itself.
+Copyright 2006 J. Shirley.  This document can be freely redistributed
+and can be modified and re-distributed under the same conditions as
+Perl itself.
 
