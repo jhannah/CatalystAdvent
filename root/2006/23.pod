@@ -1,4 +1,4 @@
-=head1 Day 22 - Creating a Google Maps Mashup
+=head1 Day 23 - Creating a Google Maps Mashup
 
 Create a Catalyst Application that queries Google Geocode Service and
 uses it to create a searchable map.
