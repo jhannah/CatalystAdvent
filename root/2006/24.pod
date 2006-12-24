@@ -152,7 +152,7 @@ L<Catalyst::Example::InstantCRUD> is a very good example of a
 programmer-centric scaffolding abstraction, extremely useful and easy
 to extend.
 
-head2 Thanks
+=head2 Thanks
 
 The 2006 advent calendar was a community effort with 13 authors on 4
 continents.  Documentation is usually a weak point in distributed
