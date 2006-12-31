@@ -28,7 +28,7 @@ particular importance for svk):
 
  $ svk mirror http://dev.catalyst.perl.org/repos/Catalyst //mirror/Catalyst
  $ svk sync -r HEAD //mirror/Catalyst
- $ svk co ///mirror/Catalyst
+ $ svk co //mirror/Catalyst
 
 =head2 Mailing lists
 
@@ -106,18 +106,18 @@ author, email modules@cpan.org to ask about what to do.
 
 Patches for bug fixes, or test cases to demonstrate bugs are popular.
 A test case that requires an example application should be B<minimal>.
-That is, no extra plugins, use C< $c->res->body > for output where
+That is, no extra plugins, use C<< $c->res->body >> for output where
 practical and so on.
 
 Documenting how to use features is also important.  Where it is
 possible to provide a simple proof of concept reference implementation
 for a tutorial this is particularly encouraged.  These reference
 implementations exist for all of the L<Catalyst::Tutorial>
-applications, the Cheer application from day 1 of this years advent
+applications, the Cheer application from day 1 of this year's advent
 calendar, the Chained example from day 10, CatTube from day 8 and
 Geocat from yesterday.  Look in
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples> to see a
-wide variety of examples.  In fact the source for the advent calendar
+wide variety of examples.  In fact, the source for the advent calendar
 application is there under CatalystAdvent.
 
 In some way newbies write the best documentation, so we always ask
@@ -127,12 +127,12 @@ convert them into useful documentation early in the game.
 =head2  CPAN
 
 There are a large number of plugins in the L<Catalyst::Plugin>
-namespace on L<CPAN>.  There are also a few fewer modules in the
-L<Catalyst::Controller> name space, not to forget the
+namespace on L<CPAN>.  There are also a few modules in the
+L<Catalyst::Controller> name space, as well ast the
 L<Catalyst::Model>, L<Catalyst::View> and L<Catalyst::Engine>
 name spaces.  If you want to write your own L<Catalyst> extensions for
 L<CPAN> please check via the mailing list and irc (yes, preferably
-both) if possible to sanity check your approach and make a general
+both) if possible, to sanity check your approach and make a general
 request for comments.
 
 =head2 Scaffolding
@@ -141,12 +141,12 @@ At the moment the easiest scaffolding for L<Catalyst> to get up and
 running with is L<Catalyst::Example::InstantCRUD>.  It uses
 L<DBIx::Class> and L<HTML::Widget> to provide a rapid database
 scaffolding module.  The L<HTML::Widget> entry (day 19) shows some
-techniques you can use to extend this.  However remember, while
+techniques you can use to extend this.  However, remember that while
 scaffolding can provide you with an attractive looking kick-start to a
-project, depending on its complexity, you working around the
+project (depending on its complexity), working around the
 assumptions of the scaffolding later on may cost you more time than
 creating your application by hand in the first place would have taken.
-However, scaffolding does have its uses, just less often than people
+Scaffolding does have its uses, just less often than people
 would like to think.  Having said that,
 L<Catalyst::Example::InstantCRUD> is a very good example of a
 programmer-centric scaffolding abstraction, extremely useful and easy
