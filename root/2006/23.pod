@@ -239,7 +239,7 @@ object if we need to.  The code for this is simply:
     sub ACCEPT_CONTEXT {
         my ( $self, $c ) = @_;
         # Create the geocoder object if we need to
-        $self->{'geocoder'} ||= Geo::Coder::Google->new(
+        $self->{geocoder} ||= Geo::Coder::Google->new(
             apikey => $c->config->{google}->{apikey} );
         return $self;
     }
@@ -247,18 +247,24 @@ object if we need to.  The code for this is simply:
 Now that the geocoder object itself is created, that means our geocode
 function is quite small:
 
-    sub geocode { my ( $self, $location ) = @_; return
-        $self->{'.geocoder'}->geocode( location => $location ); }
+    sub geocode { 
+        my ( $self, $location ) = @_; 
+        return $self->{geocoder}->geocode( location => $location ); 
+    }
 
 The method for geocoding is to simply pass this back to the client,
 since Google returns JSON we will to, by using View::JSON.  This is
 handled in the controller C<GeoCat::Controller::Search>, under the
 root action we defined earlier:
 
-    sub root : Chained('base') : PathPart('') : Args(0) { my ( $self,
-        $c ) = @_; if ( $c->req->params->{location} ) {
-        $c->stash->{location} = $c->model('Geocode') ->geocode(
-        $c->req->params->{location}); } $c->forward('View::JSON'); }
+    sub root : Chained('base') : PathPart('') : Args(0) { 
+        my ( $self, $c ) = @_; 
+        if ( $c->req->params->{location} ) {
+            $c->stash->{location} = $c->model('Geocode')->geocode(
+                $c->req->params->{location});
+        }
+        $c->forward('View::JSON');
+    }
 
 Now you can test this by starting the server, and issuing a C<GET>
 command:
@@ -282,7 +288,8 @@ first unless instructed otherwise.  To pick TT as our default view, we
 simply need to insert the "default_view" key in our configuration file
 C<geocat.yml>:
 
-    --- name: GeoCat default_view: TT
+    --- name: GeoCat
+        default_view: TT
 
 Now when you load GeoCat (make sure you restart the server) you'll get
 the proper view for each action.
