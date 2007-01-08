@@ -3,8 +3,7 @@ package CatalystAdvent;
 use strict;
 use warnings;
 
-use Catalyst qw( -Debug 
-                 Static::Simple
+use Catalyst qw( Static::Simple
                  Cache::FileCache
                  DefaultEnd );
 
