@@ -23,7 +23,7 @@ exist.  The basic unit of a string in Perl is a "character":
 
 C<$1>, in this example, will contain the first I<character> in the
 string.  This intuitive if the string is something like C<"abcde">,
-but it also holds true for a string like C<???>.  What you think of as
+but it also holds true for a string like C<日本語>.  What you think of as
 characters, Perl thinks of as characters.
 
 However, the problem arises when you confuse a I<byte> (or an
