@@ -5,7 +5,9 @@ use warnings;
 
 use Catalyst qw( Static::Simple
                  Cache::FileCache
-                 DefaultEnd );
+                 DefaultEnd 
+                 Unicode
+              );
 
 our $VERSION = '0.03';
 

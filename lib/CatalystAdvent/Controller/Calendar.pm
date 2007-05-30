@@ -90,8 +90,13 @@ sub day : Regex('^(\d{4})/(\d\d?)$') {
             MakeIndex    => 0,
             TopLinks     => 0
         );
-        $parser->parse_from_file("$file");
+
+        open my $fh, '<:utf8', $file or die "Failed to open $file: $!";
+        $parser->parse_from_filehandle($fh);
+        close $fh;
+        
         $cached_pod = $parser->asString;
+        print {*STDERR} "hey pod: $cached_pod\n";
         $c->cache->set( "$file $mtime", $cached_pod, '12h' );
     }
     $c->stash->{pod} = $cached_pod;
@@ -171,8 +176,11 @@ sub feed : Global {
             TopLinks     => 0
         );
 
-        $parser->parse_from_file( ''. $path{ $day } );
-
+        my $file = q{}. $path{$day};
+        open my $fh, '<:utf8', $file or die "Failed to open $file: $!";
+        $parser->parse_from_filehandle($fh);
+        close $fh;
+        
         $feed->add_entry(
             title    => { type => 'text', content => $parser->summary },
             content  => { type => 'xhtml', content => $parser->asString },
