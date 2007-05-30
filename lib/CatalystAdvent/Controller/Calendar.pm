@@ -96,7 +96,6 @@ sub day : Regex('^(\d{4})/(\d\d?)$') {
         close $fh;
         
         $cached_pod = $parser->asString;
-        print {*STDERR} "hey pod: $cached_pod\n";
         $c->cache->set( "$file $mtime", $cached_pod, '12h' );
     }
     $c->stash->{pod} = $cached_pod;
