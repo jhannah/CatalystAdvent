@@ -202,4 +202,4 @@ Jonathan Rockway C<jrockway@cpan.org>
 
 Copyright (c) 2006, Jonathan Rockway.  This article may be
 redistributed under the same terms of Perl -- GPLv2, or Artistic 1.0.
-Enjoy.
+Enjoy. 
