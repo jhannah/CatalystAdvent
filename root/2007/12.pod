@@ -1,0 +1,5 @@
+=head1 local::lib and Catalyst
+
+=head1 AUTHOR
+
+John Goulah

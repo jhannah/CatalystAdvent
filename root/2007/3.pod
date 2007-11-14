@@ -1,0 +1,5 @@
+=head1 Get more REST - Using YUI and JavaScript for REST
+
+=head1 AUTHOR
+
+J. Shirley
