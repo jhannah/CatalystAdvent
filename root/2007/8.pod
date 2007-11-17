@@ -1,0 +1,11 @@
+
+=head1 Catalyst + OpenFlashChart: Fancy graphs with minimal fuss
+
+=head3 AUTHOR
+
+Jason Kohles, E<lt>email@jasonkohles.comE<gt>
+
+L<http://www.jasonkohles.com/>
+
+=cut
+
