@@ -1,5 +1,146 @@
 =head1 Get more REST - Using YUI and JavaScript for REST
 
+Today, we'll look into building a fully capable REST client in YUI that allows
+record creation, retrieving, updating and deletion (CRUD) as well as searching.
+
+=head2 Start Here First
+
+To make the most of this article, it is important to not only understand the
+basic idea of REST but to also see how it works within Catalyst.
+
+To start out understanding REST, read the excellent article by Ryan Tomayko 
+L<http://tomayko.com/articles/2004/12/12/rest-to-my-wife>, about explaining
+REST in simple terms that a non technical person is able to understand.  It will
+help a technical person understand it even more.
+
+Up next is to get a good understanding for how REST works inside of Catalyst,
+using Adam Jacob's excellent L<Catalyst::Action::REST> package.  The best way
+to get up to speed is to review Day 9 from the 2006 Advent Calendar, at
+L<http://www.catalystframework.org/calendar/2006/9.pod>.
+
+=head2 Following Along
+
+The examples that are listed here are available from the Catalyst subversion
+repository, available via:
+
+ svn co http://dev.catalystframework.org/repos/Catalyst/trunk/examples/CatalystREST-YUI
+
+It is a good idea to check out the sources of the sample application to better
+follow along with the examples.  Included is the necessary YUI javascript files
+to enhance this application as you go.
+
+=head2 Why use JavaScript?
+
+The reason why we're required to use JavaScript for a full REST service is
+because of the limited vocabulary that a browser coupled with plain HTML is
+allowed to speak.  The browser will only ever send GET and POST requests in
+response to user interaction with an HTML document.  However, when using the
+C<XmlHttpRequest> method that is a standard in all Grade A browsers the 
+vocabulary is extended to support PUT, DELETE and HEAD.
+
+=head2 The Connection to REST
+
+REST is based off of getting what you ask for.  In the simplest form, an
+C<XmlHttpRequest> isn't enough to talk to a REST webservice.  There are a few
+major components that fit together to make everything work:
+
+=over
+
+=item Content Type
+
+=item Request Method
+
+=item 
+
+=back
+
+=head2 Preparing the REST WebService
+
+To gain access to the REST services, we'll be accessing both the C<list> and the
+C<item> actions.  The list is going to be pulled by using a customized YUI
+DataSource object.
+
+This will ask the REST service for a list of our people objects, and in a simple
+form is nothing more than a L<DBIx::Class> search:
+
+   sub user_list_GET {
+       my ( $self, $c ) = @_;
+
+       my %user_list;
+       my $user_rs = $c->model('DB::User')->search;
+       while ( my $user_row = $user_rs->next ) {
+           $user_list{ $user_row->user_id } =
+             $c->uri_for( '/user/' . $user_row->user_id )->as_string;
+       }
+       $self->status_ok( $c, entity => \%user_list );
+   }
+
+That is from the original REST article, and to make the most of the list we're
+going to enhance the listing to provide some additional meta information that 
+enhances the webservice with features such as pagination and other contextual
+information.  We'll add in pagination with a CGI parameter "page" and a param
+for the number of items per page called "per_page"
+
+   sub user_list_GET {
+       my ( $self, $c ) = @_;
+       my $page     = $c->req->params->{page} || 1;
+       my $per_page = $c->req->params->{per_page} || 10;
+
+       # We'll use an array now:
+       my @user_list;
+       my $rs = $c->model('DB::User')
+           ->search(undef, { rows => $per_page })->page( $page );
+       while ( my $user_row = $rs->next ) {
+           push @user_list, {
+               $user_row->get_columns,
+               uri => $c->uri_for( '/user/' . $user_row->user_id )->as_string
+           };
+       }
+
+       $self->status_ok( $c, entity => {
+           result_set => {
+               totalResultsAvailable => $rs->pager->total_entries,
+               totalResultsReturned  => $rs->pager->entries_on_this_page,
+               firstResultPosition   => $rs->pager->current_page
+               result => [ @user_list ]
+           ;}
+       });
+   };
+
+So now we have a serialized structure that looks like this in JSON:
+
+=head2 Connecting with YUI
+
+After the webservice is up, it is time to setup the Yahoo DataSource object:
+
+    /* Create the YAHOO.util.DataSource object, the parameter is the
+       URI to your REST service
+    */
+    this.myDataSource = new YAHOO.util.DataSource("/rest/user_list?");
+    this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
+    this.myDataSource.connXhrMode = "queueRequests";
+    this.myDataSource.responseSchema = {
+    	resultsList: "result_set.result",
+        /* We have to define the fields for usage elsewhere */
+        fields: [
+            "pk1", "token", "default_lang", "languages",
+            "url", "t_created", "t_updated", "actions"
+        ]
+     };
+
+After this, we have a functional DataSource object that can be tied into a
+DataTable:
+
+        myDataTable = new YAHOO.widget.DataTable(
+            "kb_list", myColumnDefs,
+            this.myDataSource, {
+                /* The initialRequest is appended to the URI to set params */
+                initialRequest: "page=1&content-type=text/x-json"
+            }
+        );
+
+=cut
+
 =head1 AUTHOR
 
 J. Shirley
