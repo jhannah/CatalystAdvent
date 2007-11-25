@@ -182,7 +182,71 @@ http://perlalchemy.blogspot.com/2006/10/tags-and-search-and-dbixclass.html).
 
 =head3 Full Text Search
 
+For full text search I use the PostgreSQL tsearch2 engine here.
+
 =head3 Search by Proximity
 
+For searching by proximity I use the PostgreSQL geometric functions 
+(http://www.postgresql.org/docs/8.2/interactive/functions-geometry.html).
+There is 
+one problem with it - the distance operator assumes planar coordinates, 
+while for the interesting thing is to search geografic data with the standard
+latitude/longitude coordinates.  In our solution we just don't care about
+being exact and just multiply the 'distance' in degrees by 50 to get approximate
+distance in miles.  The actual proportion is about 43 for latitude and 69 for
+longitude at about the London's longitude, it would be possible to get quite 
+good results by dividing the latitude and longitude by those numbers in the
+database - but I would rather have good data in the database then more exact
+results.  Maybe at some point we shell switch to use some real geografic 
+distance functions (I've seen a PosgreSQL extension to do that - but I was
+scared a bit by it's experimental status).
 
+So here is the function used to filter the results by proximity to a place:
+
+sub search_for_distance {
+    my ( $self, $rs, $params ) = @_;
+    my $lat_long = $params->{lat_long};
+    my $distance = $params->{distance} / 50;  
+    # around London the actual proportions are around 43 for latitude 
+    # and 69 for longitude 
+    return $rs->search( 
+        { "(lat_long <-> '$lat_long'::POINT) < " => \$distance },
+        { join => 'location' }
+    );
+}
+
+This function assumes there are two parameters on the $params hash: distance
+and lat_long (lattitude/logintude coordinates).  The location data in our
+database are in a separate table called 'location'.
+
+We also use another search extension:
+
+sub search_for_lat_long {
+    my ( $self, $rs, $params ) = @_;
+    my $lat_long = $params->{lat_long};
+    $rs = $rs->search( undef,        
+        { 
+            join => 'location',
+            '+select' => [ \"(lat_long <-> '$lat_long'::POINT) AS distance" ],
+            '+as' => 'distance',
+            order_by => 'distance ASC',
+        }
+    );
+    return $rs;
+}
+
+This function sorts the results by proximity to the point determined by the
+lat_long coordinates.  This way the user does not need to specify the
+maximum distance - the closest results are displayed on the first pages
+anyway - and that is enough for most of the searches.
+
+=head2 And Beyond
+
+In the search by proximity extension I've used ordering of the results.  There
+is one problem with this.  We use many 'search' calls on the resultset
+to cumulate the predicates - but we cannot do this with the order.  Only the 
+last 'order_by' parameter used in the 'search' calls is effective.  I believe
+it would be useful to have a similar 'cumulative' behaviour for 'order_by' 
+and we can add this to 'advanced_search' (or perhaps it can be added to
+the core DBIC search method).
 
