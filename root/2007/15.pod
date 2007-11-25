@@ -1,0 +1,188 @@
+=head1 Advanced Search in web DBIx::Class based applications (with tags, full text search and searching by location)
+
+There is a bit of irony that I write that article, for people to learn from it,
+while in fact it is my failing to properly wrap my head around the problem and encapsulate 
+my solution into a CPAN library that forces me to write an article in the first
+place.  But maybe someone smarter then me will read it and write that CPAN
+module?
+
+=head2 The Problem
+
+It is a common case that on a web site you need an 'advanced search' feature
+that let's the user combine simple predicates into more elaborated queries.
+Usually all the predicates are joined with an 'AND' - and the technique I
+describe here is based on this assumption.  At first this task looks pretty
+simple.  You have a list of parameters from the web form, corresponding the the
+columns of some database table, you have the values of those parameters and you
+need to find all the records in that table that have those values in those
+columns.  You just do: 
+
+    my @records = $schema->ResultSet( 'MyTable' )->search( 
+        $reqest->params, 
+        { page => 1, rows => 5 } 
+    );
+
+Simple.
+
+Then of course you add parameter validation and filtering - but this is outside
+of the scope of this article.
+
+Then you need to add checks on columns not only in the searched table, but also
+on columns from related records and things become more complicated.  What I
+propose here is a solution that works for the simple case, solves the related
+tables case, and also is easily extendable to cover more complicated predicates
+like searching by a conjunction of tags, full text searches or searches by
+location. I also add implementation of those 'advanced' predicates (using the
+PostgreSQL extensions for full text search and location based search).
+
+=head2 The Solution
+
+The solution I propose is this simple module:
+
+    package Ymogen2::DB::RSSearchBase;
+    
+    use strict;
+    use warnings;
+    
+    use base qw( DBIx::Class::ResultSet );
+    
+    sub advanced_search {
+        my ( $self, $params, $attrs ) = @_;
+        for my $column ( keys %$params ){
+            if( my $search = $self->can( 'search_for_' . $column ) ){ 
+                $self = $self->$search( $params );
+                next;
+            }
+            my ( $full_name, $relation ) = simple_predicate( $column );
+            my $join;
+            $join = { join => [ $relation ] } if $relation;
+            $self = $self->search( 
+                    { $full_name => $params->{$column} }, 
+                    $join,
+            );
+        }
+        $self = $self->search( {}, $attrs );
+        return (wantarray ? $self->all : $self)
+    }
+
+You use it like that:
+
+    my @records = $schema->ResultSet( 'MyTable' )->advanced_search( 
+        \%search_params, 
+        { page => 1, rows => 5 } 
+    );
+
+But first you need to make your ResultSet class inherit from it.  This can be
+done in several ways, what we do is adding:
+
+    __PACKAGE__->resultset_class(__PACKAGE__ . '::ResultSet');
+    
+    package Ymogen2::DB::Schema::Users::ResultSet;
+
+    use base qw( Ymogen2::DB::RSSearchBase );
+
+
+
+to MyTable.pm.
+
+For the simple case it works just like the familiar 'search' method of the
+L<DBIx::Class::ResultSet class>. But it also works for searching in related
+records.  For that we have the simple_predicate function. It looks like that: 
+
+    sub simple_predicate {
+        my $field = shift;
+        if( $field =~ /(.*?)\.(.*)/ ){
+            my $first = $1;
+            my $rest  = $2;
+            my( $column, $join ) = simple_predicate( $rest );
+            if ( $join ) {
+                return $column, { $first => $join };
+            }else{
+                return $first . '.' . $column, $first;
+            }
+        }elsif( $field ){ 
+            return $field;
+        }else{
+            return;
+        }
+
+What it does is parsing column names of the format:
+'relationship1.relationship2.relationship3.column' into 'relationship3.column'
+- the fully qualified column name and a 
+'{ relationship1 => { relationship2 => relationship3 } }' hash used for joining
+the appriopriate tables.
+
+(I had also a non-recursive version - but it was not simpler)
+
+So now you can do this:
+
+    my @records = $schema->ResultSet( 'MyTable' )->advanced_search( 
+        {
+            column1 => 'value1',
+            column2 => 'value2', 
+            some_relation.column => 'value3',
+            some_other_relation.some_third_relation.column => 'value4', 
+        },
+        { page => 1, rows => 5 }
+    );
+    
+Useful?
+We use it.
+
+=head2 The Extensions
+
+But the real advantage of this approach is how easily it can be extended.  
+
+=head3 Tags
+
+For example let say we need to search by conjunction of tags like that:
+
+    my @records = $schema->ResultSet( 'MyTable' )->advanced_search( {
+        column1 => 'value1',
+        some_other_relation.some_third_relation.column => 'value4',
+        tags => [ qw/ tag1 tag2 tag3/ ],
+    });
+ 
+What we need is a method called 'search_for_tags' that will do the search.  The
+nice thing is that we don't need to warry how this will be combined with the
+rest of the predicates - DBIC will do the right thing (for and 'AND' relation).
+
+Here is the method:
+
+    sub search_for_tags {
+        my ( $self, $params ) = @_;
+        my @tags = @{$params->{tags}};
+        my %search_params;
+        my $suffix = '';
+        my $i = 1;
+        for my $tag ( @tags ){
+            $search_params{'tags' . $suffix .  '.name'} = $tag;
+            $suffix = '_' . ++$i;
+        }
+        my @joins = ( 'tags' ) x scalar( @tags );
+        $self = $self->search( \%search_params, { 
+                join => \@joins,
+            } 
+        );
+        return $self;
+    }
+
+It builds a query like that:
+
+    SELECT * FROM MyTable me, Tags tags, Tags tags_2, Tags tags_3
+    WHERE tags.mytable_id = me.id AND tags.tag = 'tag1' AND
+    tags_2.mytable_id = me.id AND tags_2.tag = 'tag2' AND
+    tags_3.mytable_id = me.id AND tags_3.tag = 'tag3' 
+
+This query will use indices and should be fast (a more detailed cover of this
+technique you can find at my blog at:
+http://perlalchemy.blogspot.com/2006/10/tags-and-search-and-dbixclass.html).
+
+*Attention:* You need the 0.08008 version of DBIx::Class for this to work properly.
+
+=head3 Full Text Search
+
+=head3 Search by Proximity
+
+
+
