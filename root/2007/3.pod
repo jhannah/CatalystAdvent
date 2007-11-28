@@ -23,7 +23,7 @@ L<http://www.catalystframework.org/calendar/2006/9.pod>.
 The examples that are listed here are available from the Catalyst subversion
 repository, available via:
 
- svn co http://dev.catalystframework.org/repos/Catalyst/trunk/examples/CatalystREST-YUI
+ svn co http://dev.catalystframework.org/repos/Catalyst/trunk/examples/RestYUI
 
 It is a good idea to check out the sources of the sample application to better
 follow along with the examples.  Included is the necessary YUI javascript files
@@ -53,6 +53,29 @@ major components that fit together to make everything work:
 =item 
 
 =back
+
+=head2 Starting the Catalyst Application
+
+We're taking last year's AdventREST example app and slightly modifying it to
+add support for YUI.
+
+So, to get started you can check out that application from subversion by doing:
+ 
+ svn co http://dev.catalystframework.org/repos/Catalyst/trunk/examples/AdventREST
+
+Or check out the completed RestYUI application.
+
+The only fundamental change to the application is adding the Template Toolkit
+view:
+
+ script/adventrest_create.pl view TT TT
+
+Also, we have to grab the static files for YUI itself.  As of writing this,
+version 2.3.1 is available from L<http://sourceforge.net/project/downloading.php?group_id=165715&filename=yui_2.3.1.zip>.  Check the latest version at
+L<http://developer.yahoo.com/yui/>
+
+After extracting the files from the zip archive, just copy over the .js files to
+the root/static directory.
 
 =head2 Preparing the REST WebService
 
@@ -101,9 +124,9 @@ for the number of items per page called "per_page"
            result_set => {
                totalResultsAvailable => $rs->pager->total_entries,
                totalResultsReturned  => $rs->pager->entries_on_this_page,
-               firstResultPosition   => $rs->pager->current_page
+               firstResultPosition   => $rs->pager->current_page,
                result => [ @user_list ]
-           ;}
+           }
        });
    };
 
@@ -111,12 +134,27 @@ So now we have a serialized structure that looks like this in JSON:
 
 =head2 Connecting with YUI
 
-After the webservice is up, it is time to setup the Yahoo DataSource object:
+After the webservice is up, it is time to setup the Yahoo DataSource object.
+
+We'll create a simple template off of the index action in C<Root.pm>, so
+create this action in Root.pm:
+
+ sub index : Private {
+     my ( $self, $c ) = @_;
+     $c->forward( $c->view('TT') );
+ }
+
+That will just direct the action for "/" to go to TT, and render an "index.tt"
+template.
+
+The C<index.tt> file is pretty basic, and after the HTML tags this is the crux
+of what gets the job done:
 
     /* Create the YAHOO.util.DataSource object, the parameter is the
        URI to your REST service
     */
-    this.myDataSource = new YAHOO.util.DataSource("/rest/user_list?");
+    this.myDataSource = new YAHOO.util.DataSource("[%
+         c.uri_for( c.controller('User').action_for('user_list') ) %]");
     this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
     this.myDataSource.connXhrMode = "queueRequests";
     this.myDataSource.responseSchema = {
