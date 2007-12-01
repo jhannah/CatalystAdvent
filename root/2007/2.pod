@@ -195,6 +195,12 @@ and a set of templates initially generated using the Catalyst helpers to give
 a portal page.
 
 
+=head2 Example application code
+
+You can check out the code from the Catalyst repository with
+
+ svn co http://dev.catalystframework.org/repos/Catalyst/trunk/examples/ExtJS
+
 
 =head2 Form Architecture Considerations
 
@@ -223,17 +229,6 @@ testing you would need to consider using a tool like Selenium. Check out
 L<http://www.infoq.com/articles/testing-ajax-selenium> 
 L<http://www.infoq.com/news/2007/09/selenium-grid-parallel-testing>
 L<http://search.cpan.org/~lukec/Test-WWW-Selenium-1.13/lib/WWW/Selenium.pm>
-
-
-=head2 Sample application code
-
-You can check out the code from the Catalyst repository with
-
- svn co http://dev.catalystframework.org/repos/Catalyst/trunk/examples/ExtJS
-
-Or you can try it out at
-
-L<http://dragonstaff.com/catadventextjs/>
 
 
 =head2 Comma Gotcha
