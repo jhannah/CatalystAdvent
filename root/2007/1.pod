@@ -1,4 +1,4 @@
-=head1 Day 2 - Getting started with ExtJS screen library
+=head1 Day 1 - Getting started with ExtJS screen library
 
 Today we take a look at the ExtJS screen library and how to get started
 using it within a Catalyst web application.
