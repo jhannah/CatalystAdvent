@@ -1,4 +1,4 @@
-=head1 Get more REST - Using YUI and JavaScript for REST
+=head1 Dat 2.  Get more REST - Using YUI and JavaScript for REST
 
 Today, we'll look into building a fully capable REST client in YUI that allows
 record creation, retrieving, updating and deletion (CRUD) as well as searching.
@@ -16,7 +16,7 @@ help a technical person understand it even more.
 Up next is to get a good understanding for how REST works inside of Catalyst,
 using Adam Jacob's excellent L<Catalyst::Action::REST> package.  The best way
 to get up to speed is to review Day 9 from the 2006 Advent Calendar, at
-L<http://www.catalystframework.org/calendar/2006/9.pod>.
+L<http://www.catalystframework.org/calendar/2006/9>.
 
 =head2 Following Along
 
