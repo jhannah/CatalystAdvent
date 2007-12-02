@@ -110,7 +110,7 @@ More details at L<http://extjs.com/learn/Ext_1_to_2_Migration_Guide>
 =head3 Installation
 
 If you're on Linux, install ExtJS to your web server document root, e.g. 
-/var/www/html/ext-1.1. When you want to use it in a Catalyst project create a 
+/var/www/html/ext-1.1.1. When you want to use it in a Catalyst project create a 
 symbolic link from your root/static directory
 
  $ ln -s /var/www/html/ext-1.1.1 root/static/
