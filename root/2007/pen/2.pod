@@ -1,56 +1,107 @@
-=head1 Dat 2.  Get more REST - Using YUI and JavaScript for REST
+=head1 Get more REST - Using YUI and JavaScript for REST
 
-Today, we'll look into building a fully capable REST client in YUI that allows
-record creation, retrieving, updating and deletion (CRUD) as well as searching.
+Today, we'll look into building a fully capable REST client in YUI that allows record
+creation, retrieving, updating and deletion (CRUD) as well as searching.  This is not a 
+copy and paste article, but explains the general concepts as a read-along to reading the
+source of the example application.
 
-=head2 Start Here First
+=head2 Start Here First: Understanding REST
 
-To make the most of this article, it is important to not only understand the
-basic idea of REST but to also see how it works within Catalyst.
+To make the most of this article, it is important to not only understand the basic idea of
+REST but to also see how it works within Catalyst.
 
-To start out understanding REST, read the excellent article by Ryan Tomayko 
-L<http://tomayko.com/articles/2004/12/12/rest-to-my-wife>, about explaining
-REST in simple terms that a non technical person is able to understand.  It will
-help a technical person understand it even more.
+To start out understanding REST, read the excellent article by Ryan Tomayko
+L<http://tomayko.com/articles/2004/12/12/rest-to-my-wife>, about explaining REST in simple
+terms that a non technical person is able to understand.  It will help a technical person
+understand it even more.
 
-Up next is to get a good understanding for how REST works inside of Catalyst,
-using Adam Jacob's excellent L<Catalyst::Action::REST> package.  The best way
-to get up to speed is to review Day 9 from the 2006 Advent Calendar, at
-L<http://www.catalystframework.org/calendar/2006/9>.
+Up next is to get a good understanding for how REST works inside of Catalyst, using Adam
+Jacob's excellent L<Catalyst::Action::REST> package.  The best way to get up to speed is to
+review Day 9 from the 2006 Advent Calendar, at
+L<http://www.catalystframework.org/calendar/2006/9.pod>.
 
-=head2 Following Along
+=head2 Following Along: Using the Source
 
 The examples that are listed here are available from the Catalyst subversion
 repository, available via:
 
  svn co http://dev.catalystframework.org/repos/Catalyst/trunk/examples/RestYUI
 
-It is a good idea to check out the sources of the sample application to better
-follow along with the examples.  Included is the necessary YUI javascript files
-to enhance this application as you go.
+This is a fully functional application that uses REST webservices instead of the
+traditional method of form submission and posting.  While this isn't an ideal use of
+REST, and it doesn't give you anything over a non-JavaScript based form, it should help
+people think about things a little different and show the power of a framework that can
+use any view, not just HTML, to represent objects.
 
-=head2 Why use JavaScript?
+This article talks about building the core pieces, but there are many other important
+points in the example application that are not covered specifically in the article.  Please
+check out the source above, run the application and read the source as you read this
+article.  
 
-The reason why we're required to use JavaScript for a full REST service is
-because of the limited vocabulary that a browser coupled with plain HTML is
-allowed to speak.  The browser will only ever send GET and POST requests in
-response to user interaction with an HTML document.  However, when using the
-C<XmlHttpRequest> method that is a standard in all Grade A browsers the 
-vocabulary is extended to support PUT, DELETE and HEAD.
+=head1 Why use JavaScript?
 
-=head2 The Connection to REST
+The big question that comes along when working with REST in the browser is why do you have
+to use JavaScript.  The reason why we're required to use JavaScript for a full REST service
+is because the vocabulary that a browser speaks natively is limited to only two verbs: GET
+and PoST.
 
-REST is based off of getting what you ask for.  In the simplest form, an
-C<XmlHttpRequest> isn't enough to talk to a REST webservice.  There are a few
-major components that fit together to make everything work:
+However, when using the C<XmlHttpRequest> JavaScript object that is available in all Grade
+A browsers the vocabulary is extended to support PUT, DELETE and HEAD and many others.
+
+With this, you can write a web application that is also a web service, with very little
+redundant code.  Additionally, the tests can test the data and separate tests can test
+the HTML rendering.  This makes things much less tedious, and the tests more accurate.
+
+With Selenium testing the JavaScript, you can have full end-to-end testing with very little
+pain.  To me, we're finally at a point in browser development where the question is why not
+use JavaScript.
+
+=head2 Connecting to REST
+
+The general idea of REST is getting what you ask for, in the format you want.  In the
+simplest form, an C<XmlHttpRequest> isn't enough to talk to a REST webservice.  There are a
+few major points that come together to make everything work:
 
 =over
 
 =item Content Type
 
+Because YUI assumes you're working with a brain-dead framework that can't
+support wonderful things like REST, you have to map the default content-type
+(or dig into YUI and setup different content type headers, but this is quite
+a bit of work).  In the REST controller, assigning this content type to 
+serialization format is a piece of cake:
+
+ __PACKAGE__->config(
+    # Set the default serialization to JSON
+    'default' => 'JSON',
+    'map' => {
+        # Remap x-www-form-urlencoded to use JSON for serialization
+        'application/x-www-form-urlencoded' => 'JSON',
+    },
+ );
+
+YUI will also not set the default content type header to a useful value, so you have to
+do that in the JavaScript.  This is covered later in detail.
+
 =item Request Method
 
-=item 
+The request method is the verb.  This means you are GETting a resource, PUTting a new
+resource in the system, POSTing an update to an existing resource or DELETEing something.
+
+Luckily, XmlHttpRequest and YUI supports this just fine without any additional tweaking.
+
+=item Data Serialization
+
+The Content-Type not only specifies how you want the data back, but it specifies how
+you are sending data.  In the context of a PUT or POST, any data you send has to match
+the Content-Type provided.  So if you send a Content-type header of 'text/x-json', the
+data has to be in JSON.  There are a ton of serialization formats available, so pick
+what works best for you in each application.
+
+If you're working with a JavaScript-based interface, I prefer JSON.  If I'm doing command
+line interaction, I like serialization in YAML.  The same resource can handle multiple
+serialization formats, just change the Content-type!
 
 =back
 
@@ -75,7 +126,33 @@ version 2.3.1 is available from L<http://sourceforge.net/project/downloading.php
 L<http://developer.yahoo.com/yui/>
 
 After extracting the files from the zip archive, just copy over the .js files to
-the root/static directory.
+the root/static directory.  My preferred method is to do this:
+
+ cd MyApp
+ mkdir root/static/yui
+ cd /where/you/unpacked/yui/build
+ for i in *; do cp $i/$i.js $i/$i-beta.js /path/to/MyApp/root/static/yui; done
+
+That will copy all the non-minimized (but not debug versions) and beta JS files
+into your static/yui path, so you can reference them with an easy URI:
+ C</static/yui/yahoo.js>
+
+The other files that are very useful are the "sam" CSS and image files.  For
+the datatable, we're going to use C<sam/datatable.css> and a few other images:
+
+=over
+
+=item sprite.png
+
+=item dt-arrow-dn.png
+
+=item dt-arrow-up.png
+
+=back
+
+Those will make the DataTable look nice and stylish.  If you want to expand more
+on the YUI styles then the buttons, containers and other layouts are a great
+asset provided by Yahoo.
 
 =head2 Preparing the REST WebService
 
@@ -177,8 +254,100 @@ DataTable:
             }
         );
 
-=cut
+=head1 Adding REST PUT and POST Methods via YUI
+
+The fundamental difference between a PUT and POST is a PUT creates a new resource and
+POST updates an existing resource.  In the original advent article, the PUT and POST
+articles were aliased and therefore provide identical functionality.  We're not going to
+change this, because for the purposes of this article it doesn't matter.  YUI will
+respect whatever method provided in the C<asyncRequest> call.  So if you want to do a
+PUT, the call looks like:
+
+    var request = YAHOO.util.Connect.asyncRequest(
+        'PUT',
+        uri, callback, json_data
+    );
+
+It's a good idea to read the overview and some examples of how to use asyncRequest, but
+the usage is very simple.  That is really all that is necessary to trigger a REST call
+in YUI, but you have to watch the content type.  By default, YUI will not set the
+proper content type, and since JSON is by far the easiest serialization method to use
+in JavaScript, we're going to use that.  YUI fortunately has an easy method for changing
+the content type, but it isn't a well-named method and you have to be careful because it
+sets the content type on subsequent calls:
+
+    YAHOO.util.Connect.setDefaultPostHeader('text/x-json');
+
+Adding that line before any C<asyncRequest> calls will ensure you are sending the
+right content type header, and won't cause the REST service any confusion.  The next
+step is actually encoding the JSON data from the form.
+
+=head2 JSON Parsing and Encoding in JavaScript
+
+The C<json2.js> JSON stringifier and parser is used in this article and is available from
+L<http://www.JSON.org/js.html>.  It is public domain, and works very well.
+
+=head2 From Form to JSON to REST
+
+Given a form object, as what is declared in the C<root/user/single_user.tt> file, and
+hijack the normal submit mechanisms to enable a REST POST or PUT to a backend webservice
+is just a simple few lines of JavaScript:
+
+    /* Setup the listener when the form is submitted: */
+    YAHOO.util.Event.addListener(form, "submit", function(e) {
+        /* Cancel the default submit event.
+           You can get creative here for graceful fallbacks, think about it!
+        */
+        YAHOO.util.Event.preventDefault(e);
+        /* Start a timeout to encapsulate the REST call */
+        window.setTimeout(function() {
+            /* What URI are we going to POST or PUT to?  Ourselves, in this case */
+            var uri  = '[% c.req.uri %]';
+
+            /* The actual data structure, it still is just JavaScript at this point.
+               Keep in mind there are better ways to take a form and translate it into
+               JSON, but being explicit never killed anybody
+            */
+            var data = {
+                user_id:     form['user_id'].value,
+                fullname:    form['fullname'].value,
+                description: form['description'].value
+            };
+            /* Set the content-type to text/x-json, otherwise things will break! */ 
+            YAHOO.util.Connect.setDefaultPostHeader('text/x-json');
+            /* The actual call, this bit makes the HTTP call */
+            var request = YAHOO.util.Connect.asyncRequest(
+                '[% method %]',
+                uri,
+                /* Callback should contain a success and failure method, read the
+                   YUI asyncRequest docs! */
+                callback,
+                /* Stringify our data structure into JSON, this is sent in the HTTP BODY */
+                JSON.stringify(data)
+            );
+        }, 200);
+    });
+
+That's it, with a lot of comments!  This will send a PUT or POST request to the backend
+service with the form data encoded in JSON.  You're not limited to PUT or POST methods,
+you can also use DELETE, HEAD and any other method defined in the RFC.
+
+To see the full page, check out C<root/user/single_user.tt> in the RestYUI example.
+
+=head1 The State of (un)REST in the Browser World
+
+Beware, that not all browsers support every method so YUI and REST is not guaranteed to
+work on every browser and every platform.  It's up to the browser developers to decide to
+support full specifications and I'm happy to report that most browsers do in this context,
+including both Internet Explorer 6.x and 7.
 
 =head1 AUTHOR
 
-J. Shirley
+J. Shirley wrote the YUI based portions, with the original 2006 REST article
+being written by Adam Jacob.
+
+Adam Jacob also wrote the Catalyst::Action::REST module, which is the foundation
+to all of this.
+
+=cut
+
