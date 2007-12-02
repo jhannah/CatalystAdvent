@@ -95,7 +95,7 @@ dependency that looks like this, along with the other modules the app is using
 
 Once you've added all of your dependencies, you can install them 
 
- % cd My-Module-branch
+ % cd MyApp
  % perl Makefile.PL && make installdeps 
 
 Assuming you have a fresh perl and local::lib installation, the dependency list
@@ -119,6 +119,7 @@ to code that you are working on.  For example, if you've made a patch or just
 want to test out a branch of code, you can install it to your local::lib in the
 typical way
 
+ % cd My-Module-branch
  % perl Makefile.PL && make install
 
 Then later if you want to rollback to the current version of the module fire up 
