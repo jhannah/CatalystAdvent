@@ -83,9 +83,8 @@ Then I subclassed it for my actual controllers:
     $self->request->mark_as_accepted_by($self->user);
   }
 
-
-Very clean.  There's no reliance on strings indexing hash, and there's
-no repeated code.
+Very clean.  There's no reliance on strings indexing into hashes, and
+there's no repeated code. 
 
 (BTW, the reason I put user and request into C<< $c->stash >> instead
 of into C<$self> is because we show a message like "Thank you,
