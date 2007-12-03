@@ -88,10 +88,10 @@ Very clean.  There's no reliance on strings indexing hash, and there's
 no repeated code.
 
 (BTW, the reason I put user and request into C<< $c->stash >> instead
-of into C<$self> is because we show a message like "Thank you C<$user>
-for approving request C<$request->uuid>".  The begin action that
-inflates and stashes the URL params makes the both the template and
-the controller eaiser to work with.)
+of into C<$self> is because we show a message like "Thank you,
+C<< $user->name >>, for approving request C<< $request->uuid >>".  The
+begin action that inflates and stashes the URL params makes the both
+the template and the controller eaiser to work with.)
 
 =head1 Actions from base controllers
 
@@ -210,7 +210,7 @@ model:
 Whatever work is required to lookup a C<foo> by its C<food> is handled
 completely outside of Catalyst.  This way I can easily write tests,
 and use the code in other applications.  (We save a lot of development
-time by writting common code that can be subclassed for different
+time by writing common code that can be subclassed for different
 clients or interfaces.)
 
 The rest of the action is something like preparing C<$foo> for display
