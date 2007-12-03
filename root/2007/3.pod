@@ -1,6 +1,6 @@
 =head1 Application Design Techniques
 
-Happy 3 December!  Today, I'm going to talk about some techniques
+Happy 3 December!  Today, I'm going to talk about some techniques for
 making your Catalyst applications as maintainable (and enjoyable) as
 possible.  These are all techniques I use in my applications daily, so
 don't think that this is just some theoretical nonsense that I think
@@ -189,7 +189,7 @@ customized by configuration options.
 =head1 Thin controllers
 
 There will be another article this month on Rails-style "mvC" versus
-real MVC design, but for now I'll just breifly explain the concept.
+real MVC design, but for now I'll just briefly explain the concept.
 
 You'll notice above that my example Catalyst actions above look like:
 
@@ -243,4 +243,3 @@ L<http://www.stonehenge.com/open_enrollment.html>
 Jonathan Rockway C<< <jrockway@cpan.org> >>
 
 Infinity Interactive, Inc L<http://www.iinteractive.com>.
-
