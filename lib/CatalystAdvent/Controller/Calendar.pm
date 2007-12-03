@@ -181,11 +181,11 @@ sub feed : Global {
         close $fh;
         
         $feed->add_entry(
-            title    => { type => 'text', content => $parser->summary },
+            title    => { type => 'text', content => $parser->title },
             content  => { type => 'xhtml', content => $parser->asString },
             author   => { name => $parser->author||'Catalyst', 
 			  email => ($parser->email||
-				    'catalyst@lists.rawmode.org') },
+				    'catalyst@lists.scsys.co.uk') },
             link     => $c->uri_for( "/$year/$day" ),
             id       => $c->uri_for( "/$year/$day" ),
             published=> format_date_w3cdtf( $stat{ $day }->ctime ),
