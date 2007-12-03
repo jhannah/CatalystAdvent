@@ -240,7 +240,7 @@ L<http://www.stonehenge.com/open_enrollment.html>
 
 =head1 AUTHOR
 
-Jonathan Rockway C<< jrockway@cpan.org >>
+Jonathan Rockway C<< <jrockway@cpan.org> >>
 
 Infinity Interactive, Inc L<http://www.iinteractive.com>.
 
