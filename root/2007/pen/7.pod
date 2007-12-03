@@ -44,7 +44,7 @@ the Authentication Plugin. This module B<Catalyst::Plugin::Authentication> is
 available at your favorite CPAN repository.
 
 B<NOTE>: This article assumes you are using the most recent 
-version available (as of this writing 0.10002**).  
+version available (as of this writing 0.10003**).  
 
 The Password credential module is part of the main Authentication plugin, so
 there is no need to install that separately.
