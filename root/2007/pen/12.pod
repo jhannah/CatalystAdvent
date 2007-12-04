@@ -14,8 +14,10 @@ deploying Catalyst applications.
 
 =head2 Prerequisites
 
-The prerequisites require a toolchain (make, C compiler, etc) and an outbound 
-connection (to connect with CPAN).
+The prerequisites for local::lib simply require a toolchain (make, C compiler, 
+etc) and an outbound connection (to connect with CPAN). This tutorial was 
+written from the perspective that the user is familiar with Catalyst and 
+working on a Linux based system.
 
 =head2 Getting Started
 
@@ -42,23 +44,39 @@ and unpack it
 
 =head2 Installation
 
-If any of the following steps hang for any reason, you may need to go into the 
-build directory (~/.cpan/build/CPAN-1.92) and run make install, but the typical
-process is simply
+The typical installation process is very straightforward, barring any system
+oddities
 
  % cd ~/local-lib-1.001000
  % perl Makefile.PL --bootstrap
  % make test
  % make install
+
+=over 1
+
+Note: If any of the above steps hang for any reason, you may need to go 
+into the build directory (~/.cpan/build/CPAN-1.92) and run make install. 
+
+=back
+
+You should now be setup with a ~/perl5 directory, which will be used for 
+further module installations via CPAN. To complete installation, setup your 
+environment by adding it to your .bashrc for subsequent logins and reload the
+file for this session
+
  % eval `perl -I$HOME/perl5/lib/perl5 -Mlocal::lib` >> ~/.bashrc
  % source .bashrc
+
 
 =head3 Verifying the Installation 
 
 You can now check that MODULEBUILDRC, PERL5LIB, PERL_MM_OPT and PATH all 
-mention your new setup under ~/perl5 using the 'set' command. Then install a 
-few basic modules for faster downloading, checksum checking, and stopping 
-persistant state warnings, respectively
+mention your new setup under ~/perl5 using the 'set' command 
+
+ set | egrep "MODULEBUILDRC|PERL5LIB|PERL_MM_OPT|PATH"
+
+Now you are safe to install a few basic modules for faster downloading, 
+checksum checking, and stopping persistant state warnings, respectively
 
  % perl -MCPAN -e 'install(LWP)'
  % perl -MCPAN -e 'install Digest::SHA'
@@ -68,9 +86,11 @@ persistant state warnings, respectively
 
 There is really nothing new to getting a basic Catalyst application working at
 this point, except to understand that you are now using the modules under 
-~/perl5 so you can install anything you please. There are several suggestions 
-L<here|Catalyst::Manual::Installation> for getting Catalyst installed.  For 
-development all you need is to install L<Catalyst::Devel> like so 
+~/perl5 so you can install anything you please. There is no need for root 
+privileges as everything will install cleanly into your local directory. There 
+are several suggestions L<here|Catalyst::Manual::Installation> for getting 
+Catalyst installed.  For development all you need is to install 
+L<Catalyst::Devel> like so 
 
  % perl -MCPAN -e 'install Catalyst::Devel'
 
@@ -80,39 +100,49 @@ Then you can create an app and fire it up
  % cd MyApp
  % script/myapp_server.pl
 
-=head2 Additional Benefits of local::lib
+You are now running your Catalyst application under local::lib
 
-=head3 Using Makefile.PL to Install Your App Dependencies
+=head2 Using Makefile.PL to Install Your App Dependencies
 
 If you start with an empty site_perl (only core modules) and a fresh local::lib
 installation, you can actually build your application, test it works, and use 
 the modules in the deployment of your app (Note: a fresh perl installation  
-requires root).  This also requires that you have been adding the application 
+requires root). Your options here are to compile perl from scratch, or to use 
+your package management system to install only core perl package and possibly
+a perl database driver. For a clean local::lib install, just move your old 
+directory out of the way and redo the tarball installation steps above.
+
+This also requires that you have been adding the application 
 dependencies to your Makefile.PL. For example, you would probably have a 
 dependency that looks like this, along with the other modules the app is using
 
  requires 'Catalyst' => '5.7010';
 
-Once you've added all of your dependencies, you can install them 
+For more info see L<Module::Install>.  Once you've added all of your 
+dependencies, build the Makefile 
 
  % cd MyApp
- % perl Makefile.PL && make installdeps 
+ % perl Makefile.PL 
 
-Assuming you have a fresh perl and local::lib installation, the dependency list
-will show each module as 'missing' which makes it build all of the 
-dependencies into your ~/perl5/lib/perl5 directory. For testing, just verify 
-your application starts up. You can then take this set of modules and deploy it
-with your application on another box, knowing that set of modules works with
-that version of the application being deployed. 
+Assuming you have a fresh perl and local::lib installation, the following
+command will show each module as 'missing' which makes it build all of the 
+dependencies into your ~/perl5/lib/perl5 directory
 
-This is also useful in an environment with multiple developers.
-If a dependency is added, it has to go into Makefile.PL. Making sure modules
-are only installed with 'make installdeps' verifies that when the code is 
-committed that uses a new module, other developers can easily install it into 
-their local::lib (with 'perl Makefile.PL && make installdeps'), and thus 
-becomes a new dependecy in the build process.
+ % make installdeps 
 
-=head3 Testing Module Code In Your Environment 
+For testing, just verify your application starts up. You can then take this set
+of modules, tar, and deploy them with your application on another box, knowing 
+that this set of modules works with this version of the application that 
+you've compiled your modules against.
+
+Installing deps with Makefile.PL is also useful in an environment with multiple
+developers.  If a dependency is added, it has to go into Makefile.PL. Making 
+sure modules are only installed with C<make installdeps> verifies that when 
+the code is committed that uses a new module, other developers can easily 
+install it into their local::lib (with C<perl Makefile.PL && make installdeps>)
+and thus becomes a new dependecy in the build process.
+
+=head2 Testing Module Code In Your Environment 
 
 One more useful thing about local::lib is that you can use it to test patches 
 to code that you are working on.  For example, if you've made a patch or just 
@@ -136,7 +166,7 @@ way to overwrite your version
 
 =head2 Summary
 
-We have seen where you can use local::lib as a development environment
+We have seen where you can use L<local::lib> as a development environment
 and touched on how you can use it to build modules for deploying on other 
 hosts. It can be handy for control over your modules on shared hosts and in a 
 multi-developer setting as well as an easy way to work on external code.  
