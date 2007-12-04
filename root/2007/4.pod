@@ -3,7 +3,7 @@
 
 =head2 About Open Flash Chart
 
-Open Flash Chart is a flash application that prudoces some very nice-looking,
+Open Flash Chart is a flash application that produces some very nice-looking,
 interactive (and in some cases animated) charts and graphs for your web
 application.  It's also completely free and open source, released under the
 GNU General Public License.
