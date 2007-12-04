@@ -40,21 +40,23 @@ article.
 
 =head1 Why use JavaScript?
 
-The big question that comes along when working with REST in the browser is why do you have
-to use JavaScript.  The reason why we're required to use JavaScript for a full REST service
-is because the vocabulary that a browser speaks natively is limited to only two verbs: GET
-and PoST.
+The big question that comes along when working with REST in the browser is why
+do you have to use JavaScript.  The reason why we're required to use JavaScript
+for a full REST service is because the vocabulary that a browser speaks natively
+is limited to only two verbs: GET and POST.
 
-However, when using the C<XmlHttpRequest> JavaScript object that is available in all Grade
-A browsers the vocabulary is extended to support PUT, DELETE and HEAD and many others.
+However, when using the C<XmlHttpRequest> JavaScript object that is available in
+all Grade A browsers the vocabulary is extended to support PUT, DELETE and HEAD
+and many others.
 
-With this, you can write a web application that is also a web service, with very little
-redundant code.  Additionally, the tests can test the data and separate tests can test
-the HTML rendering.  This makes things much less tedious, and the tests more accurate.
+With this, you can write a web application that is also a web service, with very
+little redundant code.  Additionally, the tests can test the data and separate
+tests can test the HTML rendering.  This makes things much less tedious, and the
+tests more accurate.
 
-With Selenium testing the JavaScript, you can have full end-to-end testing with very little
-pain.  To me, we're finally at a point in browser development where the question is why not
-use JavaScript.
+With Selenium testing the JavaScript, you can have full end-to-end testing with
+very little pain.  To me, we're finally at a point in browser development where
+the question is why not use JavaScript.
 
 =head2 Connecting to REST
 
@@ -86,22 +88,23 @@ do that in the JavaScript.  This is covered later in detail.
 
 =item Request Method
 
-The request method is the verb.  This means you are GETting a resource, PUTting a new
-resource in the system, POSTing an update to an existing resource or DELETEing something.
+The request method is the verb.  This means you are GETting a resource, POSTting
+a new resource in the system, PUTing an update to an existing resource or
+DELETEing something.
 
 Luckily, XmlHttpRequest and YUI supports this just fine without any additional tweaking.
 
 =item Data Serialization
 
-The Content-Type not only specifies how you want the data back, but it specifies how
-you are sending data.  In the context of a PUT or POST, any data you send has to match
-the Content-Type provided.  So if you send a Content-type header of 'text/x-json', the
-data has to be in JSON.  There are a ton of serialization formats available, so pick
-what works best for you in each application.
+The Content-Type not only specifies how you want the data back, but it specifies
+how you are sending data.  In the context of a PUT or POST, any data you send
+has to match the Content-Type provided.  So if you send a Content-type header of
+'text/x-json', the data has to be in JSON.  There are a ton of serialization
+for mats available, so pick what works best for you in each application.
 
-If you're working with a JavaScript-based interface, I prefer JSON.  If I'm doing command
-line interaction, I like serialization in YAML.  The same resource can handle multiple
-serialization formats, just change the Content-type!
+If you're working with a JavaScript-based interface, I prefer JSON.  If I'm
+doing command line interaction, I like serialization in YAML.  The same resource
+can handle multiple serialization formats, just change the Content-type!
 
 =back
 
@@ -256,31 +259,33 @@ DataTable:
 
 =head1 Adding REST PUT and POST Methods via YUI
 
-The fundamental difference between a PUT and POST is a PUT creates a new resource and
-POST updates an existing resource.  In the original advent article, the PUT and POST
-articles were aliased and therefore provide identical functionality.  We're not going to
-change this, because for the purposes of this article it doesn't matter.  YUI will
-respect whatever method provided in the C<asyncRequest> call.  So if you want to do a
-PUT, the call looks like:
+The fundamental difference between a PUT and POST is a POST creates a new
+resource and PUTT updates an existing resource.  In the original advent article,
+the PUT and POST articles were aliased and therefore provide identicali
+functionality.  We're not going to change this, because for the purposes of this
+article it doesn't matter.  YUI will respect whatever method provided in the
+C<asyncRequest> call.  So if you want to do a PUT, the call looks like:
 
     var request = YAHOO.util.Connect.asyncRequest(
         'PUT',
         uri, callback, json_data
     );
 
-It's a good idea to read the overview and some examples of how to use asyncRequest, but
-the usage is very simple.  That is really all that is necessary to trigger a REST call
-in YUI, but you have to watch the content type.  By default, YUI will not set the
-proper content type, and since JSON is by far the easiest serialization method to use
-in JavaScript, we're going to use that.  YUI fortunately has an easy method for changing
-the content type, but it isn't a well-named method and you have to be careful because it
-sets the content type on subsequent calls:
+It's a good idea to read the overview and some examples of how to use
+asyncRequest, but the usage is very simple.  That is really all that is
+necessary to trigger a REST call in YUI, but you have to watch the content type.
+By default, YUI will not set the proper content type, and since JSON is by far
+the easiest serialization method to use in JavaScript, we're going to use that.
+
+YUI fortunately has an easy method for changing the content type, but it isn't
+a well-named method and you have to be careful because it sets the content type
+on subsequent calls, even if they're not a POST:
 
     YAHOO.util.Connect.setDefaultPostHeader('text/x-json');
 
-Adding that line before any C<asyncRequest> calls will ensure you are sending the
-right content type header, and won't cause the REST service any confusion.  The next
-step is actually encoding the JSON data from the form.
+Adding that line before any C<asyncRequest> calls will ensure you are sending
+the right content type header, and won't cause the REST service any confusion.  
+The next step is actually encoding the JSON data from the form.
 
 =head2 JSON Parsing and Encoding in JavaScript
 
