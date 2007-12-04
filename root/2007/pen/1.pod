@@ -1,5 +1,0 @@
-=head1 Day 1 - Catalyst Application Design
-
-=head1 AUTHOR
-
-Jon Rockway
