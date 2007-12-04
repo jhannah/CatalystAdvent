@@ -16,18 +16,16 @@ go into too much detail with the basics of creating an application...
 =head2 Installing Ext
 
 To install Ext, you first need to download and unzip the distribution.  For
-this tutorial we will be using version 2.0 release candidate 1, which is the
-latest version at the time of this writing.  If you use a different version,
-you will need to adjust some of these commands.  If you prefer to avoid the
-risks of using late-beta software and stick with the latest 1.x release,
-this tutorial should still be helpful, but may require a lot of tweaking.
+this tutorial we will be using version 2.0, which is the latest version at
+the time of this writing.  If you use a different version, you will need to
+adjust some of these commands.
 
   % cd root/static
-  % curl -O http://extjs.com/deploy/ext-2.0-rc1.zip
+  % curl -O http://extjs.com/deploy/ext-2.0.zip
   ...
-  % unzip ext-2.0-rc1.zip
+  % unzip ext-2.0.zip
   ...
-  % mv ext-2.0-rc1 ext
+  % mv ext-2.0 ext
 
 There are some portions of the Ext framework that we will need in every page,
 so we're going to add those to the head section now.  I like to define a
