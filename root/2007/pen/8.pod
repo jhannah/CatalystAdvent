@@ -1,11 +1,11 @@
 
 =head1 Inline Authentication Without Redirection
 
-Yesterday Jay Kuri covered Adding Authentication to your Catalyst App, which
-showed you how to determine if the user needed to authenticate, and if they
-did to redirect them to a login controller.  Today I'm going to show you
-an alternate approach, one that doesn't require redirection, that just
-handles the login inline.
+Earlier this week Jay Kuri covered Adding Authentication to your Catalyst
+App, which showed you how to determine if the user needed to authenticate,
+and if they did to redirect them to a login controller.  Today I'm going
+to show you an alternate approach, one that doesn't require redirection,
+that just handles the login inline.
 
 Why would you want to handle the login inline, rather than redirecting to a
 login page?  Have you ever had to login to a web application and fill out a
@@ -39,9 +39,10 @@ authenticated or not.
         my $password = delete $c->request->params->{ '__password' };
         
         if ( $username && $password ) {
-            if ( $c->login( $username, $password ) ) {
-                return 1;
-            }
+            return 1 if $c->authenticate( {
+                username    => $username,
+                password    => $password,
+            } );
             $c->stash->{ 'error_msg' } = 'Incorrect username or password';
         }
         
