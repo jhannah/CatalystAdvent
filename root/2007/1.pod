@@ -201,6 +201,13 @@ You can check out the code from the Catalyst repository with
 
  svn co http://dev.catalystframework.org/repos/Catalyst/trunk/examples/ExtJS
 
+Run it with
+
+ perl script/extjs_server.pl -k
+
+then browse to e.g. http://myserver:3000. Read the comments
+on the screens and in the code.
+
 
 =head2 Form Architecture Considerations
 
@@ -226,8 +233,11 @@ The choice will depend on how slick a user interface you want and your available
 time, as writing Javascript can be time-consuming. AJAX screens often look better 
 but are less accessible for blind visitors and can be harder to debug. For 
 testing you would need to consider using a tool like Selenium. Check out 
+
 L<http://www.infoq.com/articles/testing-ajax-selenium> 
+
 L<http://www.infoq.com/news/2007/09/selenium-grid-parallel-testing>
+
 L<http://search.cpan.org/~lukec/Test-WWW-Selenium-1.13/lib/WWW/Selenium.pm>
 
 
@@ -238,7 +248,10 @@ to do if you're used to programming Perl, it stops Internet Explorer's parser.
 You'll get a blank page! It's easily spotted by running your output HTML code 
 through HTML Tidy.
 
+Good luck!
 
 =head1 AUTHOR
 
 peterdragon - Peter Edwards <peter@dragonstaff.co.uk>
+
+L<http://perl.dragonstaff.co.uk/>

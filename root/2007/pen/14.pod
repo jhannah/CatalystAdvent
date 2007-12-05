@@ -1,0 +1,9 @@
+=head1 Using Multiple Configuration Files and Accessing A Catalyst Model From An External Batch Script
+
+Catalyst::Plugin::ConfigLoader::Multi
+
+Accessing a Catalyst model from an external batch script.
+
+=head1 AUTHOR
+
+peterdragon
