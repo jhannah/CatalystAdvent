@@ -47,26 +47,7 @@ authenticated or not.
         }
         
         $c->stash->{ 'template' } = 'auth/login.tt2';
-        $c->detach( 'View::TT' );
-    }
-
-You can also throw in a regular old login method, in case you need somewhere
-to link to when someone clicks a login button in the applications header or
-something like that.
-
-    sub login : Local {
-        my ( $self, $c ) = @_;
-        
-        $c->forward( 'check_login' );
-    }
-
-And for good measure, put a logout action in here too.
-
-    sub logout : Local {
-        my ( $self, $c ) = @_;
-        
-        $c->logout;
-        $c->response->redirect( $c->uri_for( '/' ) );
+        return 0;
     }
 
 =head2 The login template
@@ -105,7 +86,7 @@ put this in your root controller.
     sub auto : Private {
         my ( $self, $c ) = @_;
         
-        $c->forward( '/auth/check_login' );
+        $c->forward( '/auth/check_login' ) || return 0;
         return 1;
     }
 
