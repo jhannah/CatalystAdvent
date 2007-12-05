@@ -70,8 +70,8 @@ So once all of these modules are installed, you can proceed to ...
 =head2 Configuration
 
 To enable authentication in your application, there are only two things you
-need to do. First, you must add the Authentication module to your use Catalyst
-line if your application
+need to do. First, you must add the Authentication and session modules to 
+the use Catalyst section of your application
 
  use Catalyst qw/ ...
                  Authentication
