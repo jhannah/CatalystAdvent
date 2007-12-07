@@ -8,7 +8,7 @@ putting your application into production.
 =head2 About local::lib 
 
 L<local::lib> provides an easy way to localize a perl module library to a 
-particular users environment.  It can be advantageous on shared hosts for full 
+particular user's environment.  It can be advantageous on shared hosts for full 
 control over non-root installations and a powerful tool for building and 
 deploying Catalyst applications.
 
@@ -108,7 +108,7 @@ If you start with an empty site_perl (only core modules) and a fresh local::lib
 installation, you can actually build your application, test it works, and use 
 the modules in the deployment of your app (Note: a fresh perl installation  
 requires root). Your options here are to compile perl from scratch, or to use 
-your package management system to install only core perl package and possibly
+your package management system to install only core perl packages and possibly
 a perl database driver. For a clean local::lib install, just move your old 
 directory out of the way and redo the tarball installation steps above.
 
