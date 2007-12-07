@@ -1,4 +1,4 @@
-=head1 Day 10 - Rapid CRUD with Catalyst
+=head1 Day 7 - Rapid CRUD with Catalyst
 
 Today we'll build an entire CRUD application with 20
 lines of Perl, using L<CatalystX::CRUD>, L<Rose::HTML::Objects>, 
