@@ -52,12 +52,8 @@ oddities
  % make test
  % make install
 
-=over 1
-
 Note: If any of the above steps hang for any reason, you may need to go 
 into the build directory (~/.cpan/build/CPAN-1.92) and run make install. 
-
-=back
 
 You should now be setup with a ~/perl5 directory, which will be used for 
 further module installations via CPAN. To complete installation, setup your 
