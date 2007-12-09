@@ -1,4 +1,80 @@
-=head1 $c->uri_for fun
+*UNFINISHED* =head1 Day 11 - $c->uri_for fun and profit *UNFINISHED*
+
+Today we will take a trip into the wonderful and mystical world of uri_for.
+The basic premise behind uri_for is to make generating URLs for actions with parameters easy and fun. Lets look at some examples.
+
+=head3 Basic uri_for
+$c->uri_for will return the URL for the current actions namespace, so, if you are in Controller MyApp::Foo it will return http://localhost:3000/foo for any action you are running in that controller. If you wanted to get to a specific action you can do
+
+$c->uri_for('actionname') which would give you http://localhost:3000/foo/actioname
+
+What if I wanted to get outside of the 'foo' namespace? well, use a / to root it :
+
+$c->uri_for('/actionname')
+http://localhost:3000/actionname
+ 
+For most cases this simple construct is more than adequate but a more canonical way is via the action_for construct for instance, If in my controller i have
+
+sub add :Path('pathliabletochange') {
+...
+
+I could refer to this action in the current namespace as follows
+$c->uri_for($c.action_for('add')) 
+http://localhost:3000/foo/pathliabletochange
+
+If, in the future i decided to change my URI structure all the references to this controller would update accordingly.
+
+This technique also has other uses we will come to later.
+
+=head3 Adding parameters
+
+You can easily add parameters to the uri_for object like this:
+
+$c->uri_for(undef,{a => b, c => d});
+http://localhost:3000/?a=b&amp;c=d
+
+or even in a TT template:
+[% c.uri_for('bar',{a => b, c => d}) %]
+http://localhost:3000/bar?a=b&amp;c=d
+
+or 
+
+[% c.uri_for('bar',c.req.params) %]
+http://localhost:3000/bar?a=b&amp;c=d (assuming parameters passed in to page were a=b c=d)
+
+=head Complex paths with captures
+uri_for makes it incredibly easy to create and adjust paths for chained actions, for instance
+
+$c.uri_for($c.action,$c.req.captures,'new');
+
+would fill out all the captures in the current uri and add new to it
+http://localhost:3000/foo/4/bar/new
+
+=head3 uri_for internals
+
+uri_for returns a URI object so you can do all the usual tricks, for instance, say you were wanting to go to a secure section of your catalyst site you could do the following 
+
+my $uri = c.uri_for('secure');
+$uri->scheme('https');
+https://localhost:3000/foo/secure
+
+
+
+
+sub action_uri {
+        my ($c, $controller, $action, @params) = @_;
+        return $c->uri_for($c->controller($controller)->action_for($action), @params);
+}
+
+sub redirect_to_action {
+        my ($c, $controller, $action, @params) =@_;
+        $c->response->redirect($c->uri_for($c->controller($controller)->action_for($action), @params));
+        $c->detach;
+}
+
+
+=head2 Links to documentation
+
 
 =head1 AUTHOR
 
