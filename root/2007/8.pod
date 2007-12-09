@@ -60,7 +60,7 @@ further module installations via CPAN. To complete installation, setup your
 environment by adding it to your .bashrc for subsequent logins and reload the
 file for this session
 
- % eval `perl -I$HOME/perl5/lib/perl5 -Mlocal::lib` >> ~/.bashrc
+ % echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> ~/.bashrc
  % source .bashrc
 
 
