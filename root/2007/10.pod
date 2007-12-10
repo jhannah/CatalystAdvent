@@ -20,7 +20,7 @@ First up you need to install CatalystX::Starter from cpan:
 
  $ sudo cpan
  cpan[1]> install CatalystX::Starter
- # output sniped
+ # output snipped
     /usr/bin/make install  -- OK
  cpan[9]> exit
 
@@ -31,9 +31,9 @@ L<CatalystX::Starter> is pretty light on dependencies, so shouldn't
 CatalystX::Stater provides the script C< catalystx-starter > with
 which you can bootstrap the extension that you're writing, as follows:
 
- $ catalystx-starter 'Catalsyt::Controller::reCAPTCHA'
- Created files in Catalsyt-Controller-reCAPTCHA
- $ cd Catalsyt-Controller-reCAPTCHA
+ $ catalystx-starter 'Catalyst::Controller::reCAPTCHA'
+ Created files in Catalyst-Controller-reCAPTCHA
+ $ cd Catalyst-Controller-reCAPTCHA
  $ ls
  Changes       MANIFEST.SKIP Makefile.PL   README        gitignore     lib           t
 
