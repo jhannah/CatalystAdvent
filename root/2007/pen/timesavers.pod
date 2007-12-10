@@ -1,12 +1,12 @@
-=head1 Two great catalyst timesavers.
+=head1 Two great catalyst time savers.
 
 Today we're going to go through some L<CPAN> modules that are great
-timesavers.  First up, we'll look at L<CatalystX::Starter> which
-priovides a sane helper for you to write other L<Catalyst> extensions,
-then secondly we'll show you the easiest way to integrete a robust
+time savers.  First up, we'll look at L<CatalystX::Starter> which
+provides a sane helper for you to write other L<Catalyst> extensions,
+then secondly we'll show you the easiest way to integrate a robust
 L<Captcha|http://en.wikipedia.org/wiki/Captcha> into your application
-with L<Catalyst::Controller::ReCAPTCHA> in order to protect publically
-available parts of your application from scripts.
+with L<Catalyst::Controller::ReCAPTCHA> in order to protect public
+parts of your application from scripts.
 
 =head2 CatalystX::Starter
 
@@ -29,7 +29,7 @@ L<CatalystX::Starter> is pretty light on dependencies, so shouldn't
  prove troublesome to install.
 
 CatalystX::Stater provides the script C< catalystx-starter > with
-which you can boostrap the extension that you're writing, as follows:
+which you can bootstrap the extension that you're writing, as follows:
 
  $ catalystx-starter 'Catalsyt::Controller::reCAPTCHA'
  Created files in Catalsyt-Controller-reCAPTCHA
@@ -105,11 +105,11 @@ straightforward, and isn't available yet, as the reCAPTCHA service
 requires a javascript enabled browser, which WWW::Mechanize is not, so
 in this instance the test app provides for manual testing only (we
 could work around this with Selenium but haven't got around to this
-yet). 
+yet).
 
 If you can use automated tests for your application, the following
 will work to test your application.  Issue this command form the C<
-TestAPP> directory:
+TestApp> directory:
 
  $ perl -Ilib t/live-test.t
 
@@ -140,7 +140,7 @@ books."
 It's a service provided by Carnegie-Melon University in order to
 provide human assistance with digitisation of books in their library,
 and is currently the recommended Captcha implementation of the
-oritinal Captcha developers.
+original Captcha developers.
 
 =head2 Preparation
 
@@ -157,12 +157,12 @@ follows (in .conf format):
  </recaptcha>
 
 where the "key string" is the one provided by the service for your
-site. 
+site.
 
 =head2 Implementation
 
-This is extremenly simple.  In any controller that you want to use
-reCAPTCHA, instaead of the line:
+This is extremely simple.  In any controller that you want to use
+reCAPTCHA, instead of the line:
 
  use base 'Catalyst::Controller';
 
@@ -210,7 +210,7 @@ L<Catalyst::Controller::reCAPTCHA>!
 =head3 Author and Copyright
 
 Copyright  Kieren Diment <zarquon@cpan.org> 2007.  This article may be
-copied and redistrubuted under the same terms as perl itself.
+copied and redistributed under the same terms as perl itself.
 
 
 
