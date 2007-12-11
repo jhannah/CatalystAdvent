@@ -82,7 +82,6 @@ done in several ways, what we do is adding:
     use base qw( Ymogen2::DB::RSSearchBase );
 
 
-
 to MyTable.pm.
 
 For the simple case it works just like the familiar 'search' method of the
@@ -182,16 +181,44 @@ http://perlalchemy.blogspot.com/2006/10/tags-and-search-and-dbixclass.html).
 
 =head3 Full Text Search
 
-For full text search I use the PostgreSQL tsearch2 engine here.
+For full text search I use the PostgreSQL tsearch2 engine here.  
+First I split the query into a list of words, then I build a tsearch2 query out
+of those words using the '|' alternative operator and quote the result.  
+When programming a site for a geek audience the alternative approach can be to let 
+the user to build the query using the tsearch2 syntax.
+
+  sub search_for_query {
+      my ( $self, $rs, $params ) = @_;
+      my $value = $params->{query};
+          my @query_cols = $self->query_cols; 
+          my $dbh = $self->result_source->schema->storage->dbh;
+          my @words =  split /\s+/, $value;
+          my $q = $dbh->quote( join '|',  @words );
+          return $rs->search( {
+                  '-nest' => [
+                  $query_cols[0] => \"@@ to_tsquery( $q )",
+                  $query_cols[1] => \"@@ to_tsquery( $q )",
+                  ]
+              }
+          );
+  }
+  
+  sub query_cols {
+      return qw/ name_vec synopsis_vec /;
+  }
+
+We override the query_cols method in some subclasses so that we can search
+by different columns.
 
 =head3 Search by Proximity
 
 For searching by proximity I use the PostgreSQL geometric functions 
 (http://www.postgresql.org/docs/8.2/interactive/functions-geometry.html).
-There is 
-one problem with it - the distance operator assumes planar coordinates, 
+There are  
+problems with it - the distance operator assumes planar coordinates, 
 while for the interesting thing is to search geografic data with the standard
-latitude/longitude coordinates.  In our solution we just don't care about
+latitude/longitude coordinates and the search does not use indices.
+In our solution we just don't care about
 being exact and just multiply the 'distance' in degrees by 50 to get approximate
 distance in miles.  The actual proportion is about 43 for latitude and 69 for
 longitude at about the London's longitude, it would be possible to get quite 
@@ -199,9 +226,9 @@ good results by dividing the latitude and longitude by those numbers in the
 database - but I would rather have good data in the database then more exact
 results.  Maybe at some point we shell switch to use some real geografic 
 distance functions (I've seen a PosgreSQL extension to do that - but I was
-scared a bit by it's experimental status).
+scared a bit by it's experimental status).  
 
-So here is the function used to filter the results by proximity to a place:
+Here is the function we use to filter the results by proximity to a place:
 
 sub search_for_distance {
     my ( $self, $rs, $params ) = @_;
@@ -240,13 +267,36 @@ lat_long coordinates.  This way the user does not need to specify the
 maximum distance - the closest results are displayed on the first pages
 anyway - and that is enough for most of the searches.
 
-=head2 And Beyond
+I did not yet test the efficiency of this solution, but without using indices
+it cannot be very scalable.  There is a workaround for that.
+The '<<' (letf to), '>>' (right to) and '<<|', '|>>' for up and down 
+comparison operators can use indices.  So one can use them 
+to build a query based on
+L<<a href="http://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan distance</a>>
+instead of the normal geometry.
 
-In the search by proximity extension I've used ordering of the results.  There
-is one problem with this.  We use many 'search' calls on the resultset
-to cumulate the predicates - but we cannot do this with the order.  Only the 
-last 'order_by' parameter used in the 'search' calls is effective.  I believe
-it would be useful to have a similar 'cumulative' behaviour for 'order_by' 
-and we can add this to 'advanced_search' (or perhaps it can be added to
-the core DBIC search method).
+=head2 The To Do
+
+One interesting addition to the code above would be to add some generic
+code to deal with ordering.  Another open question is how to package the 
+extensions.  They depend on the column names and this does not look generic. 
+Maybe someone reading this has a good idea how to do it. 
+
+=head2 The Conclusion
+
+What I presented here is a base class for ResultSets implementing an advanced_search
+method which can be treated as a replacement of the standard 'search' method but is
+easier to extend.  And which can be usefull for the task of building queries out
+of HTML Form parameters.
+
+=head3 AUTHOR
+
+Zbigniew Lukasiak, E<lt>zzbbyy@gmail.comE<gt>
+
+L<http://perlalchemy.blogspot.com/>
+
+The code in this article is copyrighted by Ymogen (http://ymogen.com) and is licenced 
+under the same conditions as Perl itself.
+
+=cut
 
