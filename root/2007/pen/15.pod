@@ -109,7 +109,7 @@ What it does is parsing column names of the format:
 'relationship1.relationship2.relationship3.column' into 'relationship3.column'
 - the fully qualified column name and a 
 '{ relationship1 => { relationship2 => relationship3 } }' hash used for joining
-the appriopriate tables.
+the appropriate tables.
 
 (I had also a non-recursive version - but it was not simpler)
 
@@ -143,7 +143,7 @@ For example let say we need to search by conjunction of tags like that:
     });
  
 What we need is a method called 'search_for_tags' that will do the search.  The
-nice thing is that we don't need to warry how this will be combined with the
+nice thing is that we don't need to wary how this will be combined with the
 rest of the predicates - DBIC will do the right thing (for and 'AND' relation).
 
 Here is the method:
@@ -216,7 +216,7 @@ For searching by proximity I use the PostgreSQL geometric functions
 (http://www.postgresql.org/docs/8.2/interactive/functions-geometry.html).
 There are  
 problems with it - the distance operator assumes planar coordinates, 
-while for the interesting thing is to search geografic data with the standard
+while for the interesting thing is to search geographic data with the standard
 latitude/longitude coordinates and the search does not use indices.
 In our solution we just don't care about
 being exact and just multiply the 'distance' in degrees by 50 to get approximate
@@ -286,7 +286,7 @@ Maybe someone reading this has a good idea how to do it.
 
 What I presented here is a base class for ResultSets implementing an advanced_search
 method which can be treated as a replacement of the standard 'search' method but is
-easier to extend.  And which can be usefull for the task of building queries out
+easier to extend.  And which can be useful for the task of building queries out
 of HTML Form parameters.
 
 =head3 AUTHOR
