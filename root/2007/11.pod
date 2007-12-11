@@ -205,7 +205,7 @@ customized on a per-user basis then you have a bit more to think about.
 Any time your content is customized on a per-user basis, you are likely
 destroying the cacheability of that content. This means that you need to be
 very careful to set your $c->stash->{'cachecontrol'} appropriately whenever
-you are performing actions that rely on authenticated user. This can be tricky
+you are performing actions that rely on an authenticated user. This can be tricky
 as any action may respond differently depending on whether the user is
 authenticated.
 
