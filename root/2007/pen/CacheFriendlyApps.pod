@@ -43,7 +43,7 @@ The way you do this is to send the Cache-Control header with the value
 
  Cache-Control: no-cache
  
-Doesn't get any simpler than that. Now let's move on to the one we are most
+It doesn't get any simpler than that. Now let's move on to the one we are most
 interested in today...
 
 =head3 How long can this be cached?
@@ -75,11 +75,11 @@ That's not so difficult, is it?
 =head2 Our madness
 
 Now that we know how to inform cache servers of our intentions, how do we
-integrate that into our Catalyst app. More importantly, how do we deal with
+integrate that into our Catalyst app? More importantly, how do we deal with
 the numerous paths through our application that might generate a page while
 still providing a sensible cache value?
 
-The path I usually take is to have a default maximum time limit for any given
+The method I usually use is to have a default maximum time limit for any given
 page in the application. This default does not need to be huge, even 1 hour
 (3600 seconds) is enough to drastically reduce the load on your web
 application (think 1 request for that resource per hour and you start to get
@@ -133,7 +133,7 @@ Marking a path as uncacheable is just as easy:
         # ...
     }
  }
- 
+
 Setting an element in the cachecontrol hash allows any action to specify it's
 intentions with regard to cacheability. These intentions will be clear
 regardless of how the action was reached. Keep in mind also that only actions
@@ -226,13 +226,13 @@ the end routine above:
      ## rest of routine from above
      ...
  }
- 
+
 There are some remaining issues you need to be aware of when working with
 caching - particularly if you are running cache-servers in front of your web
 application. First, using the above method means that no logged-in users will
 generate pages that stay in your cache. This can be problematic, especially if
 your application caters mainly to registered users. The other problem is that
-when an unregistered user B<DOES> cause a page to be cached, registered users
+when an unregistered user DOES cause a page to be cached, registered users
 will receive that cached copy, even if they are logged in.
 
 To make matters worse, when you are making your site cacheable, you must pay
