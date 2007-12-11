@@ -53,7 +53,7 @@ valid. The 'Expires' header is often used to set a date and time whereupon the
 page will no longer be valid. This is a good header to use if you know exactly
 when a page will no longer be valid. In my experience, however, when working
 with web applications you more often want to indicate how long a piece of data
-is good for before it needs to be refreshed. Usually, this is in relation to
+is good before it needs to be refreshed. Usually, this is in relation to
 the time the data is requested.
 
 In other words, you usually want to say 'this is valid for the next 10
