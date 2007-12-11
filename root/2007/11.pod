@@ -34,7 +34,7 @@ you the two main options you need to know about.
 =head3 Don't cache this
 
 Every application is going to have data that is only valid at the time
-requested or for the user making the request. So it is important to know how
+requested or for the user making the request, so it is important to know how
 to tell any caches along the way that the data you are sending should not be
 cached at all.
 
