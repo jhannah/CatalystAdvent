@@ -129,7 +129,7 @@ Marking a path as uncacheable is just as easy:
     # Never cache the result of a login attempt
     $c->stash->{'cachecontrol'}{'processlogin'} = 0;
     
-    if ($c->authenticte({ ... })) {
+    if ($c->authenticate({ ... })) {
         # ...
     }
  }
@@ -164,7 +164,6 @@ then we set the Cache-Control header accordingly.
          # cache time set. 
          
          foreach my $section ( keys %{$c->stash->{'cachecontrol'}} ) {
-             my $time = ;
              
              # if the currently selected cache-control element is less
              # than the page's cache-time - we drop the cache-time to 
