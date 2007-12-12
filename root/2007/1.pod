@@ -194,6 +194,8 @@ writing ExtJS Catalyst applications. It provides code, a menu, a couple of pages
 and a set of templates initially generated using the Catalyst helpers to give
 a portal page.
 
+The ExtJS Catalyst sample app is accessible at
+L<http://www.dragonstaff.co.uk/extjs/home>
 
 =head2 Example application code
 
