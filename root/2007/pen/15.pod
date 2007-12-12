@@ -58,8 +58,7 @@ The solution I propose is this simple module:
             $self = $self->search({}, { join => $relation });
             $columns->{$full_name} = $params->{$column};
         }
-        $self = $self->search( $columns, $attrs );
-        return (wantarray ? $self->all : $self)
+        return $self->search( $columns, $attrs );
     }
 
 You use it like that:
