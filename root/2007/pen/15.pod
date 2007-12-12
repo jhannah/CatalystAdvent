@@ -45,23 +45,20 @@ The solution I propose is this simple module:
     use warnings;
     
     use base qw( DBIx::Class::ResultSet );
-    
+
     sub advanced_search {
         my ( $self, $params, $attrs ) = @_;
+        my $columns = {};
         for my $column ( keys %$params ){
-            if( my $search = $self->can( 'search_for_' . $column ) ){ 
+            if( my $search = $self->can( "search_for_$column" ) ){
                 $self = $self->$search( $params );
                 next;
             }
-            my ( $full_name, $relation ) = simple_predicate( $column );
-            my $join;
-            $join = { join => [ $relation ] } if $relation;
-            $self = $self->search( 
-                    { $full_name => $params->{$column} }, 
-                    $join,
-            );
+            my ( $full_name, $relation ) = $self->simple_predicate( $column );
+            $self = $self->search({}, { join => $relation });
+            $columns->{$full_name} = $params->{$column};
         }
-        $self = $self->search( {}, $attrs );
+        $self = $self->search( $columns, $attrs );
         return (wantarray ? $self->all : $self)
     }
 
@@ -89,7 +86,7 @@ L<DBIx::Class::ResultSet class>. But it also works for searching in related
 records.  For that we have the simple_predicate function. It looks like that: 
 
     sub simple_predicate {
-        my $field = shift;
+        my ( $self, $field)  = @_;
         if( $field =~ /(.*?)\.(.*)/ ){
             my $first = $1;
             my $rest  = $2;
