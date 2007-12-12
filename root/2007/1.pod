@@ -3,9 +3,9 @@
 Today we take a look at the ExtJS screen library and how to get started
 using it within a Catalyst web application.
 
-Don't forget to come back on Day 17 for a more advanced example by jasonk in 
+Don't forget to come back on Day 9 for a more advanced example by jasonk in 
 "Catalyst with Ext+Ajax: Editable Data Grids" 
-L<http://catalyst.perl.org/calendar/2007/17>
+L<http://catalyst.perl.org/calendar/2007/9>
 
 =head2 What is ExtJS?
 

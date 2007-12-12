@@ -20,6 +20,15 @@ You can check out the code under Linux with
 Under Windows use TortoiseSVN L<http://tortoisesvn.tigris.org/> to 
 check it out from that URL.
 
+Sort out dependencies
+
+ $ perl Makefile.PL
+ $ make
+
+Then make it fly
+
+ $ perl script/extjs_server.pl
+
 
 =head2 The problem
 
