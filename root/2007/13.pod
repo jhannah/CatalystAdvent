@@ -83,7 +83,7 @@ uri_for returns a normalised L<URI> object so you can do all the usual tricks, f
 
 =head2 Useful code snippets
 
-You could add these in MyApp.pm to make them available for all your actions. 
+You could add these in your main application class (e.g. MyApp.pm) to make them available for all your actions. 
 
     sub action_uri {
             my ($c, $controller, $action, @params) = @_;
