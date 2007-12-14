@@ -1,4 +1,4 @@
-=head1 Day 11 - $c->uri_for fun and profit
+=head1 Day 13 - $c->uri_for fun and profit
 
 Today we will take a trip into the wonderful and mystical world of uri_for.
 The basic premise behind uri_for is to make generating URIs for actions with parameters easy and fun (well as fun as URIs get).
