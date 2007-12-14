@@ -39,7 +39,7 @@ PostgreSQL extensions for full text search and location based search).
 
 The solution I propose is this simple module:
 
-    package Ymogen2::DB::RSSearchBase;
+    package AdvancedSearch;
     
     use strict;
     use warnings;
@@ -54,42 +54,42 @@ The solution I propose is this simple module:
                 $self = $self->$search( $params );
                 next;
             }
-            my ( $full_name, $relation ) = $self->simple_predicate( $column );
+            my ( $full_name, $relation ) = $self->parse_column( $column );
             $self = $self->search({}, { join => $relation });
             $columns->{$full_name} = $params->{$column};
         }
         return $self->search( $columns, $attrs );
     }
 
-You use it like that:
+You can use it like that:
 
     my @records = $schema->ResultSet( 'MyTable' )->advanced_search( 
-        \%search_params, 
+        $reqest->params, 
         { page => 1, rows => 5 } 
     );
 
 But first you need to make your ResultSet class inherit from it.  This can be
 done in several ways, what we do is adding:
 
-    __PACKAGE__->resultset_class(__PACKAGE__ . '::ResultSet');
+    MyTable->resultset_class(MyTable . '::ResultSet');
     
-    package Ymogen2::DB::Schema::Users::ResultSet;
+    package MyApp::DBSchema::MyTable::ResultSet;
 
-    use base qw( Ymogen2::DB::RSSearchBase );
+    use base qw( AdvancedSearch );
 
 
 to MyTable.pm.
 
 For the simple case it works just like the familiar 'search' method of the
 L<DBIx::Class::ResultSet class>. But it also works for searching in related
-records.  For that we have the simple_predicate function. It looks like that: 
+records.  For that we have the parse_column function. It looks like that: 
 
-    sub simple_predicate {
+    sub parse_column {
         my ( $self, $field)  = @_;
         if( $field =~ /(.*?)\.(.*)/ ){
             my $first = $1;
             my $rest  = $2;
-            my( $column, $join ) = simple_predicate( $rest );
+            my( $column, $join ) = parse_column( $rest );
             if ( $join ) {
                 return $column, { $first => $join };
             }else{
@@ -127,6 +127,9 @@ We use it.
 =head2 The Extensions
 
 But the real advantage of this approach is how easily it can be extended.  
+It works as a kind of a fuzy L<http://en.wikipedia.org/wiki/Template_method_pattern> - where
+you don't specify the exact names of the methods to be called - but rather setup a condition
+on those names.  Like here we say - now call a method that starts with 'search_for_' if it exists.
 
 =head3 Tags
 
@@ -171,37 +174,38 @@ It builds a query like that:
 
 This query will use indices and should be fast (a more detailed cover of this
 technique you can find at my blog at:
-http://perlalchemy.blogspot.com/2006/10/tags-and-search-and-dbixclass.html).
+L<http://perlalchemy.blogspot.com/2006/10/tags-and-search-and-dbixclass.html>).
 
 *Attention:* You need the 0.08008 version of DBIx::Class for this to work properly.
 
 =head3 Full Text Search
 
-For full text search I use the PostgreSQL tsearch2 engine here.  
+For full text search I use the PostgreSQL tsearch2 engine here 
+(see L<http://www.sai.msu.su/~megera/postgres/gist/tsearch/V2/>).  
 First I split the query into a list of words, then I build a tsearch2 query out
 of those words using the '|' alternative operator and quote the result.  
 When programming a site for a geek audience the alternative approach can be to let 
 the user to build the query using the tsearch2 syntax.
 
-  sub search_for_query {
-      my ( $self, $rs, $params ) = @_;
-      my $value = $params->{query};
-          my @query_cols = $self->query_cols; 
-          my $dbh = $self->result_source->schema->storage->dbh;
-          my @words =  split /\s+/, $value;
-          my $q = $dbh->quote( join '|',  @words );
-          return $rs->search( {
-                  '-nest' => [
-                  $query_cols[0] => \"@@ to_tsquery( $q )",
-                  $query_cols[1] => \"@@ to_tsquery( $q )",
-                  ]
-              }
-          );
-  }
-  
-  sub query_cols {
-      return qw/ name_vec synopsis_vec /;
-  }
+    sub search_for_query {
+        my ( $self, $rs, $params ) = @_;
+        my $value = $params->{query};
+            my @query_cols = $self->query_cols; 
+            my $dbh = $self->result_source->schema->storage->dbh;
+            my @words =  split /\s+/, $value;
+            my $q = $dbh->quote( join '|',  @words );
+            return $rs->search( {
+                    '-nest' => [
+                    $query_cols[0] => \"@@ to_tsquery( $q )",
+                    $query_cols[1] => \"@@ to_tsquery( $q )",
+                    ]
+                }
+            );
+    }
+    
+    sub query_cols {
+        return qw/ name_vec synopsis_vec /;
+    }
 
 We override the query_cols method in some subclasses so that we can search
 by different columns.
@@ -209,7 +213,7 @@ by different columns.
 =head3 Search by Proximity
 
 For searching by proximity I use the PostgreSQL geometric functions 
-(http://www.postgresql.org/docs/8.2/interactive/functions-geometry.html).
+L<http://www.postgresql.org/docs/8.2/interactive/functions-geometry.html>.
 There are  
 problems with it - the distance operator assumes planar coordinates, 
 while for the interesting thing is to search geographic data with the standard
@@ -226,17 +230,17 @@ scared a bit by it's experimental status).
 
 Here is the function we use to filter the results by proximity to a place:
 
-sub search_for_distance {
-    my ( $self, $rs, $params ) = @_;
-    my $lat_long = $params->{lat_long};
-    my $distance = $params->{distance} / 50;  
-    # around London the actual proportions are around 43 for latitude 
-    # and 69 for longitude 
-    return $rs->search( 
-        { "(lat_long <-> '$lat_long'::POINT) < " => \$distance },
-        { join => 'location' }
-    );
-}
+    sub search_for_distance {
+        my ( $self, $rs, $params ) = @_;
+        my $lat_long = $params->{lat_long};
+        my $distance = $params->{distance} / 50;  
+        # around London the actual proportions are around 43 for latitude 
+        # and 69 for longitude 
+        return $rs->search( 
+            { "(lat_long <-> '$lat_long'::POINT) < " => \$distance },
+            { join => 'location' }
+        );
+    }
 
 This function assumes there are two parameters on the $params hash: distance
 and lat_long (lattitude/logintude coordinates).  The location data in our
@@ -244,19 +248,19 @@ database are in a separate table called 'location'.
 
 We also use another search extension:
 
-sub search_for_lat_long {
-    my ( $self, $rs, $params ) = @_;
-    my $lat_long = $params->{lat_long};
-    $rs = $rs->search( undef,        
-        { 
-            join => 'location',
-            '+select' => [ \"(lat_long <-> '$lat_long'::POINT) AS distance" ],
-            '+as' => 'distance',
-            order_by => 'distance ASC',
-        }
-    );
-    return $rs;
-}
+    sub search_for_lat_long {
+        my ( $self, $rs, $params ) = @_;
+        my $lat_long = $params->{lat_long};
+        $rs = $rs->search( undef,        
+            { 
+                join => 'location',
+                '+select' => [ \"(lat_long <-> '$lat_long'::POINT) AS distance" ],
+                '+as' => 'distance',
+                order_by => 'distance ASC',
+            }
+        );
+        return $rs;
+    }
 
 This function sorts the results by proximity to the point determined by the
 lat_long coordinates.  This way the user does not need to specify the
@@ -268,7 +272,7 @@ it cannot be very scalable.  There is a workaround for that.
 The '<<' (letf to), '>>' (right to) and '<<|', '|>>' for up and down 
 comparison operators can use indices.  So one can use them 
 to build a query based on
-L<<a href="http://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan distance</a>>
+L<http://en.wikipedia.org/wiki/Taxicab_geometry>
 instead of the normal geometry.
 
 =head2 The To Do
@@ -291,8 +295,7 @@ Zbigniew Lukasiak, E<lt>zzbbyy@gmail.comE<gt>
 
 L<http://perlalchemy.blogspot.com/>
 
-The code in this article is copyrighted by Ymogen (http://ymogen.com) and is licenced 
-under the same conditions as Perl itself.
+The code in this article is licenced under the same conditions as Perl itself.
 
 =cut
 
