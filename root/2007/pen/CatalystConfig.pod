@@ -83,13 +83,23 @@ config would take precedence.
 =head2 ConfigLoader: The Aptly Named Configuration Loader
 
 The great thing that L<Catalyst::Plugin::ConfigLoader> does for you is merging
-the various configurations.  Rather than simply overwrite the entirety of
-a components configuration, it will merge them giving precedence up the chain
-towards "human editability".
+the various external configurations.  Rather than simply overwrite the entirety
+of a components configuration, it will merge external files and give them
+precedence.  The higher the "human editability" of the configuration, the
+higher the precedence.
 
-The lowest is the component package (ConfigEg/Model/Foo.pm), up next is
-ConfigEg.pm and the last step is the individual configuration files.  By default
-this would be configeg.yml and the final word is configeg_local.yml
+=head2 Configuration Merging
+
+Catalyst will automatically merge all the various sections of configuration into
+one easy to use structure.  ConfigLoader handles taking the external files, and
+Catalyst will take that information and merge it with the internal configuration
+of the components.
+
+To illustrate this, here is a brief example.  The lowest in configuration
+precedence is the component package itself (C<ConfigEg/Model/Foo.pm>), up next
+is C<ConfigEg.pm> and the highest is the individual configuration files loaded
+by ConfigLoader, which pulls in the external files.  By default this would be
+configeg.yml and configeg_local.yml.
 
 By merging, what happens is if you have the following (completely and totally
 fabricated) structure in the component package C<ConfigEg/Model/Foo.pm>:
