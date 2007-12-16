@@ -191,17 +191,17 @@ the user to build the query using the tsearch2 syntax.
     sub search_for_query {
         my ( $self, $rs, $params ) = @_;
         my $value = $params->{query};
-            my @query_cols = $self->query_cols; 
-            my $dbh = $self->result_source->schema->storage->dbh;
-            my @words =  split /\s+/, $value;
-            my $q = $dbh->quote( join '|',  @words );
-            return $rs->search( {
-                    '-nest' => [
-                    $query_cols[0] => \"@@ to_tsquery( $q )",
-                    $query_cols[1] => \"@@ to_tsquery( $q )",
-                    ]
-                }
-            );
+        my @query_cols = $self->query_cols; 
+        my $dbh = $self->result_source->schema->storage->dbh;
+        my @words =  split /\s+/, $value;
+        my $q = $dbh->quote( join '|',  @words );
+        return $rs->search( {
+                '-nest' => [
+                $query_cols[0] => \"@@ to_tsquery( $q )",
+                $query_cols[1] => \"@@ to_tsquery( $q )",
+                ]
+            }
+        );
     }
     
     sub query_cols {
