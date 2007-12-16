@@ -100,6 +100,7 @@ records.  For that we have the parse_column function. It looks like that:
         }else{
             return;
         }
+    }
 
 What it does is parsing column names of the format:
 'relationship1.relationship2.relationship3.column' into 'relationship3.column'
