@@ -89,7 +89,7 @@ records.  For that we have the parse_column function. It looks like that:
         if( $field =~ /(.*?)\.(.*)/ ){
             my $first = $1;
             my $rest  = $2;
-            my( $column, $join ) = parse_column( $rest );
+            my( $column, $join ) = $self->parse_column( $rest );
             if ( $join ) {
                 return $column, { $first => $join };
             }else{
