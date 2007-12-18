@@ -20,7 +20,7 @@ of the concepts should apply.  I think.
 First, buy yourself some time.  Since the processes start out small and
 grow over time, you can temporarily calm the chaos by restarting all of
 your FCGI child processes.  Sound drastic?  It depends on how desperate
-your sitation already is.  If your processes are growing without bound,
+your situation already is.  If your processes are growing without bound,
 your server(s) are thrashing in swap, and your web site response rate
 is grinding to a halt, you need some immediate relief.  A simple restart
 will give you that.
