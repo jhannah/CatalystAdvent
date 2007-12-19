@@ -1,11 +1,10 @@
 =head1 HTML::FormFu - Handles forms, so you don't have to 
 
 Today you'll get to play with HTML forms, without the usual nausea. 
-Of course, the guide is Catalyst-oriented.
 
 L<HTML::FormFu> handles form rendering, validation,  filtering and other 
 common form tasks, but keeps your controller code clean by using external 
-config files everything.
+config files for everything.
 
 =head2 Getting started
 
@@ -42,16 +41,17 @@ using C<root/forms/mycontroller/myaction.yml> as a config file.
 
 Here's the code for adding persons:
 
-
  sub add : Local FormConfig {
    my ($self, $c) = @_;
  
-   if ($c->stash->{form}->submitted_and_valid) {
+   my $form = $c->stash->{form};
+   if ($form->submitted_and_valid) {
      my $person = $c->model('DB::Person')->new_result({});
-     $c->stash->{form}->save_to_model($person);
-     $c->response->redirect($c->uri_for('/'));
+     $form->save_to_model($person);
+     $c->response->redirect($c->uri_for('/')); $c->detach;
    }
  }
+ 
  
 As you can see, FormFu can perform some L<DBIx::Class> magick, you should 
 read more about in L<HTML::FormFu::Model::DBIC>
@@ -75,17 +75,20 @@ And the config file, C<root/forms/person/add.yml> :
      label: Name
      constraints:
        - Required
+
    - type: Text
      name: email
      label: Email
      constraints:
        - Required
        - Email
+
    - type: Text
      name: phone
      label: Phone
      constraints:
        - Required
+
    - type: Radiogroup
      label: Boy or girl? :)
      name: gender
@@ -95,13 +98,15 @@ And the config file, C<root/forms/person/add.yml> :
        - [ 'f', 'F' ]
      constraints:
        - Required
+
    - type: Submit
      name: submit
      value: OK
-     constraints:
-       - SingleValue
 
-The config options are all described in the L<HTML::Formfu|fine manual> . You should also read
+ constraints:
+   - SingleValue
+
+The config options are all described in the L<fine manual|HTML::FormFu> . You should also read
 about the constraints in L<HTML::FormFu::Constraint> .
 
 =head3 A touch of style
@@ -144,17 +149,22 @@ The edit form is not much different, so we should just use the same config:
  
  sub edit : Local FormConfig('person/add.yml') {
    my ($self, $c, $id) = @_;
+ 
    $id =~ /\d+/ or die 'invalid id';
-   $c->stash->{person} = $c->model('DB::Person')->find($id) or die "person $id not found";
+   my $person = $c->stash->{person} = $c->model('DB::Person')->find($id) or die "person $id not found";
  
-   $c->stash->{form}->values_from_model($c->stash->{person});
+   my $form = $c->stash->{form};
  
-   if ($c->stash->{form}->submitted_and_valid) {
-     $c->stash->{form}->save_to_model($c->stash->{person});
-     $c->response->redirect($c->uri_for('/'));
+ 
+   if ($form->submitted_and_valid) {
+     $form->save_to_model($person);
+     $c->response->redirect($c->uri_for('/')); $c->detach;
+   } elsif (! $form->submitted ) {
+     $form->defaults_from_model($person);
    }
- }
  
+ }
+  
 Just add C< [% form %] > to your template and you're done.
 
 You can also checkout the finished application, to compare notes:
@@ -169,11 +179,6 @@ You can add filters to your form. For instance, if you want to  allow your users
 to write the phone number as they feel like (with dashes and slashes and brackets) , but
 want to store it in a standard way in your database, you could use L<HTML::FormFu::Filter::NonNumeric> 
 to strip the extra chars. Read more about adding filters in L<HTML::FormFu::Filter>
-
-=head3 Performance 
-
-If you feel too much time is consumed on reading the config file and building the form , you can reuse 
-the same object by  L<HTML::FormFu/clone|cloning> it.
 
 =head3 More DBIx::Class Magick
 
@@ -191,9 +196,11 @@ L<HTML::FormFu::Imager> will resize and validate uploaded images, and inflate th
 Most importantly, you should read the actual L<HTML::FormFu> documentation, but also don't forget to subscribe to the 
 friendly mailing list at L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/html-formfu>.
 
+You'll also find a lot of examples and solutions in the L<FormFu Cookbook|HTML::FormFu::Manual::Cookbook>
+
 =head1 AUTHOR
 
 Bogdan Lucaciu <bogdan@sns.ro>
 
-L<System & Network Solutions|http://www.sns.ro/en>
+System & Network Solutions
 
