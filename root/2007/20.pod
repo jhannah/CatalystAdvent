@@ -106,7 +106,7 @@ And the config file, C<root/forms/person/add.yml> :
  constraints:
    - SingleValue
 
-The config options are all described in the L<fine manual|HTML::FormFu> . You should also read
+The config options are all described in L<HTML::FormFu>'s fine manual . You should also read
 about the constraints in L<HTML::FormFu::Constraint> .
 
 =head3 A touch of style
@@ -196,7 +196,7 @@ L<HTML::FormFu::Imager> will resize and validate uploaded images, and inflate th
 Most importantly, you should read the actual L<HTML::FormFu> documentation, but also don't forget to subscribe to the 
 friendly mailing list at L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/html-formfu>.
 
-You'll also find a lot of examples and solutions in the L<FormFu Cookbook|HTML::FormFu::Manual::Cookbook>
+You'll also find a lot of examples and solutions in  L<HTML::FormFu::Manual::Cookbook>.
 
 =head1 AUTHOR
 
