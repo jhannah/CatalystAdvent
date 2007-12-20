@@ -154,8 +154,7 @@ The edit form is not much different, so we should just use the same config:
    my $person = $c->stash->{person} = $c->model('DB::Person')->find($id) or die "person $id not found";
  
    my $form = $c->stash->{form};
- 
- 
+
    if ($form->submitted_and_valid) {
      $form->save_to_model($person);
      $c->response->redirect($c->uri_for('/')); $c->detach;
