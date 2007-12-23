@@ -1,5 +1,34 @@
-=head1 Deployable Instances
+=head1 Pluggable Modules and Deployable Instances
+
+=head2 Discussed Concepts 
+
+This article discusses  about two catalyst concepts .
+
+1. How chaining can be used to create applications that have a central engine that process core logic and allow independent modules be built on top.
+
+2. Par and creating spawns of the application that can span again and integrate to the master site . The individual spawn can be carried around as a separate application.
+
+=head2 Built Application example
+
+The tutorial is accompanied by a functional and well commented code base at the url :// 
+
+
+For demonstrating the above mentioned concepts a quiz application has been taken as example.
+
+The final application must be able to 
+
+I). Create quizzes that can be taken on the site or deployed to a trainer's laptop , which the trainer can carry to colleges.The application must make sure that the deployed quiz contains only the required questions in the db , as the questions can be proprietary and the trainer must be able to take only what is necessary. It must also allow a deployed quiz to act as master and create smaller quizzes from it . Ideal when a trainer takes 500 questions and has to train 10 batches with different question set  in the same college.
+
+II). Each created quiz must be able to choose the modules  and the number of questions from each module .
+A module can be "choose the correct answer" ,"Fill in the blanks " etc.
+
+III). It must be  possible to build new modules that can work along with the application and yet can be developed independently without any constraints on its internal logic , look and feel.
+
+
+=head2 Building the application
+
+This tutorial will take you step by step on building such an application . 
 
 =head1 AUTHOR
 
-Antano Solar JOhn
+Antano Solar John
