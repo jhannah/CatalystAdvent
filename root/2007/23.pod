@@ -284,7 +284,7 @@ There are few things  to be kept in mind to create a questioning module .
 
 When the above points are followed , 
 
-The three methods in the quiz  controller (start , process and finish) , handle the creation of the quiz , scoring , moving over the questions and moving over to the next module .
+The three methods in the quiz  controller (start , process and finish)  handle  scoring , moving over the questions and moving over to the next module .
 
 
 With that in mind, the complete controller code for a simple choose the correct answer module is 
