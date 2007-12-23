@@ -353,7 +353,9 @@ Since we had stated that using the above said convention for the questions table
 
 
 
-=head3 Special thanks to Ma Foi Academy for allowing me to expose part of the code developed for the organization in this article.
+=head3 Thanks
+
+Special thanks to Ma Foi Academy for allowing me to expose part of the code developed for the organization in this article.
 
 =head1 AUTHOR
 
