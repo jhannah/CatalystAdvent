@@ -76,9 +76,10 @@ Each of which are explained  below .
 
   This function does two things 
 
-  1.Initializes the quiz by loading the details of the modules used and their respective question numbers
-     into the session.
-  2.Determines the first module and the first question that have to be asked and its corresponding url.
+  1.Initializes the quiz by loading the details of the modules used and their 
+    respective question numbers into the session.
+  2.Determines the first module and the first question that have to be asked and 
+    its corresponding url.
   
 
 sub start : Local
@@ -90,7 +91,8 @@ sub start : Local
 
   if ($c->request->param('name')) {
 
-     #Loads the modules and the questions selected randomly from each module during create and stores it in session      
+     #Loads the modules and the questions selected randomly from each module 
+     #during create and stores it in session      
     my $quiz = $c->model('QuizMaster::Quizzes')->search({id=>$quizid})->first;
     my $modules = [$quiz->search_related('quizmodules',{quiz=>$quizid})->all];
     $c->session->{quiz}={participant=>$c->request->param('name'),name=>$quiz->name};
@@ -99,7 +101,9 @@ sub start : Local
     foreach my $module (@{$modules}) {
 
       
-      push @{$moduledata} , { id => $module->id , name=>$module->module->name, questions => [split ' ',$module->questions] };
+      push @{$moduledata} , { id => $module->id , 
+                              name=>$module->module->name,
+                               questions => [split ' ',$module->questions] };
        
     }
 
@@ -130,7 +134,8 @@ This method plays the key role of maintaining the flow and scoring
 
  This controller does two things .
  1.It does scoring for the previously answered question
- 2.Set the action path(url) for the next question  that can be used by the module displaying the current question 
+ 2.Set the action path(url) for the next question  that can be used by the module 
+   displaying the current question 
 
 
 sub process : PathPart('quiz/process') Chained('/')  CaptureArgs(1) {
@@ -158,7 +163,9 @@ sub process : PathPart('quiz/process') Chained('/')  CaptureArgs(1) {
 	}
       }
 	
-      # The score per question is taken as 10 here . It can also be set to take a value from the sessions in which case the questioning modules can assign different marks to each question
+      # The score per question is taken as 10 here . 
+      #It can also be set to take a value from the sessions in which case the 
+      #questioning modules can assign different marks to each question
       my $spq = 10;
 	
       $c->session->{quiz}->{score} += ($flag * $spq);
@@ -205,7 +212,8 @@ sub process : PathPart('quiz/process') Chained('/')  CaptureArgs(1) {
 
     }
       
-    #if the current question is the last question of the last module set action path to the quiz finish controller
+    #if the current question is the last question of the last module set action path 
+     to the quiz finish controller
     else {
       $c->stash->{postaction}="/quiz/finish/$quizid";
 	
@@ -298,7 +306,8 @@ sub index : PathPart('Ctca') Chained('/quiz/process')  Args(1)  {
     $c->stash->{question} = $question;
     
     $c->stash->{options}= [$question->search_related('options',question=>$questionid)->all];
-    $c->session->{quiz}->{answer} = {choice => $question->correct}; # The only extra line by the module that is needed to let the engine handle the flow and scoring 
+    # The only extra line by the module that is needed to let the engine handle the flow and scoring 
+    $c->session->{quiz}->{answer} = {choice => $question->correct};
     $c->stash->{template} = 'Ctca/index.tt2';
     
 }
