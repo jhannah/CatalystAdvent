@@ -69,7 +69,7 @@ root/auth/login.tt2.
         <br />
         
         [% FOREACH p IN Catalyst.request.params.pairs %]
-            [% NEXT if p.key.matches( '^__' ) %]
+            [% NEXT IF p.key.matches( '^__' ) %]
             <input type="hidden" name="[% p.key %]" value="[% p.value %]" />
         [% END %]
         
