@@ -5,13 +5,13 @@ Unit testing and acceptance testing for Catalyst.
 =head2 Introduction
 
 Any non-trivial project needs solid QA, and most Catalyst projects are
-not trivial. This article will guide through some specific way to test
+not trivial. This article will guide you through some specific ways to test
 your controllers.
 
 General Perl testing is beyond the scope of this discussion, but you
 can read about it in L<Test::Tutorial>, L<Test::Simple>,
 L<Test::More>, and the 
-L<Perl Testing Notebook|http://www.oreilly.com/catalog/perltestingadn> 
+L<Perl Testing Notebook|http://www.oreilly.com/catalog/perltestingadn>, 
 which is highly recommended.
 
 =head2 Think outside the box with Test::WWW::Mechanize::Catalyst
@@ -154,7 +154,7 @@ All tests successful again :)
 
 This concludes our example, but remember we're just scratching the
 surface of Test::WWW::Mechanize::Catalyst. You can submit forms,
-authenticate using cookies, please explore this further:
+authenticate using cookies, and do much more. Please explore this further:
 
 L<Test::WWW::Mechanize::Catalyst>, L<Test::WWW::Mechanize>,
 L<WWW::Mechanize>, L<LWP::UserAgent>.
@@ -162,11 +162,11 @@ L<WWW::Mechanize>, L<LWP::UserAgent>.
 =head2 Chuck Norris tests his Catalyst controllers with Test::More
 
 While testing your app from outside is very useful to check if your
-features are implemented as planned, more rigurous testing is needed
+features are implemented as planned, more rigorous testing is needed
 to ensure the B<corectness of your code>.
 
 When testing controllers you basically want to fake their context, run the 
-action and check the stash.
+action, and check the stash.
 
 Let's do just that. Open a new file, t/controller_root_unit.t:
 
@@ -189,7 +189,7 @@ Let's do just that. Open a new file, t/controller_root_unit.t:
 You have there a fake model that always gives 5 days till xmas, and a
 fake context that returns the fake model.
 
-Later on, after the action is ran, you can pick up the results from
+Later on, after the action is run, you can pick up the results from
 the fake context's stash.
 
 When unit testing controllers, just make sure you provide all the
