@@ -1,6 +1,6 @@
 =head1 Catalyst and nginx
 
-In the spirit of perl, in that there is always more than one way to do it,
+In the spirit of Perl, in that there is always more than one way to do it,
 there are also many ways to deploy your Catalyst application.
 
 First, I will summarize the available options and then go into the details of
@@ -28,16 +28,16 @@ my own choice for application deployment.
 
 =head2 The Built-in Server
 
-The first method is the perl-based standalone server.  This method is actually
+The first method is the Perl-based standalone server.  This method is actually
 several methods, as it has several engines.  This is the server that is
 used when the development server is initiated via:
 
  script/myapp_server.pl
 
 The default development server (as it is commonly referred to) is a simple
-single threaded server.  A secondary perl-based engine that is more robust for
+single threaded server.  A secondary Perl-based engine that is more robust for
 production usage is the HTTP::Prefork.  This engine is more similar to what
-mongrel is in the Rails world, and is a perl implementation of a prefork
+mongrel is in the Rails world, and is a Perl implementation of a prefork
 server that can handle simultaneous connections.  At the end of this article, 
 I'll show how to use nginx to proxy to the Prefork server.
 
@@ -47,19 +47,19 @@ Apache is the stalwart of the web servers, and mod_perl is firmly attached to
 Apache.  It has a tremendous number of merits to it, but it is very complex to
 simply get an application going properly.  My general recommendation on this
 deployment methodology is to not use it unless you have distinct reasons to.
-There are numerous valid reasons, but it tends to be a heavier weight
+There are numerous valid reasons, but it tends to be a heavyweight
 deployment mechanism that isn't worth the tradeoffs for simple web
 applications.  If you know enough to use mod_perl, you won't be looking here!
 
 =head2 FastCGI
 
-Finally, we have FastCGI.  A simple protocol that acts as a gateway between an
+Finally, we have FastCGI, a simple protocol that acts as a gateway between an
 application and a web server.  FastCGI scripts are handled via socket
-communications (either unix sockets or tcp sockets) between the webserver and
+communications (either Unix sockets or TCP sockets) between the webserver and
 the application.  Most deployment mechanisms make usage of external scripts,
 with an external process manager that spawns the application FastCGI processes.
 
-This may sound daunting, so lets break down FastCGI components into primitive
+This may sound daunting, so let's break down FastCGI components into primitive
 concepts.  But first, a simple definition as to what FastCGI is: FastCGI is
 simply a common protocol used for applications to talk to a webserver.
 
@@ -67,8 +67,8 @@ The first is the webserver.  This is really an interchangeable piece of your
 deployment.  For external FastCGI scripts, you can safely ignore the webserver.
 
 The second piece is the FastCGI process manager.  In the case of mod_fcgid and
-mod_fastcgi (both Apache modules) there is support for a simple FastCGI process
-manager.  These modules handle spawning, reaping and maintaining the child
+mod_fastcgi (both Apache modules), there is support for a simple FastCGI process
+manager.  These modules handle spawning, reaping, and maintaining the child
 processes.  In an external setup, there is some third party that does this
 task.  Currently, Catalyst (by default) uses FCGI::ProcManager.  This handles
 spawning the individual children.
@@ -78,14 +78,14 @@ to the FastCGI socket, and handles the incoming requests while sending the
 response upstream to the socket, which the webserver listens to and sends the
 response to the originating client.
 
-The merits of using FastCGI are numerous, the most distinct of which are the
-capability to restart your application without down time or without touching
+The merits of using FastCGI are numerous, the most distinct of which is the
+capability to restart your application without downtime or without touching
 the webserver.  The user running your application doesn't even need to be the
 same user as the webserver.
 
-The zero-downtime is achieved because multiple FastCGI processes can listen to
+This zero downtime is achieved because multiple FastCGI processes can listen to
 the same socket.  This means that you can start your next version on the
-socket, then shutdown the old version.  The upstream webserver doesn't even
+socket, then shut down the old version.  The upstream webserver doesn't even
 notice, or need to be notified.
 
 I hope this article has been convincing enough to make use of FastCGI, because
@@ -97,7 +97,7 @@ being rock solid for my tests and subsequent deployments.
 
 Apache has never let me down, but it has frustrated me.  Nginx won me over
 because it has a very non-intrusive and intuitive configuration format and has
-a great number of features so it is hard to miss Apache for any modern
+a great number of features, so it is hard to miss Apache for any modern
 projects.  It certainly doesn't have all the features that Apache has (most
 importantly, no traditional CGI support) but it works very well, and is very,
 very fast.
@@ -106,21 +106,20 @@ While the front-end FastCGI proxy won't really affect an application's
 processing speed, it does affect how quickly static files and related resources
 are served, as well as the client communications.  This is accomplished by
 reducing the time it takes for the client to receive the first byte, and other
-related metrics. While these efficiencies seem trivial, they matter and add-up,
+related metrics. While these efficiencies seem trivial, they do matter, and they add up,
 especially for high performance applications that require analysis of load
-order and blocking elements in the generated markup.  Often times the response
+order and blocking elements in the generated markup.  Oftentimes the response
 from users is that things simply "feel" faster.
 
 =head1 Nginx Configuration
 
 Configuring a location in nginx to be handled by FastCGI is trivial.  It's a
-simple one line, nestled into a location block, which points out the location
+simple one-liner, nestled into a location block, which points out the location
 to the socket:
 
     fastcgi_pass  unix:/var/www/MyApp/fastcgi.socket;
 
-
-You can use unix sockets or tcp sockets:
+You can use Unix sockets or TCP sockets:
 
     fastcgi_pass  127.0.0.1:10003;
 
@@ -181,7 +180,7 @@ figure out the right path to your application.
 =head1 Using Catalyst::Engine::HTTP::Prefork
 
 This is one of main reasons why I love nginx over Apache.  To switch from
-fastcgi to using prefork, you simply have to change one line.  Instead of
+fastcgi to using prefork, you just have to change one line.  Instead of
 fastcgi_pass, you simply have proxy_pass in its place.
 
     proxy_pass  http://localhost:3000/;
