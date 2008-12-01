@@ -35,11 +35,11 @@ used when the development server is initiated via:
  script/myapp_server.pl
 
 The default development server (as it is commonly referred to) is a simple
-single threaded server.  A secondary pure-perl engine that is more robust for
+single threaded server.  A secondary perl-based engine that is more robust for
 production usage is the HTTP::Prefork.  This engine is more similar to what
-mongrel is (with the exception of no C-based HTTP handling), and has a prefork
-model for handling multiple connections.  At the end of this article, I'll show
-how to proxy to the Prefork server.
+mongrel is in the Rails world, and is a perl implementation of a prefork
+server that can handle simultaneous connections.  At the end of this article, 
+I'll show how to use nginx to proxy to the Prefork server.
 
 =head2 Apache and mod_perl
 
