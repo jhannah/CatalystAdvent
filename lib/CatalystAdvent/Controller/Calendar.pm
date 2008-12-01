@@ -180,9 +180,9 @@ sub feed : Global {
         $parser->parse_from_filehandle($fh);
         close $fh;
         
-        $feed->add_entry(
+        my $e = $feed->add_entry(
             title    => { type => 'text', content => $parser->title },
-            content  => { type => 'xhtml', content => $parser->asString },
+            content  => { type => 'xhtml', content => "<![CDATA[" . $parser->asString . "]]>" },
             author   => { name => $parser->author||'Catalyst', 
 			  email => ($parser->email||
 				    'catalyst@lists.scsys.co.uk') },
