@@ -148,6 +148,36 @@ create another location block:
 Now, every request to a file in /static will be served directly from nginx.
 Speedy!
 
+=head2 The fastcgi_params
+
+For the most part, you can copy and paste this file if it isn't already
+available.  Most packages include this, or an example of it, but in case you
+don't have it around just copy it verbatim into your nginx directory.  If you
+do already have it, make sure to add the C<SCRIPT_NAME> line so Catalyst can
+figure out the right path to your application.
+
+    fastcgi_param  QUERY_STRING       $query_string;
+    fastcgi_param  REQUEST_METHOD     $request_method;
+    fastcgi_param  CONTENT_TYPE       $content_type;
+    fastcgi_param  CONTENT_LENGTH     $content_length;
+
+    # Catalyst requires SCRIPT_NAME to be passed in
+    fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+    fastcgi_param  REQUEST_URI        $request_uri;
+    fastcgi_param  DOCUMENT_URI       $document_uri;
+    fastcgi_param  DOCUMENT_ROOT      $document_root;
+    fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+
+    fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+    fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+
+    fastcgi_param  REMOTE_ADDR        $remote_addr;
+    fastcgi_param  REMOTE_PORT        $remote_port;
+    fastcgi_param  SERVER_ADDR        $server_addr;
+    fastcgi_param  SERVER_PORT        $server_port;
+    fastcgi_param  SERVER_NAME        $server_name;
+
+
 =head1 Using Catalyst::Engine::HTTP::Prefork
 
 This is one of main reasons why I love nginx over Apache.  To switch from
