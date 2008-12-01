@@ -3,9 +3,9 @@
 =begin pod::xhtml
 
 <p>Respondents were approached via the Catalyst mailing list
-(approximately 1000 subscribers) , a post to many perl mongers mailing
-lists and a post on the Perlbuzz weblog (approximately 1800
-subscribers via feedburner). 100 responses were received within 24
+(approximately 1000 subscribers), a post to many Perl Mongers mailing
+lists, and a post on the Perlbuzz weblog (approximately 1800
+subscribers via Feedburner). 100 responses were received within 24
 hours, and with no reminders, a total of 153 responses were received
 in one week. There were a handful of responses received after this
 time, but they were not included in this analysis.The breakdown of
@@ -949,9 +949,9 @@ catalyst coders</span></h2>
 
 <p>The average proportion of catalyst coders on
 the team was 65% (standard deviation 33.9). Excluding teams of 1
-(sole traders), the average proportion of catalyst coders was 58%
+(sole traders), the average proportion of Catalyst coders was 58%
 (standard deviation 32). This indicates quite a high usage of
-catalyst across all teams, and its viability as a platform for
+Catalyst across all teams, and its viability as a platform for
 small to medium sized teams.</p>
 
 <h2><span style='font-family:"Times New Roman"'>Desire for more
@@ -961,12 +961,12 @@ catalyst usage.</span></h2>
 like fewer people using Catalyst in their team. This may well
 represent misunderstanding the question. Of the remaining 92
 respondents that had usable data for this question, 25% of
-respondents would like their team of catalyst programmers to remain
+respondents would like their team of Catalyst programmers to remain
 the same size. One quarter of respondents would like to see their
 team grow by up to 50%. A further quarter indicated that they would
-like to see growth of catalyst coders increased usage of Catalyst
+like to see growth of Catalyst coders increased usage of Catalyst
 in their team by between 50 and 125%, and the remaining group would
-like to see very high increased usage of catalyst &ndash; between
+like to see very high increased usage of Catalyst&mdash;between
 125 and 900%.</p>
 
 <p>This indicates that Catalyst is popular among
@@ -1218,11 +1218,11 @@ team</span></b></p>
 
 <p>So 88% of responses indicated that two or
 fewer people in the team were subscribers to the mailing list.
-There is little difference in these figures if 1 person teams are
+There is little difference in these figures if one-person teams are
 excluded.</p>
 
 <p>This data with the team size allows us to
-estimate the number of catalyst users per subscriber to the mailing
+estimate the number of Catalyst users per subscriber to the mailing
 list. First we exclude all team sizes above 15 as outliers. This
 leaves the mean team size as 4.4 members (95% confidence interval
 of 4.86 to 4.92). For this group we know the mean number of mailing
@@ -1242,12 +1242,12 @@ estimate substantially. This is a conservative estimate because our
 ability to reach non-subscribers was limited by survey distribution
 channels and the relatively short turnaround. Therefore we are
 confident that a 50% correction for non-response bias is a
-conservative estimate, and puts the number of catalyst programmers
+conservative estimate, and puts the number of Catalyst programmers
 at around the 5000 mark, although we need to stress that this is a
 conservative estimate.</p>
 <h2>IRC Channel statistics</h2>
 
-<p>We know that there are about 175 regular irc
+<p>We know that there are about 175 regular IRC
 channel members. The survey includes 130 of these subscribers
 (although this is an overestimate as some occasional users would
 also have indicated membership). This is more evidence that our
@@ -1264,6 +1264,7 @@ further 4 indicated that they expected no growth. This indicates a
 strong potential for the growth of usage of Catalyst. The 2 year
 question was not used due to the long term projection, and the
 consistency with the 12 month growth projections.</p>
+
 <h2>Miscellaneous comments</h2>
 
 <p>There were a few comments that indicated that
