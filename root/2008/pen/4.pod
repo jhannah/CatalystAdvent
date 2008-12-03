@@ -219,7 +219,7 @@ Then, in C</var/www/conf/httpd.conf> we configure FastCGI like this:
 
   Alias / /myapp/
 
-Now stop and start the server as it's running in a chroot environment:
+Stop and start the server to load mod_fastcgi:
 
   $ sudo apachectl stop
   /usr/sbin/apachectl stop: httpd stopped
@@ -251,13 +251,13 @@ Connect to your server address and see the application running there.
 
 One thing that is recommended, is to serve static files with the webserver rather
 than the application.
-Given you've put the application into the change root environment located at
+Given you've put the application into the change root environment to
 B</var/www/MyApp> you need to add the following to the B<httpd.conf> B<behind>
 the Alias directive mapping the FastCGI application:
 
   Alias /static/ /MyApp/root/static/
 
-Congratulations, with that your deployment should be generally ready for prime time.
+Congratulations, your deployment should be generally ready for prime time.
 
 =head1 AUTHOR
 
