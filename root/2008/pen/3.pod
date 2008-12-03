@@ -55,10 +55,10 @@ script/yourapp_create.pl view GP Graphics::Primitive
 </pre>
 
 <p>
-This creates a <tt>GP</tt> view.  You'll need to decide on a suitable way to forward
+This creates a <tt>GP </tt> view.  You'll need to decide on a suitable way to forward
 to the appropriate view in your application.  Since this view expects to find
 a Graphics::Primitive object in the <tt>graphics_primitive</tt> key of the
-stash, you might forward to the <tt>GP</tt> view when that key is set.
+stash, you might forward to the <tt>GP </tt> view when that key is set.
 
 <h2>The Problem</h2>
 
@@ -73,8 +73,8 @@ Our throughput is currently 4.4Mb/s.
 <p>
 When presenting such a measurement to a reader, such as the amount of bandwidth
 being consumed by your site, it is often desirable to give the number
-some context. If we wanted to convey more information to the reader, such as
-the last 24 measurements, we might resort to a table:
+some context. If we wanted to conduct more information to the reader &#8212; such as
+the last 24 measurements &#8212; we might resort to a table.
 </p>
 <table>
  <thead>
@@ -250,7 +250,7 @@ action.
 <p>
 That gets our chart created and the data in it.  You'll want to substitute
 this static data for something dynamic.  Since I've no idea where your data
-is, I will leave it to you.
+is then I will leave it to you.
 </p>
 
 =end pod::xhtml
@@ -308,6 +308,13 @@ will render it for us.
 =begin pod::xhtml
 
 <p>
+The Graphics::Primitive view defaults to using the L<Cairo driver|http://search.cpan.org/perldoc?Graphics::Primitive::Driver::Cairo>.
+The driver args and content type in our example instruct Graphics::Primitive
+to render our scene as a PNG.  Changein the format and the content type to
+SVF, PDF or PostScript would yield the same chart in those formats.
+</p>
+
+<p>
 The sparkline provides a small but dense view into the data being discussed.  In
 lieu of the methods already discussed, one could place the following:
 </p>
@@ -316,7 +323,8 @@ Throughput is <img src="/static/images/2008/sparklines/simple-spark.png"> 4.4Mb/
 </blockquote>
 
 <p>
-You'll get this sparkline when you visit the action we made above!
+You'll get this sparkline when you visit the action we made above! (But not
+the text, that's an excercise left to the reader.)
 </p>
 
 <p>
@@ -356,7 +364,9 @@ Throughput is <img src="/static/images/2008/sparklines/curr-spark.png"> <span st
 
 <p>
 Here we've added a new series to the chart.  We then set the series to use a
-Point renderer.  With this we highlight the "current" point on the chart.
+Point renderer.  With this we highlight the "current" point on the chart.  We
+can also change the color of the numeric measurement to provide a visual cue
+to the reader, tying the number to the point.
 </p>
 
 <p>
@@ -394,7 +404,7 @@ Throughput is <img src="/static/images/2008/sparklines/all-spark.png"> <span sty
 =begin pod::xhtml
 
 <p>
-You could go yet another step further and highlight the "normal" range of values:
+You could go a step further and highlight the "normal" range of values:
 </p>
 <blockquote>
 Throughput is <img src="/static/images/2008/sparklines/range-spark.png"> <span style="color: #ff0000">4.4Mb/s</span> (<span style="color: #3399ff">High 5.8, Low 0.7</span>).
@@ -423,4 +433,7 @@ documentation or reading L<more on sparklines|http://www.edwardtufte.com/bboard/
 may give you other ideas.
 </p>
 
-<p style="font-style: italic">-- Cory 'gphat' Watson</p>
+
+<h2>Author</h2>
+
+Cory 'gphat' Watson <tt>&lt;cwatson at coldhardcode.com&gt;</tt>
