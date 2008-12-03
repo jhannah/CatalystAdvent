@@ -14,8 +14,8 @@
 
 =head1 Catalyst and OpenBSD
 
-On OpenBSD we have a package management that allows us to
-get a fully-fledged Catalyst environment quite easily and fast ready.
+On OpenBSD we have a package management system that allows us to
+get ready a fully-fledged Catalyst environment quite easily and fast.
 
 There are two possible ways to achieve this but this article sticks to the
 officially recommended one: packages.
@@ -25,7 +25,7 @@ story.
 =head1 Preparation
 
 Given you have installed OpenBSD 4.4, the first thing before you can start is to
-pick a mirror nearby you from L<http://www.openbsd.org/ftp.html>.
+pick a mirror near you from L<http://www.openbsd.org/ftp.html>.
 I use my favorite mirror in this article, which is located in
 Europe/Germany, quite fast and up to date: L<ftp://ftp.de.openbsd.org/pub/OpenBSD/>.
 
@@ -36,9 +36,9 @@ you're using.
 
 With the mirror and the package directory we have the complete URL pointing to
 L<ftp://ftp.de.openbsd.org/pub/OpenBSD/4.4/packages/amd64>
-which we put it into the environment variable called B<PKG_PATH>.
+which we put in the B<PKG_PATH> environment variable.
 
-What you enter on your terminal (assuming a korn-like shell) is:
+What you should enter in your terminal (assuming a korn-like shell) is:
 
   $ export PKG_PATH=ftp://ftp.de.openbsd.org/pub/OpenBSD/4.4/packages/amd64
   $
@@ -46,7 +46,7 @@ What you enter on your terminal (assuming a korn-like shell) is:
 To save you from repeating that in the future, just put it into the shell
 profile (B<~/.profile> for ksh).
 
-Further i assume you're in the group B<wheel> so you can run B<sudo>.
+Further I will assume you're in the B<wheel> group so you can run B<sudo>.
 
 =head1 Installation
 
@@ -66,7 +66,7 @@ Now fetch the B<index.txt> file so you can use B<grep> to easily find packages:
   112067 bytes received in 0.61 seconds (178.44 KB/s)
   $
 
-Given we want to know all packages have B<Catalyst> in their name we run
+Because we want to know all the packages having B<Catalyst> in their name we run
 B<grep> like this:
 
   $ grep Catalyst index.txt
@@ -85,7 +85,7 @@ B<grep> like this:
   $
 
 We see L<p5-Catalyst-Devel|http://search.cpan.org/perldoc?Catalyst::Devel> in
-the list and continue to install it:
+the list and proceed to install it:
 
   $ sudo pkg_add p5-Catalyst-Devel
   p5-Class-Accessor-0.31: complete
@@ -99,7 +99,7 @@ the list and continue to install it:
   p5-Catalyst-Devel-1.08: complete
   $
 
-... done, wasn't that easy?!  We have all we need for the Catalyst base system.
+... done, wasn't that easy?!  We have everything we need for the Catalyst base system.
 
 For session support we install 
 the L<session plugin|http://search.cpan.org/perldoc?Catalyst::Plugin::Session>,
@@ -117,7 +117,7 @@ and L<cookie state|http://search.cpan.org/perldoc?Catalyst::Plugin::Session::Sta
   p5-Catalyst-Plugin-Session-State-Cookie-0.09: complete
   $
   
-Lets say we want the application to use the
+Let's assume we want the application to also use the
 L<authentication plugin|http://search.cpan.org/perldoc?Catalyst::Plugin::Authentication> too:
 
   $ sudo pkg_add p5-Catalyst-Plugin-Authentication
@@ -180,12 +180,12 @@ This is the point you can start implementing whatever nice application you want.
 
 =head1 Deployment
 
-After some time you surely want to make your application is accessible to others.
+After some time you surely want to make your application accessible to others.
 
-As OpenBSD comes already with an httpd capable to handle all this you only
+As OpenBSD already comes with an httpd capable to handle all of this you only
 need to configure it appropriately.
-Using FastCGI is a quite performat option, so we install mod_fastcgi, the FCGI
-module and FCGI::ProcManager:
+Using FastCGI is quite an efficient option, so we should install mod_fastcgi, 
+the FCGI module and FCGI::ProcManager:
 
   $ sudo pkg_add mod_fastcgi fcgi p5-FCGI-ProcManager
   mod_fastcgi-2.4.2p2: complete
@@ -202,7 +202,7 @@ module and FCGI::ProcManager:
   you should fully stop and then restart the server.
   $
 
-To enable enable mod_fastcgi we just need to type:
+To enable mod_fastcgi we just need to type:
 
   $ sudo /usr/local/sbin/mod_fastcgi-enable
   Enabling  module...
@@ -214,7 +214,7 @@ To enable enable mod_fastcgi we just need to type:
   rm /var/www/conf/httpd.conf.new
   $
 
-Then, in C</var/www/conf/httpd.conf> we configure FastCGI like this:
+Then, in C</var/www/conf/httpd.conf> we configure FastCGI as follows:
 
   FastCgiExternalServer /myapp -socket /tmp/myapp.socket
 
@@ -228,7 +228,7 @@ Stop and start the server to load mod_fastcgi:
   /usr/sbin/apachectl start: httpd started
   $
 
-The last thing we need to do is to start B<script/myapp_fastcgi.pl>.
+The last thing we need to do is running B<script/myapp_fastcgi.pl>.
 
 One thing is important here: the httpd on OpenBSD is running in a change root
 environment per default, which is rooted at B</var/www>.
@@ -250,10 +250,11 @@ And now we start the fastcgi process(es):
 
 Connect to your server address and see the application running there.
 
-One thing that is recommended, is to serve static files with the webserver rather
-than the application.
+One thing is recommended though, the static files should be served by the webserver,
+not your Catalyst application.
+
 Given you've put the application into the change root environment to
-B</var/www/MyApp> you need to add the following to the B<httpd.conf> B<behind>
+B</var/www/MyApp> you need to add the following to the B<httpd.conf> B<before>
 the Alias directive mapping the FastCGI application:
 
   Alias /static/ /MyApp/root/static/
