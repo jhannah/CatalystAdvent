@@ -55,10 +55,10 @@ script/yourapp_create.pl view GP Graphics::Primitive
 </pre>
 
 <p>
-This creates a <tt>GP </tt> view.  You'll need to decide on a suitable way to forward
+This creates a <tt>GP</tt> view.  You'll need to decide on a suitable way to forward
 to the appropriate view in your application.  Since this view expects to find
 a Graphics::Primitive object in the <tt>graphics_primitive</tt> key of the
-stash, you might forward to the <tt>GP </tt> view when that key is set.
+stash, you might forward to the <tt>GP</tt> view when that key is set.
 
 <h2>The Problem</h2>
 
