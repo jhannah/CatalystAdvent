@@ -6,6 +6,7 @@
      border: 1px solid gray;
      background-color: #d9d9d9;
      padding: 3px;
+     padding-bottom: 0;
  }
 </style>
 
@@ -239,7 +240,7 @@ First we create a tmp directory below B</var/www>:
 
   $ sudo mkdir -m 1777 /var/www/tmp
 
-And now we start the fastcgi process:
+And now we start the fastcgi process(es):
 
   $ ./script/myapp_fastcgi.pl -l /var/www/tmp/myapp.socket
   ...
