@@ -184,7 +184,7 @@ fastcgi to using prefork, you just have to change one line.  Instead of
 fastcgi_pass, you simply have proxy_pass in its place and then set the
 proxy headers:
 
-    location / {
+    location /myapp/ { # Or, simply "location /"
         proxy_set_header Host $http_host;
         proxy_set_header X-Forwarded-Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
