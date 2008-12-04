@@ -481,7 +481,9 @@ Voila! There you have it. Go nuts.
 =head1 AUTHOR
 
 Devin Austin
+
 devin.austin@gmail.com
+
 http://www.codedright.net
 
 =head1 LICENSE
