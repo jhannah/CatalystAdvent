@@ -439,6 +439,42 @@ Edit lib/Controller/Photos.pm to match this file:
     <div>&laquo;<a href="[% c.uri_for("/photos") %]">back</a>
 
 
+
+And last but not least, the required HTML::FormFu files:
+
+=over
+
+=item add.yml
+
+     ---
+     indicator: submit
+
+    elements:
+      - type: Text
+        name: photo_name
+        label: Name this photo
+        container_tag: div
+        
+      - type: File
+        name: photo
+        label: Your photo
+        container_tag: div
+      
+      - type: Textarea
+        name: caption
+        label: Photo caption
+        container_tag: div
+   
+      - type: Submit
+        name: submit
+        value: Upload!
+      
+    constraints:
+      SingleValue
+  
+    filters:
+      HTMLScrubber
+
 Voila! There you have it. Go nuts.
 
 =head1 AUTHOR
