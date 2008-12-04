@@ -439,10 +439,11 @@ Edit lib/Controller/Photos.pm to match this file:
     <div>&laquo;<a href="[% c.uri_for("/photos") %]">back</a>
 
 
+=head2 FormFu
 
 And last but not least, the required HTML::FormFu files:
 
-=over
+=over 12
 
 =item add.yml
 
