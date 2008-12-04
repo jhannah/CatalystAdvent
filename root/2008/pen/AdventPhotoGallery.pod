@@ -26,7 +26,7 @@ JPEG files can be manipulated by Imager.
 
 =back
 
-Once you have installed these two things with great success, move on to the next step.
+Once you have installed these modules with great success, move on to the next step.
 
 =head1 Let's get started already!
 
