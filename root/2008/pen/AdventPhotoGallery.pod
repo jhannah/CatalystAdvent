@@ -24,9 +24,11 @@ JPEG files can be manipulated by Imager.
 
 =item C<DateTime>
 
+=item C<Catalyst::Controller::HTML::FormFu>
+
 =back
 
-Once you have installed these modules with great success, move on to the next step.
+Once you have installed these two things with great success, move on to the next step.
 
 =head1 Let's get started already!
 
@@ -35,8 +37,9 @@ at the very least.  If not, you have some documentation to read first :-)
 
 Create a controller in your application called Photos.  Something like this:
 
+
     perl script/*create.pl controller Photos
-    
+
 Next, you'll want to set up a table called Photos in your RDBMS of choice.  Here, we use MySQL because I've yet to learn Postgres.
 The necessary columns you will need are as follows:
 
@@ -83,6 +86,10 @@ other:
 
 =back
 
+Now, create your model:
+
+    ./script/myapp_create.pl model DB DBIC::Schema MyApp::Schema 'DBI:mysql:database=myapp' 'narf' 'blarf'
+
 So now you have your basic tables set up.  Next, we need to generate our Schema files so DBIx::Class can interact with our
 database objects.  I use this script to update/create my schema definition from the database.
 Copy/paste this script into a file called myapp_update_schema.pl (replace "myapp" with whatever you named this application) and stick it
@@ -104,11 +111,12 @@ in the script/ directory of your application:
 	    [ "dbi:mysql:myapp", "narf", "blarf" ]
     );
     
+
 now run perl script/*update*.  If there are no errors, proceed!
 
 =head2 Adding the InflateColumn::FS magic
 
-Open up Schema/Photos.pm.  Since we used ::Loader, there will be a good portion of the file that you're not supposed to manually
+Open up lib/Schema/Photos.pm.  Since we used ::Loader, there will be a good portion of the file that you're not supposed to manually
 edit.  This is marked by these lines:
 
     # Created by DBIx::Class::Schema::Loader v0.04005 @ 2008-12-01 02:57:02
@@ -126,13 +134,14 @@ You can safely modify anything below this though.  Add these lines to the file:
 	    }
     );
     
+
 This tells DBIx::Class that the column "path" is now a Path::Class::File object and we can call Path::Class::File methods on it upon retrieval.
 
 Great! Now let's edit our controller.
 
 =head1 The Photos Controller
 
-Edit Controller/Photos.pm to match this file:
+Edit lib/Controller/Photos.pm to match this file:
 
     package MyApp::Controller::Photos;
 
@@ -143,7 +152,7 @@ Edit Controller/Photos.pm to match this file:
     use Imager;
     use MIME::Types;
     use File::MimeInfo ();
-    use BoyosPlace;
+    use MyApp;
 
     __PACKAGE__->mk_accessors(qw(thumbnail_size));
 
@@ -358,8 +367,11 @@ Edit Controller/Photos.pm to match this file:
     	}
 
     }
+    1;
 
-The view:
+
+
+=head2 The view:
 
 =over 12
 
@@ -443,6 +455,7 @@ it under the same terms as Perl itself.
 =cut
 
 1;
+
 
 
 
