@@ -181,9 +181,17 @@ figure out the right path to your application.
 
 This is one of main reasons why I love nginx over Apache.  To switch from
 fastcgi to using prefork, you just have to change one line.  Instead of
-fastcgi_pass, you simply have proxy_pass in its place.
+fastcgi_pass, you simply have proxy_pass in its place and then set the
+proxy headers:
 
-    proxy_pass  http://localhost:3000/;
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_pass  http://localhost:3000/;
+    }
 
 Now, all connections for that location go to your application which is running
 on the built-in server (hopefully with Catalyst::Engine::HTTP::Prefork).  If
