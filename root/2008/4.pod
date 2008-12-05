@@ -50,26 +50,9 @@ Further I will assume you're in the B<wheel> group so you can run B<sudo>.
 
 =head1 Installation
 
-Now fetch the B<index.txt> file so you can use B<grep> to easily find packages:
+Now use B<pkg_info> to easily find all the packages having B<Catalyst> in their name:
 
-  $ ftp $PKG_PATH/index.txt
-  Trying 2001:638:a00:f008::1...
-  ftp: connect to address 2001:638:a00:f008::1: No route to host
-  Trying 131.188.40.91...
-  Connected to openbsd.informatik.uni-erlangen.de.
-  ...
-  Retrieving pub/OpenBSD/4.4/packages/amd64/index.txt
-  local: index.txt remote: index.txt
-  150 Opening BINARY mode data connection for 'index.txt' (112067 bytes).
-  100% |**************************************************|   109 KB    00:00    
-  226 Transfer complete.
-  112067 bytes received in 0.61 seconds (178.44 KB/s)
-  $
-
-Because we want to know all the packages having B<Catalyst> in their name we run
-B<grep> like this:
-
-  $ grep Catalyst index.txt
+  $ pkg_info -Q Catalyst
   p5-Catalyst-Action-RenderView-0.08.tgz
   p5-Catalyst-Authentication-Store-DBIx-Class-0.104.tgz
   p5-Catalyst-Controller-FormBuilder-0.04.tgz
