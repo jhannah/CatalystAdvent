@@ -9,13 +9,15 @@ First things first, we need to make sure we have everything.
 
 =item C<DBIx::Class::InflateColumn::FS>
 
-This will be used to store our file pointer in the database, write the image to the file system, and later, give us a
-Path::Class::File object to manipulate our images later on.
+This will be used to store our file pointer in the database, write the
+image to the file system, and later, give us a Path::Class::File
+object to manipulate our images later on.
 
 =item C<Imager>
 
-The all and the everything for our image manipulation needs.  If not installed already, make sure you install libjpeg so that
-JPEG files can be manipulated by Imager.
+The all and the everything for our image manipulation needs.  If not
+installed already, make sure you install libjpeg so that JPEG files
+can be manipulated by Imager.
 
 
 =item C<MIME::Types>
@@ -28,20 +30,22 @@ JPEG files can be manipulated by Imager.
 
 =back
 
-Once you have installed these two things with great success, move on to the next step.
+Once you have installed these modules, move on to the next step.
 
 =head1 Let's get started already!
 
-Ok.  So here comes the fun stuff.  We're going to assume you know how to create a Catalyst application skeleton, controllers, and models
-at the very least.  If not, you have some documentation to read first :-)
+Ok.  So here comes the fun stuff.  We're going to assume you know how
+to create a Catalyst application skeleton, controllers, and models at
+the very least.  If not, you have some documentation to read first :-)
 
-Create a controller in your application called Photos.  Something like this:
-
+Create a controller in your application called Photos as follows:
 
     perl script/*create.pl controller Photos
 
-Next, you'll want to set up a table called Photos in your RDBMS of choice.  Here, we use MySQL because I've yet to learn Postgres.
-The necessary columns you will need are as follows:
+Next, you'll want to set up a table called Photos in your RDBMS of
+choice.  Here, I've used MySQL, but you could use SQLite , Postresql
+or any other RDBMS supported by DBIx::Class.  The necessary columns
+you will need are as follows:
 
 =over 12
 
@@ -65,8 +69,8 @@ type: DATETIME
 size: 
 null: no
 other: 
-(If you so desire, include the InflateColumn::DateTime component to be able to manipulate this column as if it were
-a DateTime object)
+(If you want, include the InflateColumn::DateTime component to be
+able to manipulate this column as if it were a DateTime object)
 
 =item path
 
@@ -88,27 +92,30 @@ other:
 
 Now, create your model:
 
-    ./script/myapp_create.pl model DB DBIC::Schema MyApp::Schema 'DBI:mysql:database=myapp' 'narf' 'blarf'
+    ./script/myapp_create.pl model DB DBIC::Schema MyApp::Schema 'DBI:mysql:database=myapp' 'user' 'password'
 
-So now you have your basic tables set up.  Next, we need to generate our Schema files so DBIx::Class can interact with our
-database objects.  I use this script to update/create my schema definition from the database.
-Copy/paste this script into a file called myapp_update_schema.pl (replace "myapp" with whatever you named this application) and stick it
-in the script/ directory of your application:
+So now you have your basic tables set up.  Next, we need to generate
+our Schema files so DBIx::Class can interact with our database
+objects.  I use this script to update/create my schema definition from
+the database.  Copy/paste this script into a file called
+myapp_update_schema.pl (replace "myapp" with whatever you named this
+application) and stick it in the script/ directory of your
+application:
 
-    #!/usr/bin/perl 
+ #!/usr/bin/perl 
 
 
-    use FindBin;
-    use DBIx::Class::Schema::Loader qw| make_schema_at |;
-    make_schema_at(
-    	"MyApp::Schema",
-    	{
-		    debug          => 1,
-		    use_namespaces => 0,
-		    components     => [qw/ InflateColumn::DateTime InflateColumn::FS PK::Auto/],
-		    dump_directory => "$FindBin::Bin/../lib"
+ use FindBin;
+ use DBIx::Class::Schema::Loader qw| make_schema_at |;
+ make_schema_at(
+ 	"MyApp::Schema",
+ 	{
+            debug          => 1,
+	    use_namespaces => 0,
+	    components     => [qw/ InflateColumn::DateTime InflateColumn::FS PK::Auto/],
+	    dump_directory => "$FindBin::Bin/../lib"
 	    },
-	    [ "dbi:mysql:myapp", "narf", "blarf" ]
+	    [ "dbi:mysql:myapp", "user", "password" ]
     );
     
 
@@ -116,26 +123,29 @@ now run perl script/*update*.  If there are no errors, proceed!
 
 =head2 Adding the InflateColumn::FS magic
 
-Open up lib/Schema/Photos.pm.  Since we used ::Loader, there will be a good portion of the file that you're not supposed to manually
-edit.  This is marked by these lines:
+Open up lib/Schema/Photos.pm.  Since we used ::Loader, there will be a
+good portion of the file that you're not supposed to manually edit.
+This is marked by these lines:
 
     # Created by DBIx::Class::Schema::Loader v0.04005 @ 2008-12-01 02:57:02
     # DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:A/YrsvGDAWKpDaGlJ3Dwqg
-    
-You can safely modify anything below this though.  Add these lines to the file:
 
-    use MyApp;
-    __PACKAGE__->add_columns(
-	    "path",
-	    {
-	        data_type      => 'TEXT',
-            is_fs_column   => 1,
-            fs_column_path => MyApp->path_to( 'root', 'static', 'photos' ) . ""
-	    }
-    );
-    
+You can safely modify anything below this though.  Add these lines to
+the file:
 
-This tells DBIx::Class that the column "path" is now a Path::Class::File object and we can call Path::Class::File methods on it upon retrieval.
+ use MyApp;
+ __PACKAGE__->add_columns(
+ "path",
+     {
+	data_type      => 'TEXT',
+        is_fs_column   => 1,
+        fs_column_path => MyApp->path_to( 'root', 'static', 'photos' ) . ""
+     }
+);
+
+This tells DBIx::Class that the column "path" is now a
+Path::Class::File object and we can call Path::Class::File methods on
+it upon retrieval.
 
 Great! Now let's edit our controller.
 
