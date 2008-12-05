@@ -40,7 +40,7 @@ the very least.  If not, you have some documentation to read first :-)
 
 Create a controller in your application called Photos as follows:
 
-    perl script/*create.pl controller Photos
+    perl script/myapp_create.pl controller Photos
 
 Next, you'll want to set up a table called Photos in your RDBMS of
 choice.  Here, I've used MySQL, but you could use SQLite , Postresql
@@ -57,6 +57,20 @@ null: no
 other: PRIMARY KEY auto_increment
 
 =item name
+
+type: VARCHAR
+size: 255
+null: no
+other:
+
+=item mime
+
+type: VARCHAR
+size: 255
+null: no
+other:
+
+=item mime
 
 type: VARCHAR
 size: 255
@@ -117,9 +131,20 @@ application:
 	    },
 	    [ "dbi:mysql:myapp", "user", "password" ]
     );
-    
 
-now run perl script/*update*.  If there are no errors, proceed!
+now run this script:
+
+    perl script/myapp_update_schema.pl                                     
+    MyApp::Schema::Photos->load_components(
+      "InflateColumn::DateTime",
+      "InflateColumn::FS",
+    ...
+    MyApp::Schema::Photos->set_primary_key("photoid");
+    MyApp::Schema::Photos->add_unique_constraint("photos_pkey", ["photoid"]);
+    Dumping manual schema for MyApp::Schema to directory /tmp/MyApp/script/../lib ...
+    Schema dump completed.
+
+If there are no errors, proceed!
 
 =head2 Adding the InflateColumn::FS magic
 
@@ -232,7 +257,7 @@ Edit lib/Controller/Photos.pm to match this file:
 	    my $mime = MIME::Types->new;
  
         ## comment out this block if you're not using the Authorization plugin
-	    unless ( $c->check_user_roles('admin') ) {
+	    if ( $c->can('check_user_roles') && !$c->check_user_roles('admin') ) {
 
 		    $c->flash->{error_msg} =
 		      "You don't have the proper permissions to add photos here";
@@ -377,15 +402,14 @@ Edit lib/Controller/Photos.pm to match this file:
     	}
 
     }
+
     1;
-
-
 
 =head2 The view:
 
 =over 12
 
-=item add.tt2
+=item root/photos/add.tt2
 
     <h2>Upload your photos</h2>
     [% UNLESS form.submitted_and_valid %]
@@ -398,7 +422,7 @@ Edit lib/Controller/Photos.pm to match this file:
 
     [% END %]
 
-=item delete.tt2
+=item root/photos/delete.tt2
 
     [% UNLESS c.req.param('delete') %]
     <h2>Deleting [% photo.name %]</h2>
@@ -413,7 +437,7 @@ Edit lib/Controller/Photos.pm to match this file:
     <p>Deleted!</p>
     [% END %]
 
-=item index.tt2
+=item root/photos/index.tt2
 
     [% USE table (photos, rows=3) %]
     <h2>Puppy Photos</h2>
@@ -438,8 +462,7 @@ Edit lib/Controller/Photos.pm to match this file:
     <table>
     </div>
 
-
-=item view.tt2
+=item root/photos/view.tt2
 
     <h2>[% photo.name %]</h2>
     <div id="photo">
@@ -448,14 +471,13 @@ Edit lib/Controller/Photos.pm to match this file:
     <p>[% photo.caption %]</p>
     <div>&laquo;<a href="[% c.uri_for("/photos") %]">back</a>
 
-
 =head2 FormFu
 
 And last but not least, the required HTML::FormFu files:
 
 =over 12
 
-=item add.yml
+=item root/forms/photos/add.yml
 
      ---
      indicator: submit
