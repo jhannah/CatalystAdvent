@@ -5,7 +5,7 @@ send emails. You know the common patterns: confirmation emails, password
 recovery emails, monthly newsletter, here's your order, invoice
 attached. The works. 
 
-L<Catalyst::View::Email> is the pretty much standard way to send email
+L<Catalyst::View::Email> is the standard way to send email
 from Catalyst apps. So you can start removing that nasty email sending
 code from your controllers now ;)
 
@@ -13,16 +13,15 @@ code from your controllers now ;)
 
 Well, first things first, install L<Catalyst::View::Email> from CPAN. 
 
-Now let's start building our app. Not being very original , I decided to
-go with a Christmas theme: this will allow people to let their would-be
+Now let's start building our app. Not being very original, I decided to
+go with a Christmas theme: the app will allow people to let their would-be
 Santa know what they want for Christmas. So we'll need the user's email and
 name, Santa's email and a description for the gift. Wrap all this in an
 email and deliver to Santa :)
 
 Obviously I'll just focus on the email part, so I'll leave important stuff
 like input validation or DOS protection (you don't want some kiddie sending 
-gazillions of emails through your app) as an exercise to the reader :)
-
+gazillions of emails through your app) as an exercise to the reader.
 
 Here goes:
 
@@ -109,7 +108,7 @@ show some feedback. Add this in index.tt:
 =head2 Using an email template
 
 So now you know how to quickly send emails from Catalyst. But stuffing
-that message buddy in a string is rather dirty. This is where 
+that message body in a string is rather dirty. This is where 
 L<Catalyst::View::Email::Template> comes handy. It will use your default
 view to render a template, assemble a multi-part email using 
 L<Email::MIME::Creator> and send it out.
@@ -159,12 +158,12 @@ And here's the email template in root/email.tt :
  Merry X-mas,
  Santa's helpers
 
-Now you can change your email templates without touching the controller code. Cool!
+Now you can change your email templates without touching the controller code. Neat!
 
 =head2 What now?
 
 You probably want more features, like sending HTML email or attaching files.
-L<Catalyst::View::Email> handles these things as well, instead of directly setting
+L<Catalyst::View::Email> handles these things well: instead of directly setting
 the email body, you can pass an arrayref with Email::Mime parts , and there's
 a nice example in the documentation. 
 
@@ -174,4 +173,5 @@ on IRC ( irc.perl.org , #catalyst) if things don't work out.
 =head1 AUTHOR
 
 Bogdan Lucaciu <bogdan@sinapticode.ro>
+
 Sinapticode
