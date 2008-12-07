@@ -169,7 +169,7 @@ eyes.  Your next option would be to generate a chart that presents this informat
 We won't cover how to do this with Catalyst at the moment.  We'll just look
 at the result for now.
 <p>
-<img src="/calendar/static/images/2008/sparklines/bigchart.png" alt="A Big Chart">
+<img src="/static/images/2008/sparklines/bigchart.png" alt="A Big Chart">
 <p>
 This is a wonderful idea!  The data is now presented in a really meaningful way.  The
 problem is that the chart is a very large image for such a small amount of information.
@@ -319,7 +319,7 @@ The sparkline provides a small but dense view into the data being discussed.  In
 lieu of the methods already discussed, one could place the following:
 </p>
 <blockquote>
-Throughput is <img src="/calendar/static/images/2008/sparklines/simple-spark.png"> 4.4Mb/s.
+Throughput is <img src="/static/images/2008/sparklines/simple-spark.png"> 4.4Mb/s.
 </blockquote>
 
 <p>
@@ -333,7 +333,7 @@ them down sorting out a chart.  But we can do much better!
 </p>
 
 <blockquote>
-Throughput is <img src="/calendar/static/images/2008/sparklines/curr-spark.png"> <span style="color: #ff0000">4.4Mb/s</span>.
+Throughput is <img src="/static/images/2008/sparklines/curr-spark.png"> <span style="color: #ff0000">4.4Mb/s</span>.
 </blockquote>
 
 =end pod::xhtml
@@ -374,7 +374,7 @@ Unfortunately, this has flaws as well.  The graph gives us enough context to kno
 4.4Mb/s is on the high end, but the scale is ambiguous.  We can improve this even further:
 </p>
 <blockquote>
-Throughput is <img src="/calendar/static/images/2008/sparklines/all-spark.png"> <span style="color: #ff0000">4.4Mb/s</span> (<span style="color: #3399ff">High 5.8, Low 0.7</span>).
+Throughput is <img src="/static/images/2008/sparklines/all-spark.png"> <span style="color: #ff0000">4.4Mb/s</span> (<span style="color: #3399ff">High 5.8, Low 0.7</span>).
 </blockquote>
 
 =end pod::xhtml
@@ -407,7 +407,7 @@ Throughput is <img src="/calendar/static/images/2008/sparklines/all-spark.png"> 
 You could go a step further and highlight the "normal" range of values:
 </p>
 <blockquote>
-Throughput is <img src="/calendar/static/images/2008/sparklines/range-spark.png"> <span style="color: #ff0000">4.4Mb/s</span> (<span style="color: #3399ff">High 5.8, Low 0.7</span>).
+Throughput is <img src="/static/images/2008/sparklines/range-spark.png"> <span style="color: #ff0000">4.4Mb/s</span> (<span style="color: #3399ff">High 5.8, Low 0.7</span>).
 </blockquote>
 
 =end pod::xhtml
