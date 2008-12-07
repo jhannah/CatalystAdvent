@@ -42,8 +42,7 @@ in c:\strawberry\.
 
 Actaully there's not much to this.  Portable Strawberry Perl already
 has a sensible CPAN mirror set up, but given that Catalyst requires
-quite a lot of dependencies, you might want to set up a
-L<Minicpan|CPAN::Mini>.
+quite a lot of dependencies, you might want to set up  L<CPAN::Mini>.
 
 =head2 Step 5, Introduce yourself to the joy of windows command line editing.
 
@@ -61,8 +60,8 @@ Anyway, while you could C< notest install HTTP::Server::Simple > and
 then go into your application's root directory and then the C< perl
 Makefile.PL \n make installdeps process > (remember windows shell
 doesn't have C< && >), I've found this a little unpredictable
-(probably because of my unfamiliarity with Windows), so here's a two
-liner that skips testing for everything:
+(probably because of my unfamiliarity with Windows), so here's a
+two-liner that skips testing for everything:
 
  perl Makefile.PL
  perl −MCPAN −MYAML::Syck −e "CPAN::Shell−>notest(install => $_) for grep { $_ ne \"perl\" } keys %{ LoadFile(\"META.yml\")−>{requires} }"
@@ -92,9 +91,10 @@ without (too much) pain.
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to Adam Kennedy and the rest of the team behind L<Perl::Dist>
-who have made this possible.  And thanks to Microsoft for realising
-that they have to make an effort not to be second class citizens.
+Thanks to Adam Kennedy and the rest of the contributors L<Perl::Dist>,
+and the vertical metre of beer contest who made this possible.  And
+thanks to Microsoft for realising that they have to make an effort not
+to be second class citizens.
 
 =head1 AUTHOR
 
