@@ -6,7 +6,7 @@ Controller, while usually this belongs in your Model.  Although at
 first it seems like more effort to go to the trouble of setting up the
 model correctly, but as your application grows, taking care of design
 like this rapidly pays dividends.
-<
+
 If you need access to a database schema or two in a model, or if you
 need to be able to access C< path_to > or something else that belongs
 in $c, you'll want to use this technique.  First we'll show how to do
