@@ -63,9 +63,9 @@ The code is pretty similar:
  }
 
 The C< meta > method above is a benefit of L<Moose> (actually
-L<Class::MOP>.  Although this example isn't much clearer with Moose
+L<Class::MOP>).  Although this example isn't much clearer with Moose
 than without, for the most part Moose greatly increases the read- and
-write-ability of your code.  see L<Moose::Manual::Cookbook> for many
+write-ability of your code.  see the L<Moose::Cookbook> for many
 examples.
 
 =AUTHORS
