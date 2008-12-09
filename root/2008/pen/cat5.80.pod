@@ -1,0 +1,249 @@
+=head1 Day 9.  Catalyst 5.80
+
+Today's entry is about the upoming Catalyst 5.80 release, also unofficially
+known as C<Catamoose>.
+
+The main aim of the 5.80 release is the porting of the Catalyst core from
+using L<Class::Accessor::Fast> and L<NEXT> to using L<Moose> and L<Class::C3>,
+in a backwards-compatible way.
+
+In this article I hope to explain some of the reasons why this change is being 
+made, show how simple it is to convert code to run 'I<natively>' in 5.80. (i.e. 
+without any of the backwards compatibility being needed, and taking advantage of
+the more modern paradigms offered by the port); what the change will
+enable the framework to do in future, give you some insight into the project 
+progress so far and remaining milestones, and explain what you can do to
+help us achieve 100% backwards compatibility for your applications.
+
+=head1 Motivation
+
+L<NEXT> is awfully slow and hacky, and L<Class::Accessor::Fast> is good at what it
+does, but it doesn't do very much.
+
+L<Class::C3::XS> is fast for perl 5.8, and c3 MRO is included natively in perl 5.10. 
+Moose, despite having a reputation for being slow, generates accessors which are 
+slightly faster than those made by L<Class::Accessor::Fast>, and also gives you
+B<a lot> of useful functionality for extending classes in a flexible way, helps you 
+to refactor, and makes code neater and more re-useable.
+
+Therefore porting Catalyst to use these newer technologies seemed like a logical step
+towards making the framework more flexible, better architected internally, 
+easier to extend for users, and also easier to componentise - as some of the more 
+bleeding-edge Catalyst based projects currently have to work in some inelegant ways
+to do what they want. The challenge to the project was maintaining backwards
+compatibility, so that existing plugin components, and people's existing applications,
+continue to function with the new architecture.
+
+Once this release is stable, there are many ideas for further projects in the
+next development version, all of which have become much easier than they've previously been. 
+Some example projects which have been talked about by various people are:
+
+=over
+
+=item Refactoring the dispatcher (so that pluggable/custom dispatchers can be supported).
+
+=item Splitting the application and request context (allowing configuration and templates
+to be white-labeled, so you can run many differently configured sites on the same codebase).
+
+=item Allowing a full declerative/DSL syntax for application code, rather than relying on
+'just good enough' hacks such as perl's attributes.
+
+=back
+
+The port itself, whilst just a step along the road, opens up many possibilities:
+
+=over
+
+=item Debug mode could contain an application browser which let you drill down into the
+objects in your application and the values of their attributes.
+
+=item Automatic profiling
+
+=item Component introspection for code generation in devel.
+
+FIXME
+
+=back
+
+And these are just ideas off the top of my head. I'm sure that the ever-inventive
+Catalyst community will produce FIXME.
+
+=head3 What has been the project timeline?
+
+=over
+
+=item 10/3 mst branched and initial work started.
+
+=item 14/3 groditi & kenobi start making major changes
+
+=item 23/6 The port has made slow progress, but is coming along nicely. 
+There is a lot of screaming about how the class data / config system works. 
+quote from the revision log: C<config wins, groditi loses. FUCK YOU FOR SUPPORTING THAT STUPID BEHAVIOR>
+ 
+=item 28/7 I started playing and adding tests for bugs I find and fixes in 
+L<MooseX::Emulate::Class::Accessor::Fast>.
+ 
+=item 1/9 Latest 5.70 trunk is merged to the moose branch by mst
+
+=item 4/9 rafl decides the test suite is too slow with the Moose startup cost, 
+makes a branch. 
+
+=item 9/9 The entire moose branch is merged to 5.80 trunk.
+
+=item 9/9 rafl's L<Test::Aggregate> branch is merged to trunk.
+
+=item A month goes by, almost nothing happens :(
+
+=item 16/10 rafl starts making test fixes and small cleanups.
+
+=item 22/11 I start smoke tests against all the current plugins, and working out 
+backwards-compatibility issues.
+
+=item 1/12 rafl completes L<Class::C3::Adopt::NEXT>
+
+=item 5/23 5.8000_04 developer release, with
+
+=back
+
+At this point, most applications work with 5.80, but there is still a list of
+known issues to solve, and some corner-case bugs which cause a number of plugins tests to fail.
+
+Once these issues are solved, the remaining activities are:
+
+=over
+
+=item Look at the performance vs 5.70 and optimise where necessary to bring
+it back to previous levels.
+
+=item Aggressively smoke test all known Catalyst components and applications 
+on CPAN and in subversion repositories, going over the results compared to against 5.70
+to catch remaining backwards compatibility issues.
+
+=back
+
+We hope to have 5.80 released as early as possible in the new year, but at the same time,
+we're not planning to rush, and there is still plenty of things which need fixing, and
+we need to be confident that we've done everything we can to test and ensure backwards
+compatibility.
+
+=head2 Why has it taken so long?
+
+Changing two of the core technologies of a complex framework such as Catalyst, 
+whilst maintaining backwards compatibility is no mean feat.
+
+At least two CPAN distributions (L<MooseX::Emulate::Class::Accessor::Fast> and 
+L<Class::C3::Adopt::NEXT>) have been produced due to this project (with all the 
+tests, documentation and bugfixes that entails).
+
+Also, none of the Catalyst developers are paid for the work that they do, so 
+it gets done at whatever pace people have time - 5.70 is still stable and good 
+enough for most people's needs.
+
+=head2 Is there anything that I could do to help?
+
+Sure there is! If you have a Catalyst application (even if you think it is trivial), 
+please download test out the latest developlent release, or the latest code from Subversion.
+
+The team would B<very much> like to hear about any issues which you may find, and reporting 
+bugs (even if we already found the bug ourselves) will give us greater confidence that 5.80
+works for B<everyone's> Catalyst applications - not just those maintained by people involved
+in the project.
+
+If you're suddenly even more enthusiastic than just helping to test your applications and 
+components, then feel free to drop into #catalyst-dev on irc and we'll be more than happy 
+to suggest additional ways you can help.
+
+=head2 Porting to 5.80
+
+I<Wait a second - I thought you said that 5.80 would be backwards compatible?>
+
+I<Yes> - 5.80 B<is> backwards compatible, so everything should keep working, but 
+there are a number of things you can do to make your components and applications
+take advantage of Catalyst 5.80.
+
+=head2 NEXT
+
+Use of C<NEXT> is now deprecated. Switching to C<Class::C3> will stop L<Class::C3::Adopt::NEXT>
+from moaning at you, and is pretty trivial.
+
+=head3 Using Moose directly in components
+
+Where before, you used plain old perl and L<Class::Accessor::Fast>, you can now switch to
+L<Moose>.
+
+=head2 A simple example
+
+    package MyApp::Model::SomeModel;
+    use strict;
+    use warnings;
+    use base qw/Catalyst::Model::SomeModel/;
+    
+    # Your code
+    
+becomes:
+
+    package MyApp::Model::SomeModel;
+    use Moose;
+    extends 'Catalyst::Model::SomeModel';
+    no Moose;
+    
+    # Your code.
+
+=head2 A more complex cases (e.g. component authors, or overriding functionality in your base class):
+
+    package Catalyst::Model::SomeModel;
+    use strict;
+    use warnings;
+    use base qw/Catalyst::Model/;
+    
+    BEGIN {
+        __PACKAGE__->mk_accessors(qw/ foo bar /);
+    }
+
+    sub redispatch {
+        my ($self, @args) = @_;
+        # Do stuff to @args
+        $self->NEXT::method(@args);
+    }
+    
+    sub modify_method {
+        my $self = shift;
+        # Code before method
+        $self->NEXT::method(@_);
+        # Code after method
+    }
+    
+becomes:
+
+    package Catalyst::Model::SomeModel;
+    use Moose;
+    extends 'Catalyst::Model';
+    has [qw/ foo bar /] => ( is => 'rw' );
+    
+    sub redispatch {
+        my ($self, @args) = @_;
+        # Do stuff to @args
+        $self->next::method(@args);
+    }
+    
+    before 'modify_method' => sub { # Code before method };
+    after 'modify_method' => sub { # Code after method };
+
+=head2 Where can I find out more?
+
+=over
+
+=item L<Moose>
+
+=item L<Class::C3::Adopt::NEXT>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to all the contributors to the 5.80 port for making it happen, 
+and the #moose guys for Moose itself.
+
+=head1 AUTHOR
+
+Tomas Doran (t0m) <bobtfish@bobtfish.net>

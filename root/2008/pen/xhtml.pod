@@ -1,0 +1,52 @@
+=head1 Day 12.  Using XHTML Strict mode during application development.
+
+I have a confession to make, I hate HTML - I hate validating it, 
+I'm very bad at creating well formed markup, and I hate the
+annoying display bugs you find which are due to mis-matched tags.
+
+Therefore the prospect of a way to make my browser refuse to render my
+documents unless they were perfect HTML was very appealing, as it stopped
+me from having to spend time fixing my awful markup at the end of a project,
+as it forces me to do it as I go along.
+
+In this article I'm going to show you my simple CPAN module, L<Catalyst::View::TT:Xhtml>,
+can be used during development to force your browser to strictly interpret Xhtml, but
+easily turned off during production, where, whilst you don't I<expect> to generate 
+invalid markup, should try to gracefully degrade without the browser refusing to render
+the page.
+
+=head1 What does this module do?
+
+The module is a very simple subclass of L<Catalyst::View::TT>, which delegates to
+its parent for templating, and then, if the content type of the response is C<'text/html'>,
+and the client's C<Accept> header includes C<application/xhtml+xml>, changes the
+content type to C<pplication/xhtml+xml>, which causes browsers to turn on a strict,
+xml validating mode.
+
+=head1 How do I use it?
+
+Add the following code to C<MyApp/View/Xhtml.pm>:
+
+    package MyApp::View::Xhtml;
+    use strict;
+    use warnings;
+    use base qw/Catalyst::View::Xhtml MyApp::View::TT/; 
+    
+    1;
+    
+Note that adding your current TT view to B<the right hand side> of the inheritance
+causes the configuration from your normal TT view (assumed to be C<MyApp::View::TT> 
+in the example above) to be inherited, but C<Catalyst::View::Xhtml> needs to be on 
+the left hand side so that its C<process> method gets called first.
+
+Then, assuming that you are using L<Catalyst::Action::RenderView>, you can just
+set the C<default_view> configuration parameter as appropriate to change
+the response headers output as appropriate.
+
+Personally I configure the Xhtml view in C<MyApp.pm>, but I have a commented out entry
+setting it to the original TT view in C<myapp.conf>, which is un-commented
+as my application is deployed.
+
+=head1 AUTHOR
+
+Tomas Doran (t0m) <bobtfish@bobtfish.net>
