@@ -120,10 +120,11 @@ handle that for us, based on the font's <a href="http://en.wikipedia.org/wiki/Va
 <p>
 We've set this TextBox to the Helvetica font family with a size of 45 points and
 a color of black.  We set the text to say hello to whatever name is passed in
-as the first argument.  Finally set the horizontal alignment to "center".
+as the first argument.  The horizontal alignment to "center", since headers look
+pretty that way.
 </p>
 <p>
-Finally we add the TextBox to the container.  Our previously glossed over
+Finally, we add the TextBox to the container.  Our previously glossed over
 <tt>layout_manager</tt> does the work now.  I chose to use the
 <a href="http://search.cpan.org/perldoc?Layout::Manager::Compass">Compass layout manager</a>.
 The <tt>add_component</tt> method takes a second argument that is
@@ -169,7 +170,7 @@ We create a new TextBox that is almost identical to the existing one, but we
 set the font size to something more reasonable.  We also set the horizontal
 alignment to "left".  A careful look will reveal some some padding changes to
 the new TextBox as well as the container.  A bit of padding is added to the top
-of the TextBox to push separate it from the header.  Then 5 units of padding
+of the TextBox to separate it from the header.  Then 5 units of padding
 are added to the entire container so that our text isn't right up against the
 edge of the page.  Adding the component is the same as before.  Since the new
 TextBox was added second, it's drawn below the first.
