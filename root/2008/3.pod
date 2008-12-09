@@ -59,6 +59,7 @@ This creates a <tt>GP </tt> view.  You'll need to decide on a suitable way to fo
 to the appropriate view in your application.  Since this view expects to find
 a Graphics::Primitive object in the <tt>graphics_primitive</tt> key of the
 stash, you might forward to the <tt>GP </tt> view when that key is set.
+</p>
 
 <h2>The Problem</h2>
 
