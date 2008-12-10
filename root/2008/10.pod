@@ -1,0 +1,45 @@
+=head1 Day 10.  Dealing with Config::General's inability to provide single item arrays.
+
+Today's recipe is very quick and simple, but scratches a minor irritation. L<Config::General> (Apache-style) is the default configuration file format, which is great for readability, and the ease with which non-programmers can modify it.  However, it doesn't deal with single item arrays well. That is if you have the following configuration:
+
+ <some_values>
+ want_an_array some data
+ </some_values>
+
+But this wil some out as a scalar:
+
+ print $c->{config}->{some_values}
+
+results in the output C< some data >.
+
+One way of fixing this is to just provide spurious extra keys in the config file:
+
+ <some_values>
+ want_an_array some data
+ want_an_array junk
+ </some_values>
+
+And now you have an array:
+
+ print $c->{config}->{some_values}
+ ARRAY(0x800d80)
+
+=head2 When it absolutely has to be an array and can have a length of 1.
+
+But this is not entireley satisfactory.  Enter L<Moose>:
+
+
+ setup' => sub {
+     use Moose::Autobox;
+     $_[0]->config->{some_values}{want_an_array} = [ $_[0]->config->{some_values}{want_an_array}->flatten ];
+ }
+
+And the problem is fixed!
+
+=head1 ACKNOWLEDGEMENTS
+
+Matt Trout (for the code), Jessie Sheidlower (for getting the code out of matt finally)
+
+=head1 AUTHOR
+
+Kieren Diment <zarquon@cpan.org>

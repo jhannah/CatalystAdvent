@@ -9,7 +9,11 @@ yet, as some of the modules that Catalyst requires don't install
 cleanly under Windows.  On the other hand these failures are generally
 not going to stop a typical Catalyst installation from working,
 although watch out for Windows' eccentricities like signal handling in
-your app.
+your app.  Also, note that BerkelyDB takes some deep voodoo that's
+beyond me to work in Strawberry Perl (as well as administrator access
+to install Sun's msi installer), so avoid modules with these
+dependencies too if you want them to work with Strawberry at this
+stage.
 
 =head2 Step one, find a Windows machine.
 
