@@ -1,6 +1,6 @@
 =head1 Day 9.  Catalyst 5.80
 
-Today's entry is about the upoming Catalyst 5.80 release, also unofficially
+Today's entry is about the upcoming Catalyst 5.80 release, also unofficially
 known as C<Catamoose>.
 
 The main aim of the 5.80 release is the porting of the Catalyst core from
@@ -8,11 +8,11 @@ using L<Class::Accessor::Fast> and L<NEXT> to using L<Moose> and L<Class::C3>,
 in a backwards-compatible way.
 
 In this article I hope to explain some of the reasons why this change is being 
-made, show how simple it is to convert code to run 'I<natively>' in 5.80. (i.e. 
+made, to show how simple it is to convert code to run 'I<natively>' in 5.80. (i.e. 
 without any of the backwards compatibility being needed, and taking advantage of
-the more modern paradigms offered by the port); what the change will
-enable the framework to do in future, give you some insight into the project 
-progress so far and remaining milestones, and explain what you can do to
+the more modern paradigms offered by the port); to show what the change will
+enable the framework to do in future; to give you some insight into the project 
+progress so far and remaining milestones, and to explain what you can do to
 help us achieve 100% backwards compatibility for your applications.
 
 =head1 Motivation
@@ -20,22 +20,22 @@ help us achieve 100% backwards compatibility for your applications.
 L<NEXT> is awfully slow and hacky, and L<Class::Accessor::Fast> is good at what it
 does, but it doesn't do very much.
 
-L<Class::C3::XS> is fast for perl 5.8, and c3 MRO is included natively in perl 5.10. 
+L<Class::C3::XS> is fast for Perl 5.8, and the C3 MRO (Method Resolution Order algorithm) is included natively in Perl 5.10. 
 Moose, despite having a reputation for being slow, generates accessors which are 
 slightly faster than those made by L<Class::Accessor::Fast>, and also gives you
 B<a lot> of useful functionality for extending classes in a flexible way, helps you 
 to refactor, and makes code neater and more re-useable.
 
 Therefore porting Catalyst to use these newer technologies seemed like a logical step
-towards making the framework more flexible, better architected internally, 
-easier to extend for users, and also easier to componentise - as some of the more 
+towards making the framework more flexible, giving it better internal architecture,
+making it easier to extend for users, and also making it easier to componentise - as some of the more 
 bleeding-edge Catalyst based projects currently have to work in some inelegant ways
 to do what they want. The challenge to the project was maintaining backwards
 compatibility, so that existing plugin components, and people's existing applications,
 continue to function with the new architecture.
 
 Once this release is stable, there are many ideas for further projects in the
-next development version, all of which have become much easier than they've previously been. 
+next development version, all of which will become much easier than they've previously been. 
 Some example projects which have been talked about by various people are:
 
 =over
@@ -45,8 +45,8 @@ Some example projects which have been talked about by various people are:
 =item Splitting the application and request context (allowing configuration and templates
 to be white-labeled, so you can run many differently configured sites on the same codebase).
 
-=item Allowing a full declerative/DSL syntax for application code, rather than relying on
-'just good enough' hacks such as perl's attributes.
+=item Allowing a full declarative/DSL syntax for application code, rather than relying on
+'just good enough' hacks such as Perl's attributes.
 
 =back
 
@@ -88,7 +88,7 @@ L<MooseX::Emulate::Class::Accessor::Fast>.
 =item 4/9 rafl decides the test suite is too slow with the Moose startup cost, 
 makes a branch. 
 
-=item 9/9 The entire moose branch is merged to 5.80 trunk.
+=item 9/9 The entire Moose branch is merged to 5.80 trunk.
 
 =item 9/9 rafl's L<Test::Aggregate> branch is merged to trunk.
 
@@ -112,12 +112,12 @@ Once these issues are solved, the remaining activities are:
 
 =over
 
-=item Look at the performance vs 5.70 and optimise where necessary to bring
+=item Look at the performance vs. 5.70 and optimise where necessary to bring
 it back to previous levels.
 
 =item Aggressively smoke test all known Catalyst components and applications 
-on CPAN and in subversion repositories, going over the results compared to against 5.70
-to catch remaining backwards compatibility issues.
+on CPAN and in Subversion repositories, going over the results compared to against 5.70
+to catch remaining backwards-compatibility issues.
 
 =back
 
@@ -129,7 +129,7 @@ compatibility.
 =head2 Why has it taken so long?
 
 Changing two of the core technologies of a complex framework such as Catalyst, 
-whilst maintaining backwards compatibility is no mean feat.
+whilst maintaining backwards compatibility, is no mean feat.
 
 At least two CPAN distributions (L<MooseX::Emulate::Class::Accessor::Fast> and 
 L<Class::C3::Adopt::NEXT>) have been produced due to this project (with all the 
@@ -142,7 +142,7 @@ enough for most people's needs.
 =head2 Is there anything that I could do to help?
 
 Sure there is! If you have a Catalyst application (even if you think it is trivial), 
-please download test out the latest developlent release, or the latest code from Subversion.
+please download and test out the latest development release, or the latest code from Subversion.
 
 The team would B<very much> like to hear about any issues which you may find, and reporting 
 bugs (even if we already found the bug ourselves) will give us greater confidence that 5.80
@@ -168,7 +168,7 @@ from moaning at you, and is pretty trivial.
 
 =head3 Using Moose directly in components
 
-Where before, you used plain old perl and L<Class::Accessor::Fast>, you can now switch to
+Where before, you used plain old Perl and L<Class::Accessor::Fast>, you can now switch to
 L<Moose>.
 
 =head2 A simple example
@@ -189,7 +189,7 @@ becomes:
     
     # Your code.
 
-=head2 A more complex cases (e.g. component authors, or overriding functionality in your base class):
+=head2 A more complex case (e.g. component authors, or overriding functionality in your base class):
 
     package Catalyst::Model::SomeModel;
     use strict;
