@@ -58,8 +58,8 @@ The code is pretty similar:
 
  sub ACCEPT_CONTEXT {
      my ($self, $c ) = @_;
-     $self->meta->clone_object($self, path_to => $c->path_to(''));
-     return $self;
+     my $new = $self->meta->clone_object($self, path_to => $c->path_to(''));
+     return $new;
  }
 
 The C< meta > method above is a benefit of L<Moose> (actually
