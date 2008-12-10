@@ -6,10 +6,10 @@
 Graphics::Primitive is a collection of objects that allow you build a 2d "scene".
 The building block of these scenes is a
 <a href="http://search.cpan.org/perldoc?Graphics::Primitive::Component">Component</a>.
-It has a width and height, colors (fore and back), borders, insets and padding.
+It has a width and height, colors (fore and back), borders, insets, and padding.
 A <a href="http://search.cpan.org/perldoc?Graphics::Primitive::Container">Container</a>
 builds on Component and yields a component that can contain other components.  To allow
-for more than plain ol' boxes Graphics::Primitive provides
+for more than plain ol' boxes, Graphics::Primitive provides
 <a href="http://search.cpan.org/perldoc?Graphics::Primitive::TextBox">TextBox</a>,
 <a href="http://search.cpan.org/perldoc?Graphics::Primitive::Canvas">Canvas</a> and
 <a href="http://search.cpan.org/perldoc?Graphics::Primitive::Image">Image</a>.  While
@@ -51,7 +51,7 @@ stash, you might forward to the <tt>GP </tt> view when that key is set.
 
 <p>
 The first step in our document's life is to instantiate a new Graphics::Primitive object and
-set it's width and height.  We'll use Paper::Specs to find the size for our desired output paper.
+set its width and height.  We'll use Paper::Specs to find the size for our desired output paper.
 </p>
 
 =end pod::xhtml
@@ -88,9 +88,9 @@ us our width and height.  We'll cover <tt>layout_manager</tt> later.
 <h2>Gussying Things Up</h2>
 
 <p>
-Graphics::Primitive is a color agnostic library.  You might've noticed
-the <tt>use</tt> line above that included <a href="http://search.cpan.org/perldoc?Graphics::Color">Graphics::Color</a>.
-Specifically, the RGB library.  To make the PDF interesting, we can
+Graphics::Primitive is a color-agnostic library.  You might've noticed
+the <tt>use</tt> line above that included <a href="http://search.cpan.org/perldoc?Graphics::Color">Graphics::Color</a>,
+specifically, the RGB library.  To make the PDF interesting, we can
 add a <a href="http://search.cpan.org/perldoc?Graphics::Primitive::TextBox">TextBox</a> component.
 </p>
 
@@ -120,7 +120,7 @@ handle that for us, based on the font's <a href="http://en.wikipedia.org/wiki/Va
 <p>
 We've set this TextBox to the Helvetica font family with a size of 45 points and
 a color of black.  We set the text to say hello to whatever name is passed in
-as the first argument.  The horizontal alignment to "center", since headers look
+as the first argument.  The horizontal alignment is set to "center", since headers look
 pretty that way.
 </p>
 <p>
@@ -140,7 +140,7 @@ a PDF that says "Hello $name!"
 <h2>Adding A Body</h2>
 <p>
 We can add as many components into our scene as space allows.  Graphics::Primitive
-doesn't stop you from adding too much, but it will do it's best to squeeze
+doesn't stop you from adding too much, but it will do its best to squeeze
 everything in.  In this case we'll add another textbox to thank our visitor.
 </p>
 
@@ -148,7 +148,7 @@ everything in.  In this case we'll add another textbox to thank our visitor.
 
   my $tb2 = Graphics::Primitive::TextBox->new(
     width => $size[0],
-    text => "Thanks for reading this advent entry!",
+    text => "Thanks for reading this Advent entry!",
     color => Graphics::Color::RGB->new(red => 0, green => 0, blue => 0, alpha => 1),
     font => Graphics::Primitive::Font->new(
       size => 12,
@@ -180,8 +180,8 @@ TextBox was added second, it's drawn below the first.
 
 <p>
 This has been an extremely brief introduction to Graphics::Primitive and how
-you can create sophisicated, dynamic documents using Catalyst.  You can do much
-more, such as creating SVG, PostScript or PNG output.
+you can create sophisticated, dynamic documents using Catalyst.  You can do much
+more, such as creating SVG, PostScript, or PNG output.
 </p>
 <p>
 If you are interested in learning more check out my <a href="http://www.oneforthehustle.com/gp/ppw08.pdf">talk from PPW 2008</a>

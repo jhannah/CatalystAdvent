@@ -4,15 +4,15 @@ Today we'll show you how to avoid spaghetti controllers with
 ACCEPT_CONTEXT.  It's tempting to stuff lots of business logic in your
 Controller, while usually this belongs in your Model.  Although at
 first it seems like more effort to go to the trouble of setting up the
-model correctly, but as your application grows, taking care of design
+model correctly, as your application grows, taking care of design
 like this rapidly pays dividends.
 
 If you need access to a database schema or two in a model, or if you
 need to be able to access C< path_to > or something else that belongs
 in $c, you'll want to use this technique.  First we'll show how to do
-this without L<Moose>, then With L<Moose>.
+this without L<Moose>, then with L<Moose>.
 
-=head2 Without Moose.
+=head2 Without Moose
 
 Here's an example that gives us access to $c->path_to:
 
@@ -41,16 +41,16 @@ Or if we wanted two different database schemas accessible from two different Cat
  }
 
 Now when you have a subroutine in your model, you can access the
-relevant bit of $c with $self->path_to, $self->schema1 or whatever
+relevant bit of $c with C$self->path_to, $self->schema1 or whatever
 you named your accessor.  This avoids polluting your model with the
 bits of the context object that you don't need, makes your code more
-maintainable, and avoids some nasty gotchas that are to do with
+maintainable, and avoids some nasty gotchas that have to do with
 variable scope.
 
 =head2 Doing the same with Moose
 
-Catalyst 5.8 will use L<Moose>, so it makes sense to use the L<Moose>
-meta-object system to handle these issues for you.
+Catalyst 5.8 will use the L<Moose> meta-object system, so it makes sense
+to use L<Moose> to handle these issues for you.
 
 The code is pretty similar:
 
@@ -65,7 +65,7 @@ The code is pretty similar:
 The C< meta > method above is a benefit of L<Moose> (actually
 L<Class::MOP>).  Although this example isn't much clearer with Moose
 than without, for the most part Moose greatly increases the read- and
-write-ability of your code.  see the L<Moose::Cookbook> for many
+write-ability of your code.  See the L<Moose::Cookbook> for many
 examples.
 
 =AUTHORS
