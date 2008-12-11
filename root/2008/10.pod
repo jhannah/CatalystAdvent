@@ -38,10 +38,11 @@ subsequent entries can't be bogus without leading to problems), or if
 need to know the length of the array without cumbersome
 workarounds. Enter L<Moose>:
 
- after 'setup' => sub {
+ sub setup {
      use Moose::Autobox;
      $_[0]->config->{some_values}{want_an_array} = [ $_[0]->config->{some_values}{want_an_array}->flatten ];
- };
+     shift->next::method(@_);
+ }
 
 Place this solution in MyApp.pm (it's just a normal subroutine with
 some Moose style syntax around it), and the problem is fixed!
