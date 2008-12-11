@@ -115,8 +115,8 @@ trunk is merged to the moose branch by mst
 
 =item *
 
-4/9 rafl decides the test suite is too slow with the Moose startup
-cost, makes a branch.
+4/9 rafl decides running the (5.70) test suite is too slow, 
+makes a branch of 5.80 as that is where new development is happening.
 
 =item *
 
@@ -194,7 +194,7 @@ stable and good enough for most people's needs.
 =head2 Is there anything that I could do to help?
 
 Sure there is! If you have a Catalyst application (even if you think
-it is trivial), please download test out the latest developlent
+it is trivial), please download and test out the latest developlent
 release, or the latest code from Subversion.
 
 The team would B<very much> like to hear about any issues which you
@@ -252,20 +252,18 @@ becomes:
     use warnings;
     use base qw/Catalyst::Model/;
     
-    BEGIN {
-        __PACKAGE__->mk_accessors(qw/ foo bar /);
-    }
-
+    __PACKAGE__->mk_accessors(qw/ foo bar /);
+    
     sub redispatch {
         my ($self, @args) = @_;
         # Do stuff to @args
-        $self->NEXT::method(@args);
+        $self->NEXT::redispatch(@args);
     }
     
     sub modify_method {
         my $self = shift;
         # Code before method
-        $self->NEXT::method(@_);
+        $self->NEXT::redispatch(@_);
         # Code after method
     }
     
@@ -275,12 +273,6 @@ becomes:
     use Moose;
     extends 'Catalyst::Model';
     has [qw/ foo bar /] => ( is => 'rw' );
-    
-    sub redispatch {
-        my ($self, @args) = @_;
-        # Do stuff to @args
-        $self->next::method(@args);
-    }
     
     before 'modify_method' => sub { # Code before method };
     after 'modify_method' => sub { # Code after method };
