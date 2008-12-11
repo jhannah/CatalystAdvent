@@ -36,11 +36,12 @@ using a plugin that requires an arrayref even with only one item (and it
 can't be bogus without leading to problems), or if need to know the
 length of the array without cumbersome workarounds. Enter L<Moose>:
 
-
- setup => sub {
+ use Moose;
+ after 'setup' => sub {
      use Moose::Autobox;
      $_[0]->config->{some_values}{want_an_array} = [ $_[0]->config->{some_values}{want_an_array}->flatten ];
- }
+ };
+ no Moose;
 
 Place this solution in MyApp.pm and the problem is fixed!
 
