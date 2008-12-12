@@ -1,0 +1,196 @@
+=head1 Making Catalyst Sites Shine with Varnish
+
+If you have ever deployed a web application, you know the holding-your-breath
+feeling you get as you first route live traffic to your app. You also know
+that moment just before, where your finger hovers over the enter key ever so
+slightly as you wonder if the way you built it is going to hold up under real
+life traffic.
+
+There are many things you can do to prepare your app for traffic. There are
+likewise many approaches you can take toward optimizing your application.
+Unfortunately, the one method that has the potential to make the most impact
+is often the last thing considered, if it's considered at all.
+
+What is this method? B<Front-end caching>. When wisely applied, front-end
+caching can turn a site that crumbles under load into a site that sails
+through traffic spikes with nary a whimper. L<Last
+year|http://www.catalystframework.org/calendar/2007/11>, I covered a method
+for integrating cache control into your application. This year, I'm going to
+introduce you to my choice for actually handling the caching,
+L<Varnish|http://varnish-cache.org>.
+
+In this article, I will show you how to configure and use Varnish on your
+site. I will also provide and walk you through a basic varnish config that you
+can use out of the box on your site.
+
+=head2 What is Varnish?
+
+For many years the old standby for caching was
+L<Squid|http://www.squid-cache.org/>, a caching proxy server that with the
+right magic could be turned into a fairly functional http accelerator. While
+squid performed quite well for those willing to do the work to configure it
+properly, at it's heart it's still a forward proxy and it could be somewhat
+difficult to get it to do exactly what you wanted it to.
+
+=head3 Enter Varnish
+
+Varnish is a relative newcomer to the caching scene, having it's 1.0 release
+in 2006. Unlike Squid, Varnish is designed from the ground up to be an http
+accelerator, a caching reverse proxy. It is designed specifically to solve the
+problem we face as web-application developers, namely how to improve
+performance on a site or application that has many moving parts and
+performance dependencies (databases, etc.)
+
+There are many benefits to using Varnish, and while I don't want to start a
+laundry list, I will cover the two that I find to be most interesting. First,
+it has an I<extremely> flexible config language that makes it possible to
+control nearly every aspect of how web requests are processed and how your app
+is cached. Second, it supports ESI, or Edge Side Includes.
+
+Edge side includes allow you to break your pages into smaller pieces, and
+cache those pieces independently. ESI is a complicated topic, which I will
+cover in another article. Today, we are going to focus on getting Varnish up
+and running.
+
+=head3 Getting Varnish up and running
+
+As of this writing, the current Varnish release is 2.0.2. While there are
+Varnish binary packages available for many *nix distributions, before
+installing them, please ensure that they provide the 2.0.2 release. If they do
+not, I suggest strongly that you compile your own. The 2.0.2 release includes
+several improvements and fixes that you want to have. This article (and the
+next) assumes you are using the 2.0.2 version.
+
+I will not cover the download and installation process, as that is very well
+covered on the L<Varnish
+Wiki|http://varnish.projects.linpro.no/wiki/Installation>. We will begin at
+the most important part, configuring varnish. Go ahead and get Varnish
+installed... I'll wait.
+
+=head2 Configuring Varnish
+
+Welcome back. Let's get to configuring Varnish. As I mentioned before, Varnish
+is specifically designed to solve the problem we have, and as such, comes with
+a default configuration built in that can be used 'out of the box' to get http
+acceleration running. To use Varnish in it's basic config, you simply have to
+start it up (don't do this just yet):
+
+ varnishd -a :80 -b localhost:8080 -T localhost:6082
+
+This will start varnish listening on port 80, and forwarding traffic to a web
+server listening on localhost port 8080. It also turns on the management
+interface on port 6082.
+
+I can hear you thinking 'Ok... If it's that easy, why don't we just use the
+default configuration?' The answer is somewhat complicated, but the short
+version is that the Varnish developers know the problem we are dealing with
+and know what the correct behavior is in the majority of cases. In the
+majority of cases, though, the application Varnish is talking to is not
+designed to work with a cache, and believes it is talking to a web browser. As
+such, Varnish rightly behaves very conservatively about what it can cache and
+what it can't.
+
+Since our application understands that it's talking to a cache, we can let
+Varnish do a bit more for us. You I<did> read L<last year's
+article|http://www.catalystframework.org/calendar/2007/11>, right? If not, you
+should. Even if you haven't, though, you are ok because our configuration is
+going to be a _little_ more lax than Varnish's default, but not too much.
+
+=head3 The Varnish Configuration Language
+
+As you already saw, Varnish can receive it's most critical information as
+command line arguments. However, if you want to really harness the power of
+Varnish, you need to provide it a more advanced configuration in the form of a
+VCL file.
+
+A VCL file tells Varnish exactly how to handle each phase of request
+processing. VCL is very powerful and allows for evaluation and modification of
+nearly every aspect of a HTTP request and response. It allows you to examine
+headers, do regular expresion comparisons and substitutions, and generally
+muck with incoming web requests on the fly. It provides a robust programming
+language that will be somewhat familiar to anyone who has programmed in Perl
+or C.
+
+While the Varnish Configuration Language is quite robust, it does have it's
+limitations. If you happen to find yourself in the quite rare situation where
+you are running into those limitations, VCL allows you to do something almost
+unheard of... It let's you drop into C to perform your task. While we won't
+use this functionality in this article, it does give you a hint about just how
+powerful the Varnish cache really is.
+
+=head3 How VCL works
+
+Your VCL file is more than just a config file. Your Varnish config is in fact
+a mini program, a program that is actually compiled and linked in to Varnish
+at runtime. There are several steps to how Varnish handles each request and in
+your VCL file you have the option to customize the behavior of each one.
+
+There are actually 10 subroutines that control how Varnish behaves, and that
+you can change in your Varnish config. They are:
+
+=over
+
+=item vcl_recv()
+
+Called after a request is received but before it is processed.
+
+=item vcl_pipe()
+
+Called when a request must be forwarded directly to the backend with minimal
+handling by Varnish (think HTTPS CONNECT)
+
+=item vcl_hash()
+
+Called to determine the hash key used to look up a request in the cache.
+
+=item vcl_hit()
+
+Called when the object requested has been found in the cache.
+
+=item vcl_miss()
+
+Called after a cache lookup when the object requested was not found in the
+cache.
+
+=item vcl_pass()
+
+Called when the request is to be passed to the backend and the response should
+not be cached.
+
+=item vcl_fetch()
+
+Called when the request has been sent to the backend and a response has been
+received from the backend.
+
+=item vcl_deliver()
+
+Called before a cached object is sent to the requesting client.
+
+=item vcl_timeout()
+
+Called when an object in the cache is about to expire.
+
+=item vcl_discard()
+
+Called when a cached object is about to be removed from the cache due to
+expiration or lack of space.
+
+=back
+
+That seems like a lot, but as I mentioned before Varnish has pretty reasonable
+defaults, so you only need to override a few of these.
+
+Strictly speaking, Varnish doesn't actually let you replace it's defaults.
+Your definitions of the above routines simply run I<before> the builtin
+versions of those same routines. Fortunately, we can prevent varnish from
+proceeding on to the builtin version by returning the appropriate value within
+our version of the routine. If that seems confusing, don't worry. It will
+become clear when we start looking at our config.
+
+The routines we are most interested in are B<vcl_recv>, which handles the
+incoming request from the browser, and B<vcl_fetch>, which in essense decides
+whether the object just retrieved should go into the cache.
+
+=head3 Our configuration
+
+Our configuration is
