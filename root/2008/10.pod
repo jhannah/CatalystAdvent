@@ -35,7 +35,7 @@ And now you have an array:
 Unfortunately this is not entirely satisfactory, as sometimes you're
 using a plugin that requires an arrayref even with only one item (and
 subsequent entries can't be bogus without leading to problems), or if
-need to know the length of the array without cumbersome
+you need to know the length of the array without cumbersome
 workarounds. Enter L<Moose>:
 
  sub setup {

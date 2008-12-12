@@ -46,9 +46,9 @@ So doing it from MyApp.pm is maybe a bit cleaner -
   );
 
 although this is still quite verbose, of course. Generally, this
-approach is only ever used to allow URL localisations - for example if
+approach is only ever used to allow URL localisations. For example, if
 you sell a white label app to a foreign client you can change the URL
-parts to their language; I'm aware of people having done this in
+parts to their language. I'm aware of people having done this in
 production.
 
 Of course, the other thing you can do is to use this to make reusable
@@ -125,7 +125,7 @@ on MyApp::Controller::Name.
 
 Of course, I still think that Catalyst's self-contained controller approach
 is better, but if you really want routes, please consider the code above as
-under the same license as perl and send CatalystX::Routes to the CPAN :)
+under the same license as Perl and send CatalystX::Routes to the CPAN :)
 
 -- mst
 
