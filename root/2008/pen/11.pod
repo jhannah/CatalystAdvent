@@ -1,23 +1,26 @@
 =head1 Doing rails-style routes with Catalyst
 
-People often ask about using rails-style routes, and why Catalyst doesn't
-"support" them. Well, actually, it does - through the magic of config.
+People often ask about using rails-style routes, and why Catalyst
+doesn't "support" them. Well, actually, it does - through the magic of
+config.
 
 =head1 Routes via the config file
 
-The key is this: action attributes are actually just defaults - when you do
+The key is this: action attributes are actually just defaults - when
+you do
 
   sub foo :Local {
 
-that makes the default attribute hash for foo { Local => [ '' ] }. Well,
-it doesn't, because Local is parsed - what you actually get for
+that makes the default attribute hash for foo C< { Local => [ '' ]
+} >. Well, it doesn't, because Local is parsed - what you actually get
+for
 
   package MyApp::Controller::Name;
 
   sub foo :Local {
 
-is { Path => [ 'name/foo' ] }. Now, this can be overriden from the config
-file by doing something like:
+is C< {  Path => [ 'name/foo' ]  } >. Now, this can  be overriden from
+the config file by doing something like:
 
   <Controller Name>
     <action foo>
@@ -42,10 +45,11 @@ So doing it from MyApp.pm is maybe a bit cleaner -
     }
   );
 
-alhtough this is still quite verbose, of course. Generally, this approach is
-only ever used to allow URL localisations - for example if you sell a white
-label app to a foreign client you can change the URL parts to their language;
-I'm aware of people having done this in production.
+although this is still quite verbose, of course. Generally, this
+approach is only ever used to allow URL localisations - for example if
+you sell a white label app to a foreign client you can change the URL
+parts to their language; I'm aware of people having done this in
+production.
 
 Of course, the other thing you can do is to use this to make reusable
 controllers -
@@ -82,10 +86,11 @@ and now Thingies->list will be chained off Thingies->load_thingies.
 
 =head1 Syntactic sugar
 
-But we were talking about routes, weren't we? Though I would observe that
-controllers' self-contained-ness is what makes this sort of subclass-to-reuse
-stuff possible; the rails guys say "re-use in the large is overrated", we
-say "well, actually, it's bloody hard, but if you're careful ...". Anyway.
+But we were talking about routes, weren't we? Though I would observe
+that controllers' self-contained-ness is what makes this sort of
+subclass-to-reuse stuff possible; the rails guys say "re-use in the
+large is overrated", we say "well, actually, it's bloody hard, but if
+you're careful ...". Anyway.
 
 Let's see if we can't make routes a bit prettier.
 
@@ -115,10 +120,8 @@ Let's see if we can't make routes a bit prettier.
   };
 
 and the end result will be (provided we've marked foo as an action via
-
-  sub foo :Action {
-
-) that /some/path will dispatch to that method on MyApp::Controller::Name.
+C< sub foo :Action { > ) that /some/path will dispatch to that method
+on MyApp::Controller::Name.
 
 Of course, I still think that Catalyst's self-contained controller approach
 is better, but if you really want routes, please consider the code above as
