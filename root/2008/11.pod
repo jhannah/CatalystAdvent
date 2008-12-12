@@ -1,6 +1,6 @@
-=head1 Doing rails-style routes with Catalyst
+=head1 Doing Rails-style routes with Catalyst
 
-People often ask about using rails-style routes, and why Catalyst
+People often ask about using Rails-style routes, and why Catalyst
 doesn't "support" them. Well, actually, it does - through the magic of
 config.
 
@@ -11,13 +11,13 @@ you do
 
   sub foo :Local {
 
-that makes the default attribute hash for foo C< { Local => [ '' ]
-} >. Well, it doesn't, because Local is parsed - what you actually get
-for
+that makes the default attribute hash for foo C< { Local => [ '' ] }
+>. Well, it doesn't, because when Local is parsed - what you actually
+get for the following:
 
   package MyApp::Controller::Name;
 
-  sub foo :Local {
+  sub foo :Local { # ...
 
 is C< {  Path => [ 'name/foo' ]  } >. Now, this can  be overriden from
 the config file by doing something like:
@@ -88,7 +88,7 @@ and now Thingies->list will be chained off Thingies->load_thingies.
 
 But we were talking about routes, weren't we? Though I would observe
 that controllers' self-contained-ness is what makes this sort of
-subclass-to-reuse stuff possible; the rails guys say "re-use in the
+subclass-to-reuse stuff possible; the Rails guys say "re-use in the
 large is overrated", we say "well, actually, it's bloody hard, but if
 you're careful ...". Anyway.
 
