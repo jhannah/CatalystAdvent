@@ -1,6 +1,6 @@
 =head1 Day 13.  Using XHTML Strict mode during application development.
 
-I have a confession to make, I hate HTML -  I'm very bad at creating 
+I have a confession to make:I hate HTML. I'm very bad at creating 
 well formed markup, I hate validating it, and I really hate the
 annoying display bugs you find which are due to mis-matched tags.
 
@@ -53,8 +53,8 @@ can just set the C<default_view> configuration parameter as
 appropriate to change the View.
 
 Personally I configure the XHTML view in C<MyApp.pm>, but I have a 
-commented out entry setting it to the original TT view in 
-C<myapp.conf>, which is un-commented as my application is deployed.
+commented-out entry setting it to the original TT view in 
+C<myapp.conf>, which I un-comment when my application is deployed.
 
 =head1 That is kinda neat, but your module is only, 5 lines of code..
 
