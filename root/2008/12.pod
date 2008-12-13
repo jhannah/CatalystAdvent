@@ -6,7 +6,7 @@ practices for URL construction. The Chained feature can make URLs fun
 should they look like to the user?
 
 RESTful CRUD URLs are an increasingly common (and therefore
-contentious) practice. What's the proper way to create, read, update
+contentious) practice. What's the proper way to create, read, update,
 and delete your precious data?
 
 L<CatalystX::CRUD> offers two different URL styles out-of-the-box.
@@ -34,7 +34,7 @@ The L<CatalystX::CRUD::REST> Controller offers an RPC-compat config
 option as well, so that either style works.
 
 But the special reserved method names in the Controllers mean that
-you can't have a user named C<search>, C<create> or C<list>. And that
+you can't have a user named C<search>, C<create>, or C<list>. And that
 seems to rankle some folks, who would prefer a URL convention like:
 
  /user/id/joe        # GET joe
