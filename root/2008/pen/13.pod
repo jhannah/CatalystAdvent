@@ -1,30 +1,32 @@
-=head1 Day 12.  Using XHTML Strict mode during application development.
+=head1 Day 13.  Using XHTML Strict mode during application development.
 
-I have a confession to make, I hate HTML - I hate validating it, I'm
-very bad at creating well formed markup, and I hate the annoying
-display bugs you find which are due to mis-matched tags.
+I have a confession to make, I hate HTML -  I'm very bad at creating 
+well formed markup, I hate validating it, and I really hate the
+annoying display bugs you find which are due to mis-matched tags.
 
-Therefore the prospect of a way to make my browser refuse to render my
-documents unless they were perfect HTML was very appealing, as it
-stopped me from having to spend time fixing my awful markup at the end
-of a project, as it forces me to do it as I go along.
+Therefore a way to make my browser refuse to render my documents unless 
+they were perfect HTML was very appealing, as it stops
+me from having to spend time fixing my awful markup at the end of a 
+project, as it forces me to do it as I go along.
 
-In this article I'm going to show you a simple CPAN module,
-L<Catalyst::View::TT::XHTML>, which can be used during development to
-force your browser to strictly interpret xhtml.
+In this article I'm going to show you a simple CPAN module, 
+L<Catalyst::View::TT::XHTML>, which can be used during development to 
+force your browser to strictly interpret XHTML.
 
-I'm the paranoid sort, so I don't use this module in production as,
-whilst I don't I<expect> to generate invalid markup, I'd rather a
-client browser tried to render the page than it failed.
+I'm the paranoid sort, so I don't use this module in production, as, 
+whilst I don't I<expect> to generate invalid markup, I'd rather a 
+client browser tried to render the page than it failed when not in 
+development.
 
 =head1 What does this module do?
 
-The module is a very simple subclass of L<Catalyst::View::TT>, which
-delegates to its parent for templating, and then, if the content type
-of the response is C<'text/html'>, and the client's C<Accept> header
-includes C<application/xhtml+xml>, changes the content type to
-C<pplication/xhtml+xml>, which causes browsers to turn on a strict,
-xml validating mode.
+The module is a very simple subclass of L<Catalyst::View::TT>, which 
+delegates to its parent for templating, and then, if the content type 
+of the response is C<text/html>, performs C<RFC2616> Content 
+Negotiation with a strong preference for the C<application/xhtml+xml>
+Content Type. If the client's C<Accept> header supports this, it 
+changes the content type to C<application/xhtml+xml>, which causes 
+browsers to turn on a strict, xml validating mode.
 
 =head1 How do I use it?
 
@@ -43,29 +45,35 @@ to be C<MyApp::View::TT> in the example above) to be inherited, but
 C<Catalyst::View::XHTML> needs to be on the left hand side so that its
 C<process> method gets called first.
 
-Then, assuming that you are using L<Catalyst::Action::RenderView>, you
-can just set the C<default_view> configuration parameter as
-appropriate to change the response headers output as appropriate.
+Then, assuming that you are using L<Catalyst::Action::RenderView>, you 
+can just set the C<default_view> configuration parameter as 
+appropriate to change the View.
 
-Personally I configure the Xhtml view in C<MyApp.pm>, but I have a
-commented out entry setting it to the original TT view in
+Personally I configure the XHTML view in C<MyApp.pm>, but I have a 
+commented out entry setting it to the original TT view in 
 C<myapp.conf>, which is un-commented as my application is deployed.
 
 =head1 That is kinda neat, but your module is only, 5 lines of code..
 
 Yes, it is.
 
-And I had the same 5 lines of code in every application I'd ever
-written, with a conditional on the C<$c->debug> setting, quite often
-without the relevant C<Accept> header checking. Using this module
-means you end up with 5 lines in a different view, but there is B<no
-logic to get wrong>, and it's much easier to be flexible about when
-you turn the functionality on and off.
+And I had the same 5 lines of code in every application I'd ever 
+written, with a conditional on the C<$c->debug> setting, quite 
+often without the relevant C<Accept> header checking. 
+
+Shortly after uploading this awful hack to CPAN, lots of people 
+pointed out how much it sucked, sent me failing tests, and made 
+suggestions, so the implementation is now much better than what 
+I was using previously. 
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::View::TT>, L<Catalyst::Action::RenderView>.
+L<Catalyst>, L<Catalyst::View::TT>, L<Catalyst::Action::RenderView>, 
+L<http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html>,
+L<http://www.w3.org/TR/xhtml-media-types/>.
 
 =head1 AUTHOR
 
 Tomas Doran (t0m) <bobtfish@bobtfish.net>
+>
+
