@@ -1,4 +1,4 @@
-=head1 Day 9.  Catalyst 5.80
+=head1 Day X.  Catalyst 5.80
 
 Today's entry is about the upoming Catalyst 5.80 release, also
 unofficially known as C<Catamoose>.
@@ -9,7 +9,7 @@ L<Class::C3>, in a backwards-compatible way.
 
 In this article I hope to explain some of the reasons why this change
 is being made, show how simple it is to convert code to run
-'I<natively>' in 5.80. (i.e.  without any of the backwards
+'I<natively>' in 5.80. (i.e. without any of the backwards
 compatibility being needed, and taking advantage of the more modern
 paradigms offered by the port); what the change will enable the
 framework to do in future, give you some insight into the project
@@ -77,6 +77,8 @@ attributes.
 
 Automatic profiling
 
+FIXME
+
 =item *
 
 Component introspection for code generation in devel.
@@ -110,8 +112,11 @@ loses. FUCK YOU FOR SUPPORTING THAT STUPID BEHAVIOR>
 =item *
 
 28/7 I started playing and adding tests for bugs I find and fixes in
-L<MooseX::Emulate::Class::Accessor::Fast>.  =item 1/9 Latest 5.70
-trunk is merged to the moose branch by mst
+L<MooseX::Emulate::Class::Accessor::Fast>.  
+
+=item *
+
+1/9 Latest 5.70 trunk is merged to the moose branch by mst.
 
 =item *
 
@@ -145,7 +150,7 @@ out backwards-compatibility issues.
 
 =item *
 
-5/23 5.8000_04 developer release, with STUFF TO ADD
+5/23 5.8000_04 developer release, with STUFF TO ADD FIXME
 
 =back
 
@@ -217,17 +222,27 @@ I<Yes> - 5.80 B<is> backwards compatible, so everything should keep
 working, but there are a number of things you can do to make your
 components and applications take advantage of Catalyst 5.80.
 
-=head2 NEXT
+=head3 NEXT
 
 Use of C<NEXT> is now deprecated. Switching to C<Class::C3> will stop
 L<Class::C3::Adopt::NEXT> from moaning at you, and is pretty trivial.
 
+There are documentation and examples of switching to C<Class::C3> in
+the C<Class::C3::Adopt::NEXT> distribution.. FIXME
+
 =head3 Using Moose directly in components
 
 Where before, you used plain old perl and L<Class::Accessor::Fast>,
-you can now switch to L<Moose>.
+you can now switch to L<Moose>. 
 
-=head2 A simple example
+Don't worry if this scares you for any reason, whilst C<NEXT> 
+is actively deprecated, just usingC <Class::C3> and normal perl OO 
+(as above) is still supported and perfectly acceptable, we just
+prefer the declearative and compositional nature of method 
+modifiers and the Moose sugar for many tasks, but what you use 
+in your components is up to you..
+
+=head3 A simple example
 
     package MyApp::Model::SomeModel;
     use strict;
@@ -245,22 +260,25 @@ becomes:
     
     # Your code.
 
-=head2 A more complex case (e.g. component authors, or overriding functionality in your base class):
+=head3 A more complex case (e.g. component authors, or overriding functionality in your base class):
 
-    package Catalyst::Model::SomeModel;
+    package Catalyst::Model::SomeModel::SubClass;
     use strict;
     use warnings;
-    use base qw/Catalyst::Model/;
+    use base qw/Catalyst::Model::SomeModel/;
     
     __PACKAGE__->mk_accessors(qw/ foo bar /);
-    
-    sub redispatch {
+
+    # In this case, we change the parameters and then call the original method.
+    sub baz {
         my ($self, @args) = @_;
         # Do stuff to @args
         $self->NEXT::redispatch(@args);
     }
     
-    sub modify_method {
+    # In this case, we do something before and after running a method 
+    # (e.g. add to $c->stats), but don't change the method args at all.
+    sub quux {
         my $self = shift;
         # Code before method
         $self->NEXT::redispatch(@_);
@@ -269,28 +287,67 @@ becomes:
     
 becomes:
 
-    package Catalyst::Model::SomeModel;
+    package Catalyst::Model::SomeModel::SubClass;
     use Moose;
-    extends 'Catalyst::Model';
+    extends 'Catalyst::Model::SomeModel';
     has [qw/ foo bar /] => ( is => 'rw' );
     
-    before 'modify_method' => sub { # Code before method };
-    after 'modify_method' => sub { # Code after method };
+    around 'baz' {
+        my ($orig, $self, @args) = @_;
+        # Do stuff to @args
+        $self->$orig(@args);
+    };
+    
+    before 'quux' => sub { # Code before method };
+    after  'quux' => sub { # Code after method  };
+    no Moose;
+
+=head3 A note about controllers
+
+Due to the use of method attributes (e.g. C<sub login :Local {}>) in Controllers,
+currently you must either stick with C<use base> or C<use parent>, or use the 
+Moose C<extends> keyword in a BEGIN block.
+
+We know that this is slightly inconvient, but its a side-effect of the compile-time
+nature of perl's attributes. In the long term, the plan is to deprecate the
+attribute based syntax for controllers, switching instead to a domain specific language
+(i.e. Moosee like sugar), and/or use Devel::Declare to provide new keywords.
+
+Current controller declerations will stay supported, but will become deprecated
+once a flexible syntax emerges. The exact nature of what we're planning to do
+is in no way decided yet, however the main aim of any refactor would be to enable 
+different, pluggable syntaxes for controller/component declerations - so that 
+several different syntaxes can co-exist in the same application, allowing people
+to chose something appropriate for their application, with the 'fittest' / most used
+candidate becoming the default..
 
 =head2 Where can I find out more?
 
 =over
 
-=item L<Moose>
+=item The TODO list for Catalyst 5.80 (L<http://dev.catalyst.perl.org/repos/Catalyst/Catalyst-Runtime/5.80/trunk/TODO>)
+
+=item C<#catalyst> or C<#catalyst-dev> on irc.perl.org
+
+=item The Catalyst mailing list C<FIXME>
+
+=item L<MooseX::Emulate::Class::Accessor::Fast>
 
 =item L<Class::C3::Adopt::NEXT>
+
+=item L<Moose>
+
+=item L<Class::C3>
+
+=item #moose on irc.perl.org (for general Moose questions not related to Catalyst 5.80)
 
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
 Thanks to all the contributors to the 5.80 port for making it happen,
-and the #moose guys for Moose itself.
+and the #moose guys for Moose itself. Thanks to everyone who checked
+this article, pointed out mistakes and made suggestions.
 
 =head1 AUTHOR
 

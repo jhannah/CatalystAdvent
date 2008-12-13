@@ -9,11 +9,12 @@ documents unless they were perfect HTML was very appealing, as it stopped
 me from having to spend time fixing my awful markup at the end of a project,
 as it forces me to do it as I go along.
 
-In this article I'm going to show you my simple CPAN module, L<Catalyst::View::TT:Xhtml>,
-can be used during development to force your browser to strictly interpret Xhtml, but
-easily turned off during production, where, whilst you don't I<expect> to generate 
-invalid markup, should try to gracefully degrade without the browser refusing to render
-the page.
+In this article I'm going to show you a simple CPAN module, L<Catalyst::View::TT::XHTML>,
+which can be used during development to force your browser to strictly interpret xhtml.
+
+I'm the paranoid sort, so I don't use this module in production as, whilst I don't 
+I<expect> to generate invalid markup, I'd rather a client browser tried to render the page
+than it failed.
 
 =head1 What does this module do?
 
@@ -25,18 +26,18 @@ xml validating mode.
 
 =head1 How do I use it?
 
-Add the following code to C<MyApp/View/Xhtml.pm>:
+Add the following code to C<MyApp/View/XHTML.pm>:
 
-    package MyApp::View::Xhtml;
+    package MyApp::View::XHTML;
     use strict;
     use warnings;
-    use base qw/Catalyst::View::Xhtml MyApp::View::TT/; 
+    use base qw/Catalyst::View::XHTML MyApp::View::TT/; 
     
     1;
     
 Note that adding your current TT view to B<the right hand side> of the inheritance
 causes the configuration from your normal TT view (assumed to be C<MyApp::View::TT> 
-in the example above) to be inherited, but C<Catalyst::View::Xhtml> needs to be on 
+in the example above) to be inherited, but C<Catalyst::View::XHTML> needs to be on 
 the left hand side so that its C<process> method gets called first.
 
 Then, assuming that you are using L<Catalyst::Action::RenderView>, you can just
@@ -46,6 +47,21 @@ the response headers output as appropriate.
 Personally I configure the Xhtml view in C<MyApp.pm>, but I have a commented out entry
 setting it to the original TT view in C<myapp.conf>, which is un-commented
 as my application is deployed.
+
+=head1 That is kinda neat, but your module is like, 5 lines of code..
+
+Yes, it is. 
+
+And I had the same 5 lines of code in every application I'd ever written,
+with a conditional on the C<$c->debug> setting, quite often without the 
+relevant C<Accept> header checking. Using this module means you end up 
+with 5 lines in a different view, but there is B<no logic to get wrong>, 
+and it's much easier to be flexible about when you turn the functionality 
+on and off.
+
+=head1 SEE ALSO
+
+L<Catalyst>, L<Catalyst::View::TT>, L<Catalyst::Action::RenderView>.
 
 =head1 AUTHOR
 
