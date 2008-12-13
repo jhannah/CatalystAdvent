@@ -68,12 +68,20 @@ I was using previously.
 
 =head1 SEE ALSO
 
-L<Catalyst>, L<Catalyst::View::TT>, L<Catalyst::Action::RenderView>, 
-L<http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html>,
-L<http://www.w3.org/TR/xhtml-media-types/>.
+=over
+
+=item L<Catalyst>
+
+=item L<Catalyst::View::TT>
+
+=item L<Catalyst::Action::RenderView>
+
+=item L<HTTP::Negotiate>
+
+=item L<http://www.w3.org/Protocols/rfc2616/rfc2616-sec12.html>
+
+=item L<http://www.w3.org/TR/xhtml-media-types/>
 
 =head1 AUTHOR
 
 Tomas Doran (t0m) <bobtfish@bobtfish.net>
->
-
