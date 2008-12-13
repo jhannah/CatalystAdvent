@@ -26,7 +26,10 @@ of the response is C<text/html>, performs C<RFC2616> Content
 Negotiation with a strong preference for the C<application/xhtml+xml>
 Content Type. If the client's C<Accept> header supports this, it 
 changes the content type to C<application/xhtml+xml>, which causes 
-browsers to turn on a strict, xml validating mode.
+browsers to turn on strict mode, ensuring that your XHTML is well formed.
+
+This doesn't completely remove the need to validate your markup, but
+it does go a long way.
 
 =head1 How do I use it?
 
