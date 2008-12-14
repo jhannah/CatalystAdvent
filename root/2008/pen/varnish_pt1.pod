@@ -340,7 +340,7 @@ send it right through to the backend.
      pass;
  }
 
-And our last check. If the client is providing an Authorization header, that
+And our last check. If the client is providing an Authorization header that
 indicates some sort of access control is in place and we want to pass it
 directly through to the backend. Chances are, if an Authorization header is
 being provided, the data coming back is going to be tailored to the user in
@@ -463,9 +463,9 @@ And here is perhaps the most important rule in our cache control policy and
 where we depart significantly from Varnish's default behavior. This looks at
 the Cache-Control header in the response object to see whether the string
 'max-age' appears within it. If it does, then it clears out any cookie related
-headers on the request and response and places the response object in the
-cache. If it doesn't, we tell Varnish not to cache it, no matter what it
-thinks about the response's cacheability.
+headers and places the response object in the cache. If it doesn't, we tell
+Varnish not to cache it, no matter what it thinks about the response's
+cacheability.
 
 As we touched on before, anything containing any cookie related headers is
 immediately deemed uncacheable by Varnish by default. Varnish's behavior is
@@ -474,7 +474,7 @@ saying 'Trust the backend server, if it says it's cacheable, cache it.' Since
 we are running the backend server and in an app like Catalyst we have complete
 and reliable control over the headers provided, this is relatively safe to do.
 
-By default, varnish also interprets the Expires header to determine
+By default, Varnish also interprets the Expires header to determine
 cacheability. We eschew Varnish's logic here and say 'if we didn't set max-age
 on the web-server, then you are not to cache it.' This gives us one clear
 method for controlling the cacheability of data in our application... and
