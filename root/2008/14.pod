@@ -28,7 +28,7 @@ can use out of the box on your site.
 For many years the old standby for caching was
 L<Squid|http://www.squid-cache.org/>, a caching proxy server that with the
 right magic could be turned into a fairly functional http accelerator. While
-squid performed quite well for those willing to do the work to configure it
+Squid performed quite well for those willing to do the work to configure it
 properly, at its heart it's still a forward proxy and it could be somewhat
 difficult to get it to do exactly what you wanted it to.
 
@@ -39,13 +39,14 @@ in 2006. Unlike Squid, Varnish is designed from the ground up to be an http
 accelerator, a caching reverse proxy. It is designed specifically to solve the
 problem we face as web-application developers, namely how to improve
 performance on a site or application that has many moving parts and
-performance dependencies (databases, etc.)
+performance dependencies (databases, etc.).
 
 There are many benefits to using Varnish, and while I don't want to start a
 laundry list, I will cover the two that I find to be most interesting. First,
 it has an I<extremely> flexible config language that makes it possible to
 control nearly every aspect of how web requests are processed and how your app
-is cached. Second, it supports ESI, or Edge Side Includes.
+is cached. Second, it supports ESI, or Edge Side Includes, a small XML-based
+markup language for dynamically assembling web content.
 
 Edge side includes allow you to break your pages into smaller pieces, and
 cache those pieces independently. ESI is a complicated topic, which I will
@@ -71,7 +72,7 @@ installed... I'll wait.
 
 Welcome back. Let's get to configuring Varnish. As I mentioned before, Varnish
 is specifically designed to solve the problem we have, and as such, comes with
-a default configuration built in that can be used 'out of the box' to get http
+a default configuration built in that can be used out of the box to get http
 acceleration running. To use Varnish in its basic config, you simply have to
 start it up (don't do this just yet):
 
@@ -93,7 +94,7 @@ what it can't.
 Since our application understands that it's talking to a cache, we can let
 Varnish do a bit more for us. You I<did> read L<last year's
 article|http://www.catalystframework.org/calendar/2007/11>, right? If not, you
-should. Even if you haven't, though, you are ok. Our configuration is
+should. Even if you haven't, though, you are OK. Our configuration is
 going to be a I<little> more lax than Varnish's default, but not too much.
 
 =head3 The Varnish Configuration Language
@@ -105,7 +106,7 @@ VCL file.
 
 A VCL file tells Varnish exactly how to handle each phase of request
 processing. VCL is very powerful and allows for evaluation and modification of
-nearly every aspect of a HTTP request and response. It allows you to examine
+nearly every aspect of an HTTP request and response. It allows you to examine
 headers, do regular expresion comparisons and substitutions, and generally
 muck with incoming web requests on the fly. It provides a robust programming
 language that will be somewhat familiar to anyone who has programmed in Perl
@@ -114,7 +115,7 @@ or C.
 While the Varnish Configuration Language is quite robust, it does have its
 limitations. If you happen to find yourself in the quite rare situation where
 you are running into those limitations, VCL allows you to do something almost
-unheard of... It let's you drop into C to perform your task. While we won't
+unheard of... It lets you drop into C to perform your task. While we won't
 use this functionality in this article, it does give you a hint about just how
 powerful the Varnish cache really is.
 
@@ -166,7 +167,8 @@ received from the backend.
 
 =item vcl_deliver()
 
-Called before a response object (from the cache or the web server) is sent to the requesting client.
+Called before a response object (from the cache or the web server) is
+sent to the requesting client.
 
 
 =back
@@ -176,7 +178,7 @@ defaults, so you only need to override a few of these.
 
 Strictly speaking, Varnish doesn't actually let you replace its defaults.
 Your definitions of the above routines simply run I<before> the builtin
-versions of those same routines. Fortunately, we can prevent varnish from
+versions of those same routines. Fortunately, we can prevent Varnish from
 proceeding on to the builtin versions if we wish by returning the appropriate
 value within our version of the routine. If that seems confusing, don't worry.
 It will become clear when we start looking at our config.
@@ -220,7 +222,7 @@ custom vcl subroutines, vcl_recv and vcl_fetch.
 
 =head4 Set a backend
 
-The first thing we need to do in our Varnish config is set-up the web server
+The first thing we need to do in our Varnish config is set up the web server
 that Varnish will be talking to. Varnish actually has some sophisticated
 backend selection, allowing you to use a Varnish server as both a cache and a
 load balancer, serving traffic to multiple backend servers. This capability
@@ -297,9 +299,9 @@ look up the request in the cache. The B<lookup> line is important. This tells
 Varnish that it should stop executing the vcl_recv routine and look up the
 item in the cache. This is an example of a I<keyword>.
 
-Keywords in varnish can be though of as a 'return' for the subroutine combined
+Keywords in Varnish can be though of as a 'return' for the subroutine combined
 with the value it is returning. If you do not use a keyword somewhere to
-terminate your subroutine, control will fall through to the default varnish
+terminate your subroutine, control will fall through to the default Varnish
 subs. There is a knack to figuring out when to return and when to fall
 through, and you will get the hang of it after working with Varnish for a
 short while. In the meantime, you can rely on the fact that the config
@@ -316,7 +318,7 @@ it up in the cache and should instead pass it directly to the backend. This is
 most likely what you want, as POST data is generally form submission and the
 result will vary from user to user and request to request.
 
-This snippit also introduces our next keyword, I<pass>. Pass tells varnish
+This snippit also introduces our next keyword, I<pass>. Pass tells Varnish
 that it should pass the request through to the backend I<without looking it up
 in the cache>. This is a subtle but critical detail because even if you put
 something into the cache in vcl_fetch, if you I<pass> when receiving a request
@@ -352,7 +354,7 @@ Finally... our last line of vcl_recv:
 
 If we haven't explicitly handled it already somewhere along the way, we look
 it up in the cache. Note that since our vcl_recv ends with a keyword,
-Varnish's builtin vcl_recv never gets a chance to execute. That's ok in this
+Varnish's builtin vcl_recv never gets a chance to execute. That's OK in this
 case, because we have handled the different scenarios that we are interested
 in.
 
@@ -486,7 +488,7 @@ item will not be cached.
 When you are first working with the cache in place, you will at some point
 want to know if a piece of content you are looking at came from the cache or
 from the backend server. Yes, you could go to the backend server, make the
-request and watch the access logs but there is an easier way.
+request and watch the access logs, but there is an easier way.
 
 If you look at the headers returned on the item in question, you will see a
 header called 'X-Varnish.' That header will contain either one or two numbers
@@ -530,7 +532,7 @@ the following command line:
 
  varnishd -a :80 -T localhost:6082 -f catalyst.vcl -s file,/var/cache/varnish.cache,512M
 
-Note that there are startup scripts included with the varnish packages on most
+Note that there are startup scripts included with the Varnish packages on most
 distributions, and often they provide a lot of other OS specific tweaks to the
 startup environment. It's a good idea to use the startup scripts provided, if
 available for your OS of choice, and simply customize the options as
