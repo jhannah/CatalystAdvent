@@ -123,6 +123,15 @@ sub vcl_fetch {
         pass;
     }
     
+     ## if the object is specifically saying 'don't cache me' -  
+     ## obey it.
+     if(obj.http.Pragma ~ "no-cache" ||  
+        obj.http.Cache-Control ~ "no-cache" || 
+        obj.http.Cache-Control ~ "private")  {   
+    
+        pass;
+    } 
+    
     ## if the object is saying how long to cache it, you 
     ## can rely on the fact that it is cachable. 
     if (obj.http.Cache-Control ~ "max-age") {

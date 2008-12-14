@@ -443,7 +443,7 @@ particular. We should return the request to the client, but don't cache it.
 
  if(obj.http.Pragma ~ "no-cache" ||
     obj.http.Cache-Control ~ "no-cache" ||
-    obj.http.Cache-Control ~ "private"){
+    obj.http.Cache-Control ~ "private") {
          pass;
  }
 
