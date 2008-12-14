@@ -258,23 +258,15 @@ The incoming request is available within vcl_recv as 'req', you can review the
 Varnish docs to see all the properties that are available. We'll cover the
 ones we use as we encounter them.
 
- remove req.http.X-Forwarded-For;
- set    req.http.X-Forwarded-For = client.ip;
-
-The req.http variable contains the headers supplied with the request. As you
-probably have already guessed, the above lines remove any existing
-X-Forwarded-For headers on the incoming request and add a new one indicating
-the ip of the client that Varnish is actually talking to.
-
  set req.http.host = "mycatalystsite.com";
 
-This sets the host header to pass on to the backend. This is not strictly
-necessary and can cause trouble if you are fronting several sites with a
-single varnish installation. However, without this header, requests to
-I<mycatalystsite.com> and I<www.mycatalystsite.com> would be treated as
-completely separate by Varnish, potentially doubling every entry in your
-cache. If you are fronting only a single site, normalizing the hostname is a
-good idea.
+The req.http variable contains the headers supplied with the request. This
+sets the host header to pass on to the backend. This is not strictly necessary
+and can cause trouble if you are fronting several sites with a single varnish
+installation. However, without this header, requests to I<mycatalystsite.com>
+and I<www.mycatalystsite.com> would be treated as completely separate by
+Varnish, potentially doubling every entry in your cache. If you are fronting
+only a single site, normalizing the hostname is a good idea.
 
  set req.backend = catalystsite;
 
@@ -297,14 +289,15 @@ deployment.
 
  if (req.request == "GET" && req.url ~ "^/static/") {
      unset req.http.cookie;
+     unset req.http.Authorization
      lookup;
  }
 
 This tells Varnish if the request is for anything that starts with /static
-that it should remove any cookie header and then look up the request in the
-cache. The B<lookup> line is important. This tells Varnish that it should stop
-executing the vcl_recv routine and look up the item in the cache. This is an
-example of a I<keyword>.
+that it should remove any cookie header or authorization information, and then
+look up the request in the cache. The B<lookup> line is important. This tells
+Varnish that it should stop executing the vcl_recv routine and look up the
+item in the cache. This is an example of a I<keyword>.
 
 Keywords in varnish can be though of as a 'return' for the subroutine combined
 with the value it is returning. If you do not use a keyword somewhere to
@@ -464,7 +457,6 @@ Varnish does not obey no-cache instructions in its default configuration.
 
  if (obj.http.Cache-Control ~ "max-age") {
      unset obj.http.Set-Cookie;
-     unset req.http.cookie;  
      deliver;
  }
  pass;
@@ -491,25 +483,18 @@ method for controlling the cacheability of data in our application... and
 ensures that if we don't explicitly set the 'max-age' property in our app, the
 item will not be cached. 
 
-=head4 A quick side note: vcl_hit
+=head4 A quick side note: Is it a hit?
 
-There is one little piece of our configuration we have not looked at yet. It
-is the vcl_hit subroutine. Vcl_hit is executed when an item is found in the
-cache, but has not yet been returned to the client. Our vcl_hit routine is
-very simple:
+When you are first working with the cache in place, you will at some point
+want to know if a piece of content you are looking at came from the cache or
+from the backend server. Yes, you could go to the backend server, make the
+request and watch the access logs but there is an easier way.
 
- sub vcl_hit {
-     set    obj.http.X-Varnish-Hit = "HIT";
- }
-
-What we do here is set a new custom header before we respond to the client.
-That header indicates that this item was in fact found and returned from the
-cache. You may or may not want to run this way in production. Since it is a
-custom header, browsers and other caches/proxies will ignore it, but it
-provides valuable info when you are debugging wierdness on your site. Note
-also the absense of keywords. Since all we want to do is add a header, after
-we have done so, we let control fall through to Varnish's built-in vcl_hit
-routine.
+If you look at the headers returned on the item in question, you will see a
+header called 'X-Varnish.' That header will contain either one or two numbers
+(separated by a space.) If the 'X-Varnish' header contains two numbers, the
+data came from the cache. If it contains only one, it did not come out of the
+cache. Knowing this piece of information can make your debugging much simpler.
 
 Basically what we have done with this configuration is require an explicit
 cache 'allow' and what it means is that nothing in our application will be

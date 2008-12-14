@@ -17,13 +17,6 @@ backend catalystsite {
 
 sub vcl_recv {
 
-    ## Add a unique header containing the client address
-    ## This is important if you do any logging / checking based on IP.
-    ## all your traffic will appear to be from the cache server, this
-    ## gives you a header containing the original requester's IP
-    remove req.http.X-Forwarded-For;
-    set    req.http.X-Forwarded-For = client.ip;
-
     ## This sets the host header for your site - you should set this  
     ## because varnish takes host into consideration when caching.
     ## IE - www.foo.com and foo.com will be treated as separate by the cache
@@ -35,10 +28,9 @@ sub vcl_recv {
 
 
     ## this is an example of switching betwen backends based on path
-    #if ( req.url ~ "^/cat-test") {
-    #    set req.backend = catsite;
-    #    set req.http.host = "ccb.dev.ionzero.com";
-    #    #set resp.http.X-Backend = "catsite";
+    #if ( req.url ~ "^/static-test") {
+    #    set req.backend = staticsite;
+    #    set req.http.host = "mystaticsite.com";
     #}
 
     ## Force lookup if the request is a no-cache request from the client
@@ -52,6 +44,7 @@ sub vcl_recv {
     ## doesn't change much.
     if (req.request == "GET" && req.url ~ "^/static/") {
         unset req.http.cookie;
+        unset req.http.authorization;
         lookup;
     }
 
@@ -60,6 +53,7 @@ sub vcl_recv {
     ## if you use this method.
     #if (req.request == "GET" && req.url ~ "\.(gif|jpg|swf|css|js|png|jpg|jpeg|gif|png|tiff|tif|svg|swf|ico|css|js|vsd|doc|ppt|pps|xls|mp3|mp4|m4a|ogg|mov|avi|wmv|sxw|zip|gz|bz2|tgz|tar|rar|odc|odb|odf|odg|odi|odp|ods|odt|sxc|sxd|sxi|sxw|dmg|torrent|deb|msi|iso|rpm)$") {
     #    unset req.http.cookie;
+    #    unset req.http.authorization;
     #    lookup;
     #}
 
@@ -81,7 +75,8 @@ sub vcl_recv {
         pass;
     }
 
-    ## if we have an authorization header, we definitely do not want to be 
+    ## if we have an authorization header, we definitely do not want to 
+    ## cache 
     if (req.http.Authorization) {
         # Not cacheable by default #
         pass;
@@ -127,30 +122,14 @@ sub vcl_fetch {
     if (obj.http.Set-Cookie) {
         pass;
     }
-
-    ## if the object is specifically saying 'don't cache me' 
-    ## obey it.
-    if(obj.http.Pragma ~ "no-cache" ||
-       obj.http.Cache-Control ~ "no-cache" ||
-       obj.http.Cache-Control ~ "private"){
-            pass;
-    }
     
     ## if the object is saying how long to cache it, you 
     ## can rely on the fact that it is cachable. 
     if (obj.http.Cache-Control ~ "max-age") {
         unset obj.http.Set-Cookie;
-        unset req.http.cookie;  
         deliver;
     }
     pass;
-}
-
-sub vcl_hit {
-    
-    ## make it easy to see whether we got a hit on the cache or not by 
-    ## adding a header indicating a hit.
-    set    obj.http.X-Varnish-Hit = "HIT";
 }
 
 ## If you want a specific error response - you can define it here.
