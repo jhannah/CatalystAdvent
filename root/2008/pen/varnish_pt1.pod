@@ -29,12 +29,12 @@ For many years the old standby for caching was
 L<Squid|http://www.squid-cache.org/>, a caching proxy server that with the
 right magic could be turned into a fairly functional http accelerator. While
 squid performed quite well for those willing to do the work to configure it
-properly, at it's heart it's still a forward proxy and it could be somewhat
+properly, at its heart it's still a forward proxy and it could be somewhat
 difficult to get it to do exactly what you wanted it to.
 
 =head3 Enter Varnish
 
-Varnish is a relative newcomer to the caching scene, having it's 1.0 release
+Varnish is a relative newcomer to the caching scene, having its 1.0 release
 in 2006. Unlike Squid, Varnish is designed from the ground up to be an http
 accelerator, a caching reverse proxy. It is designed specifically to solve the
 problem we face as web-application developers, namely how to improve
@@ -72,7 +72,7 @@ installed... I'll wait.
 Welcome back. Let's get to configuring Varnish. As I mentioned before, Varnish
 is specifically designed to solve the problem we have, and as such, comes with
 a default configuration built in that can be used 'out of the box' to get http
-acceleration running. To use Varnish in it's basic config, you simply have to
+acceleration running. To use Varnish in its basic config, you simply have to
 start it up (don't do this just yet):
 
  varnishd -a :80 -b localhost:8080 -T localhost:6082
@@ -98,7 +98,7 @@ going to be a I<little> more lax than Varnish's default, but not too much.
 
 =head3 The Varnish Configuration Language
 
-As you already saw, Varnish can receive it's most critical information as
+As you already saw, Varnish can receive its most critical information as
 command line arguments. However, if you want to really harness the power of
 Varnish, you need to provide it a more advanced configuration in the form of a
 VCL file.
@@ -111,7 +111,7 @@ muck with incoming web requests on the fly. It provides a robust programming
 language that will be somewhat familiar to anyone who has programmed in Perl
 or C.
 
-While the Varnish Configuration Language is quite robust, it does have it's
+While the Varnish Configuration Language is quite robust, it does have its
 limitations. If you happen to find yourself in the quite rare situation where
 you are running into those limitations, VCL allows you to do something almost
 unheard of... It let's you drop into C to perform your task. While we won't
@@ -125,7 +125,7 @@ a mini program, a program that is actually compiled and linked in to Varnish
 at runtime. There are several steps to how Varnish handles each request and in
 your VCL file you have the option to customize the behavior of each one.
 
-There are actually 10 subroutines that control how Varnish behaves, and that
+There are actually 8 subroutines that control how Varnish behaves, and that
 you can change in your Varnish config. They are:
 
 =over
@@ -138,7 +138,7 @@ processed.
 =item vcl_pipe()
 
 Called when a request must be forwarded directly to the backend with minimal
-handling by Varnish (think HTTPS CONNECT)
+handling by Varnish (think HTTP CONNECT)
 
 =item vcl_hash()
 
@@ -168,21 +168,13 @@ received from the backend.
 
 Called before a response object (from the cache or the web server) is sent to the requesting client.
 
-=item vcl_timeout()
-
-Called when an object in the cache is about to expire.
-
-=item vcl_discard()
-
-Called when a cached object is about to be removed from the cache due to
-expiration or lack of space.
 
 =back
 
 That seems like a lot, but as I mentioned before Varnish has pretty reasonable
 defaults, so you only need to override a few of these.
 
-Strictly speaking, Varnish doesn't actually let you replace it's defaults.
+Strictly speaking, Varnish doesn't actually let you replace its defaults.
 Your definitions of the above routines simply run I<before> the builtin
 versions of those same routines. Fortunately, we can prevent varnish from
 proceeding on to the builtin versions if we wish by returning the appropriate
@@ -216,7 +208,7 @@ this up on the app side.
 
 =head3 The VCL file
 
-Our VCL file in it's entirety is available
+Our VCL file in its entirety is available
 L<here|http://www.catalystframework.org/calendar/static/2008/txt/catalyst_vcl.txt>.
 The file itself is well commented and is relatively easy to understand. If you
 are the kind of person who just jumps right in, you should have no trouble
@@ -444,7 +436,7 @@ Glancing at this block it's pretty obvious what is going on. The cacheable
 property on the response is set by Varnish, and it is basically Varnish's
 opinion as to whether the object could be cached or not. Varnish is pretty
 smart about this, so if it thinks the object is not cacheable, we should trust
-it's judgement and avoid placing it in the cache. Note that we don't
+its judgement and avoid placing it in the cache. Note that we don't
 automatically assume that if Varnish thinks it I<is> cacheable that we should
 cache it. We make that decision ourselves.
 
@@ -468,7 +460,7 @@ Varnish. This block says that if any of the cache-control headers are set to
 'no cache', obey them. This allows you, within your web app, to directly tell
 Varnish B<Do NOT cache this>. Without this block Varnish would attempt to
 guess whether the response was cacheable, and it would likely be wrong as
-Varnish does not obey no-cache instructions in it's default configuration.
+Varnish does not obey no-cache instructions in its default configuration.
 
  if (obj.http.Cache-Control ~ "max-age") {
      unset obj.http.Set-Cookie;
@@ -538,10 +530,10 @@ turn it on. We've seen once how simple it is to start Varnish, but we have
 also seen that Varnish's defaults are not always what we want.
 
 Varnish is a modern application, engineered to 21st century standards and it
-figures out a lot on it's own. This is a very good thing. However, there is
+figures out a lot on its own. This is a very good thing. However, there is
 one detail that often is at a odds with how I wind up deploying caching.
 
-Varnish in it's default configuration basically expects it has run of the
+Varnish in its default configuration basically expects it has run of the
 server it is running on and can use as much virtual memory as it wants. This
 is exactly what you want if you have a dedicated cache server. Unfortunately
 for me, I have often found it a hard sell, at least initially, to get a
