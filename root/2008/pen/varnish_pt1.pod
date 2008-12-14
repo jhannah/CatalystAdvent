@@ -216,9 +216,7 @@ grabbing that config and hitting the ground running. If, however, you would
 like a more in-depth exploration of that config, please continue reading.
 
 In order to create the config we described earlier, we only need to create two
-custom vcl subroutines, vcl_recv and vcl_fetch. We will, however, add a third
-sub called vcl_hit which we will use to help us determine if the cache is
-doing what we expect.
+custom vcl subroutines, vcl_recv and vcl_fetch.
 
 =head4 Set a backend
 
