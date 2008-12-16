@@ -1,6 +1,6 @@
-=head1 Day X.  Catalyst 5.80
+=head1 Day 16.  Catalyst 5.80
 
-Today's entry is about the upoming Catalyst 5.80 release, also
+Today's entry is about the upcoming Catalyst 5.80 release, also
 unofficially known as C<Catamoose>.
 
 The main aim of the 5.80 release is the porting of the Catalyst core
@@ -52,13 +52,19 @@ be supported).
 =item *
 
 Splitting the application and request context (allowing configuration
-and templates to be white-labeled, so you can run many differently
+and templates to be white-labelled, so you can run many differently
 configured sites on the same codebase).
 
 =item *
 
-Allowing a full declerative/DSL syntax for application code, rather
+Allowing a full declarative/DSL syntax for application code, rather
 than relying on 'just good enough' hacks such as perl's attributes.
+
+=item *
+
+Refactoring the application setup to be more generic and use an
+inversion of control system such as L<Bread::Board> to make the C
+atalyst wiring more flexible to whatever application you're building.
 
 =back
 
@@ -75,16 +81,17 @@ attributes.
 
 =item *
 
-Component introspection for code generation in devel.
-
-FIXME
+Moose provides a lot of powerful introspection features - it would be
+possible to use those to enhance the scaffolding generator in 
+L<Catalyst::Devel> to be more intelligent.
 
 =back
 
-And these are just ideas off the top of my head. I'm sure that the
-ever-inventive Catalyst community will produce FIXME.
+And these are just a couple of ideas off the top of my head. I'm sure 
+that the ever-inventive Catalyst community will produce ideas that 
+nobody has thought of yet.
 
-=head3 What has been the project timeline?
+=head3 What has been the project time line?
 
 =over
 
@@ -144,13 +151,22 @@ out backwards-compatibility issues.
 
 =item *
 
-5/23 5.8000_04 developer release, with STUFF TO ADD FIXME
+5/12 5.8000_04 developer release, at which point, most people's 
+applications work out of the box.
+
+=item *
+
+16/12 19 fixes since the last developer release (more than 1 a day!).
+Next developer release due once a bug causing the 
+L<Catalyst::Plugin::Authentication> backwards compatibility code to fail, 
+an issue in L<MooseX::Emulate::Class::Accessor::Fast> is fixed, and
+the POD for L<Class::C3::Adopt::NEXT> has been updated.
 
 =back
 
 At this point, most applications work with 5.80, but there is still a
 list of known issues to solve, and some corner-case bugs which cause a
-number of plugins tests to fail.
+number of plugins to fail their tests.
 
 Once these issues are solved, the remaining activities are:
 
@@ -193,7 +209,7 @@ stable and good enough for most people's needs.
 =head2 Is there anything that I could do to help?
 
 Sure there is! If you have a Catalyst application (even if you think
-it is trivial), please download and test out the latest developlent
+it is trivial), please download and test out the latest development
 release, or the latest code from Subversion.
 
 The team would B<very much> like to hear about any issues which you
@@ -214,27 +230,43 @@ compatible?>
 
 I<Yes> - 5.80 B<is> backwards compatible, so everything should keep
 working, but there are a number of things you can do to make your
-components and applications take advantage of Catalyst 5.80.
+components and applications up to date with the current best-practises
+for Catalyst application development, and forward-compatible with
+future Catalyst releases.
+
+Note that B<all> of the techniques shown here can B<already>
+be used in B<current> Catalyst components and applications. See, 
+for example, L<Catalyst::Component::InstancePerContext>, which is
+based on Moose.
 
 =head3 NEXT
 
 Use of C<NEXT> is now deprecated. Switching to C<Class::C3> will stop
 L<Class::C3::Adopt::NEXT> from moaning at you, and is pretty trivial.
 
-There are documentation and examples of switching to C<Class::C3> in
-the C<Class::C3::Adopt::NEXT> distribution.. FIXME
+An example of a class which has been switched (with the old code 
+commented out) is shown below:
+
+    package MyApp::Plugin::FooBar;
+    #use NEXT;
+    use MRO::Compat;
+
+    sub a_method {
+        my ($self, @args) = @_;
+        # Do some stuff, probably changing @args
+
+        # Re-dispatch method
+        #$self->NEXT::method();
+        $self->next::method(@args);
+    }
+
+There is more documentation and examples of switching to C<Class::C3> in
+the C<Class::C3::Adopt::NEXT> distribution..
 
 =head3 Using Moose directly in components
 
 Where before, you used plain old perl and L<Class::Accessor::Fast>,
 you can now switch to L<Moose>. 
-
-Don't worry if this scares you for any reason, whilst C<NEXT> 
-is actively deprecated, just usingC <Class::C3> and normal perl OO 
-(as above) is still supported and perfectly acceptable, we just
-prefer the declearative and compositional nature of method 
-modifiers and the Moose sugar for many tasks, but what you use 
-in your components is up to you..
 
 =head3 A simple example
 
@@ -296,21 +328,27 @@ becomes:
     after  'quux' => sub { # Code after method  };
     no Moose;
 
+Don't worry if this scares you for any reason, whilst C<NEXT> 
+is actively deprecated, just using C<Class::C3> and normal perl OO 
+(as above) is still supported, but you should start getting familiar
+with the Moose concepts, as many components are likely to be ported,
+and this is the recommended way of creating new components right now.
+
 =head3 A note about controllers
 
 Due to the use of method attributes (e.g. C<sub login :Local {}>) in Controllers,
 currently you must either stick with C<use base> or C<use parent>, or use the 
 Moose C<extends> keyword in a BEGIN block.
 
-We know that this is slightly inconvient, but its a side-effect of the compile-time
+We know that this is slightly inconvenient, but its a side-effect of the compile-time
 nature of perl's attributes. In the long term, the plan is to deprecate the
 attribute based syntax for controllers, switching instead to a domain specific language
-(i.e. Moosee like sugar), and/or use Devel::Declare to provide new keywords.
+(i.e. Moose like sugar), and/or use Devel::Declare to provide new keywords.
 
-Current controller declerations will stay supported, but will become deprecated
+Current controller declarations will stay supported, but will become deprecated
 once a flexible syntax emerges. The exact nature of what we're planning to do
 is in no way decided yet, however the main aim of any refactor would be to enable 
-different, pluggable syntaxes for controller/component declerations - so that 
+different, pluggable syntaxes for controller/component declarations - so that 
 several different syntaxes can co-exist in the same application, allowing people
 to chose something appropriate for their application, with the 'fittest' / most used
 candidate becoming the default..
@@ -323,7 +361,7 @@ candidate becoming the default..
 
 =item C<#catalyst> or C<#catalyst-dev> on irc.perl.org
 
-=item The Catalyst mailing list C<FIXME>
+=item The Catalyst mailing list L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst>
 
 =item L<MooseX::Emulate::Class::Accessor::Fast>
 
@@ -333,15 +371,18 @@ candidate becoming the default..
 
 =item L<Class::C3>
 
+=item L<MRO::Compat>
+
 =item #moose on irc.perl.org (for general Moose questions not related to Catalyst 5.80)
 
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
-Thanks to all the contributors to the 5.80 port for making it happen,
-and the #moose guys for Moose itself. Thanks to everyone who checked
-this article, pointed out mistakes and made suggestions.
+Thanks to all the contributors to the 5.80 port for making it happen, the 
+Catalyst team for Catalyst in the first place, and the #moose guys for 
+Moose itself. Also thanks to everyone who checked this article, pointed 
+out mistakes and made suggestions.
 
 =head1 AUTHOR
 
