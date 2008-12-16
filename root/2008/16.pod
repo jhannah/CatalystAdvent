@@ -319,7 +319,7 @@ becomes:
     extends 'Catalyst::Model::SomeModel';
     has [qw/ foo bar /] => ( is => 'rw' );
     
-    around 'baz' {
+    around 'baz' => sub {
         my ($orig, $self, @args) = @_;
         # Do stuff to @args
         $self->$orig(@args);
