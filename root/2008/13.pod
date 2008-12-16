@@ -56,7 +56,7 @@ Personally I configure the XHTML view in C<MyApp.pm>, but I have a
 commented-out entry setting it to the original TT view in 
 C<myapp.conf>, which I un-comment when my application is deployed.
 
-=head1 That is kinda neat, but your module is only, 5 lines of code..
+=head1 That is kinda neat, but your module is only 5 lines of code..
 
 Yes, it is.
 
