@@ -38,7 +38,7 @@ Add the following code to C<MyApp/View/XHTML.pm>:
     package MyApp::View::XHTML;
     use strict;
     use warnings;
-    use base qw/Catalyst::View::XHTML MyApp::View::TT/; 
+    use base qw/Catalyst::View::TT::XHTML MyApp::View::TT/; 
 
     1;
 
