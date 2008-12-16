@@ -9,7 +9,7 @@ L<Class::C3>, in a backwards-compatible way.
 
 In this article I hope to explain some of the reasons why this change
 is being made.  I will show how simple it is to convert code to run
-'I<natively>' in 5.80. (i.e. without any of the backwards
+I<natively> in 5.80 (i.e. without any of the backwards
 compatibility code used, and taking advantage of the more modern
 approaches offered by the port).  Then I will talk about what the
 change will enable the framework to do in future, give you some
@@ -22,8 +22,8 @@ your applications.
 L<NEXT> is awfully slow and hacky, and L<Class::Accessor::Fast> is
 good at what it does, but it doesn't do very much.
 
-L<Class::C3::XS> is fast for perl 5.8, and c3 MRO is included natively
-in perl 5.10.  Moose, despite having a reputation for being slow,
+L<Class::C3::XS> is fast for Perl 5.8, and c3 MRO is included natively
+in Perl 5.10.  Moose, despite having a reputation for being slow,
 generates accessors which are slightly faster than those made by
 L<Class::Accessor::Fast>, and also gives you B<a lot> of useful
 functionality for extending classes in a flexible way, helps you to
@@ -32,7 +32,7 @@ refactor, and makes code neater and more re-useable.
 Therefore porting Catalyst to use these newer technologies seemed like
 a logical step towards making the framework more flexible, better
 architected internally, easier to extend for users, and easier to
-componentise - as some of the more bleeding-edge Catalyst based
+componentise - as some of the more bleeding-edge Catalyst-based
 projects currently have to work in some inelegant ways to do what they
 want. The challenge to the project was maintaining backwards
 compatibility, so that existing plugin components, and people's
@@ -59,7 +59,7 @@ configured sites on the same codebase).
 =item *
 
 Allowing a full declarative/DSL syntax for application code, rather
-than relying on 'just good enough' hacks such as perl's attributes.
+than relying on 'just good enough' hacks such as Perl's attributes.
 
 =item *
 
@@ -175,7 +175,7 @@ Once these issues are solved, the remaining activities are:
 
 =item *
 
-Look at the performance vs 5.70 and optimise where necessary to bring
+Look at the performance vs. 5.70 and optimise where necessary to bring
 it back to previous levels.
 
 =item *
@@ -196,12 +196,12 @@ compatibility.
 =head2 Why has it taken so long?
 
 Changing two of the core technologies of a complex framework such as
-Catalyst, whilst maintaining backwards compatibility is no mean feat.
+Catalyst, whilst maintaining backwards compatibility, is no mean feat.
 
 At least two CPAN distributions
 (L<MooseX::Emulate::Class::Accessor::Fast> and
 L<Class::C3::Adopt::NEXT>) have been produced due to this project
-(with all the tests, documentation and bugfixes that entails).
+(with all the tests, documentation, and bugfixes that entails).
 
 Also, none of the Catalyst developers are paid for the work that they
 do, so it gets done at whatever pace people have time - 5.70 is still
@@ -266,7 +266,7 @@ the C<Class::C3::Adopt::NEXT> distribution..
 
 =head3 Using Moose directly in components
 
-Where before, you used plain old perl and L<Class::Accessor::Fast>,
+Where before, you used plain old Perl and L<Class::Accessor::Fast>,
 you can now switch to L<Moose>. 
 
 =head3 A simple example
@@ -329,8 +329,8 @@ becomes:
     after  'quux' => sub { # Code after method  };
     no Moose;
 
-Don't worry if this scares you for any reason, whilst C<NEXT>
-is actively deprecated, just using C<Class::C3> and normal perl OO
+Don't worry if this scares you for any reason. Whilst C<NEXT>
+is actively deprecated, just using C<Class::C3> and normal Perl OO
 (as above) is still supported, but you should start getting familiar
 with the Moose concepts, as many components are likely to be ported,
 and this is the recommended way of creating new components right now.
@@ -341,15 +341,15 @@ Due to the use of method attributes (e.g. C<sub login :Local {}>) in
 Controllers, currently you must either stick with C<use base> or C<use
 parent>, or use the Moose C<extends> keyword in a BEGIN block.
 
-We know that this is slightly inconvenient, but its a side-effect of
-the compile-time nature of perl's attributes. In the long term, the
-plan is to deprecate the attribute based syntax for controllers,
-switching instead to a domain specific language (i.e. Moose like
+We know that this is slightly inconvenient, but it's a side-effect of
+the compile-time nature of Perl's attributes. In the long term, the
+plan is to deprecate the attribute-based syntax for controllers,
+switching instead to a domain specific language (i.e. Moose-like
 sugar), and/or use Devel::Declare to provide new keywords.
 
 Current controller declarations will stay supported, but will become
 deprecated once a flexible syntax emerges. The exact nature of what
-we're planning to do is in no way decided yet, however the main aim of
+we're planning to do is in no way decided yet, but the main aim of
 any refactor would be to enable different, pluggable syntaxes for
 controller/component declarations - so that several different syntaxes
 can co-exist in the same application, allowing people to chose
