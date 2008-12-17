@@ -22,7 +22,7 @@ per-user information to customize your pages.
 
 In order to cope with this change, you have to start generalizing your pages,
 so the content is not specific to any particular user. This is a topic I
-touched on at the end of L<last years
+touched on at the end of L<last year's
 article|http://www.catalystframework.org/calendar/2007/11>. We briefly covered
 a couple of options for solving that problem, mostly involving javascript.
 What you may not have noticed, though, is that in doing so we were directly
@@ -33,11 +33,11 @@ So, here we sit, the fundamental pillars of our web development process
 shattered around us. What do we do now? Well, we do what we always do, we
 start building again. The javascript / ajax options I mentioned for loading
 data into the page at view time make a lot of sense; but in some sense it
-feels wrong, like a blank spot in your newspaper that says 'go look on in our
+feels wrong, like a blank spot in your newspaper that says 'go and look in our
 weekly magazine to see this article.' It works, but it doesn't feel right.
 
-We've moved our processing to the client, where we know we have less than
-stellar control over what happens, if anything happens at all. It also just
+We've moved our processing to the client, where we know we have very little
+control over what happens, if anything happens at all. Additionally it
 barely solves our problems, and doesn't solve them in every case.
 
 So what do we do? For a long time the answer was 'nothing.' We were out of
@@ -168,8 +168,7 @@ within it, and ESI was not active, the content could show up in the users
 browser. It also lets you have other content that is not ESI included, but is
 only shown if the page is being ESI processed.
 
-Since our main concern is the include routine, we will focus on that going
-forward.  
+Since our main concern is the include routine, this will be our focus.
 
 =head2 An Example
 
@@ -258,8 +257,8 @@ this (error checking excluded for simplicity):
 
 Ok... So in order to add the recent articles block, first we have to edit the
 template and add our recent articles html to the page. Unfortunately, though,
-the html won't work if we don't populate the 'recentarticles' stash variable.
-Not a big deal... we just have to forward to the recentarticles action. Our
+the html won't work if we don't populate the 'C< recentarticles >' stash variable.
+Not a big deal... we just have to forward to the C< recentarticles > action. Our
 page action would now look like this:
 
  sub page : Local {
@@ -279,15 +278,15 @@ forced to cache at the very small 5 minute interval that the recent article
 block requires.
 
 The particularly experienced among you are thinking of ways to avoid putting
-the recentarticles call into every page. Calling the routine from within the
+the C< recentarticles > call into every page. Calling the routine from within the
 template, perhaps, or some sort of lazy-loading hackery. Wouldn't it be nice
 if you didn't have to hack it in?
 
 =head3 Using ESI
 
 Let's tackle the same problem now, only this time let's use ESI. We get to use
-the recentarticles action as-is, because we factored it out well in the first
-place. With ESI, though, we will be calling recentarticles directly, so we
+the C< recentarticles > action as-is, because we factored it out well in the first
+place. With ESI, though, we will be calling C< recentarticles > directly, so we
 will need to give it its own template. Let's see what it would look like.
 
  <span class="recentarticles">
@@ -296,9 +295,9 @@ will need to give it its own template. Let's see what it would look like.
       [% END %]
  </span>
 
-Pretty straightforward. Now that that is done, we can start using it via ESI.
+Pretty straightforward. Now that we've done this, we can start using it via ESI.
 Let's start cleaning up. We'll start by revisiting our view template, this
-time pulling in the recentarticles block via ESI.
+time pulling in the C< recentarticles > block via ESI.
 
   <div id="maincontent">
     <h2>[% blog.title %]</h2>
@@ -312,7 +311,7 @@ time pulling in the recentarticles block via ESI.
     <!--esi <esi:include src="/articles/recentarticles" /> -->
   </div>
 
-Next we'll drop the recentarticles forward from our article view routine.
+Next we'll drop the C< recentarticles > forward from our article view routine.
 
  sub view : Local Args(1) {
      my ($self, $c, $articleid) = @_;
@@ -354,12 +353,12 @@ must have a single limited cache time. This is where Varnish + ESI begins to
 really shine. Each piece of content is cached according to its own rules, and
 Varnish assembles the page at request time from the data it has. So the
 article view page, which may be 30 minutes old, is pulled in from the cache,
-and the recentarticles block which may be only a minute old, is also pulled
+and the C< recentarticles > block which may be only a minute old, is also pulled
 in. The content is combined and served up to the waiting browser.
 
 Your site has just experienced a drastic reduction in processing required to
 serve up each page. The article view page for any given article is requested
-at most once every hour. The recentarticles block is requested more
+at most once every hour. The C< recentarticles > block is requested more
 frequently, but even that has reduced your processing, as only the recent
 articles logic is run, instead of the combined article retrieval and recent
 article logic.
@@ -378,7 +377,7 @@ content that aren't cached at all. If you have a 'your favorite articles'
 block, that block can be passed through to the web server, even while the page
 it's included into is served from the cache.
 
-All you have to do to make this work is what we did above for recentarticles
+All you have to do to make this work is what we did above for C< recentarticles >
 with the minor addition of setting the cache time to zero. Your users get
 personalized content and you still get to have caching.
 
