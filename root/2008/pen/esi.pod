@@ -151,7 +151,7 @@ C<esi:remove> and the C< <!--esi ... --> > constructs.
 
 The C<esi:include> construct does exactly what you think it does. It allows
 you to include something into the current page. This is the piece of ESI you
-will use most often, as it allows you to include another bit of content within
+will use most often, as it allows you to load another piece of content within
 the current page.
 
 The C<esi:remove> construct also does what you think it does. Anything between
@@ -173,13 +173,22 @@ forward.
 
 =head2 An Example
 
-We've talked about why to use ESI.  We've talked briefly about I<how> to use ESI.  It's time to take some concrete examples and show how it all works.
+We've talked about why to use ESI. We've talked briefly about I<how> to use
+ESI. It's time to take some concrete examples and show how it all works.
 
-For demonstration purposes, we will create a hypothetical site.  Let's suppose we have a blog site.  The site has multiple authors and people post new entries throughout the day.  Under each article the of the article, we will have a block that displays links to the last 5 articles added to the site. 
+For demonstration purposes, we will create a hypothetical site. Let's suppose
+we have a blog site. The site has multiple authors and people post new entries
+throughout the day. Under each article, we will have a block that displays
+links to the last 5 articles added to the site.
 
-In order for this to work, our article view action must contain the logic to load the article being requested.  It also must contain the logic to figure out what the most recent five articles is.  If you were smart you probably 
-factored out the most recent 5 article logic, but you still have to forward
-to it within your view action to fill in the 'recentarticles' stash data. If you had done this, and you are already using the caching method outlined L<last year|http://www.catalystframework.org/calendar/2007/11> your actions might look something like this:
+In order for this to work, our article view action must contain the logic to
+load the article being requested. It also must contain the logic to figure out
+what the most recent five articles are. If you were smart you probably
+factored out the most recent five article logic, but you still have to forward
+to it within your view action to fill in the 'recentarticles' stash data. If
+you had done this, and you are already using the caching method outlined
+L<last year|http://www.catalystframework.org/calendar/2007/11> your actions
+might look something like this:
 
  package BlogSite::Controller::Articles;
  
