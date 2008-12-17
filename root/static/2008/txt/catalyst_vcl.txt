@@ -59,7 +59,7 @@ sub vcl_recv {
 
     ## Chances are that if we are receiving POST data, we don't want to cache 
     ## so we short circuit it here.
-    if (req.request == 'POST') {
+    if (req.request == "POST") {
         pass;
     }
 
