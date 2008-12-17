@@ -1,4 +1,4 @@
-=head1 Super Site Building Hotness with Edge Side Includes
+=head1 Site Building Hotness with Edge Side Includes
 
 We've covered L<caching|http://www.catalystframework.org/calendar/2007/11> a
 fair amount L<recently|http://www.catalystframework.org/calendar/2008/14>.
