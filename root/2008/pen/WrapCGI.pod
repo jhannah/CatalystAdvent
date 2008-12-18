@@ -1,0 +1,5 @@
+=head1 WrapCGI: CGI.pm in your Catalyst app.
+
+L<Catalyst::Controller::WrapCGI> allows you to use CGI.pm directly in your Catalyst controller.
+
+A huge benefit of this is quick porting of a 
