@@ -81,8 +81,6 @@ sub paste : Path("/cgi-bin/bleachit.cgi") {
         
         my $code = $q->param('code');
         my $cleaned_string = eval "use Acme::Bleach; $code" . "";
-        $c->log->debug("Code: $code");
-        $c->log->debug("Clean code: $cleaned_string");
  
         print $q->header, $q->start_html('Cleaned code'),
         $q->h1("Your code, cleaned:"),
