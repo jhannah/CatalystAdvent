@@ -108,3 +108,9 @@ here:
 That's *it*.  That's how WrapCGI integrates CGI into Catalyst.  
 
 Tada!
+
+head1 AUTHOR
+
+Devin Austin aka dhoss
+
+devin.austin@gmail.com
