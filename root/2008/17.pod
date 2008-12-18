@@ -7,7 +7,7 @@ sites. As is often the case, though, using a powerful tool effectively takes
 some getting used to. It also means learning new ways of doing things. Caching
 is no exception.
 
-When most developers build web-apps, they have a model in mind that is so
+When most developers build web apps, they have a model in mind that is so
 ingrained that they scarcely know it's there. What is it? It can be summed up
 by a phrase you've heard many times; 'The user requesting this page...' It is
 the assumption that the page is being built right now for one person who is
@@ -24,14 +24,14 @@ In order to cope with this change, you have to start generalizing your pages,
 so the content is not specific to any particular user. This is a topic I
 touched on at the end of L<last year's
 article|http://www.catalystframework.org/calendar/2007/11>. We briefly covered
-a couple of options for solving that problem, mostly involving javascript.
+a couple of options for solving that problem, mostly involving JavaScript.
 What you may not have noticed, though, is that in doing so we were directly
 trying to cope with the realization that our second assumption had failed; we
 can no longer build the entire page at once.
 
 So, here we sit, the fundamental pillars of our web development process
 shattered around us. What do we do now? Well, we do what we always do, we
-start building again. The javascript / ajax options I mentioned for loading
+start building again. The JavaScript / AJAX options I mentioned for loading
 data into the page at view time make a lot of sense; but in some sense it
 feels wrong, like a blank spot in your newspaper that says 'go and look in our
 weekly magazine to see this article.' It works, but it doesn't feel right.
@@ -41,13 +41,13 @@ control over what happens, if anything happens at all. Additionally it
 barely solves our problems, and doesn't solve them in every case.
 
 So what do we do? For a long time the answer was 'nothing.' We were out of
-luck. Use Javascript and cookies to customize anything on the page. Trim our
+luck. Use JavaScript and cookies to customize anything on the page. Trim our
 cache times to their absolute minimum in order to allow the dynamism that our
 sites and our users have become accustomed to. It worked, but again, not
 entirely, not necessarily every time, I<and> it was complicated.
 
-Things have changed, though. There is a tool which until recently has only
-been available to those willing to pay for hosted caching systems. With the
+Things have changed, though. There is a tool which until recently was only
+available to those willing to pay for hosted caching systems. With the
 2.0 release of the L<Varnish cache software|http://varnish-cache.org/>, we
 finally get easy access to Edge Side Includes, or ESI.
 
@@ -61,7 +61,7 @@ assemble the whole page at request time.
 
 What this means for you is that each 'page' that you create doesn't have to
 know the details of every piece of content that will show up on the fully
-rendered page. Instead, it just needs to know what, on a high-level, will go
+rendered page. Instead, it just needs to know what, on a high level, will go
 there. It leaves actually filling in those details to the cache, which is the
 point in your system that the browser is actually talking to anyway.
 
@@ -75,19 +75,20 @@ can be handled separately, then the story page itself can last much longer.
 
 =head3 A game changer
 
-I have seen MVC catch a lot of flack lately in the web development realm. MVC
-itself originated in the GUI realm and has been somewhat successfully applied
-elsewhere. I've read blog posts and comments lately about how MVC doesn't
-translate to the web and how it is not the right pattern to use. Most often
-the support for this argument relates to the web's transactional nature or
-its lack of state. Some people are familiar enough with the origins of MVC to
-bring up another point. They say one of the points of MVC was to allow view to
-retrieve its data as it was needed which was necessary to really provide an
-interactive application, an application that responds to us the way we expect
-real-world objects and machines to respond to us. All of these argments are
-correct.
+I have seen MVC catch a lot of flak lately in the web development
+realm. MVC itself originated in the GUI realm and has been somewhat
+successfully applied elsewhere. I've read blog posts and comments about
+how MVC doesn't translate to the web and how it is not the right pattern
+to use. Most often the support for this argument relates to the web's
+transactional nature or its lack of state. Some people are familiar
+enough with the origins of MVC to bring up another point. They say one
+of the points of MVC was to allow the view to retrieve its data as it
+was needed, which was necessary to really provide an interactive
+application, an application that responds to us the way we expect
+real-world objects and machines to respond to us. All of these argments
+are correct.
 
-That said, for me even though there is somewhat of a mismatch between web
+That said, for me even though there is something of a mismatch between web
 development and MVC in its truest sense, there are other benefits of the MVC
 pattern that make it worthwhile anyway. Separating the problem space into
 manageable pieces is important. Forcing the conceptualization of the whole
@@ -107,14 +108,14 @@ beyond solving our dynamic content problem. If you let it, it will change
 everything about how you develop your web applications. If you pause to think
 about it, you begin to realize that with ESI every piece of repeated content
 can be served up separately. Every piece of content can contain its own rules
-about how it is displayed and even more interestingly how it is cached.
+about how it is displayed, and even more interestingly, how it is cached.
 
 Having ESI in our web-development toolbox moves us one step closer to true MVC
-development on the web. Each view of a piece of content is a self contained
+development on the web. Each view of a piece of content is a self-contained
 item. It has its own view rules, its own source of data, and its own
-controller logic all of which contain only the details they need to do their
+controller logic, all of which contain only the details they need to do their
 very specific job. For anyone who has done desktop GUI programming (especially
-with systems like Cocoa or QT) this will begin to feel familiar.
+with systems like Cocoa or QT), this will begin to feel familiar.
 
 With ESI you get another bit of the MVC pattern that GUI developers take for
 granted. You get reuse. We're not talking about the 'factor out this bit of
@@ -126,8 +127,8 @@ self-contained widgets that we can plop into a site anywhere we want. I don't
 have to tell you that this is a big deal.
 
 When the editor asks 'can't we put that most recent articles box on this
-page,' we can finally comfortably say 'yes, no problem, give me about 10
-minutes.' We can finally say 'oh, you want a custom box that shows only
+page,' we can finally comfortably say 'Yes, no problem, give me about 10
+minutes.' We can finally say 'Oh, you want a custom box that shows only
 stories that are of interest to the current user? Sure. On every page?
 alright.' I know some server admins who would have nightmares just
 I<overhearing> that statement.
@@ -147,7 +148,7 @@ explore all of the abilities of ESI in this article, but we will cover the
 most important ones, which happen to also be the ones that Varnish provides.
 
 There are three bits of ESI that you need to know. They are C<esi:include>,
-C<esi:remove> and the C< <!--esi ... --> > constructs.
+C<esi:remove>, and the C< <!--esi ... --> > constructs.
 
 The C<esi:include> construct does exactly what you think it does. It allows
 you to include something into the current page. This is the piece of ESI you
@@ -168,7 +169,7 @@ within it, and ESI was not active, the content could show up in the users
 browser. It also lets you have other content that is not ESI included, but is
 only shown if the page is being ESI processed.
 
-Since our main concern is the include routine, this will be our focus.
+Since our main concern is the C<include> routine, this will be our focus.
 
 =head2 An Example
 
@@ -224,7 +225,7 @@ a template that looks like this:
    <span class="byline">by [% blog.author.name %]</span>
    
    <span class="articlebody">
-       [% blog.body &]
+       [% blog.body %]
    </span>
  </div>
  <div id="bottomblock">
@@ -256,7 +257,7 @@ this (error checking excluded for simplicity):
  }
 
 Ok... So in order to add the recent articles block, first we have to edit the
-template and add our recent articles html to the page. Unfortunately, though,
+template and add our recent-articles html to the page. Unfortunately, though,
 the html won't work if we don't populate the 'C< recentarticles >' stash variable.
 Not a big deal... we just have to forward to the C< recentarticles > action. Our
 page action would now look like this:
@@ -277,10 +278,10 @@ recent articles block or not. The second is that now your static pages are
 forced to cache at the very small 5 minute interval that the recent article
 block requires.
 
-The particularly experienced among you are thinking of ways to avoid putting
-the C< recentarticles > call into every page. Calling the routine from within the
-template, perhaps, or some sort of lazy-loading hackery. Wouldn't it be nice
-if you didn't have to hack it in?
+The particularly experienced among you are thinking of ways to avoid
+putting the C< recentarticles > call into every page. Calling the
+routine from within the template, perhaps, or some sort of lazy-loading
+hackery. Wouldn't it be nice if you didn't have to hack it in?
 
 =head3 Using ESI
 
@@ -332,20 +333,20 @@ also.
       $c->stash->{'template'} = "pages/" . $pagetoview . ".tt2";
  }
 
-That's a bit simpler, isn't it. For both the the static pages and the article
+That's a bit simpler, isn't it? For both the the static pages and the article
 view routine, the page you see looks the same. What is happenning on each
 request has changed significantly however.
 
-First, we are not calling our recent article logic on every request, we are
-also not hitting our db on every request. There's something else that's
+First, we are not calling our recent article logic on every request; we are
+also not hitting our database on every request. There's something else that's
 changed as well. Both our article content and our static page content are not
-limited to 5 minute caching anymore. They are back to caching at 1 and 2 hours
+limited to 5-minute caching anymore. They are back to caching at 1 and 2 hours
 respectively.
 
 But what about the recent articles content? That can't be cached for 2 hours.
 Don't worry. It isn't. The recent article information is only cached for its
 5 minute limit. So what's going on? How can the article be cached for an hour
-but the recent article list be cached for 5 minutes. They are on the same
+but the recent article list be cached for 5 minutes? They are on the same
 page, it's got to be one or the other.
 
 You are absolutely correct. The full page that is delivered to the browser
@@ -367,7 +368,7 @@ article logic.
 
 This gets more interesting when you have a block of content that is customized
 for each user. On a site that doesn't use ESI, any page that contains a block
-that is personalized for the end-user I<can not be cached at all.> This is a
+that is personalized for the end-user I<can not be cached at all>. This is a
 major problem. It puts you in the position of choosing personalization or
 performance.
 
@@ -420,7 +421,7 @@ since then. Without Varnish (or some other ESI processor) in front of your dev
 site processing the ESI, though, your site will look awfully strange. So what
 do you do? 
 
-Once again, we are developers so we build something. In this case, to solve
+Once again, we are developers, so we build something. In this case, to solve
 this problem I wrote an ESI parser in javascript that runs in the browser. You
 can place it in your ESI enabled pages within an C< <esi:remove> > block, and
 your production site will never be the wiser, but without the Varnish cache in
