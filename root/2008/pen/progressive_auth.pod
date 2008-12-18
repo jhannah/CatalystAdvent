@@ -1,4 +1,4 @@
-=head1 Progressive Authentication with Catalyst (Using OpenID)
+c=head1 Progressive Authentication with Catalyst (Using OpenID)
 
 I<Note: > This article has an accompanying example application that can be
 downloaded and ran, please see the L</"Try it and see"> section for more
@@ -8,7 +8,7 @@ information.
 
 Often times, as applications (especially any application with social aspects)
 grow and evolve there becomes a necessity for "other" forms of authentication.
-Most typically, this is in the form off a temporary password that is emailed
+Most typically, this is in the form of a temporary password that is emailed
 to a user.  Many applications actually change the users password to some
 generated password, which means that the previous password is invalid.  Other
 applications just email out in plain text.  
