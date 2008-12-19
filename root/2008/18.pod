@@ -4,10 +4,9 @@ L<Catalyst::Controller::WrapCGI> allows you to use CGI.pm directly in
 your Catalyst controller.
 
 A huge benefit of this is quick porting of a legacy CGI.pm application
-directly into a Catalyst skeleton in an almost cut and paste fashion.
-You B<still> have the full power of the Catalyst framework and you
+directly into a Catalyst skeleton in an almost cut-and-paste fashion.
+You B<still> have the full power of the Catalyst framework, but you
 don't lose any of your CGI application's functionality.
-
 
 To demonstrate a quick WrapCGI application, we're going to write a
 pastebot using WrapCGI, Acme::Bleach (to keep our code clean :-) ) and
