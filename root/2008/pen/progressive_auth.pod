@@ -1,23 +1,23 @@
 c=head1 Progressive Authentication with Catalyst (Using OpenID)
 
 I<Note: > This article has an accompanying example application that can be
-downloaded and ran, please see the L</"Try it and see"> section for more
+downloaded and run. Please see the L</"Try it and see"> section for more
 information.
 
 =head2 A brief overview of authentication
 
 Often times, as applications (especially any application with social aspects)
-grow and evolve there becomes a necessity for "other" forms of authentication.
+grow and evolve, there becomes a necessity for "other" forms of authentication.
 Most typically, this is in the form of a temporary password that is emailed
-to a user.  Many applications actually change the users password to some
-generated password, which means that the previous password is invalid.  Other
-applications just email out in plain text.  
+to a user.  Many applications actually change the user's password to some
+generated password, making the previous password invalid.  Other
+applications just email the forgotten password in plain text.  
 
-Both of these solutions are wrong.  (Now I'm just going to leave it at that)
+Both of these solutions are wrong.  (Now I'm just going to leave it at that.)
 
 This situation directly inspired the development of the Progressive Realm
 (L<http://search.cpan.org/~jayk/Catalyst-Plugin-Authentication-0.100091/lib/Catalyst/Authentication/Realm/Progressive.pm>).
-While we won't cover proper handling of temporary passwords, since that is a 
+We won't cover proper handling of temporary passwords, since that is a 
 more involved topic and much larger article (to be discussed at a later date,
 but I provide a brief note at the bottom of this article).
 
@@ -27,28 +27,29 @@ very simple setting.
 =head2 OpenID and Local Authentication
 
 The simple example is centered around handling OpenID.  OpenID, by itself, is
-very simple.  However there are some nits that eventually end up in ugly and
+very simple.  However there are some nits that eventually result in ugly and
 unmaintainable code, unless you have the foresight to handle it.  This
 foresight usually comes from writing the above mentioned ugly code.  The
 subsequent solution that isn't ugly tends to look very similar to the
 Progressive realm, hence its creation.
 
-First off, to handle OpenID and local authentication is no difficult matter.
-In fact, some would call it trivial.  To get it running, it requires nothing
-more than the Authentication plugin, the OpenID credential and a session
-plugin.  The main issue to overcome with OpenID is that while you can
-associate the authenticating URL to an account, sometimes users also have a
-password on the site.  It can be difficult to handle the authentication for
-both, and often times the login controller becomes ugly.  There is far too
-much logic there, and it doesn't really do much other than determine which
-realm the user is in.  The Progressive realm is the ready made solution!
+First off, to handle OpenID and local authentication is an almost
+trivial matter. To get it running, it requires nothing more than the
+Authentication plugin, the OpenID credential, and a session plugin.  The
+main issue to overcome with OpenID is that while you can associate the
+authenticating URL to an account, sometimes users also have a password
+on the site.  It can be difficult to handle the authentication for both,
+and often times the login controller becomes ugly.  There is far too
+much logic there, and it doesn't really do much other than determine
+which realm the user is in.  The Progressive realm is the ready-made
+solution!
 
 (As an aside, a very cool usage for this is to have an application that
-progressively reveals features to users based on their authenticating realm)
+progressively reveals features to users based on their authenticating realm.)
 
 To configure the realms, you first have to load the authentication plugin.
-Also, you need a session store because what good is authenticating users if
-their authentication only lasts for one request.  To do this, we just add the
+Also, you need a session store, because what good is authenticating users if
+their authentication only lasts for one request?  To do this, we just add the
 following plugins to MyApp.pm:
 
  use Catalyst qw/ 
@@ -59,7 +60,7 @@ following plugins to MyApp.pm:
 =head2 The Simple Case: Local Authentication
 
 Now, the Authentication and Session plugins are loaded and it is time to
-configure Authentication.  More Authentication configurations just use the
+configure Authentication.  Most Authentication configurations just use the
 Password credential, and the configuration looks something like this:
 
     __PACKAGE__->config(
@@ -84,7 +85,7 @@ Password credential, and the configuration looks something like this:
     );
 
 Now, a simple call to authenticate in your controller will check the password
-against the store and either succeed or fail.  The code here is just very 
+against the store and either succeed or fail.  The code here is very 
 simple:
 
     if ( $c->authenticate({ username => $username, password => $password }) ) {
@@ -148,7 +149,7 @@ realm, the code starts to look like this:
 
 That's not bad code, but it's a lot more than just using a single realm.  The
 problem is when you continue to add realms and other mechanisms for users to
-authenticate (webservices, temporary passwords) it grows and becomes more
+authenticate (web services, temporary passwords) it grows and becomes more
 unmaintainable.  Eventually, it ends up on The Daily WTF and people refer to
 it with hand waves and resignations.
 
@@ -190,7 +191,7 @@ Progressive realm class, and then list what realms are legitimate to try.
     );
 
 With the configuration finished, it's time to modify the authenticate call to
-remove the specific realm (or, if C<progressive> isn't your default realm to 
+remove the specific realm (or, if C<progressive> isn't your default realm, to 
 set that explicitly).
 
 Also, it is a good idea to filter exactly what you are putting into the
@@ -209,13 +210,13 @@ entire stash.  The code for authenticating now looks like this:
     }
 
 When new realms are added, simply add the parameter keys to the list of
-parameters and things should transparently work.  The order of C<realms> in
+parameters and things should work transparently.  The order of C<realms> in
 the Progressive configuration determines the order the subordinate realms are
 called, and whichever one matches first returns.
 
 =head2 Try it and see
 
-This advent entry is accompanied by a fully working example application that
+This Advent entry is accompanied by a fully working example application that
 demonstrates the principles.  It is available as a standalone tarball at
 L<http://www.coldhardcode.com/examples/catalyst/ProgressiveAuth-0.01.tar.gz>
 or if you prefer an svn checkout:
@@ -226,12 +227,12 @@ or if you prefer an svn checkout:
 
 Jay Shirley, the IT Director at L<http://www.nasaproracing.com> and Co-Founder
 of L<http://www.coldhardcode.com>.  He is a die-hard Catalyst user, evangelist 
-and perl hacker.
+and Perl hacker.
 
 =head2 Appendix A: A note on temporary passwords
 
 As a follow-up, the proper solution for temporary passwords is to have
-multiple realms for authentication, one for temporary passwords and one for
-legitimate passwords, if the user authenticates in the temporary realm then
-you force a password change.  If the user authenticates via the normal realm,
+multiple realms for authentication: one for temporary passwords and one for
+legitimate passwords. If the user authenticates in the temporary realm then
+you force a password change. If the user authenticates via the normal realm,
 nothing changes.
