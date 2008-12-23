@@ -1,4 +1,4 @@
-c=head1 Progressive Authentication with Catalyst (Using OpenID)
+=head1 Progressive Authentication with Catalyst (Using OpenID)
 
 I<Note: > This article has an accompanying example application that can be
 downloaded and run. Please see the L</"Try it and see"> section for more
