@@ -262,11 +262,11 @@ Catalyst view for JSON and configure that. We will be using
 L<Catalyst::View::JSON> so make sure it's installed before you
 continue.
 
-=begin html
+=begin pod::xhtml
 
 <p><img src="http://www.catalystframework.org/calendar/static/2008/mochikit/05_create_json_view.jpg"/></p>
 
-=end html
+=end pod::xhtml
 
 Once we created our view, let's configure it. It's good practice to set
 a default view once a Catalyst app has more than one view. In our case
@@ -560,17 +560,17 @@ the server to see if the data structure you're expecting is really being
 returned or not. Of course if needed you can also see the request and
 response headers.
 
-=begin html
+=begin pod::xhtml
 
 <p><img src="http://www.catalystframework.org/calendar/static/2008/mochikit/06_firebug_post.jpg"/></p>
 
-=end html
+=end pod::xhtml
 
-=begin html
+=begin pod::xhtml
 
 <p><img src="http://www.catalystframework.org/calendar/static/2008/mochikit/07_firebug_response.jpg"/></p>
 
-=end html
+=end pod::xhtml
 
 Another FireBug feature I wanted to show is the easy ability to log DOM
 elements to the console window so you can inspect them further. With
@@ -587,11 +587,11 @@ inspect what type of data structure an object is and what values it
 contains. You can do this for any DOM element or variable. The
 screenshot below shows the result of our "resp" object:
 
-=begin html
+=begin pod::xhtml
 
 <p><img src="http://www.catalystframework.org/calendar/static/2008/mochikit/08_firebug_dom.jpg"/></p>
 
-=end html
+=end pod::xhtml
 
 The final FireBug cool feature I wanted to show is the JavaScript
 console. This console allows full interaction with your page on the
@@ -602,11 +602,11 @@ file because it's faster and doesn't need to have the page refreshed to
 load the updated JS file. Below you see a screenshot of calling our
 partial C<u_message()> function from the console.
 
-=begin html
+=begin pod::xhtml
 
 <p><img src="http://www.catalystframework.org/calendar/static/2008/mochikit/09_firebug_console.jpg"/></p>
 
-=end html
+=end pod::xhtml
 
 The full finished app can be downloaded here L<http://http://www.catalystframework.org/calendar/static/2008/mochikit/MyApp_MochiKit.tar.gz>. Hopefully this article helps anyone who wants to start doing AJAX with Catalyst.
 
