@@ -1,5 +1,8 @@
 =head1 Catalyst and nginx
 
+B<NOTE:> This article has been moved to the Catalyst Wiki at
+L<http://dev.catalyst.perl.org/wiki/adventcalendararticles/2008/02-catalyst_and_nginx>.
+
 In the spirit of Perl, in that there is always more than one way to do it,
 there are also many ways to deploy your Catalyst application.
 
