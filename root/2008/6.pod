@@ -172,6 +172,10 @@ on IRC ( irc.perl.org , #catalyst) if things don't work out.
 
 =head1 AUTHOR
 
-Bogdan Lucaciu <bogdan@sinapticode.ro>
+Bogdan Lucaciu <bogdan@sinapticode.com>
+
+=head3 COPYRIGHT
+
+Copyright 2008 Sinapticode - L<http://www.sinapticode.com>
 
 Sinapticode
