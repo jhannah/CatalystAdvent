@@ -1,5 +1,10 @@
 =head1 Catalyst Advent - Day 9 - YAML, YAML, YAML!
 
+B<NOTE>: This article was written in 2005. In the meantime, Catalyst has
+switched to using Config::General as the format for its configuration files.
+YAML files being whitespace-sensitive, copy/pasting from POD often caused
+problems. See also the Catalyst Wiki (L<http://dev.catalyst.perl.org/wiki>).
+
 When you start a new Catalyst app you configure it directly
 with __PACKAGE__->config, thats ok for development but admins
 will hate you when they have to deploy this.

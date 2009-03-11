@@ -4,6 +4,8 @@ Today we look at how to solve a common problem: accessing a Catalyst
 model from a batch script outside Catalyst while sharing some configuration
 settings such as the database connection string.
 
+B<UPDATE>: As of 2008, there is a new module which avoids the "kudlgy" solution
+mentioned below: L<Config::JFDI>.
 
 =head2 Sample Application
 

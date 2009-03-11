@@ -1,5 +1,8 @@
 =head1 Catalyst Advent - Day 10 - Catalyst on shared hosting
 
+B<NOTE>: This article was written in 2005. Make sure to check the
+Catalyst Wiki (L<http://dev.catalyst.perl.org/wiki>) for updated information.
+
 So, you want to put your Catalyst app out there for the whole world to
 see, but you don't want to break the bank. There is an answer - if you can
 get shared hosting with FastCGI and a shell, you can install your Catalyst

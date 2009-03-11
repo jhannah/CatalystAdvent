@@ -1,5 +1,8 @@
 =head1 Catalyst Advent - Day 7 - mod_perl Deployment
 
+B<NOTE>: This article was written in 2005. For more up-to-date information
+on deplyoment, please see L<http://dev.catalyst.perl.org/wiki/deployment>
+
 In today's entry, I'll be talking about deploying an application in
 production using Apache and mod_perl.
 

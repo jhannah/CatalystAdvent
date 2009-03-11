@@ -1,5 +1,8 @@
 =head1 Catalyst Advent - Day 12 - L<Catalyst::Plugin::Subrequest>
 
+B<NOTE>: This article was written in 2005. Make sure to check the
+Catalyst Wiki (L<http://dev.catalyst.perl.org/wiki>) for updated information.
+
 =head2 Component based sub-requests.
 
 This is actually one of the features we brought over from L<Maypole>. There it 

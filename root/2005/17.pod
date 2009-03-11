@@ -1,5 +1,8 @@
 =head1 Catalyst Advent - Day 17 - FastCGI Deployment
 
+B<NOTE>: This article was written in 2005. For more up-to-date information
+on deplyoment, please see L<http://dev.catalyst.perl.org/wiki/deployment>
+
 As a companion to Day 7's mod_perl article, today's article is about
 production FastCGI deployment.
 

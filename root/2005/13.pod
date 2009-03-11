@@ -1,5 +1,8 @@
 =head1 Catalyst Advent - Day 13 - DBIx::Class as Catalyst Model
 
+B<NOTE>: This article was written in 2005. Make sure to check the
+Catalyst Wiki (L<http://dev.catalyst.perl.org/wiki>) for updated information.
+
 =head2 Our Database
 
 This text will show you how to start using DBIx::Class as your model within

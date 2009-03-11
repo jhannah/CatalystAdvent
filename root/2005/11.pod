@@ -1,5 +1,8 @@
 =head1 Catalyst Advent - Day 11 - Caching
 
+B<NOTE>: This article was written in 2005. Make sure to check the
+Catalyst Wiki (L<http://dev.catalyst.perl.org/wiki>) for updated information.
+
 Catalyst makes it easy to employ several different types of caching to speed
 up your applications.
 

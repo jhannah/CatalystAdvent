@@ -1,5 +1,8 @@
 =head1 Catalyst Advent - Day 6 - Building PAR Packages
 
+B<NOTE>: This article was written in 2005. For more up-to-date information
+on deplyoment, please see L<http://dev.catalyst.perl.org/wiki/deployment>
+
 You know the problem, you got a application perfectly running on your
 development box, but then *shudder* you have to quickly move it to
 another one for demonstration/deployment/testing...
