@@ -1,5 +1,8 @@
 =head1 Making your Catalyst App Cache-friendly
 
+B<NOTE:> This article has moved to the Catalyst wiki at
+L<http://dev.catalyst.perl.org/wiki/adventcalendararticles/2007/11-Making_your_Catalyst_App_Cache-friendly>.
+
 Web caches are very powerful and are used in many places throughout the
 internet. Most cache servers have complex builtin routines designed to guess
 how long it should cache a particular piece of content. This is because many

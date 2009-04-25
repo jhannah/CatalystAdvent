@@ -1,5 +1,8 @@
 =head1 Catalyst Advent - Day 14 - Authentication/Authorization
 
+B<NOTE:> This article is now obsolete. Please refer to
+L<http://dev.catalyst.perl.org/wiki/gettingstarted/howtos/interim_authorization_and_authentication_example>.
+
 This is done in several steps:
 
 =over 4

@@ -1,5 +1,8 @@
 =head1 Catalyst Advent - Day 24 - Authorization
 
+B<NOTE:> This article is not obsolete. Please refer to
+L<http://dev.catalyst.perl.org/wiki/gettingstarted/howtos/interim_authorization_and_authentication_example>.
+
 =head1 Introduction
 
 Authorization is the step that comes after authentication. Authentication
