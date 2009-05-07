@@ -1,4 +1,4 @@
-use inc::Module::Install;
+use inc::Module::Install 0.87;
 
 name('CatalystAdvent');
 abstract('Catalyst Application');
