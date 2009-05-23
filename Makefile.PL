@@ -24,4 +24,6 @@ catalyst_files();
 
 install_script( glob('script/*.pl') );
 auto_install();
+resources repository => 'http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/CatalystAdvent/';
+
 &WriteAll;
