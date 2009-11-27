@@ -24,6 +24,10 @@ Editors
   - heidi jo brandenburg 
   - Cass Johnston
 
+Volunteers
+  - Alex Nedelcu (some Formhandler stuff)
+  - Tomas Doran (8th or later)
+
 Starting article
   - a call to action similar in tone to 'How perl happens' (chromatic) and 'Dreamcasting' (mst)
   - should mention free support in exchange of docpatches, liberal commit/comaint rights
