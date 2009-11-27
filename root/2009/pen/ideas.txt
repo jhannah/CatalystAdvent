@@ -7,7 +7,8 @@ Articles structure
 Confirmed ideas:
   - DBIx::Class::Schema::Versioned - castaway
   - Plack + Catalyst - miyagawa (or an editor with miyagawa's help)
-  - External authentication (Openid, oauth, twitter, facebook) - Cosmin Budrica
+  - External authentication (Openid, oauth) - Cosmin Budrica
+  - FBConnect (authentication, API examples ) - Cosmin Budrica
   - Padre::Plugin::Catalyst - garu
   - js grid - jquery/ajax/json/moose roles -  Ian Docherty 
   - Configuration layouts: customizing your app per user/host/env/etc. Wallace Reis 
