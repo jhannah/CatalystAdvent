@@ -1,0 +1,29 @@
+Articles structure
+  - most writers don't have tuits for big editorials and guides, so concise articles with snippets of code are recommended
+  - introduction: why/when use the technique/module/advice presented here
+  - body: snippets of copy-pasted code, with just enough comments to make it clear (similar to modules SYNOPSYS)
+  - ending: further reading, stuff we didn't include but you should know about, alternatives, caveats
+
+Confirmed ideas:
+  - DBIx::Class::Schema::Versioned - castaway
+  - Plack + Catalyst - miyagawa (or an editor with miyagawa's help)
+  - External authentication (Openid, oauth, twitter, facebook) - Cosmin Budrica
+  - Padre::Plugin::Catalyst - garu
+  - js grid - jquery/ajax/json/moose roles -  Ian Docherty 
+  - Configuration layouts: customizing your app per user/host/env/etc. Wallace Reis 
+  - database lookup functions working over SOAP  - Ian Sillitoe 
+  - 
+Organising:
+  - Bogdan Lucaciu ( bogdan at sinapticode ro , zamolxes on irc)
+  - Devin Austin (devin.austin at gmail com , dhoss on irc)
+  - Kieren Diment (diment at gmail com , kd on irc)
+
+Editors
+  - Jesse Sheidlower 
+  - heidi jo brandenburg 
+  - Cass Johnston
+
+Starting article
+  - a call to action similar in tone to 'How perl happens' (chromatic) and 'Dreamcasting' (mst)
+  - should mention free support in exchange of docpatches, liberal commit/comaint rights
+  - mst
