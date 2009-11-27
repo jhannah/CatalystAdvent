@@ -26,4 +26,5 @@ Editors
 Starting article
   - a call to action similar in tone to 'How perl happens' (chromatic) and 'Dreamcasting' (mst)
   - should mention free support in exchange of docpatches, liberal commit/comaint rights
+  - don't forget to mention ironman, urging people to read ironman planet, register their blogs, write about their catalyst projects and ideas
   - mst
