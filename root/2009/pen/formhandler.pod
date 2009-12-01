@@ -207,8 +207,12 @@ Edit a new file in C<lib/Blog/Controller/Article.pm> ...
       my ($self, $c, $id) = @_;
       
       $c->error("ID isn't valid!") unless $id =~ /^\d+$/;
-      $c->stash->{item} = $c->stash->{articles}->find($id)
-          or $c->forward_to_action('Article', 'not_found');
+      $c->stash->{item} = $c->stash->{articles}->find($id);
+      unless ($c->stash->{item}) {
+          # $c->flash->{error_msg} = "Request article is not available!";
+	  $c->response->status(404);
+	  $c->forward_to_action('Article', 'list');
+      }
   }
   
   sub edit : Chained('item') {
@@ -290,8 +294,8 @@ The "title" field is required
 
 =item *
 
-The "published date" field expects the format YYYY-MM-DD. You'll be
-wise to add a Javascript calendar.
+The "published date" field expects the format YYYY-MM-DD. You'd be
+wise to enhance this input with a Javascript widget.
 
 =back
 
