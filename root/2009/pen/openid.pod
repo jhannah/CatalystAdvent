@@ -1,0 +1,8 @@
+=head1 OpenID Authentication with Catalyst::Authentication::Credential::OpenID
+
+TBD.
+
+=head1 Author
+
+Casey West <casey@geeknest.com>
+
