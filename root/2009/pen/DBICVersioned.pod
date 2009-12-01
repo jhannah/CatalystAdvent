@@ -1,14 +1,14 @@
 =head1 Your Application, Phase Two - The database change
 
-You're done coding, testing, deploying to customers, you put your feet
-up, and then the boss says "Right, time for Phase 2".
+You've finished coding, testing, and deploying to customers. You put
+your feet up, and then the boss says "Right, time for Phase 2."
 
 With your code all nicely checked in to a version control system,
 you're quite happy to add your features, fix a few defects, and deploy
-a new release. This time around however, the database structure needs
+a new release. This time around, however, the database structure needs
 rearranging as well.
 
-The obvious way to upgrade your database structure might be to grab
+One obvious way to upgrade your database structure might be to grab
 the SQL for the changed parts, and diff it, just like code:
 
     CREATE TABLE books (
@@ -30,7 +30,7 @@ something like this:
   ALTER TABLE books MODIFY COLUMN title VARCHAR(1024) NOT NULL;
 
 But for a large set of changes this is probably tedious and time
-consuming, and thats just the update from the previous version of the
+consuming, and that's just the update from the previous version of the
 application. What about crazy customers who for some unknown reason
 are still running the version from a year ago? Do you go back and
 painstakingly create the C<ALTER> statements for those as well?
@@ -63,16 +63,16 @@ the setting of the C<$VERSION> variable.
 When this Schema is deployed to a database, it will create an extra
 table called C<dbix_class_schema_versions>. An initial row will be
 added containing the C<$VERSION> of the deployed schema, and the date
-it was installed.
+it was installed:
 
     version   |      installed
    ---------------------------------
      0.0.1    | 2009-12-01 15:55:02
 
 This data is used to verify, on every re-connection to the database,
-that the installed software (Schema) matches with the version of the
-database structure it is talking to. If the version does not match, a
-warning is given.
+that the installed software (Schema) matches the version of the database
+structure it is talking to. If the version does not match, a warning is
+given.
 
 =head2 Upgrading the database structure
 
@@ -80,8 +80,8 @@ First, make sure you have a copy of the SQL for the original Schema:
 
   My::Schema->connect('dbi:SQLite:test.db')->create_ddl_dir();
 
-By default, this will produce an SQL DDL file for PostgreSQL, MySQL
-and SQLite, see the L<DBIx::Class::Schema> documentation for other
+By default, this will produce an SQL DDL file for PostgreSQL, MySQL,
+and SQLite. See the L<DBIx::Class::Schema> documentation for other
 formats and arguments.
 
 Second, change your Result class to represent the new structure:
@@ -109,7 +109,7 @@ any existing database:
 
 =head2 Caveats
 
-This system provides a bare bones way of upgrading the structure of
+This system provides a bare-bones way of upgrading the structure of
 your database. It does not know anything about data migration. You are
 encouraged to investigate and override the various methods that
 C<Versioned> supplies with any code you need in order to migrate the
