@@ -208,7 +208,7 @@ Edit a new file in C<lib/Blog/Controller/Article.pm> ...
       
       $c->error("ID isn't valid!") unless $id =~ /^\d+$/;
       $c->stash->{item} = $c->stash->{articles}->find($id)
-          or $c->error("ID $id is nonexistent");    
+          or $c->forward_to_action('Article', 'not_found');
   }
   
   sub edit : Chained('item') {
@@ -236,7 +236,7 @@ Edit a new file in C<lib/Blog/Controller/Article.pm> ...
       #   if it returns False, then a validation error happened
       return unless $form->process( params => $c->req->params  );
 
-      $c->flash->{info_msg} = "Article saved!";
+      # $c->flash->{info_msg} = "Article saved!";
       $c->redirect_to_action('Article', 'edit', [$item->article_id]);
   }
 
@@ -346,16 +346,12 @@ and go to the following URL ...
 
 =head2 Further Reading
 
-=head3 On HTML::FormHandler
-
 See L<HTML::FormHandler::Manual::Intro> for a more complex example
 with custom validators and notes about template rendering.
 
 Also, checkout L<HTML::FormHandler::Manual::Cookbook>,
 L<HTML::FormHandler::Manual::Tutorial> and the others documents in the
 L<HTML::FormHandler::Manual>.
-
-=head3 On Catalyst
 
 =head1 AUTHOR
 
