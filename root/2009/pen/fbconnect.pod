@@ -1,7 +1,12 @@
 =head1 FBConnect with Catalyst::Authentication::Credential::FBConnect
 
-L<Catalyst::Authentication::Credential::FBConnect> offers an easy way to grab the credential identifier from a user on Facebook.
-It uses L<WWW::Facebook::API>.
+L<Catalyst::Authentication::Credential::FBConnect> offers an easy way to grab the credential identifier, session key and session expires from a user on Facebook.
+
+Creaza un $c->user cu metodele:
+session_uid
+session_key
+session_expires
+
 
 =head1 Instalation
 
@@ -19,8 +24,11 @@ L<MooseX::Types::Common>
 =head1 Getting it done
 
 
-=begin pod::perl
+=begin pod::xhtml
 
+<p>
+
+<pre>
 package MyApp;
 
 __PACKAGE__->config( 'authentication' => {
@@ -62,11 +70,21 @@ __PACKAGE__->add_columns(
         data_type           => 'integer',
         is_auto_increment   => 1,
     },
+    email => {
+        data_type           => 'varchar',
+        is_nullable         => 1
+    },
+    password => {
+        data_type           => 'varchar',
+        is_nullable         => 1
+    },
     credential_identifier => {
         data_type           => 'varchar',
+        is_nullable         => 1
     },
     credential_source => {
         data_type           => 'varchar',
+        is_nullable         => 1
     },
 );
 
@@ -89,8 +107,6 @@ sub login : Path('/login/facebook') {
     my ($self, $c) = @_;
 
     if( $c->authenticate( {}, 'facebook' ) ) {
-        #$c->user->session_uid;
-
         my $user = $c->model('DB::User')->find_or_create( {
             credential_identifier   => $c->user->session_uid,
             credential_source       => 'facebook',
@@ -106,17 +122,58 @@ sub login : Path('/login/facebook') {
 
 1;
 
+</pre>
 
-=end pod::perl
+</p>
 
+=end pod::xhtml
+
+
+You can also assign a facebook account to an already existing account.
+
+=begin pod:xhtml
+
+<p><pre>
+
+#somewhere in a password required login: $c->authenticate( { email => $email, password => $password }, 'foo' );
+
+package MyApp::Controller::FBconnect;
+use strict;
+use warnings;
+
+sub assign : Path('/assign/facebook') {
+    my ($self, $c) = @_;
+
+    my $user = $c->user if $c->user_in_realm('foo');
+    if( $c->authenticate( {}, 'facebook' ) ) {
+        $user->update( {
+            credential_identifier   => $c->user->session_uid,
+            credential_source       => 'facebook',
+        } );
+
+        $c->authenticate( {
+            credential_identifier   => $user->credential_identifier,
+            credential_source       => 'facebook'
+        }, 'dbic' ) or die "Login failed";
+    }
+        
+}
+
+</pre></p>
+
+
+=end pod:xhtml
 
 
 This practicaly gets you the uid from Facebook. This can be used later on with L<WWW::Facebook::API>.
 
 Here's some example code to actualy use L<WWW::Facebook::API>
 
-=begin pod::perl
+=begin pod::xhtml
     
+<p>
+
+<pre>
     my $client = WWW::Facebook::API->new(
         desktop         => 0,
         api_key         => 'my_api_key'
@@ -133,8 +190,12 @@ Here's some example code to actualy use L<WWW::Facebook::API>
     my $friends = $client->friends->get(
         uid => $c->user->credential_identifier
     );
+</pre>
 
-=end pod::perl
+</p>
+
+
+=end pod::xhtml
 
 
 More about this can be found in the L<WWW::Facebook::API> docs
