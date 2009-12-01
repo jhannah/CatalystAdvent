@@ -131,7 +131,7 @@ editing the wiki or patching some POD or sending a test or even implementing
 a feature or fixing a bug. And if you want to try and contribute something
 but can't think of what, well, for this month only we could really rather do
 with ... Advent Calendar articles :) - so please, please mail the Advent
-Calendar co-ordinator Bogdan Lucacia aka zamolxes on bodgan at sinapticode.com
+Calendar co-ordinator Bogdan Lucaciu aka zamolxes on bogdan at sinapticode.com
 if you fancy having a go, and if you can't think of a topic then try picking
 one of the modules I mention above and writing about that!
 
