@@ -19,7 +19,7 @@ an interface for viewing / editing articles in a blog
 
 =item * 
 
-use HTML::FormHandler for the editing functionality
+uses HTML::FormHandler for the editing functionality
 
 =back
 
@@ -160,7 +160,7 @@ Edit a new file in C<lib/Blog/Controller/Article.pm> ...
 
   # this class is a HTML::FormHandler class that we'll define below
   use Blog::Form::Article;
-  
+
   sub articles : Chained('/') PathPart('article') CaptureArgs(0) {
       my ($self, $c) = @_;
       $c->stash->{articles} = $c->model('DB::Article');
@@ -181,18 +181,27 @@ Edit a new file in C<lib/Blog/Controller/Article.pm> ...
       $c->forward_to_action('Article', 'add');
   }
 
-  sub add : Chained('articles') Args(0) FormConfig {
+  sub add : Chained('articles') {
+      my ($self, $c) = @_;  
+      $c->forward_to_action('Article', 'add');
+  }
+
+  # both adding and editing happens here
+  # no need to duplicate functionality
+  sub save : Private {
       my ($self, $c) = @_;
 
       # if the item doesn't exist, we'll just create a new result
       my $item = $c->stash->{item} || $c->model('DB::Article')->new_result({});
       my $form = Blog::Form::Article->new( item => $item );
-      
+
+      $c->stash( form => $form, template => 'article/save.tt' );
+
       # the "process" call has all the saving logic,
       #   if it returns False, then a validation error happened
       return unless $form->process( params => $c->req->params  );
 
-      $c->flash->{info_msg} = "New Article added!";
+      $c->flash->{info_msg} = "Article saved!";
       $c->redirect_to_action('Article', 'edit', [$item->article_id]);
   }
 
@@ -213,14 +222,19 @@ in C<lib/Blog/Form/Article.pm> looking like this ...
   extends 'HTML::FormHandler::Model::DBIC';
   with 'HTML::FormHandler::Render::Simple';
   
-  has_field 'title'   => ( type => 'Text',     required => 1 );
-  has_field 'ts'      => ( type => 'Date', label => 'Published Date' );
-  has_field 'content' => ( type => 'TextArea', required => 0 );
-  has_field 'tags'    => ( type => 'TextArea', required => 0 );
+  has_field 'title'    => ( type => 'Text',     required => 1 );
+  has_field 'ts'       => ( type => 'Date', label => 'Published Date' );
+  has_field 'content'  => ( type => 'TextArea', required => 0 );
+  has_field 'tags_str' => ( type => 'TextArea', required => 0 );
 
   1;
 
-... and to make this work, also add the template ...
+... and to make this work, also add the view ...
+
+  # perl script/blog_create.pl view TT TT
+
+... configure the templates path, and add the following file in
+C<root/article/save.tt> ...
 
   <h1>
     [% IF item.article_id %]Editing "[% item.title %]"
@@ -276,15 +290,21 @@ The "title" field is required
 
 =item *
 
-The "published date" field expects the format YYYY-MM-DD
+The "published date" field expects the format YYYY-MM-DD. You'll be
+wise to add a Javascript calendar.
 
 =back
 
-There's only one problem ... the "tags" field is a textarea. We want
-Blog::Form::Article to automatically get the value, split it by ",",
-create the missing tags, and create the necessary links between the
-article and those tags. We'll just append the following to
-Blog::Form::Article ...
+There's only one problem ... the "tags_str" field is a
+textarea. HTML::FormHandler can work directly with many-to-many
+relationships, but in this case we want the editing to be as
+"free-form" as possible. So we want to specify those tags in a simple
+textarea, separated by commas.
+
+To save the tags, we want Blog::Form::Article to automatically get the
+value, split it in words by ",", create the missing tags, and create
+the necessary links between the article and those tags. We'll just
+append the following to Blog::Form::Article ...
 
   before 'update_model' => sub {
       my $self = shift;
@@ -301,8 +321,9 @@ Blog::Form::Article ...
       }
   };  
 
-But we also want it to load the current tags in the textarea when
-the form renders. So we'll just append this ...
+We have this flexibility, since HTML::FormHandler is based on
+Moose. But we also want it to load the current tags in the textarea
+when the form renders. So we'll just append this ...
 
   after 'setup_form' => sub {
       my $self = shift;
