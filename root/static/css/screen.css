@@ -57,7 +57,17 @@ a {
 }
 
 a:hover {
-    color: #d00;
+        color: #d00;
+}
+
+#content a:link,
+#content a:visited {
+    border-bottom: 1px dotted #DD0000;
+}
+
+#content a:hover,
+#content a:focus {
+    border-bottom-style: solid;
 }
 
 h2 {
@@ -65,45 +75,45 @@ h2 {
     color: #b00;
 }
 
-.calendar {
+#content .calendar {
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 1em;
 }
 
-.calendar td {
+#content .calendar td {
     text-align: center;
 }
 
-.calendar th {
+#content .calendar th {
     padding: 5px;
     border: 1px solid #ddd;
     background: #f0f0f0;
 }
 
-.calendar td {
+#content .calendar td {
     padding: 5px;
 }
 
-.calendar td.link {
+#content .calendar td.link {
     padding: 0;
 }
 
-.calendar td.today {
+#content .calendar td.today {
     background: #797;
 }
 
-.calendar td.today a {
+#content .calendar td.today a {
     border: 1px solid #575;
     color: #fff;
 }
 
-.calendar td.today a:hover {
+#content .calendar td.today a:hover {
     background: #bdb;
     color: #444;
 }
 
-.calendar a {
+#content .calendar a {
     display: block;
     padding: 5px;
     border: 1px solid #eee;
@@ -111,7 +121,7 @@ h2 {
     color: #444;
 }
 
-.calendar a:hover {
+#content .calendar a:hover {
     background: #f0f0f0;
 }
 
@@ -158,4 +168,11 @@ a img {
     left: 0.4em;
     position: absolute;
     width: 33%;
+}
+
+@media print {
+    a {
+        color: black !important;
+        border: 0 !important;
+    }
 }
