@@ -1,50 +1,44 @@
-<h1>Creating a simple blog with Catalyst, HTML::FormHandler and DBIx::Class</h1>
+=head1 Creating a simple blog with Catalyst, HTML::FormHandler and DBIx::Class
 
-<h2>Introduction</h2>
+=head2 Introduction
 
-<p>
-  <a href="http://search.cpan.org/~gshank/HTML-FormHandler-0.28001/">
-    HTML::FormHandler</a> is a module for handling forms / HTTP requests
-  that includes validation rules and, in case of DBIC models, it also
-  includes the logic to save the model in your database.
-</p>
+L<HTML::FormHandler> is a module for handling forms / HTTP requests
+that includes validation rules and, in case of DBIC models, it also
+includes the logic to save the model in your database.
 
-<p>
-  I like HTML::FormHandler because of its simplicity, extendability
-  and Moose integration provided.
-</p>
+I like HTML::FormHandler because of its simplicity, extendability
+and Moose integration provided.
 
-<p>
-  This tutorial includes a fairly simple example ...
-  <ul>
-    <li>an interface for viewing / editing articles in a blog</li>
-    <li>use HTML::FormHandler for the editing functionality</li>
-  </ul>
-</p>
+This tutorial includes a fairly simple example ...
 
-<h2>Setting up the project</h2>
+=over
 
-<p>
-  To start a new project ...
-  <pre>
-    # catalyst.pl Blog
-  </pre>
-</p>
+=item *
 
-<p>
-  Let's generate the model ...
-  <pre>
-    perl script/blog_create.pl model DB DBIC::Schema Blog::Schema \
-    create=static components=TimeStamp \
-    'dbi:Pg:dbname=blog' 'blog' 'blog' '{ AutoCommit => 1 }'
-  </pre>
-</p>
+an interface for viewing / editing articles in a blog
 
-<p>
-  Our articles will be tagged (to make the form processing more
-  interesting), so add a model representing tags
-  in <i>lib/Blog/Schema/Result/Tag.pm</i> ...
-  <pre>
+=item * 
+
+use HTML::FormHandler for the editing functionality
+
+=back
+
+=head2 Setting up the project
+
+To start a new project ...
+
+ # catalyst.pl Blog
+
+Let's generate the model ...
+
+ perl script/blog_create.pl model DB DBIC::Schema Blog::Schema \
+ create=static components=TimeStamp \
+ 'dbi:Pg:dbname=blog' 'blog' 'blog' '{ AutoCommit => 1 }'
+
+Our articles will be tagged (to make the form processing more
+interesting), so add a model representing tags
+in C<lib/Blog/Schema/Result/Tag.pm> 
+
   package Blog::Schema::Result::Tag;
   
   use strict;
@@ -69,13 +63,10 @@
   __PACKAGE__->set_primary_key('tag_id');
   1;    
   </pre>
-</p>
 
-<p>
-  Let's also add an Article model
-  in <i>lib/Blog/Schema/Result/Article.pm</i> ...
+Let's also add an Article model
+in C<lib/Blog/Schema/Result/Article.pm>...
 
-  <pre>
   package Blog::Schema::Result::Article;
   
   use strict;
@@ -111,11 +102,10 @@
   __PACKAGE__->set_primary_key('article_id');  
   __PACKAGE__->has_many(article_tags => 'Blog::Schema::Result::ArticleTag', 'article_fk');
   __PACKAGE__->many_to_many(tags => 'article_tags', 'tag');
-  </pre>
 
-  ... with a coresponding link table ...
 
-  <pre>
+... with a coresponding link table ...
+
   package Blog::Schema::Result::ArticleTag;
   
   use strict;
@@ -138,21 +128,15 @@
   __PACKAGE__->add_unique_constraint([ qw/article_fk tag_fk/ ]);    
   __PACKAGE__->belongs_to(tag => 'Blog::Schema::Result::Tag', 'tag_fk');
   __PACKAGE__->belongs_to(article => 'Blog::Schema::Result::Article', 'article_fk');
-  </pre>
-</p>
 
-<p>
-  We're almost done setting up our project. Now just deploy your
-  schema with a command like this ...
-  <pre>
+We're almost done setting up our project. Now just deploy your
+schema with a command like this ...
+
     # perl -I./lib -MBlog::Model::DB \
          -e " Blog::Model::DB->new->schema->deploy "
-  </pre>
-</p>
 
-<p>
-  Also add these utilities to lib/Blog.pm ...
-  <pre>
+Also add these utilities to lib/Blog.pm ...
+
   sub redirect_to_action {
       my ($c, $controller, $action, @params) =@_;
       $c->response->redirect($c->uri_for($c->controller($controller)->action_for($action), @params));
@@ -163,15 +147,11 @@
       $c->forward($controller, $action, @params);
       $c->detach;
   }  
-  </pre>
-</p>
 
-<h2>Creating the CRUD controller</h2>
+=head2 Creating the CRUD controller
 
-<p>
-  Edit a new file in <i>lib/Blog/Controller/Article.pm</i> ...
+Edit a new file in C<lib/Blog/Controller/Article.pm> ...
 
-  <pre>
   package Blog::Controller::Article
   
   use strict;
@@ -215,20 +195,15 @@
       $c->flash->{info_msg} = "New Article added!";
       $c->redirect_to_action('Article', 'edit', [$item->article_id]);
   }
-  </pre>
 
-  This CRUD is pretty standard, and it would be possible to abstract
-  it away in a 
-  <a href="http://search.cpan.org/~hkclark/Catalyst-Manual-5.8002/lib/Catalyst/Manual/CatalystAndMoose.pod#Controller_Roles">role</a>. 
-</p>
+This CRUD is pretty standard, and it would be possible to abstract
+it away in a role (see  L<Catalyst::Manual::CatalystAndMoose/Controller_Roles>)
 
-<h2>The Editing Form</h2>
+=head2 The Editing Form
 
-<p>
-  Let's start with the HTML::FormHandler derived class
-  in <i>lib/Blog/Form/Article.pm</i> looking like this ...
+Let's start with the HTML::FormHandler derived class
+in C<lib/Blog/Form/Article.pm> looking like this ...
   
-  <pre>
   package Blog::Form::Article;
   
   use strict;
@@ -244,15 +219,13 @@
   has_field 'tags'    => ( type => 'TextArea', required => 0 );
 
   1;
-  </pre>
 
-  ... and to make this work, also add the template ...
+... and to make this work, also add the template ...
 
-  <pre>
-  &lt;h1&gt;
+  <h1>
     [% IF item.article_id %]Editing "[% item.title %]"
     [% ELSE %]Adding a new article[% END %]
-  &lt;/h1&gt;
+  </h1>
   
   [% form.render_start %]
   
@@ -261,10 +234,10 @@
   [% form.render_field('content') %]
   [% form.render_field('tags') %]
   
-  &lt;div class="submit"&gt;&lt;input type="submit" value="Save" /&gt;&lt;/div&gt;
+  <div class="submit"><input type="submit" value="Save" /></div>
   [% form.render_end %]
 
-  &lt;style type="text/css"&gt;
+  <style type="text/css">
     form fieldset {
         width: 450px;
     }  
@@ -291,24 +264,28 @@
     form .submit input {
         width: 100px;
     }
-  &lt;/style&gt;
-  </pre>
-</p>
+  </style>
 
-<p>
-  OK, so we now have a form with automatic validation ...
-  <ul>
-    <li>The "title" field is required</li>
-    <li>The "published date" field expects the format YYYY-MM-DD</li>
-  </ul>
+OK, so we now have a form with automatic validation ...
 
-  There's only one problem ... the "tags" field is a textarea. We want
-  Blog::Form::Article to automatically get the value, split it by ",",
-  create the missing tags, and create the necessary links between the
-  article and those tags. We'll just append the following to
-  Blog::Form::Article ...
+=over 
 
-  <pre>
+=item *
+
+The "title" field is required
+
+=item *
+
+The "published date" field expects the format YYYY-MM-DD
+
+=back
+
+There's only one problem ... the "tags" field is a textarea. We want
+Blog::Form::Article to automatically get the value, split it by ",",
+create the missing tags, and create the necessary links between the
+article and those tags. We'll just append the following to
+Blog::Form::Article ...
+
   before 'update_model' => sub {
       my $self = shift;
       my $item = $self->item;
@@ -323,12 +300,10 @@
   	$item->article_tags->create({ tag => $tag_obj });
       }
   };  
-  </pre>
 
-  But we also want it to load the current tags in the textarea when
-  the form renders. So we'll just append this ...
+But we also want it to load the current tags in the textarea when
+the form renders. So we'll just append this ...
 
-  <pre>
   after 'setup_form' => sub {
       my $self = shift;
       my $item = $self->item;
@@ -337,20 +312,22 @@
          $item->tags->search({}, { order_by => 'name' })->all;
       $self->field('tags_str')->value($value);
   };
-  </pre>
-</p>
 
-<h2>Testing</h2>
+=head2 Testing
 
-<p>
-  And we are done. Start your development server with ...
-  <pre>
+And we are done. Start your development server with ...
+
     perl script/blog_server.pl -r -d
-  </pre>
 
-  and go to the following URL ...
-  <pre>
+and go to the following URL ...
+
     http://localhost:3000/article/add
-  </pre>
-</p>
+
+=head1 AUTHOR
+
+Alexandru Nedelcu <alex@sinapticode.com>
+
+=head3 COPYRIGHT
+
+Copyright 2009 Sinapticode - L<http://www.sinapticode.com>
 
