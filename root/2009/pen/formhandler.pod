@@ -23,7 +23,7 @@ can use already defined Moose constraints
 
 I don't like it in FormFu that the standard way of defining a form is
 within an YAML file ... I know that many people use that form
-definition for the response rendering but validation rules are
+definition for the response rendering but validation rules are a
 contract of the request and should be decoupled from the response
 
 =item *
@@ -378,6 +378,19 @@ And we are done. Start your development server with ...
 and go to the following URL ...
 
     http://localhost:3000/article/add
+
+=head2 Further Reading
+
+=head3 On HTML::FormHandler
+
+See L<HTML::FormHandler::Manual::Intro> for a more complex example
+with custom validators and notes about template rendering.
+
+Also, checkout L<HTML::FormHandler::Manual::Cookbook>,
+L<HTML::FormHandler::Manual::Tutorial> and the others documents in the
+L<HTML::FormHandler::Manual>.
+
+=head3 On Catalyst
 
 =head1 AUTHOR
 
