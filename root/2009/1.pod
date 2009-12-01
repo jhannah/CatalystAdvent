@@ -115,7 +115,8 @@ itches to be scratched. Even for core this is true - t0m now acts as the
 split the dist building work with Marcus Ramberg, our long-standing release
 manager; Kieren Diment aka "kd" replaced Jesse Sheidlower aka "the_jester" as
 docs co-ordinator after Real Life happened to the_jester (well, that and
-writing a book about my favorite word ...).
+writing L<http://www.amazon.com/F-Word-Jesse-Sheidlower/dp/0195393112>, of
+which I of course heartily approve :).
 
 Speaking of documentation, the Catalyst (and for that matter DBIx::Class)
 project has always had a spirit of treating documenters as at least as
