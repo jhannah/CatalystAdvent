@@ -1,0 +1,164 @@
+=head1 How Catalyst Happens
+
+=head2 What happened this year?
+
+Well ... wow. Advent time already again. That means another year almost over.
+And what a year it's been.
+
+In April of this year, we shipped Catalyst 5.80 - the first Catalyst to use
+Moose from the ground up. It was a straight port, with minimal additional
+features - and we did that for a reason. The reason was that 5.80 as was
+allowed us to shake out the compatibility issues resulting from a complete
+change of object systems. Change One Thing At Once, as the old adage goes
+- and many thanks to Guillermo Roditi (groditi) and Scott McWhirter (konobi)
+for doing the slogging to get a first ported version up we could start
+beating on and clean up for release.
+
+We did this in the hope that rather than needing to add features to core
+to take advantage of Moose, the Catalyst community would step up and figure
+it out in the wider world so we could try and fail a few times to find the
+best path without committing ourselves to maintaining compatibility with
+the bad ideas.
+
+Frankly, I'd say the plan succeeded beyond our wildest expectations.
+
+=head2 What modules are worth a (re-)look?
+
+L<Catalyst::Model::DBIC::Schema> has been rewritten using a traits system to
+enable plugins to be written and loaded for it easily, and is once again
+a shining example of best practices for model adaptor authoring (many thanks
+to Rafael Kitover aka Caelum for doing the heavy lifting - and for putting up
+with my nitpicking during the process).
+
+L<CatalystX::RoleApplicator> allows us to elegantly add roles to the
+application, request, response, engine, dispatcher and stats classes in use,
+eliminating the need to construct near-empty classes in order to compose
+together additional functionality. Better still, RoleApplicator is implemented
+using L<MooseX::RelatedClassRoles> so you can use the same interface when you
+hit similar problems in your own code (many thanks to Hans Dieter Pearcey aka
+confound for writing both).
+
+L<Catalyst::Controller::ActionRole> provides the :Does attribute which applies
+roles to your action class rather than setting it ala :ActionClass - far
+cleaner and as with RoleApplicator allows multiple behaviours to be used
+at once (merci to both confound, and to Florian Ragwitz aka rafl for this
+one).
+
+Given that, we can now implement things such as L<Catalyst::ActionRole::ACL> -
+which provides declarative role-based authorisation for actions (kudos to
+David Wollmann aka converter for this one) - and this can be combined onto
+the same action with other similar modules - for example
+L<Catalyst::ActionRole::NeedsLogin> from L<CatalystX::SimpleLogin>, such that
+an un-logged-in user is redirected to the login page and a logged-in user
+is restricted unless they have correct permissions - all on a single controller
+method.
+
+L<CatalystX::SimpleLogin> also illustrates that we're now able to supply
+actions from controller roles (and method modifiers to existing actions)
+- for example L<CatalystX::SimpleLogin::TraitFor::Controller::Login::Logout>
+adds a logout action to your controller (SimpleLogin was created by a
+number of evil geniuses - see the docs for the full list). This is possible
+because of work done on L<MooseX::MethodAttributes> by rafl and Tomas Doran
+aka t0m, with assorted help, kibitzing and occasional laughter from the Moose
+community.
+
+I should probably also mention Gerda Shank aka gshank's L<HTML::FormHandler>,
+which seems to be rapidly gaining in popularity - it's aiming at a different
+problem definition to L<HTML::FormFu> but given its wide adoption perhaps it's
+aiming for a better problem definition; I am grumpy and cynical about form
+handling so choose not to express an opinion. But HTML::FormHandler is
+a great example of the same, growing, trend as L<MooseX::RelatedClassRoles>
+- non-Catalyst-dependent modules being written with Moose as the lingua
+franca, and then thin glue to integrate them into Catalyst (or in the
+case of FormHandler, no glue required at all :).
+
+=head2 The point.
+
+See how every single module I've mentioned introduces at least one new name?
+
+That. Is How Catalyst Happens.
+
+Catalyst has always been a project of the community, driven by the community.
+
+I first got involved by turning up on the #catalyst channel on irc.perl.org
+and starting trying to figure out how to use Catalyst. Given I was already
+planning to abuse it as well, I was reading the source and happened to notice
+a potential bug in the regexp dispatch system; when I flagged this to the
+channel somebody immediately offered to audit and apply a patch for it if I
+could come up with one. Seeing as it was a simple fix, I whipped it up,
+presented it, and was told "what about tests?" and pointed at which test to
+add to to prove the fix worked. So I did, and it did, and the patch was
+applied. And I was addicted.
+
+Not long after that I volunteered to run the source repositories (and later
+Shadowcat ended up hosting the entire project infrastructure, but that's
+another story involving a grinch of an ISP and a christmas eve migration :)
+and as other people became addicted had the unmitigated pleasure of handing
+out commit bit after commit bit - and in more recent times arranging for
+the handing out of co-maint bit after co-maint bit as release managers for
+different releated projects shift around.
+
+I'm entry 18 in the Catalyst svnpasswd file.
+
+As of today it's 275 contributors long.
+
+A client manager once listened to me rave about this community, and told me
+that utopias never lasted. Perhaps he was right. Catalyst isn't that; it's
+an anarchy, a meritocracy, an oligarchy and a dictatorship, in equal measure
+and without contradiction. When a member of the community moves on to other
+projects two more step up to take his place; active contributors ebb, flow
+and eddie as people's work lives and real lives intersect and interact with
+itches to be scratched. Even for core this is true - t0m now acts as the
+5.80 chainsaw delegate and keeper of todo lists; rafl has stepped up to
+split the dist building work with Marcus Ramberg, our long-standing release
+manager; Kieren Diment aka kd replaced Jesse Shiedlower aka the_jester as
+docs co-ordinator after Real Life happened to the_jester (well, that and
+writing a book about my favourite word ...).
+
+Speaking of documentation, the Catalyst (and for that matter DBIx::Class)
+project has always had a spirit of treating documenters as at least as
+important as implementors - the record of contributions does not record
+who's who, or who was what for which project, and that's correct. The words
+to make a piece of code comprehensible are as essential to that piece of
+code being successfully used as the perl source is.
+
+So how does Catalyst happen?
+
+It happens because of you. The other users (I can't say "our" users, since
+we're users too). When you report problems, when you discuss things on
+mailing lists, and especially when you cross the line to contributor by
+editing the wiki or patching some POD or sending a test or even implementing
+a feature or fixing a bug. And if you want to try and contribute something
+but can't think of what, well, for this month only we could really rather do
+with ... Advent Calendar articles :) - so please, please mail the Advent
+Calendar co-ordinator Bogdan Lucacia aka zamolxes on bodgan at sinapticode.com
+if you fancy having a go, and if you can't think of a topic then try picking
+one of the modules I mention above and writing about that!
+
+=head2 A look forward to 2010
+
+Best of all, next year, it's going to keep happening. Devin Austin aka dhoss
+has almost finished the complete rewrite of the helper and script system he
+started as a Google Summer of Code minion, Zbigniew Lukasiak aka zby has an
+almost complete branch splitting the application and per-request context
+objects which will enable a whole bunch more awesome things, and miyagawa's
+Catalyst::Engine::PSGI lets us take advantage of Plack - which I fully expect
+to take the perl web world by storm in the next year. I might even manage to
+figure out how some of the things I've been experimenting with in L<Web::Simple>
+apply to improving the state of the art rather than just sitting around talking
+design with people and writing waffling articles.
+
+2009 ruled. 2010 is going to rule even more. So stick right with us and let's
+show you the former, and maybe even give you some ideas on helping make the
+latter a reality. Because this is going to be the coolest Catalyst Advent
+Calendar so far.
+
+Oh, and Merry F***ing Christmas!
+
+-- mst, out
+
+=head1 AUTHOR
+
+Matt S. Trout <mst@shadowcat.co.uk>
+
+=cut
