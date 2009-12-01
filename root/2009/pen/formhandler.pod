@@ -275,45 +275,10 @@ C<root/article/save.tt> ...
     [% IF item.article_id %]Editing "[% item.title %]"
     [% ELSE %]Adding a new article[% END %]
   </h1>
-  
-  [% form.render_start %]
-  
-  [% form.render_field('title') %]
-  [% form.render_field('ts') %]
-  [% form.render_field('content') %]
-  [% form.render_field('tags') %]
-  
-  <div class="submit"><input type="submit" value="Save" /></div>
-  [% form.render_end %]
 
-  <style type="text/css">
-    form fieldset {
-        width: 450px;
-    }  
-    form label {
-        float: left;
-        display: block;
-        width: 150px;
-    }  
-    form input, form textarea {
-        width: 300px;
-    }
-    form #tags {
-        height: 50px;
-    }
-    form .error_message {
-        margin-left: 100px;
-        color: red;
-        font-style: italic;
-    }  
-    form .submit {
-        margin-top: 10px;
-        text-align: right;
-    }
-    form .submit input {
-        width: 100px;
-    }
-  </style>
+  [% IF info_msg %]<div class="info_msg">[% info_msg %]</div>[% END %]
+
+  [% form.render %]  
 
 OK, so we now have a form with automatic validation ...
 
