@@ -1,0 +1,132 @@
+=head1 Your Application, Phase Two - The database change
+
+You're done coding, testing, deploying to customers, you put your feet
+up, and then the boss says "Right, time for Phase 2".
+
+With your code all nicely checked in to a version control system,
+you're quite happy to add your features, fix a few defects, and deploy
+a new release. This time around however, the database structure needs
+rearranging as well.
+
+The obvious way to upgrade your database structure might be to grab
+the SQL for the changed parts, and diff it, just like code:
+
+    CREATE TABLE books (
+      id    INTEGER AUTOINCREMENT,
+  -    title VARCHAR(255),
+  +    title VARCHAR(1024) NOT NULL,
+      year  INTEGER,
+    );
+
+But when you apply this change to your existing database full of
+lovely books, you find you can't run C<CREATE> on a table that's
+already there. You can C<DROP> the table first, but then your data is
+toast and your users have to start over.
+
+You could instead manually go over the database changes, and construct
+C<ALTER> statements to update existing installs to the new plan,
+something like this:
+
+  ALTER TABLE books MODIFY COLUMN title VARCHAR(1024) NOT NULL;
+
+But for a large set of changes this is probably tedious and time
+consuming, and thats just the update from the previous version of the
+application. What about crazy customers who for some unknown reason
+are still running the version from a year ago? Do you go back and
+painstakingly create the C<ALTER> statements for those as well?
+
+=head2 Enter DBIx::Class::Schema::Versioned
+
+If you're using C<DBIx::Class> to access your database from your
+application, then there's a tool which can help solve all these
+problems. C<Versioned> helps keep track of which version of your
+application is installed where, and makes it easier to upgrade.
+
+To start using Versioned in your application, add it as a component of
+the C<Schema> class, for example:
+
+   package My::Schema;
+   use base 'DBIx::Class::Schema';
+
+   our $VERSION = '0.01';
+   __PACKAGE__->load_components('+DBIx::Class::Schema::Versioned');
+   __PACKAGE__->upgrade_directory('/path/to/dir');
+
+   __PACKAGE__->load_namespaces();
+
+   1;
+
+The important parts here are the C<load_components> call, which makes
+your Schema class a subclass of C<DBIx::Class::Schema::Versioned>, and
+the setting of the C<$VERSION> variable.
+
+When this Schema is deployed to a database, it will create an extra
+table called C<dbix_class_schema_versions>. An initial row will be
+added containing the C<$VERSION> of the deployed schema, and the date
+it was installed.
+
+    version   |      installed
+   ---------------------------------
+     0.0.1    | 2009-12-01 15:55:02
+
+This data is used to verify, on every re-connection to the database,
+that the installed software (Schema) matches with the version of the
+database structure it is talking to. If the version does not match, a
+warning is given.
+
+=head2 Upgrading the database structure
+
+First, make sure you have a copy of the SQL for the original Schema:
+
+  My::Schema->connect('dbi:SQLite:test.db')->create_ddl_dir();
+
+By default, this will produce an SQL DDL file for PostgreSQL, MySQL
+and SQLite, see the L<DBIx::Class::Schema> documentation for other
+formats and arguments.
+
+Second, change your Result class to represent the new structure:
+
+  -    title => { data_type => 'VARCHAR', size => 255' },
+  +    title => { data_type => 'VARCHAR', size => 1024, is_nullable => 0 },
+
+And change the version:
+
+  -  our $VERSION = '0.01';
+  +  our $VERSION = '0.02';
+
+Now create another set of DDL files, upgrading from the original
+database layout to the new one:
+
+   My::Schema->connect('dbi:SQLite:test.db')->create_ddl_dir(undef, '0.01', undef, '0.02');
+
+Repeat this for as many upgrade paths (old version, new version) as
+you want to support.
+
+The new Schema can now be used, along with the SQL files, to upgrade
+any existing database:
+
+  My::Schema->connect('dbi:SQLite:test.db')->upgrade();
+
+=head2 Caveats
+
+This system provides a bare bones way of upgrading the structure of
+your database. It does not know anything about data migration. You are
+encouraged to investigate and override the various methods that
+C<Versioned> supplies with any code you need in order to migrate the
+data.
+
+Always examine the produced DDL files carefully. SQL::Translator is used to
+produce the diffs, and while it is good, it may not be perfect for
+your use.
+
+=head2 Further reading
+
+Make sure you read and understand the documentation of
+L<DBIx::Class::Schema::Versioned>.
+
+=head1 AUTHOR
+
+Jess Robinson <castaway@desert-island.me.uk>
+
+
+
