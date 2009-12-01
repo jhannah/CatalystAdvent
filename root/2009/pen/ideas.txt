@@ -34,3 +34,6 @@ Starting article
   - should mention free support in exchange of docpatches, liberal commit/comaint rights
   - don't forget to mention ironman, urging people to read ironman planet, register their blogs, write about their catalyst projects and ideas
   - mst
+
+Moar ideas:
+- "Bullet proof search" - Matija Grabnar: http://zanshin.matija.com/twiki/bin/view/Main/BulletProofSearch
