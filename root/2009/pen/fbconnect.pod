@@ -3,7 +3,7 @@
 L<Catalyst::Authentication::Credential::FBConnect> offers an easy way to grab the credential identifier, session key and session expires from a user on Facebook.
 
 
-You'll have the following accessors in C<$c->user>
+You'll have the following accessors in C<< $c->user >>
 
 =over
 
