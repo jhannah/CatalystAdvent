@@ -1,0 +1,164 @@
+=head1 FBConnect with Catalyst::Authentication::Credential::FBConnect
+
+L<Catalyst::Authentication::Credential::FBConnect> offers an easy way to grab the credential identifier from a user on Facebook.
+It uses L<WWW::Facebook::API>.
+
+=head1 Instalation
+
+L<Catalyst::Authentication::Credential::FBConnect> depends on:
+
+L<WWW::Facebook::API>
+
+L<Moose>
+
+L<MooseX::Types::Moose>
+
+L<MooseX::Types::Common>
+
+
+=head1 Getting it done
+
+
+=begin pod::perl
+
+package MyApp;
+
+__PACKAGE__->config( 'authentication' => {
+    default_realm => 'facebook',
+    realms => {
+        facebook => {
+            credential => {
+                class       => 'FBConnect',
+                api_key     => 'my_api_key',
+                secret      => 'my_secret',
+                app_name    => 'my_app_name',
+            }
+        },
+        dbic => {
+            credential => {
+                class       => 'Password', 
+                password_type => 'none',
+            },
+            store => {
+                class       => 'DBIx::Class',
+                user_class  => 'DB::User',
+                id_field    => 'user_id'
+            }
+        }
+    }
+} );
+
+
+
+package MyApp::Schema::Result::User;
+use strict;
+use warnings;
+
+use base 'DBIx::Class';
+
+__PACKAGE__->table( 'users' );
+__PACKAGE__->add_columns(
+    user_id => {
+        data_type           => 'integer',
+        is_auto_increment   => 1,
+    },
+    credential_identifier => {
+        data_type           => 'varchar',
+    },
+    credential_source => {
+        data_type           => 'varchar',
+    },
+);
+
+__PACKAGE__->set_primary_key( 'user_id' );
+
+__PACKAGE__->add_unique_constraint( [ qw/ credential_identifier credential_source / ] );
+
+
+1;
+
+
+
+package MyApp::Controller::FBConnect;
+use strict;
+use warnings;
+
+use base 'Catalyst::Controller';
+
+sub login : Path('/login/facebook') {
+    my ($self, $c) = @_;
+
+    if( $c->authenticate( {}, 'facebook' ) ) {
+        #$c->user->session_uid;
+
+        my $user = $c->model('DB::User')->find_or_create( {
+            credential_identifier   => $c->user->session_uid,
+            credential_source       => 'facebook',
+        } );
+
+        $c->authenticate( {
+            credential_identifier   => $user->credential_identifier,
+            credential_source       => 'facebook'
+        }, 'dbic' ) or die "Login failed";
+    }
+}
+
+
+1;
+
+
+=end pod::perl
+
+
+
+This practicaly gets you the uid from Facebook. This can be used later on with L<WWW::Facebook::API>.
+
+Here's some example code to actualy use L<WWW::Facebook::API>
+
+=begin pod::perl
+    
+    my $client = WWW::Facebook::API->new(
+        desktop         => 0,
+        api_key         => 'my_api_key'
+        secret          => 'my_secret'
+    );
+
+    #get user info
+    my $response = $client->users->get_info(
+        uids => $c->user->credential_identifier,
+        fields => [ qw/about_me quotes/ ]
+    );
+
+    #get user friends
+    my $friends = $client->friends->get(
+        uid => $c->user->credential_identifier
+    );
+
+=end pod::perl
+
+
+More about this can be found in the L<WWW::Facebook::API> docs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
