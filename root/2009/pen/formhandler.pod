@@ -139,7 +139,7 @@ in C<lib/Blog/Schema/Result/Article.pm>...
   __PACKAGE__->many_to_many(tags => 'article_tags', 'tag');
 
 
-... with a coresponding link table ...
+... with a corresponding link table ...
 
   package Blog::Schema::Result::ArticleTag;
   
@@ -187,7 +187,7 @@ Also add these utilities to lib/Blog.pm ...
 
 Edit a new file in C<lib/Blog/Controller/Article.pm> ...
 
-  package Blog::Controller::Article
+  package Blog::Controller::Article;
   
   use strict;
   use warnings;
