@@ -4,14 +4,20 @@ use strict;
 use warnings;
 
 use Catalyst qw( Static::Simple
-                 Cache::FileCache
+                 Cache
                  DefaultEnd 
                  Unicode
               );
 
 our $VERSION = '0.03';
 
-__PACKAGE__->config( name => 'CatalystAdvent' );
+__PACKAGE__->config(
+  name => 'CatalystAdvent',
+  'Plugin::Cache' => { backend => {
+    class => 'Cache::FileCache',
+    namespace => 'CatalystAdvent',
+  } },
+);
 __PACKAGE__->setup;
 
 =head1 NAME

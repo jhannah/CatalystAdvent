@@ -11,7 +11,7 @@ include('ExtUtils::AutoInstall');
 requires( Catalyst => '5.60' );
 requires( 'Catalyst::Plugin::DefaultEnd' );
 requires( 'Catalyst::Plugin::Unicode' );
-requires( 'Catalyst::Plugin::Cache::FileCache' );
+requires( 'Catalyst::Plugin::Cache' => '0.08' );
 requires( 'DateTime' );
 requires( 'File::stat' );
 requires( 'Pod::Xhtml' );
