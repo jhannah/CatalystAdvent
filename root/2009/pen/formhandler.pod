@@ -9,6 +9,41 @@ includes the logic to save the model in your database.
 I like HTML::FormHandler because of its simplicity, extendability
 and Moose integration provided.
 
+I prefer it over FormFu mostly because of subjective reasons, but most
+importantly ...
+
+=over 
+
+=item *
+
+The validation logic is done with validators written in Perl, and you
+can use already defined Moose constraints
+
+=item *
+
+I don't like it in FormFu that the standard way of defining a form is
+within an YAML file ... I know that many people use that form
+definition for the response rendering but validation rules are
+contract of the request and should be decoupled from the response
+
+=item *
+
+I don't like it that the standard way to initialize a FormFu object is
+done with a Catalyst plugin ... many times I prefer to initialize
+different forms in the same controller action.
+
+=item *
+
+HTML::FormHandler gives me the confidence that it's flexible enough
+for any challenge.
+
+=item *
+
+In HTML::FormHandler you can place all the saving logic, taking it out
+of the controller.
+
+=back
+
 This tutorial includes a fairly simple example ...
 
 =over
