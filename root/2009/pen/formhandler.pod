@@ -75,9 +75,9 @@ in C<lib/Blog/Schema/Result/Tag.pm>
 
   __PACKAGE__->add_columns(
       tag_id => {
-          data_type	=> 'integer' ,
-  	is_nullable	=> 0 ,
-  	is_auto_increment => 1
+          data_type => 'integer' ,
+          is_nullable   => 0 ,
+          is_auto_increment => 1
       },
       name => {
           data_type   => 'varchar',
@@ -103,16 +103,15 @@ in C<lib/Blog/Schema/Result/Article.pm>:
 
   __PACKAGE__->add_columns(
       article_id => {
-          data_type	=> 'integer' ,
-  	is_nullable	=> 0 ,
-  	is_auto_increment => 1
+          data_type => 'integer' ,
+          is_nullable   => 0 ,
+          is_auto_increment => 1
       },
       ts => {
           data_type     => 'datetime' ,
-  	is_nullable   => 1,
-  	set_on_create => 1,	
+          is_nullable   => 1,
+          set_on_create => 1,   
       },
-
       title => {
           data_type   => 'varchar',
           size        => 250,
@@ -129,7 +128,7 @@ in C<lib/Blog/Schema/Result/Article.pm>:
       rank => {
           data_type => 'decimal',
           size        => [3, 2],
-  	  is_nullable => 1,	
+          is_nullable => 1, 
       },
 
   );
@@ -209,8 +208,8 @@ Edit a new file in C<lib/Blog/Controller/Article.pm>:
       $c->stash->{item} = $c->stash->{articles}->find($id);
       unless ($c->stash->{item}) {
           # $c->flash->{error_msg} = "Request article is not available!";
-	  $c->response->status(404);
-	  $c->forward_to_action('Article', 'list');
+          $c->response->status(404);
+          $c->forward_to_action('Article', 'list');
       }
   }
 
@@ -320,9 +319,9 @@ append the following to Blog::Form::Article:
 
       my $tags_rs = $item->result_source->schema->resultset('Tag');
       foreach my $tag (@tags) {
-  	my $tag_obj = $tags_rs->search({ name => $tag })->first
-  	    || $tags_rs->create({ name => $tag });
-  	$item->article_tags->create({ tag => $tag_obj });
+          my $tag_obj = $tags_rs->search({ name => $tag })->first
+            || $tags_rs->create({ name => $tag });
+          $item->article_tags->create({ tag => $tag_obj });
       }
   };
 
@@ -342,32 +341,31 @@ when the form renders. So we'll just append this:
 =head3 A custom type
 
 Another problem is with the "rank". We want this to be a decimal
-number between 0 and 5. One way of doing this is to define a custom
-type:
+number between 0 and 5. An easy way to do this is with the field
+'range_start' and 'range_end' settings, but we'll demonstrate this 
+with a custom type and additional transformations:
 
   package Blog::Form::Field::Rank;
 
   use HTML::FormHandler::Moose;
   extends 'HTML::FormHandler::Field::Text';
 
-  apply(
-      [
+  apply( [
+       { # remove a dollar sign
+         transform => sub {
+           my $value = shift;
+           $value =~ s/^\$//;
+           return $value;
+       }},
        {
-  	 transform => sub {
-  	     my $value = shift;
-  	     $value =~ s/^\$//;
-  	     return $value;
-  	 }},
-       {
-  	 transform => sub { $_[0] =~ /^[\d+.]+$/ ? sprintf '%.2f', $_[0] : $_[0] },
-  	 message   => 'Value cannot be converted to a decimal',
+         transform => sub { $_[0] =~ /^[\d+.]+$/ ? sprintf '%.2f', $_[0] : $_[0] },
+         message   => 'Value cannot be converted to a decimal',
        },
        {
-  	 check => sub { $_[0] =~ /^-?\d+\.?\d*$/ && $_[0] >= 0 && $_[0] <= 5 },
-  	 message => 'Rank must be a decimal number between 0 and 5'
+         check => sub { $_[0] =~ /^-?\d+\.?\d*$/ && $_[0] >= 0 && $_[0] <= 5 },
+         message => 'Rank must be a decimal number between 0 and 5'
        }
-      ]
-      );
+      ]);
   1;
 
 And then the field declaration in the form class becomes ...
@@ -390,7 +388,7 @@ C<Blog::Form::Article> ...
   
       my $summary = generate_symmary($item->content);
       $item->update({ summary => $summary })
-  	if $summary;
+        if $summary;
   };
 
 =head2 Testing
