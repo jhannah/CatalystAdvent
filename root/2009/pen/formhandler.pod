@@ -1,36 +1,36 @@
-=head1 Creating a simple blog with Catalyst, HTML::FormHandler and DBIx::Class
+=head1 Creating a simple blog with Catalyst, HTML::FormHandler, and DBIx::Class
 
 =head2 Introduction
 
-L<HTML::FormHandler> is a module for handling forms / HTTP requests
-that includes validation rules and, in case of DBIC models, it also
-includes the logic to save the model in your database.
+L<HTML::FormHandler> is a module for handling forms and HTTP requests
+that includes not only validation rules but, in case of DBIC models, the
+logic to save the model in your database.
 
-I like HTML::FormHandler because of its simplicity, extendability
-and Moose integration provided.
+I like HTML::FormHandler because of its simplicity, extendability,
+and Moose integration that it provides.
 
-I prefer it over FormFu mostly because of subjective reasons, but most
+I prefer it over FormFu partly for subjective reasons, but most
 importantly ...
 
 =over
 
 =item *
 
-The validation logic is done with validators written in Perl, and you
-can use already defined Moose constraints
+In HTML::FormHandler, the validation logic is done with validators
+written in Perl, and you can use previously-defined Moose constraints.
 
 =item *
 
-I don't like it in FormFu that the standard way of defining a form is
-within an YAML file ... I know that many people use that form
-definition for the response rendering but validation rules are a
-contract of the request and should be decoupled from the response
+In FormFu, the standard way of defining a form is within an YAML
+file. While many people use that form definition for the response
+rendering, I feel that validation rules are a contract of the request,
+and should be decoupled from the response.
 
 =item *
 
-I don't like it that the standard way to initialize a FormFu object is
-done with a Catalyst plugin ... many times I prefer to initialize
-different forms in the same controller action.
+The standard way to initialize a FormFu object is done with a Catalyst
+plugin. I prefer to initialize different forms in the same controller
+action.
 
 =item *
 
@@ -39,24 +39,14 @@ for any challenge.
 
 =item *
 
-In HTML::FormHandler you can place all the saving logic, taking it out
-of the controller.
+You can place all of the HTML::FormHandler, taking it out of the
+controller.
 
 =back
 
-This tutorial includes a fairly simple example ...
-
-=over
-
-=item *
-
-an interface for viewing / editing articles in a blog
-
-=item *
-
-uses HTML::FormHandler for the editing functionality
-
-=back
+This tutorial includes a fairly simple example that provides an
+interface for viewing and editing articles in a blog, using
+HTML::FormHandler for the editing functionality.
 
 =head2 Setting up the project
 
@@ -64,7 +54,7 @@ To start a new project ...
 
  # catalyst.pl Blog
 
-Let's generate the model ...
+Let's generate the model:
 
  perl script/blog_create.pl model DB DBIC::Schema Blog::Schema \
  create=static components=TimeStamp \
@@ -100,7 +90,7 @@ in C<lib/Blog/Schema/Result/Tag.pm>
   </pre>
 
 Let's also add an Article model
-in C<lib/Blog/Schema/Result/Article.pm>...
+in C<lib/Blog/Schema/Result/Article.pm>:
 
   package Blog::Schema::Result::Article;
 
@@ -194,7 +184,7 @@ Also add these utilities to lib/Blog.pm ...
 
 =head2 Creating the CRUD controller
 
-Edit a new file in C<lib/Blog/Controller/Article.pm> ...
+Edit a new file in C<lib/Blog/Controller/Article.pm>:
 
   package Blog::Controller::Article;
 
@@ -258,7 +248,7 @@ it away in a role (see  L<Catalyst::Manual::CatalystAndMoose/Controller_Roles>)
 
 =head2 The Editing Form
 
-Let's start with the HTML::FormHandler derived class
+Let's start with the HTML::FormHandler-derived class
 in C<lib/Blog/Form/Article.pm> looking like this ...
 
   package Blog::Form::Article;
@@ -295,7 +285,7 @@ C<root/article/save.tt> ...
 
   [% form.render %]
 
-OK, so we now have a form with automatic validation ...
+OK, so we now have a form with automatic validation.
 
 =over
 
@@ -319,7 +309,7 @@ textarea, separated by commas.
 To save the tags, we want Blog::Form::Article to automatically get the
 value, split it in words by ",", create the missing tags, and create
 the necessary links between the article and those tags. We'll just
-append the following to Blog::Form::Article ...
+append the following to Blog::Form::Article:
 
   before 'update_model' => sub {
       my $self = shift;
@@ -338,7 +328,7 @@ append the following to Blog::Form::Article ...
 
 We have this flexibility, since HTML::FormHandler is based on
 Moose. But we also want it to load the current tags in the textarea
-when the form renders. So we'll just append this ...
+when the form renders. So we'll just append this:
 
   after 'setup_form' => sub {
       my $self = shift;
@@ -353,7 +343,7 @@ when the form renders. So we'll just append this ...
 
 Another problem is with the "rank". We want this to be a decimal
 number between 0 and 5. One way of doing this is to define a custom
-type ...
+type:
 
   package Blog::Form::Field::Rank;
 
@@ -387,7 +377,7 @@ And then the field declaration in the form class becomes ...
 =head3 Auto-generating values
 
 In our example, the Article model has a "summary" field. We want this
-to be autogenerated ... I'm sure you can find on CPAN modules for
+to be autogenerated. I'm sure you can find on CPAN modules for
 doing this, and one stupid way of doing it would be to just delete the
 HTML tags and slice it to 200 chars or something.
 
@@ -405,7 +395,7 @@ C<Blog::Form::Article> ...
 
 =head2 Testing
 
-And we are done. Start your development server with ...
+And we are done. Start your development server with:
 
     perl script/blog_server.pl -r -d
 
@@ -424,8 +414,8 @@ You can download this sample project with ...
 See L<HTML::FormHandler::Manual::Intro> for a more complex example
 with custom validators and notes about template rendering.
 
-Also, checkout L<HTML::FormHandler::Manual::Cookbook>,
-L<HTML::FormHandler::Manual::Tutorial> and the others documents in the
+Also, check out L<HTML::FormHandler::Manual::Cookbook>,
+L<HTML::FormHandler::Manual::Tutorial> and the other documents in
 L<HTML::FormHandler::Manual>.
 
 =head1 AUTHOR
