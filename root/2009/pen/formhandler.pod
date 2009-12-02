@@ -12,7 +12,7 @@ and Moose integration provided.
 I prefer it over FormFu mostly because of subjective reasons, but most
 importantly ...
 
-=over 
+=over
 
 =item *
 
@@ -52,7 +52,7 @@ This tutorial includes a fairly simple example ...
 
 an interface for viewing / editing articles in a blog
 
-=item * 
+=item *
 
 uses HTML::FormHandler for the editing functionality
 
@@ -72,17 +72,17 @@ Let's generate the model ...
 
 Our articles will be tagged (to make the form processing more
 interesting), so add a model representing tags
-in C<lib/Blog/Schema/Result/Tag.pm> 
+in C<lib/Blog/Schema/Result/Tag.pm>
 
   package Blog::Schema::Result::Tag;
-  
+
   use strict;
-  use warnings;  
+  use warnings;
   use base qw/DBIx::Class/;
-  
+
   __PACKAGE__->load_components(qw/Core/);
   __PACKAGE__->table('tags');
-  
+
   __PACKAGE__->add_columns(
       tag_id => {
           data_type	=> 'integer' ,
@@ -96,21 +96,21 @@ in C<lib/Blog/Schema/Result/Tag.pm>
       },
   );
   __PACKAGE__->set_primary_key('tag_id');
-  1;    
+  1;
   </pre>
 
 Let's also add an Article model
 in C<lib/Blog/Schema/Result/Article.pm>...
 
   package Blog::Schema::Result::Article;
-  
+
   use strict;
   use warnings;
   use base qw/DBIx::Class/;
-  
+
   __PACKAGE__->load_components(qw/TimeStamp InflateColumn::DateTime Core/);
   __PACKAGE__->table('articles');
-  
+
   __PACKAGE__->add_columns(
       article_id => {
           data_type	=> 'integer' ,
@@ -120,9 +120,9 @@ in C<lib/Blog/Schema/Result/Article.pm>...
       ts => {
           data_type     => 'datetime' ,
   	is_nullable   => 1,
-  	set_on_create => 1,	    
-      },    
-      
+  	set_on_create => 1,	
+      },
+
       title => {
           data_type   => 'varchar',
           size        => 250,
@@ -135,11 +135,11 @@ in C<lib/Blog/Schema/Result/Article.pm>...
       rank => {
           data_type => 'decimal',
           size        => [3, 2],
-  	  is_nullable => 1,	  
+  	  is_nullable => 1,	
       },
-      
-  );  
-  __PACKAGE__->set_primary_key('article_id');  
+
+  );
+  __PACKAGE__->set_primary_key('article_id');
   __PACKAGE__->has_many(article_tags => 'Blog::Schema::Result::ArticleTag', 'article_fk');
   __PACKAGE__->many_to_many(tags => 'article_tags', 'tag');
 
@@ -147,14 +147,14 @@ in C<lib/Blog/Schema/Result/Article.pm>...
 ... with a corresponding link table ...
 
   package Blog::Schema::Result::ArticleTag;
-  
+
   use strict;
   use warnings;
   use base qw/DBIx::Class/;
-  
+
   __PACKAGE__->load_components(qw/Core/);
   __PACKAGE__->table('article_tag');
-  
+
   __PACKAGE__->add_columns(
       article_fk => {
           data_type   => 'integer',
@@ -164,8 +164,8 @@ in C<lib/Blog/Schema/Result/Article.pm>...
           data_type   => 'integer',
           is_nullable => 0,
       },
-  );  
-  __PACKAGE__->add_unique_constraint([ qw/article_fk tag_fk/ ]);    
+  );
+  __PACKAGE__->add_unique_constraint([ qw/article_fk tag_fk/ ]);
   __PACKAGE__->belongs_to(tag => 'Blog::Schema::Result::Tag', 'tag_fk');
   __PACKAGE__->belongs_to(article => 'Blog::Schema::Result::Article', 'article_fk');
 
@@ -181,19 +181,19 @@ Also add these utilities to lib/Blog.pm ...
       my ($c, $controller, $action, @params) =@_;
       $c->response->redirect($c->uri_for($c->controller($controller)->action_for($action), @params));
       $c->detach;
-  }  
+  }
   sub forward_to_action {
       my ($c, $controller, $action, @params) = @_;
       $c->forward($controller, $action, @params);
       $c->detach;
-  }  
+  }
 
 =head2 Creating the CRUD controller
 
 Edit a new file in C<lib/Blog/Controller/Article.pm> ...
 
   package Blog::Controller::Article;
-  
+
   use strict;
   use warnings;
   use parent 'Catalyst::Controller';
@@ -210,7 +210,7 @@ Edit a new file in C<lib/Blog/Controller/Article.pm> ...
 
   sub item : Chained('articles') PathPart('') CaptureArgs(1) {
       my ($self, $c, $id) = @_;
-      
+
       $c->error("ID isn't valid!") unless $id =~ /^\d+$/;
       $c->stash->{item} = $c->stash->{articles}->find($id);
       unless ($c->stash->{item}) {
@@ -219,14 +219,14 @@ Edit a new file in C<lib/Blog/Controller/Article.pm> ...
 	  $c->forward_to_action('Article', 'list');
       }
   }
-  
+
   sub edit : Chained('item') {
-      my ($self, $c) = @_;  
+      my ($self, $c) = @_;
       $c->forward_to_action('Article', 'add');
   }
 
   sub add : Chained('articles') {
-      my ($self, $c) = @_;  
+      my ($self, $c) = @_;
       $c->forward_to_action('Article', 'add');
   }
 
@@ -256,16 +256,16 @@ it away in a role (see  L<Catalyst::Manual::CatalystAndMoose/Controller_Roles>)
 
 Let's start with the HTML::FormHandler derived class
 in C<lib/Blog/Form/Article.pm> looking like this ...
-  
+
   package Blog::Form::Article;
-  
+
   use strict;
   use warnings;
   use HTML::FormHandler::Moose;
-  
+
   extends 'HTML::FormHandler::Model::DBIC';
   with 'HTML::FormHandler::Render::Simple';
-  
+
   has_field 'title'    => ( type => 'Text',     required => 1 );
   has_field 'ts'       => ( type => 'Date', label => 'Published Date' );
   has_field 'content'  => ( type => 'TextArea', required => 0 );
@@ -289,11 +289,11 @@ C<root/article/save.tt> ...
 
   [% IF info_msg %]<div class="info_msg">[% info_msg %]</div>[% END %]
 
-  [% form.render %]  
+  [% form.render %]
 
 OK, so we now have a form with automatic validation ...
 
-=over 
+=over
 
 =item *
 
@@ -320,17 +320,17 @@ append the following to Blog::Form::Article ...
   before 'update_model' => sub {
       my $self = shift;
       my $item = $self->item;
-      
+
       my @tags = split /\s*,\s*/, $self->field('tags_str')->value;
       $item->article_tags->delete;
-      
+
       my $tags_rs = $item->result_source->schema->resultset('Tag');
       foreach my $tag (@tags) {
-  	my $tag_obj = $tags_rs->search({ name => $tag })->first 
+  	my $tag_obj = $tags_rs->search({ name => $tag })->first
   	    || $tags_rs->create({ name => $tag });
   	$item->article_tags->create({ tag => $tag_obj });
       }
-  };  
+  };
 
 We have this flexibility, since HTML::FormHandler is based on
 Moose. But we also want it to load the current tags in the textarea
@@ -339,8 +339,8 @@ when the form renders. So we'll just append this ...
   after 'setup_form' => sub {
       my $self = shift;
       my $item = $self->item;
-  
-      my $value = join ', ', map { $_->name } 
+
+      my $value = join ', ', map { $_->name }
          $item->tags->search({}, { order_by => 'name' })->all;
       $self->field('tags_str')->value($value);
   };
@@ -352,13 +352,13 @@ number between 0 and 5. One way of doing this is to define a custom
 type ...
 
   package Blog::Form::Field::Rank;
-  
+
   use HTML::FormHandler::Moose;
   extends 'HTML::FormHandler::Field::Text';
 
   apply(
       [
-       { 
+       {
   	 transform => sub {
   	     my $value = shift;
   	     $value =~ s/^\$//;
@@ -373,7 +373,7 @@ type ...
   	 message => 'Rank must be a decimal number between 0 and 5'
        }
       ]
-      );  
+      );
   1;
 
 And then the field declaration in the form class becomes ...
