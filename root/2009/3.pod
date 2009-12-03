@@ -297,9 +297,7 @@ append the following to Blog::Form::Article:
       my $self = shift;
       my $item = $self->item;
       
-      my $schema = $item->result_source->schema;
-  
-      my $changes = sub {	
+      $self->schema->txn_do(sub {	
           $orig->($self, @_);
   
           my @tags = split /\s*,\s*/, $self->field('tags_str')->value;
@@ -307,9 +305,7 @@ append the following to Blog::Form::Article:
           $item->article_tags->delete;
           $item->article_tags->create({ tag => { name => $_ } })
               foreach (@tags);
-      };
-  
-      $schema->txn_do($changes);
+      });
   };
 
 We have this flexibility, since HTML::FormHandler is based on
@@ -374,7 +370,7 @@ C<Blog::Form::Article> as ...
 
       # .... <init here> ...
   
-      my $changes = sub {    
+      $self->schema->txn_do(sub {    
           $orig->($self, @_);
 
           # .... < tags saving here > ....  
@@ -382,9 +378,7 @@ C<Blog::Form::Article> as ...
           # generates the summary and updates the $item
           my $summary = generate_symmary($item->content);
           $item->update({ summary => $summary }) if $summary;
-      };
-  
-      $schema->txn_do($changes);
+      });
   };
 
 You may have noticed schema->txn_do. That's a transaction. If any of
