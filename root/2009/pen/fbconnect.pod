@@ -32,8 +32,7 @@ I<Secret>, and an I<Application Name>. You'll need these to use Facebook
 Connect in Catalyst. Do your thing at
 L<http://developers.facebook.com> and come back with the info.
 
-*** what does this mean? :
-Then make sure you fetch you have our credential installed.
+Then install the credential from CPAN: 
 L<Catalyst::Authentication::Credential::FBConnect> depends on
 L<WWW::Facebook::API>, L<Moose>, L<MooseX::Types::Moose>, and
 L<MooseX::Types::Common>
