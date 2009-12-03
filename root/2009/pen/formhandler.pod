@@ -21,13 +21,6 @@ written in Perl, and you can use previously-defined Moose constraints.
 
 =item *
 
-In FormFu, the standard way of defining a form is within an YAML
-file. While many people use that form definition for the response
-rendering, I feel that validation rules are a contract of the request,
-and should be decoupled from the response.
-
-=item *
-
 The standard way to initialize a FormFu object is done with a Catalyst
 plugin. I prefer to initialize different forms in the same controller
 action.
@@ -36,11 +29,6 @@ action.
 
 HTML::FormHandler gives me the confidence that it's flexible enough
 for any challenge.
-
-=item *
-
-You can place all of the HTML::FormHandler, taking it out of the
-controller.
 
 =back
 
