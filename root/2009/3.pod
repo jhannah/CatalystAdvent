@@ -320,9 +320,10 @@ when the form renders. So we'll just append this:
       my $self = shift;
       my $item = $self->item;
 
-      my $value = join ', ', map { $_->name }
-         $item->tags->search({}, { order_by => 'name' })->all;
-      $self->field('tags_str')->value($value);
+      $self->field('tags_str')->value(
+          join ', ', 
+          $item->tags->search({}, { order_by => 'name' })->get_column('name')->all
+      );
   };
 
 =head3 A custom type
