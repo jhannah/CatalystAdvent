@@ -19,11 +19,6 @@ importantly ...
 In HTML::FormHandler, the validation logic is done with validators
 written in Perl, and you can use previously-defined Moose constraints.
 
-=item *
-
-The standard way to initialize a FormFu object is done with a Catalyst
-plugin. I prefer to initialize different forms in the same controller
-action.
 
 =item *
 
