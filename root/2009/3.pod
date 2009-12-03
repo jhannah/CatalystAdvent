@@ -158,11 +158,6 @@ Also add these utilities to lib/Blog.pm ...
       $c->response->redirect($c->uri_for($c->controller($controller)->action_for($action), @params));
       $c->detach;
   }
-  sub forward_to_action {
-      my ($c, $controller, $action, @params) = @_;
-      $c->forward($controller, $action, @params);
-      $c->detach;
-  }
 
 =head2 Creating the CRUD controller
 
@@ -192,18 +187,18 @@ Edit a new file in C<lib/Blog/Controller/Article.pm>:
       unless ($c->stash->{item}) {
           # $c->flash->{error_msg} = "Request article is not available!";
           $c->response->status(404);
-          $c->forward_to_action('Article', 'list');
+          $c->forward('list');
       }
   }
 
   sub edit : Chained('item') {
       my ($self, $c) = @_;
-      $c->forward_to_action('Article', 'add');
+      $c->forward('save');
   }
 
   sub add : Chained('articles') {
       my ($self, $c) = @_;
-      $c->forward_to_action('Article', 'add');
+      $c->forward('save');
   }
 
   # both adding and editing happens here
@@ -226,7 +221,7 @@ Edit a new file in C<lib/Blog/Controller/Article.pm>:
   }
 
 This CRUD is pretty standard, and it would be possible to abstract
-it away in a role (see  L<Catalyst::Manual::CatalystAndMoose/Controller_Roles>)
+it away in a role (see  L<Catalyst::Manual::CatalystAndMoose/"Controller_Roles">)
 
 =head2 The Editing Form
 
@@ -388,7 +383,7 @@ and go to the following URL ...
 
 You can download this sample project with ...
 
-  svn co L<http://dev.catalystframework.org/repos/Catalyst/trunk/examples/Advent09FormHandlerBlog>
+  svn co http://dev.catalystframework.org/repos/Catalyst/trunk/examples/Advent09FormHandlerBlog
 
 =head2 Further Reading
 
