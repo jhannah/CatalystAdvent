@@ -2,44 +2,53 @@
 
 =head2 FBWhat?
 
-According to Facebook, "Facebook Connect is a powerful set of APIs for developers 
-that lets users bring their identity and connections everywhere." The idea is quite 
-similar to Oauth or Yahoo's BBauth, but with a Facebook flavour.
+According to Facebook, "Facebook Connect is a powerful set of APIs for
+developers that lets users bring their identity and connections
+everywhere." The idea is quite similar to OAuth or Yahoo's BBauth, but
+with a Facebook flavor.
 
 You can read more technical stuff about it here:
 
 L<http://wiki.developers.facebook.com/index.php/Getting_Started_with_Facebook_Connect>
 
-Why would you need it? The simple scenario: you can use it like a bizarro openid, until 
-facebook becomes an openid provider :) Some of you will just want this: "allow people to 
-authenticate in my website using their facebook user"
+Why would you need it? The simple scenario: you can use it like a
+bizarro OpenID, until Facebook becomes an OpenID provider :) Some of you
+will just want this: "Allow people to authenticate on my website using
+their Facebook account."
 
-But once the user is authenticated, your Catalyst app may also access the Facebook API 
-using your user's credentials. Assuming she gives you permission, you can do all kinds 
-of tricks, like getting the list of friends, avatar and such.
+But once the user is authenticated, your Catalyst app may also access
+the Facebook API using your user's credentials. Assuming she gives you
+permission, you can do all kinds of tricks, like getting the list of
+friends, avatar, and more.
 
 =head2 I want it, what now?
 
-Easy, just use L<Catalyst::Authentication::Credential::FBConnect>. Once authenticated,  will give you the 
-facebook user identifier and the session key you can later use with L<WWW::Facebook::API>. 
+Just use L<Catalyst::Authentication::Credential::FBConnect>. Once
+authenticated, this will give you the Facebook user identifier and a
+session key you can later use with L<WWW::Facebook::API>.
 
-First of all you need to signup as a developer and get an I<API Key>, a I<Secret> and an
-I<Application Name>. You'll need these to use Facebook connect in Catalyst. Do you're thing
-at L<http://developers.facebook.com> and come back with the info.
+First of all, you need to signup as a developer and get an I<API Key>, a
+I<Secret>, and an I<Application Name>. You'll need these to use Facebook
+Connect in Catalyst. Do your thing at
+L<http://developers.facebook.com> and come back with the info.
 
-Then make sure you fetch you have our credential installed. 
-L<Catalyst::Authentication::Credential::FBConnect> depends on L<WWW::Facebook::API>, L<Moose>,
-L<MooseX::Types::Moose> and L<MooseX::Types::Common>
+*** what does this mean? :
+Then make sure you fetch you have our credential installed.
+L<Catalyst::Authentication::Credential::FBConnect> depends on
+L<WWW::Facebook::API>, L<Moose>, L<MooseX::Types::Moose>, and
+L<MooseX::Types::Common>
 
 =head1 Setting it up
 
-First thing, set up your Catalyst application. You should be familiar with authentication realms
-by now, if not, take a look at L<Catalyst::Plugin::Authentication>
+First, set up your Catalyst application. You should be familiar with
+authentication realms by now; if not, take a look at
+L<Catalyst::Plugin::Authentication>.
 
-If you use the FBConnect credential to authenticate, you don't even need a database in your app. 
-But most of your time you'll want to associate the Facebook user to a local user, and allow users
-to also authenticate the standard, password-based way. That's why we'll need two realms, C<facebook> 
-and C<dbic>.
+If you use the FBConnect credential to authenticate, you don't even need
+a database in your app. But most of the time you'll want to associate
+the Facebook user with a local user, and allow users to also authenticate
+the standard, password-based way. That's why we'll need two realms,
+C<facebook> and C<dbic>.
 
  package MyApp;
  
@@ -71,9 +80,9 @@ and C<dbic>.
 
 The user table should have some columns for holding the external credential 
 info, if you want to associate the two. We're using C<credential_identifier> 
-to hold the facebook uid. If you're using multiple external authentication 
-systems (like openid, oauth) it would be a good idea to specify the source
-for this particular credential ( C<credential_source> ).
+to hold the Facebook uid. If you're using multiple external authentication 
+systems (like OpenID or OAuth) it would be a good idea to specify the source
+for this particular credential in ( C<credential_source> ).
 
  package MyApp::Schema::Result::User;
  use strict;
@@ -116,16 +125,19 @@ for this particular credential ( C<credential_source> ).
 
 =head2 The login action
 
-The logic is simple: the first time you call C<< $c->authenticate >> for the C<facebook> realm , 
-the user will be redirected to the facebook login page. Once she manages to authenticate there,
-she will be send back by facebook to our application (in the same action), but accompanied by
-an C<auth_token> . When C<authenticate> is called this time, the user is authenticated and
-C<< $c->user >> is created with the session information. All this logic is abstracted away 
-inside the credential.
+The logic is simple: the first time you call C<< $c->authenticate >> for
+the C<facebook> realm, the user will be redirected to the Facebook
+login page. Once she manages to authenticate there, she will be sent
+back by Facebook to our application (in the same action), but
+accompanied by an C<auth_token>. When C<authenticate> is called this
+time, the user is authenticated and C<< $c->user >> is created with the
+session information. All this logic is abstracted away inside the
+credential.
 
-Now, once she's authenticated with FBConnect, she'll either register or login (hence 
-L<find_or_create>) in our internal user database. After that we'll just use the familiar 
-API to reauthenticate the user in the C<dbic> realm. 
+Once she's authenticated with FBConnect, she'll either register or
+login (hence L<find_or_create>) in our internal user database. After
+that we'll just use the familiar API to reauthenticate the user in the
+C<dbic> realm.
 
 
  sub login : Path('/login/facebook') {
@@ -147,7 +159,7 @@ API to reauthenticate the user in the C<dbic> realm.
  
 =head2 Connect an existing user
 
-You can also assign a facebook account to an already existing account
+You can also assign a Facebook account to an already existing account:
 
  
  sub assign : Path('/assign/facebook') {
@@ -171,9 +183,10 @@ You can also assign a facebook account to an already existing account
 
 =head2 Use the Facebook API
 
-All the work above  gets you the uid from Facebook. This can be used later on with L<WWW::Facebook::API>.
+All the work above gets you the uid from Facebook. This can be used
+later on with L<WWW::Facebook::API>.
 
-Here's some example code to actualy use L<WWW::Facebook::API>
+Here's some example code to actually use L<WWW::Facebook::API>:
 
     my $client = WWW::Facebook::API->new(
         desktop         => 0,
@@ -187,14 +200,14 @@ Here's some example code to actualy use L<WWW::Facebook::API>
         fields => [ qw/about_me quotes/ ]
     );
 
-    #get user friends
+    # get user's friends
     my $friends = $client->friends->get(
         uid => $c->user->credential_identifier
     );
 
 
 
-But more about this can be found in the L<WWW::Facebook::API> docs, enjoy :)
+More about this can be found in the L<WWW::Facebook::API> docs, enjoy :)
 
 =head1 AUTHOR
 
