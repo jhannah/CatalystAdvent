@@ -264,8 +264,6 @@ C<root/article/save.tt> ...
     [% ELSE %]Adding a new article[% END %]
   </h1>
 
-  [% IF info_msg %]<div class="info_msg">[% info_msg %]</div>[% END %]
-
   [% form.render %]
 
 OK, so we now have a form with automatic validation.
