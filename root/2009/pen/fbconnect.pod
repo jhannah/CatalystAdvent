@@ -1,42 +1,45 @@
-=head1 FBConnect with Catalyst::Authentication::Credential::FBConnect
+=head1 Socialize with FBConnect
 
-L<Catalyst::Authentication::Credential::FBConnect> offers an easy way to grab the credential identifier, session key and session expires from a user on Facebook.
+=head2 FBWhat?
 
+According to Facebook, "Facebook Connect is a powerful set of APIs for developers 
+that lets users bring their identity and connections everywhere." The idea is quite 
+similar to Oauth or Yahoo's BBauth, but with a Facebook flavour.
 
-You'll have the following accessors in C<< $c->user >>
+You can read more technical stuff about it here:
 
-=over
+L<http://wiki.developers.facebook.com/index.php/Getting_Started_with_Facebook_Connect>
 
-=item
+Why would you need it? The simple scenario: you can use it like a bizarro openid, until 
+facebook becomes an openid provider :) Some of you will just want this: "allow people to 
+authenticate in my website using their facebook user"
 
-session_uid
+But once the user is authenticated, your Catalyst app may also access the Facebook API 
+using your user's credentials. Assuming she gives you permission, you can do all kinds 
+of tricks, like getting the list of friends, avatar and such.
 
-=item
+=head2 I want it, what now?
 
-session_key
+Easy, just use L<Catalyst::Authentication::Credential::FBConnect>. Once authenticated,  will give you the 
+facebook user identifier and the session key you can later use with L<WWW::Facebook::API>. 
 
-=item
+First of all you need to signup as a developer and get an I<API Key>, a I<Secret> and an
+I<Application Name>. You'll need these to use Facebook connect in Catalyst. Do you're thing
+at L<http://developers.facebook.com> and come back with the info.
 
-session_expires
+Then make sure you fetch you have our credential installed. 
+L<Catalyst::Authentication::Credential::FBConnect> depends on L<WWW::Facebook::API>, L<Moose>,
+L<MooseX::Types::Moose> and L<MooseX::Types::Common>
 
-=back
+=head1 Setting it up
 
-=head1 Instalation
+First thing, set up your Catalyst application. You should be familiar with authentication realms
+by now, if not, take a look at L<Catalyst::Plugin::Authentication>
 
-L<Catalyst::Authentication::Credential::FBConnect> depends on:
-
-L<WWW::Facebook::API>
-
-L<Moose>
-
-L<MooseX::Types::Moose>
-
-L<MooseX::Types::Common>
-
-
-=head1 Getting it done
-
-
+If you use the FBConnect credential to authenticate, you don't even need a database in your app. 
+But most of your time you'll want to associate the Facebook user to a local user, and allow users
+to also authenticate the standard, password-based way. That's why we'll need two realms, C<facebook> 
+and C<dbic>.
 
  package MyApp;
  
@@ -48,7 +51,7 @@ L<MooseX::Types::Common>
                  class       => 'FBConnect',
                  api_key     => 'my_api_key',
                  secret      => 'my_secret',
-                 app_name    => 'my_app_name',
+                 app_name    => 'my_app_name', 
              }
          },
          dbic => {
@@ -66,6 +69,11 @@ L<MooseX::Types::Common>
  } );
 
 
+The user table should have some columns for holding the external credential 
+info, if you want to associate the two. We're using C<credential_identifier> 
+to hold the facebook uid. If you're using multiple external authentication 
+systems (like openid, oauth) it would be a good idea to specify the source
+for this particular credential ( C<credential_source> ).
 
  package MyApp::Schema::Result::User;
  use strict;
@@ -87,10 +95,12 @@ L<MooseX::Types::Common>
          data_type           => 'varchar',
          is_nullable         => 1
      },
+
      credential_identifier => {
          data_type           => 'varchar',
          is_nullable         => 1
      },
+
      credential_source => {
          data_type           => 'varchar',
          is_nullable         => 1
@@ -104,14 +114,20 @@ L<MooseX::Types::Common>
  
  1;
 
+=head2 The login action
+
+The logic is simple: the first time you call C<< $c->authenticate >> for the C<facebook> realm , 
+the user will be redirected to the facebook login page. Once she manages to authenticate there,
+she will be send back by facebook to our application (in the same action), but accompanied by
+an C<auth_token> . When C<authenticate> is called this time, the user is authenticated and
+C<< $c->user >> is created with the session information. All this logic is abstracted away 
+inside the credential.
+
+Now, once she's authenticated with FBConnect, she'll either register or login (hence 
+L<find_or_create>) in our internal user database. After that we'll just use the familiar 
+API to reauthenticate the user in the C<dbic> realm. 
 
 
- package MyApp::Controller::FBConnect;
- use strict;
- use warnings;
- 
- use base 'Catalyst::Controller';
- 
  sub login : Path('/login/facebook') {
      my ($self, $c) = @_;
  
@@ -129,22 +145,15 @@ L<MooseX::Types::Common>
  }
  
  
- 1;
+=head2 Connect an existing user
 
+You can also assign a facebook account to an already existing account
 
-You can also assign a facebook account to an already existing account.
-
-
- #somewhere in a password required login: $c->authenticate( { email => $email, password => $password }, 'foo' );
- 
- package MyApp::Controller::FBconnect;
- use strict;
- use warnings;
  
  sub assign : Path('/assign/facebook') {
      my ($self, $c) = @_;
  
-     my $user = $c->user if $c->user_in_realm('foo');
+     my $user = $c->user if $c->user_in_realm('dbic');
      if( $c->authenticate( {}, 'facebook' ) ) {
          $user->update( {
              credential_identifier   => $c->user->session_uid,
@@ -160,9 +169,9 @@ You can also assign a facebook account to an already existing account.
  }
 
 
+=head2 Use the Facebook API
 
-
-This practicaly gets you the uid from Facebook. This can be used later on with L<WWW::Facebook::API>.
+All the work above  gets you the uid from Facebook. This can be used later on with L<WWW::Facebook::API>.
 
 Here's some example code to actualy use L<WWW::Facebook::API>
 
@@ -185,4 +194,13 @@ Here's some example code to actualy use L<WWW::Facebook::API>
 
 
 
-More about this can be found in the L<WWW::Facebook::API> docs
+But more about this can be found in the L<WWW::Facebook::API> docs, enjoy :)
+
+=head1 AUTHOR
+
+Cosmin Budrica <cosmin@sinapticode.com>
+
+=head3 COPYRIGHT
+
+Copyright 2009 Sinapticode - L<http://www.sinapticode.com>
+
