@@ -3,15 +3,17 @@
 
 =head2 Some History
 
-There have been many, shiny new developments in the Perl community. With Catalyst's
-switch to L<Moose> a whole new world of possibilities was introduced and suddenly
-available to all developers implementing their applications with Catalyst. Another
-exciting new idea came along with L<Devel::Declare>: the ability to provide a
-declarative syntax for things that used to be more verbose or repetitious, or just
-simply to provide an API that goes beyond what the Perl parser itself provides.
+There have been many shiny new developments in the Perl community of
+late. With Catalyst's switch to L<Moose>, a whole new world of
+possibilities was introduced and suddenly available to all Catalyst
+developers. Another exciting new idea came along with L<Devel::Declare>:
+the ability to provide a declarative syntax for things that used to be
+more verbose or repetitious, or just simply to provide an API that goes
+beyond what the Perl parser itself provides.
 
-One of the shinier examples that came forth by the availability of those modules
-is L<MooseX::Declare> that allows you to write your classes like this:
+One of the neater examples that came with the availability of those
+modules is L<MooseX::Declare>, which allows you to write your classes
+like this:
 
     class SomeClass extends SomeParentClass {
 
@@ -20,20 +22,22 @@ is L<MooseX::Declare> that allows you to write your classes like this:
         method bar (Int $baz) { $self->foo + $baz }
     }
 
-While it might look like it, this is not a source filter in the sense that we all
-(hopefully) learned to avoid. The module is still parsed by perl. When for example 
-the C<class> keyword is hit, L<MooseX::Declare> takes over and parses the special
-syntax. When the C<{> opening brace is found, it gives control back to perl. This
-has the big advantage that extensions can be safely combined and also be written in
-Perl itself. In fact, the C<class> and C<method> keywords are handled by separate
-parts of L<MooseX::Declare>.
+While it might look like it, this is not a source filter in the sense
+that we all (hopefully) learned to avoid. The module is still parsed by
+perl. When for example the C<class> keyword is hit, L<MooseX::Declare>
+takes over and parses the special syntax. When the C<{> opening brace is
+found, it gives control back to perl. This has the big advantage that
+extensions can be safely combined and also be written in Perl itself. In
+fact, the C<class> and C<method> keywords are handled by separate parts
+of L<MooseX::Declare>.
 
 
 =head2 What's this got to do with Catalyst?
 
-A very good question! The module L<CatalystX::Declare> is an extension of
-L<MooseX::Declare> that allows you to write your Catalyst applications declaratively.
-An example L<CatalystX::Declare> controller would look like this:
+A very good question! The module L<CatalystX::Declare> is an extension
+of L<MooseX::Declare> that allows you to write your Catalyst
+applications declaratively. An example L<CatalystX::Declare> controller
+would look like this:
 
     controller MyApp::Controller::Foo {
 
@@ -44,14 +48,15 @@ An example L<CatalystX::Declare> controller would look like this:
         }
     }
 
-The C<controller> keyword is an extension of the C<class> handler from 
-L<MooseX::Declare>. While C<class> (like L<Moose>) will always automatically inherit
-from L<Moose::Object> when no C<extends> option is provided, C<controller>s will
-have a default superclass of L<Catalyst::Controller>.
+The C<controller> keyword is an extension of the C<class> handler from
+L<MooseX::Declare>. While C<class> (like L<Moose>) will always
+automatically inherit from L<Moose::Object> when no C<extends> option is
+provided, C<controller>s will have a default superclass of
+L<Catalyst::Controller>.
 
-The first thing you might notice about the actions is that there are no attributes.
-Everything is specified with a simple declarative syntax. The first action you see is
-this:
+The first thing you might notice about the actions is that there are no
+attributes.  Everything is specified with a simple declarative
+syntax. The first action you see is this:
 
     action base as '' under '/';
 
@@ -59,9 +64,10 @@ This is roughly equivalent to the following:
 
     sub base: Chained('/') PathPart('') CaptureArgs(0) { }
 
-Yes, all actions in L<CatalystX::Declare> are chained actions, since 
-L<Catalyst::DispatchType::Chained> is the most flexible way of designing Catalyst 
-applications (and one that lends itself especially well to declarative syntax).
+Yes, all actions in L<CatalystX::Declare> are chained actions, since
+L<Catalyst::DispatchType::Chained> is the most flexible way of designing
+Catalyst applications (and one that lends itself especially well to
+declarative syntax).
 
 The next action is where it becomes really interesting:
 
@@ -69,14 +75,16 @@ The next action is where it becomes really interesting:
         $ctx->stash(object => $ctx->model('Baz')->find($id));
     }
 
-The C<final action> creates an endpoint chained to the C<base> we declared above.
-The actions all automatically receive a C<$ctx> context variable additionally to the
-C<$self> that L<MooseX::Declare> already provides for methods.
+The C<final action> creates an endpoint chained to the C<base> we
+declared above. The actions all automatically receive a C<$ctx> context
+variable in addition to the C<$self> that L<MooseX::Declare> already
+provides for methods.
 
-The interesting part is the C<(Int $id)> signature for the action. The number of
-positional arguments is used to determine the number of arguments in the public URL.
-The above chain would run if the resource C</bar/23> is hit, and it will only match if
-its argument is an L<Int|Moose::Manual::Types>. 
+The interesting part is the C<(Int $id)> signature for the action. The
+number of positional arguments is used to determine the number of
+arguments in the public URL. The above chain would run if the resource
+C</bar/23> is hit, and it will only match if its argument is an
+L<Int|Moose::Manual::Types>.
 
 To expand a bit on the last comment, let me show you an example:
 
@@ -98,35 +106,37 @@ To expand a bit on the last comment, let me show you an example:
         }
     }
 
-If we assume C<Language> must be a valid language string (say C<en>), C<PageName> must
-be an identifier in the Perl sense (starts with a letter or underscore, not a digit) and
-C<SequentialID> is a positive integer, you can hit the above controller with the following:
+We assume that C<Language> must be a valid language string (such as
+C<en>); C<PageName> must be an identifier in the Perl sense (starts with
+a letter or underscore, not a digit); and C<SequentialID> is a positive
+integer. Then, you can hit the above controller with the following:
 
 =over
 
 =item * /en/show/foo
 
-This will load C<base> with a C<$lang> of C<en> and then dispatch to C<show_page> with a
-C<$name> of C<foo>.
+This will load C<base> with a C<$lang> of C<en> and then dispatch to
+C<show_page> with a C<$name> of C<foo>.
 
 =item * /de/show/23
 
-This will first run C<base> like before, but this time with C<de> as C<$lang> argument and
-then execute C<show_item> with an C<$id> of C<23>.
+This will first run C<base> like before, but this time with C<de> as
+C<$lang> argument and then execute C<show_item> with an C<$id> of C<23>.
 
 =back
 
-Of course you can use any number of arguments and for endpoints even slurpy arguments are
-possible:
+Of course you can use any number of arguments, and for endpoints even
+slurpy arguments are possible:
 
     final action show_page (Str @path) as page under base { ... }
 
 
 =head2 Grouping actions by their base
 
-You often have a single action as a base and many actions that chain off of it. If that is
-the case for you, you can use C<under> as a keyword to group the actions together and save
-yourself the repetition of the C<under> option:
+You often have a single action as a base and many actions that chain off
+of it. If that is the case for you, you can use C<under> as a keyword to
+group the actions together and save yourself the repetition of the
+C<under> option:
 
     action base as '' under '/';
 
@@ -137,13 +147,15 @@ yourself the repetition of the C<under> option:
         final action bar { ... }
     }
 
-Both C<foo> and C<bar> in the above example will implicitely chain off C<base>.
+Both C<foo> and C<bar> in the above example will implicitly chain off
+C<base>.
 
 =head2 Declaring other parts of the application
 
-Of course controllers and actions are the most important parts that you'd want to have a
-declarative syntax for. But they are not all that L<CatalystX::Declare> provides you with.
-You can also declare your application in a shinier syntax:
+Of course controllers and actions are the most important components for
+which you'd want to have a declarative syntax. But they are not all that
+L<CatalystX::Declare> provides you with. You can also declare your
+application in a shinier syntax:
 
     application MyApp
         with ConfigLoader
@@ -152,11 +164,13 @@ You can also declare your application in a shinier syntax:
         $CLASS->config(name => 'My App');
     }
 
-There you go; no need to inherit from L<Catalyst>, no need to call C<setup>. And the plugins
-are nicely specified as roles (which is what plugins are likely to become in the future).
+There you go; no need to inherit from L<Catalyst>, no need to call
+C<setup>. And the plugins are nicely specified as roles (which is what
+plugins are likely to become in the future).
 
-So now we have the application, and we already had the C<C> in C<MVC>, but L<CatalystX::Declare>
-also gives you keywords for the two other letters:
+So now we have the application, and we already had the C<C> in C<MVC>,
+but L<CatalystX::Declare> also gives you keywords for the two other
+letters:
 
     model MyApp::Model::DBIC extends Catalyst::Model::DBIC::Schema {
 
@@ -177,7 +191,8 @@ for views. Additionally you can also define controller roles like this:
         action base as '' under '/';
     }
 
-and you can consume them on the other side like usual in L<MooseX::Declare> based modules:
+and you can consume them on the other side like usual in
+L<MooseX::Declare> based modules:
 
     controller MyApp::Controller::Qux 
         with MyApp::ControllerRole::DefaultBase {
@@ -187,9 +202,10 @@ and you can consume them on the other side like usual in L<MooseX::Declare> base
 
 =head2 Methods and attributes
 
-Since L<CatalystX::Declare> is just an extension of L<MooseX::Declare> you can use its full
-power to declare methods and attributes as well. Here is an example of a complete root
-controller with methods and attributes:
+Since L<CatalystX::Declare> is just an extension of L<MooseX::Declare>
+you can use its full power to declare methods and attributes as
+well. Here is an example of a complete root controller with methods and
+attributes:
 
     controller MyApp::Controller::Root {
 
@@ -226,13 +242,15 @@ controller with methods and attributes:
     
 =head2 Conclusion
 
-The real hard work for all this shinyness is doen by L<MooseX::Declare>. Take a
-look at L<CatalystX::Declare> on CPAN for a full description of the available syntax,
-since the above is only the quick tour. I also casually skipped over method modifiers
-that are applied to actions, which adds some more possibilities.
+The real hard work for all this shinyness is done by
+L<MooseX::Declare>. Take a look at L<CatalystX::Declare> on CPAN for a
+full description of the available syntax, since the above is only a
+quick tour. I also casually skipped over the use of method modifiers
+that are applied to actions, which adds even more possibilities.
 
-If you want more to look at, there is an example application shipped with the distribution 
-at L<http://cpansearch.perl.org/src/PHAYLON/CatalystX-Declare-0.011/examples/MyApp-Web/>.
+If you want more samples, there is an example application shipped with
+the distribution at
+L<http://cpansearch.perl.org/src/PHAYLON/CatalystX-Declare-0.011/examples/MyApp-Web/>.
 
 =head2 Author and Copyright
 
