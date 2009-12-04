@@ -1,0 +1,241 @@
+
+=head1 Writing Your Application Declaratively
+
+=head2 Some History
+
+There have been many, shiny new developments in the Perl community. With Catalyst's
+switch to L<Moose> a whole new world of possibilities was introduced and suddenly
+available to all developers implementing their applications with Catalyst. Another
+exciting new idea came along with L<Devel::Declare>: the ability to provide a
+declarative syntax for things that used to be more verbose or repetitious, or just
+simply to provide an API that goes beyond what the Perl parser itself provides.
+
+One of the shinier examples that came forth by the availability of those modules
+is L<MooseX::Declare> that allows you to write your classes like this:
+
+    class SomeClass extends SomeParentClass {
+
+        has foo => (is => 'rw');
+
+        method bar (Int $baz) { $self->foo + $baz }
+    }
+
+While it might look like it, this is not a source filter in the sense that we all
+(hopefully) learned to avoid. The module is still parsed by perl. When for example 
+the C<class> keyword is hit, L<MooseX::Declare> takes over and parses the special
+syntax. When the C<{> opening brace is found, it gives control back to perl. This
+has the big advantage that extensions can be safely combined and also be written in
+Perl itself. In fact, the C<class> and C<method> keywords are handled by separate
+parts of L<MooseX::Declare>.
+
+
+=head2 What's this got to do with Catalyst?
+
+A very good question! The module L<CatalystX::Declare> is an extension of
+L<MooseX::Declare> that allows you to write your Catalyst applications declaratively.
+An example L<CatalystX::Declare> controller would look like this:
+
+    controller MyApp::Controller::Foo {
+
+        action base as '' under '/';
+
+        final action bar (Int $id) under base {
+            $ctx->stash(object => $ctx->model('Baz')->find($id));
+        }
+    }
+
+The C<controller> keyword is an extension of the C<class> handler from 
+L<MooseX::Declare>. While C<class> (like L<Moose>) will always automatically inherit
+from L<Moose::Object> when no C<extends> option is provided, C<controller>s will
+have a default superclass of L<Catalyst::Controller>.
+
+The first thing you might notice about the actions is that there are no attributes.
+Everything is specified with a simple declarative syntax. The first action you see is
+this:
+
+    action base as '' under '/';
+
+This is roughly equivalent to the following:
+
+    sub base: Chained('/') PathPart('') CaptureArgs(0) { }
+
+Yes, all actions in L<CatalystX::Declare> are chained actions, since 
+L<Catalyst::DispatchType::Chained> is the most flexible way of designing Catalyst 
+applications (and one that lends itself especially well to declarative syntax).
+
+The next action is where it becomes really interesting:
+
+    final action bar (Int $id) under base {
+        $ctx->stash(object => $ctx->model('Baz')->find($id));
+    }
+
+The C<final action> creates an endpoint chained to the C<base> we declared above.
+The actions all automatically receive a C<$ctx> context variable additionally to the
+C<$self> that L<MooseX::Declare> already provides for methods.
+
+The interesting part is the C<(Int $id)> signature for the action. The number of
+positional arguments is used to determine the number of arguments in the public URL.
+The above chain would run if the resource C</bar/23> is hit, and it will only match if
+its argument is an L<Int|Moose::Manual::Types>. 
+
+To expand a bit on the last comment, let me show you an example:
+
+    controller MyApp::Controller::Foo {
+
+        # see MooseX::Types
+        use MyApp::Types qw( PageName SequentialID Language );
+
+        action base (Language $lang) as '' under '/' {
+            $ctx->stash(language => $lang);
+        }
+
+        final action show_page (PageName $name) as show under base {
+            $ctx->stash(page => $ctx->model('DB::Page')->find($name));
+        }
+
+        final action show_item (SequentialID $id) as show under base {
+            $ctx->stash(item => $ctx->model('DB::Item')->find($id));
+        }
+    }
+
+If we assume C<Language> must be a valid language string (say C<en>), C<PageName> must
+be an identifier in the Perl sense (starts with a letter or underscore, not a digit) and
+C<SequentialID> is a positive integer, you can hit the above controller with the following:
+
+=over
+
+=item * /en/show/foo
+
+This will load C<base> with a C<$lang> of C<en> and then dispatch to C<show_page> with a
+C<$name> of C<foo>.
+
+=item * /de/show/23
+
+This will first run C<base> like before, but this time with C<de> as C<$lang> argument and
+then execute C<show_item> with an C<$id> of C<23>.
+
+=back
+
+Of course you can use any number of arguments and for endpoints even slurpy arguments are
+possible:
+
+    final action show_page (Str @path) as page under base { ... }
+
+
+=head2 Grouping actions by their base
+
+You often have a single action as a base and many actions that chain off of it. If that is
+the case for you, you can use C<under> as a keyword to group the actions together and save
+yourself the repetition of the C<under> option:
+
+    action base as '' under '/';
+
+    under base {
+
+        final action foo { ... }
+
+        final action bar { ... }
+    }
+
+Both C<foo> and C<bar> in the above example will implicitely chain off C<base>.
+
+=head2 Declaring other parts of the application
+
+Of course controllers and actions are the most important parts that you'd want to have a
+declarative syntax for. But they are not all that L<CatalystX::Declare> provides you with.
+You can also declare your application in a shinier syntax:
+
+    application MyApp
+        with ConfigLoader
+        with Static::Simple {
+
+        $CLASS->config(name => 'My App');
+    }
+
+There you go; no need to inherit from L<Catalyst>, no need to call C<setup>. And the plugins
+are nicely specified as roles (which is what plugins are likely to become in the future).
+
+So now we have the application, and we already had the C<C> in C<MVC>, but L<CatalystX::Declare>
+also gives you keywords for the two other letters:
+
+    model MyApp::Model::DBIC extends Catalyst::Model::DBIC::Schema {
+
+        method foo (Int $x) { ... }
+    }
+
+for models, and
+
+    view MyApp::View::HTML extends Catalyst::View::TT {
+
+        after process { ... }
+    }
+
+for views. Additionally you can also define controller roles like this:
+
+    controller_role MyApp::ControllerRole::DefaultBase {
+
+        action base as '' under '/';
+    }
+
+and you can consume them on the other side like usual in L<MooseX::Declare> based modules:
+
+    controller MyApp::Controller::Qux 
+        with MyApp::ControllerRole::DefaultBase {
+
+        action view under base { ...  }
+    }
+
+=head2 Methods and attributes
+
+Since L<CatalystX::Declare> is just an extension of L<MooseX::Declare> you can use its full
+power to declare methods and attributes as well. Here is an example of a complete root
+controller with methods and attributes:
+
+    controller MyApp::Controller::Root {
+
+        use MooseX::Types::Moose qw( Str );
+
+        has home_action => (
+            is          => 'ro',
+            isa         => Str,
+            required    => 1,
+            default     => '/somewhere/else',
+        );
+
+        method home_uri (Object $ctx) {
+            return $ctx->uri_for_action($self->home_action);
+        }
+
+        action app_base as '' under '/';
+        action end (@) isa RenderView;
+
+        under base {
+
+            # matches /
+            final action app_root as '' {
+                $ctx->response->redirect($self->home_uri($ctx));
+            }
+
+            # matches /...
+            final action fallback (@) as '' {
+                $ctx->response->status(404);
+                $ctx->response->body('File not found');
+            }
+        }
+    }
+    
+=head2 Conclusion
+
+The real hard work for all this shinyness is doen by L<MooseX::Declare>. Take a
+look at L<CatalystX::Declare> on CPAN for a full description of the available syntax,
+since the above is only the quick tour. I also casually skipped over method modifiers
+that are applied to actions, which adds some more possibilities.
+
+If you want more to look at, there is an example application shipped with the distribution 
+at L<http://cpansearch.perl.org/src/PHAYLON/CatalystX-Declare-0.011/examples/MyApp-Web/>.
+
+=head2 Author and Copyright
+
+(c) 2009, Robert 'phaylon' Sedlacek (C<r.sedlacek at shadowcat.co.uk>).
+
+=cut
