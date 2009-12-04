@@ -1,0 +1,37 @@
+=head1 Catalyst::ScriptRunner
+
+Summer of 2009 brought some great things, and one of these things was me being accepted into Google Summer of Code!  
+My project was to refactor the Catalyst::Helper API into something a little less hateful.  
+More or less, this was accomplished.  I'd like to go over some of the major points
+that I think you should know about in order to make the best use of these features.
+
+=head2 Scripts are now Classes
+
+The scripts, instead of being entities on their own, are now Moosified class instances.
+If you open one of them up, you'll see something like this:
+
+    #!/usr/bin/env perl
+
+	use Catalyst::ScriptRunner;
+	Catalyst::ScriptRunner->run('Test', 'Server');
+
+	1;
+	
+As opposed to 100+ lines of devel server logic.
+
+=head2 What does this do for me?
+
+Custom scripts!  You can now write your own custom components for your Catalyst app.
+This is Really Good if you want to hack your own server with special additions that
+would normally be rather difficult to implement robustly otherwise. The best part:
+You simply create a class called MyApp::Script::(FastCGI|Server|Create|Test|etc) and
+Catalyst automatically picks it up and runs it.  This makes it extremely easy to do things like
+create your own custom Create script, if you need extra options per application for creating
+components.
+
+That's all folks, short and simple.  Hopefully you'll find some cool and fun uses
+for the new Helper API, and you'll blog in your Ironman blogs about them!
+
+- Devin "dhoss" Austin
+
+Special thanks to mst for the shoutout in this year's first advent article!
