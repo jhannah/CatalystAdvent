@@ -13,7 +13,7 @@ If you open one of them up, you'll see something like this:
     #!/usr/bin/env perl
 
 	use Catalyst::ScriptRunner;
-	Catalyst::ScriptRunner->run('Test', 'Server');
+	Catalyst::ScriptRunner->run('MyApp', 'Server');
 
 	1;
 	
