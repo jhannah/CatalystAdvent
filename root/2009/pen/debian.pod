@@ -52,7 +52,7 @@ Only packages offered by Debian are supported by Debian: if there are bugs
 in your Debian software, it is our responsibility to help identify and
 correct them.  Often this means coordinating with the upstream software
 developers (ie, the Catalyst community) and working toward a solution
-together – but our team takes care of this on your behalf.
+together - but our team takes care of this on your behalf.
 
 =item 5
 
@@ -86,7 +86,7 @@ reports are available in Debian's open bug reporting system.
 
 If you have any requests for Catalyst-related modules (or other Perl modules)
 that you'd like packaged for Debian, please contact either myself (via IRC
-or email) or file a “Request For Package” (RFP) bug. If you have general
+or email) or file a "Request For Package" (RFP) bug. If you have general
 questions or would like to chat with us, you're welcome to visit us at any
 time - we hang around on irc.debian.org, #debian-perl.
 
