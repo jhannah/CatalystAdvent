@@ -1,0 +1,123 @@
+=head1 Running CGI Scripts Under Catalyst
+
+It is possible to run most CGI scripts under Catalyst using the modules
+L<Catalyst::Controller::WrapCGI> and L<Catalyst::Controller::CGIBin>.
+
+Why would you want to do this?
+
+Assuming you have a legacy CGI application, you may want to:
+
+=over 4
+
+=item *
+
+integrate and package a CGI script into your Catalyst application, including
+using the Catalyst Authentication framework.
+
+=item *
+
+have Perl CGI script to be compiled on startup and cached, like with
+L<ModPerl::Registry>, in a FastCGI environment rather than Apache mod_perl.
+
+=back
+
+L<Catalyst::Controller::WrapCGI> can even be useful for porting a simple
+ModPerl application to Catalyst.
+
+=head2 An Example
+
+Let's get the wwwboard application from the NMS project
+(L<http://nms-cgi.sourceforge.net/scripts.shtml>) running under L<Catalyst>.
+
+We'll call the L<Catalyst> application C<WWWBoard>.
+
+First, make a C<root/cgi-bin> directory in your app, then copy the file
+C<wwwboard.pl> there.
+
+Put the files C<wwwboard.html> and C<faq.html> into C<root/static>.
+
+Edit the configuration block in C<wwwboard.pl> to:
+
+    $basedir =  WWWBoard->path_to('root/static');
+    $baseurl = 'http://localhost:3000/';
+    $cgi_url = 'http://localhost:3000/cgi-bin/wwwboard.pl';
+
+Next, make a Controller for running your CGIs:
+
+    package WWWBoard::Controller::Board;
+
+    use strict;
+    use warnings;
+    use parent 'Catalyst::Controller::CGIBin';
+
+    1;
+
+Rewire some URLs to the files the CGI will generate in C<Controller/Root.pm>:
+
+    __PACKAGE__->config->{namespace} = '';
+
+    sub index : Path Args(0) {
+        my ($self, $c) = @_;
+
+        $c->serve_static_file($c->path_to('/root/static/wwwboard.html'));
+    }
+
+    sub board_html : Path('wwwboard.html') Args(0) {
+        my ($self, $c) = @_;
+
+        $c->serve_static_file($c->path_to('/root/static/wwwboard.html'));
+    }
+
+    sub faq_html : Path('faq.html') Args(0) {
+        my ($self, $c) = @_;
+
+        $c->serve_static_file($c->path_to('/root/static/faq.html'));
+    }
+
+    sub messages :Local Args {
+        my ($self, $c, @args) = @_;
+
+        $c->serve_static_file($c->path_to('/root/static/messages', @args));
+    }
+
+Start the server, and you will be taken to a functional message board.
+
+Non-Perl CGIs will also work, but of course will not be pre-compiled.
+
+=head2 Porting ModPerl Apps
+
+The CGI environment is a bit closer to ModPerl than the regular L<Catalyst>
+Controller environment, eg. you can print to C<STDOUT>.
+
+First step would be to rewrite your handler sub to take C<$c> instead of C<$r>
+as a parameter and replace the Apache request methods with the equivalent
+L<Catalyst> framework methods.
+
+Replacing things like L<Apache::Session> with L<Catalyst::Plugin::Session> is
+also fairly trivial.
+
+Then your URL handler would look like:
+
+    use parent 'Catalyst::Controller::WrapCGI';
+    require My::ModPerl::Handler;
+
+    sub my_handler : Local {
+        my ($self, $c, @args) = @_;
+
+        $self->cgi_to_response($c, sub {
+            My::ModPerl::Handler::handler($c);
+        });
+    }
+
+=head2 Other Examples
+
+Justin Hunter (arcanez) has gotten the Movable Type blogging software working under
+Catalyst, available here: L<http://github.com/arcanez/mtcatalyst>.
+
+Hans Dieter Pearcey (confound) has gotten Bugzilla working on Catalyst:
+L<http://opensourcery.com/blog/hans-dieter-pearcey/bugzilla-catalyst>.
+
+=head1 AUTHOR
+
+Caelum: Rafael Kitover <rkitover@cpan.org>
+
