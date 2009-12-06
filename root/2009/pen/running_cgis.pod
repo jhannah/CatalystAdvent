@@ -22,7 +22,7 @@ L<ModPerl::Registry>, in a FastCGI environment rather than Apache mod_perl.
 =back
 
 L<Catalyst::Controller::WrapCGI> can even be useful for porting a simple
-ModPerl application to Catalyst.
+mod_perl application to Catalyst.
 
 =head2 An Example
 
@@ -93,14 +93,15 @@ Start the server, and you will be taken to a functional message board.
 
 Non-Perl CGIs will also work, but of course will not be pre-compiled.
 
-=head2 Porting ModPerl Apps
+=head2 Porting mod_perl Apps
 
-The CGI environment is a bit closer to ModPerl than the regular L<Catalyst>
+The CGI environment is a bit closer to mod_perl than the regular L<Catalyst>
 Controller environment, eg. you can print to C<STDOUT>.
 
 First step would be to rewrite your handler sub to take C<$c> instead of C<$r>
 as a parameter and replace the Apache request methods with the equivalent
 L<Catalyst> framework methods.
+
 
 Replacing things like L<Apache::Session> with L<Catalyst::Plugin::Session> is
 also fairly trivial.
