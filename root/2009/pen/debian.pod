@@ -1,0 +1,73 @@
+=head1 Catalyst on Debian
+
+=head2 Introduction
+
+Because Catalyst is a rapidly evolving project, packages supplied by
+operating system vendors like Debian, Fedora, Ubuntu and many others have
+historically been outdated compared to the stable versions.  In effect,
+this limited users of Debian’s package management system to outdated versions
+of this software.
+
+As a member of the Debian Perl Group that maintains these packages, I admit
+that the historical lack of communication and coordination between the two
+communities has led to suboptimal support for these important packages.  
+
+In 2009, thanks to the efforts of Matt S. Trout and many others, Debian’s
+Catalyst packages have been improving.  The idea that Debian’s Perl packages
+are outdated is an idea that is itself becoming obsolete.  There are many
+situations where system-wide Debian packages (and similarly, Ubuntu packages)
+can be preferable to installing software manually via CPAN.
+
+=head2 Advantages
+
+Here are some reasons why packages managed by Debian are preferable to
+installing packages manually:
+
+=over
+
+=item 1
+
+Unattended installation: the majority of our packages require absolutely no user interaction during installation, in contrast to installs via CPAN. 
+
+=item 2
+
+Quicker installs for binary packages: since binary packages are pre-built, installing the package is as simple as unpacking the package and installing the files to the appropriate locations.  When many modules need to be built (as with Catalyst and MojoMojo), this can result in a significant time savings, especially when one considers rebuilding due to upgrades. 
+
+=item 3
+
+No unnecessary updates: if an update contains only changes to documentation or tests, it does not make sense to waste bandwidth downloading and installing it.  Our process separates packages with bugfixes and feature additions from those that have no functional difference to users, saving time, bandwidth and administrative overhead.
+
+=item 4
+
+Only packages offered by Debian are supported by Debian: if there are bugs in your Debian software, it is our responsibility to help identify and correct them.  Often this means coordinating with the upstream software developers (ie, the Catalyst community) and working toward a solution together – but our team takes care of this on your behalf.
+
+=item 5
+
+Updates occur with the rest of your system: while upgrading your system using aptitude, synaptic or another package management tool, your Perl packages will be updated as well.  This prevents issues where a system administrator forgets to update CPAN packages periodically, leaving your systems vulnerable to potential security issues.
+
+=item 6
+
+Important changes are always indicated during package upgrades: if there are changes to the API of a library which can potentially break applications, a supplied Debian.NEWS file will display a notice (either in a dialog box or on the command line) indicating these changes. 
+This year has seen greatly improved interaction between the Debian Perl Group and the Catalyst community, which is a trend we’d like to see continue for many years to come.  As with any open source project, communicating the needs of both communities and continuing to work together as partners will ultimately yield the greatest benefit for everyone.
+
+=back
+
+=head2 Quality Assurance
+
+The Debian Perl Group uses several tools to provide quality assurance for our users.  Chief among them is the Package Entropy Tracker (PET), a dashboard that shows information like the newest upstream versions of modules.  Our bug reports are available in Debian’s open bug reporting system.
+
+If you have any requests for Catalyst-related modules (or other Perl modules) that you’d like packaged for Debian, please contact either myself (via IRC or email) or file a “Request For Package” (RFP) bug. If you have general questions or would like to chat with us, you're welcome to visit us at any time - we hang around on irc.debian.org, #debian-perl.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+Our IRC channel, irc.debian.org (OFTC), channel #debian-perl
+
+=back
+
+=head1 AUTHOR
+
+Jonathan Yu E<lt>jawnsy@cpan.orgE<gt>
