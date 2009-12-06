@@ -52,6 +52,15 @@ Next, make a Controller for running your CGIs:
 
     1;
 
+Tell Static::Simple to not ignore C<.html> files in C<WWWBoard.pm>:
+
+    __PACKAGE__->config(
+        name => 'WWWBoard',
+        static => {
+            ignore_extensions => [ 'tt' ],
+        },
+    );
+
 Rewire some URLs to the files the CGI will generate in C<Controller/Root.pm>:
 
     __PACKAGE__->config->{namespace} = '';
