@@ -71,13 +71,24 @@ on the command line) indicating these changes.
 
 =back
 
-This year has seen greatly improved interaction between the Debian Perl Group and the Catalyst community, which is a trend we'd like to see continue for many years to come.  As with any open source project, communicating the needs of both communities and continuing to work together as partners will ultimately yield the greatest benefit for everyone.
+This year has seen greatly improved interaction between the Debian Perl Group
+and the Catalyst community, which is a trend we'd like to see continue for
+many years to come.  As with any open source project, communicating the needs
+of both communities and continuing to work together as partners will ultimately
+yield the greatest benefit for everyone.
 
 =head2 Quality Assurance
 
-The Debian Perl Group uses several tools to provide quality assurance for our users.  Chief among them is the Package Entropy Tracker (PET), a dashboard that shows information like the newest upstream versions of modules.  Our bug reports are available in Debian's open bug reporting system.
+The Debian Perl Group uses several tools to provide quality assurance for
+our users.  Chief among them is the Package Entropy Tracker (PET), a dashboard
+that shows information like the newest upstream versions of modules.  Our bug
+reports are available in Debian's open bug reporting system.
 
-If you have any requests for Catalyst-related modules (or other Perl modules) that you'd like packaged for Debian, please contact either myself (via IRC or email) or file a “Request For Package” (RFP) bug. If you have general questions or would like to chat with us, you're welcome to visit us at any time - we hang around on irc.debian.org, #debian-perl.
+If you have any requests for Catalyst-related modules (or other Perl modules)
+that you'd like packaged for Debian, please contact either myself (via IRC
+or email) or file a “Request For Package” (RFP) bug. If you have general
+questions or would like to chat with us, you're welcome to visit us at any
+time - we hang around on irc.debian.org, #debian-perl.
 
 =head1 SEE ALSO
 
