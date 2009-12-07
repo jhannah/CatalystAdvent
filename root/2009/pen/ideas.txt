@@ -5,21 +5,21 @@ Articles structure
   - ending: further reading, stuff we didn't include but you should know about, alternatives, caveats
 
 Confirmed ideas:
-x  - DBIx::Class::Schema::Versioned - castaway
-  - Plack + Catalyst - miyagawa (or an editor with miyagawa's help)
+  - Plack + Catalyst - miyagawa (or an editor with miyagawa's help) 
   - External authentication (Openid, oauth) - Cosmin Budrica
-x  - FBConnect (authentication, API examples ) - Cosmin Budrica
   - Padre::Plugin::Catalyst - garu
   - js grid - jquery/ajax/json/moose roles -  Ian Docherty i
   - Configuration layouts: customizing your app per user/host/env/etc. Wallace Reis 
   - database lookup functions working over SOAP  - Ian Sillitoe 
-  - debian + catalyst  - jawnsy
   - dbic api - nperez
   - gitalyst - ztz
   - mojomojo -dandv
   - component traits - caelum
   - querylog - zamolxes
-  - cwest - openid
+  - openid - cwest
+  - DBIx::Class::ResultSet::WithMetaData - lukes
+  - DBIC::Fixtures - lukes
+  - "Bullet proof search" - Matija Grabnar: http://zanshin.matija.com/twiki/bin/view/Main/BulletProofSearch
 
 Organising:
   - Bogdan Lucaciu ( bogdan at sinapticode ro , zamolxes on irc)
@@ -32,14 +32,11 @@ Editors
   - Cass Johnston
 
 Volunteers
-  - Alex Nedelcu (some Formhandler stuff)
   - Tomas Doran (8th or later - one article about CatalystX::SimpleLogin , + maybe others)
+  - aristotle - anything :) ( unicode, http, xml whatever) 
 
-Starting article
-  - a call to action similar in tone to 'How perl happens' (chromatic) and 'Dreamcasting' (mst)
-  - should mention free support in exchange of docpatches, liberal commit/comaint rights
-  - don't forget to mention ironman, urging people to read ironman planet, register their blogs, write about their catalyst projects and ideas
-  - mst
-
-Moar ideas:
-- "Bullet proof search" - Matija Grabnar: http://zanshin.matija.com/twiki/bin/view/Main/BulletProofSearch
+Done articles
+ - matt's opening article
+ - DBIx::Class::Schema::Versioned - castaway
+ - FBConnect (authentication, API examples ) - Cosmin Budrica
+ - debian + catalyst  - jawnsy
