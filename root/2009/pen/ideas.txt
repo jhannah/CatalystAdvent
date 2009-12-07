@@ -40,3 +40,4 @@ Done articles
  - DBIx::Class::Schema::Versioned - castaway
  - FBConnect (authentication, API examples ) - Cosmin Budrica
  - debian + catalyst  - jawnsy
+ - GSoC stuffs - dhoss
