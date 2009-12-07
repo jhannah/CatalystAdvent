@@ -1,0 +1,176 @@
+=head1 Loadable Traits for Catalyst Components
+
+Over the past few months we've developed a loadable traits system for
+L<Catalyst> components. Components are Models, Views and Controllers.
+
+Traits are L<Moose::Role>s, that are applied to classes dynamically.
+
+Roles for Controllers, with actual actions, are possible thanks to Tomas
+Doran's (t0m) and Florian Ragwitz's (rafl) work on L<MooseX::MethodAttributes>.
+
+Loadable traits support is provided by L<CatalystX::Component::Traits>, based
+on Jonathan Rockway's (jrockway) work on L<MooseX::Traits>.
+
+=head2 An Example
+
+Let's make a simple Model and some traits for it, so you can see how you might
+make use of this feature in your own projects.
+
+    package SampleApp::Model::Fortune;
+
+    use Moose;
+    use namespace::autoclean;
+    extends 'Catalyst::Model';
+    with 'CatalystX::Component::Traits';
+
+    has '+_trait_merge' => (default => 1);
+
+    __PACKAGE__->config->{traits} = [ 'Russian' ];
+
+    has fortune_command      => (is => 'rw', lazy_build => 1);
+    has fortune_command_opts => (is => 'rw', lazy_build => 1);
+
+    sub get_fortune {
+        my $self = shift;
+
+        my $command =
+            $self->fortune_command . ' ' . $self->fortune_command_opts;
+
+        my $output = qx{$command};
+        chomp $output;
+
+        return $output;
+    }
+
+    sub _build_fortune_command { 'fortune' }
+    sub _build_fortune_command_opts { '' }
+
+    __PACKAGE__->meta->make_immutable;
+
+    package SampleApp::TraitFor::Model::Fortune::Russian;
+
+    use Moose::Role;
+    use namespace::autoclean;
+
+    has percent_russian => (is => 'rw', default => 100);
+
+    around fortune_command_opts => sub {
+        my ($next, $self) = (shift, shift);
+
+        my $dbs =
+            $self->percent_russian . '% ru'
+            . ' ' .
+            (100 - $self->percent_russian) . '% /usr/share/games/fortunes';
+
+        return $self->$next(@_) . ' ' . $dbs;
+    };
+
+    package SampleApp::TraitFor::Model::Fortune::Offensive;
+
+    use Moose::Role;
+    use namespace::autoclean;
+
+    around fortune_command_opts => sub {
+        my ($next, $self) = (shift, shift);
+
+        return '-o ' . $self->$next(@_);
+    };
+
+    package SampleApp::TraitFor::Model::Fortune::OffensiveToo;
+
+    use Moose::Role;
+    use namespace::autoclean;
+
+    around fortune_command_opts => sub {
+        my ($next, $self) = (shift, shift);
+
+        my $opts = $self->$next(@_);
+        $opts =~ s/-o //; # if Offensive trait is enabled, edit it out
+
+        return "-a $opts";
+    };
+
+    1;
+
+Notice we turned on the L<CatalystX::Component::Traits/"TRAIT MERGING">
+feature, and we set a default list of traits to include (C<OffensiveToo>.)
+
+An action to make use of our new Model:
+
+    sub index :Path :Args(0) {
+        my ($self, $c) = @_; 
+
+        $c->res->content_type('text/plain; charset=utf-8');
+        $c->res->body($c->model('Fortune')->get_fortune);
+    }
+
+Now, suppose in production you don't want your customers to see offensive
+fortunes, and you want 50% of the fortunes to be in Russian.
+
+Just put the following into the C<.conf>:
+
+    <Model::Fortune>
+        traits -OffensiveToo
+        traits Russian
+        percent_russian 50
+    </Model::Fortune>
+
+We turned off the C<OffensiveToo> trait, added the C<Russian> trait and set an
+attribute that was defined in a trait directly from the config file.
+
+Hopefully this demonstrats some of the power of using L<Moose::Role>s in your
+L<Catalyst> applications.
+
+See also the C<Catalyst::ActionRole::> namespace for other awesome applications
+of L<Moose::Role>s.
+
+=head2 Components that use Loadable Traits
+
+=head3 L<Catalyst::Model::DBIC::Schema>
+
+The model for using L<DBIx::Class> in L<Catalyst> has the following traits
+available on CPAN:
+
+=over 4
+
+=item L<Catalyst::TraitFor::Model::DBIC::Schema::Caching>
+
+For caching the results of queries.
+
+=item L<Catalyst::TraitFor::Model::DBIC::Schema::Replicated>
+
+For quering replicated MySQL databases.
+
+=item L<Catalyst::TraitFor::Model::DBIC::Schema::QueryLog>
+
+L<DBIx::Class::QueryLog> support, for analyzing query performance.
+
+=back
+
+=head3 L<CatalystX::SimpleLogin>
+
+A reusable login/logout component for L<Catalyst> that is injected through the
+Plugin list. It has the following traits available on CPAN:
+
+=over 4
+
+=item L<CatalystX::SimpleLogin::TraitFor::Controller::Login::Logout>
+
+Adds logout support.
+
+=item L<CatalystX::SimpleLogin::TraitFor::Controller::Login::WithRedirect>
+
+Combines with L<Catalyst::ActionRole::NeedsLogin> to mark actions as requiring
+a login and redirecting back to the originally requested page.
+
+=item L<CatalystX::SimpleLogin::TraitFor::Controller::Login::RenderAsTTTemplate>
+
+Provides a L<Template> template for rendering the login form, for use with
+L<Catalyst::View::TT>.
+
+=back
+
+=head1 AUTHOR
+
+Caelum: Rafael Kitover <rkitover@cpan.org>
+
