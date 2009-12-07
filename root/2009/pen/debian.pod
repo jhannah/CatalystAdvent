@@ -8,10 +8,6 @@ historically been outdated compared to the stable versions.  In effect,
 this limited users of Debian's package management system to outdated versions
 of this software.
 
-As a member of the Debian Perl Group that maintains these packages, I admit
-that the historical lack of communication and coordination between the two
-communities has led to suboptimal support for these important packages.  
-
 In 2009, thanks to the efforts of Matt S. Trout and many others, Debian's
 Catalyst packages have been improving.  The idea that Debian's Perl packages
 are outdated is an idea that is itself becoming obsolete.  There are many
@@ -83,6 +79,46 @@ yield the greatest benefit for everyone.
 As with all good things, thare are naturally some situations where using
 Debian Perl Packages (or, indeed, most operating-system managed packages)
 is either impossible, impractical or undesirable.
+
+=over
+
+=item *
+
+Inadequate granularity: due to some restrictions on the size of packages
+being uploaded into Debian, there are plenty of module "bundles", including
+the main Catalyst module bundle (libcatalyst-modules-perl). Unfortunately,
+this means you may have more things installed than you need.
+
+=item *
+
+Not installable as non-root: if you don't have root on the system, or a
+friendly system administrator, you simply cannot install Debian packages,
+let alone our Perl packages. This can add to complexity for shared hosting
+scenarios where using our packages would require some virtualization.
+
+=item *
+
+Multiple versions: with a solution like L<local::lib>, it's possible to
+install multiple versions of the same package in different locations. This
+can be important for a number of reasons, including ease of testing and to
+support your legacy applications. With operating-system based packages, you
+will always have the most recent version available (and if you are using
+the stable release, you will always have the most recent serious bug/security
+fixes installed).
+
+=item *
+
+Less useful in a non-homogenous environment: if you use various different
+operating systems, it can be easier to maintain an internal CPAN Mirror
+(especially a Mini CPAN installation) than a Debian repository, Ubuntu
+repository, Fedora/RedHat repository, etc.
+
+=back
+
+For my purposes, I use Debian packages for everything because the benefits
+outweigh the perceived costs. However, this is not the case for everyone in
+all situations, so it is important to understand that Debian Perl Packages
+are not a panacea.
 
 =head2 Quality Assurance
 
