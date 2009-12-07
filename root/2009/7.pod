@@ -68,4 +68,4 @@ This new work is a good basis for people being able to do cool things, but
 I'm sure there is some work still to be done to make it easier when
 people start experimenting with their real life use-cases.
 
-- Devin "dhoss" Austin
+- Devin "dhoss" Austin, and thanks a boat load to Tomas Doran for reviewing and beefing things up in this article.
