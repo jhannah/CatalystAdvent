@@ -25,7 +25,7 @@ make use of this feature in your own projects.
 
     has '+_trait_merge' => (default => 1);
 
-    __PACKAGE__->config->{traits} = [ 'Russian' ];
+    __PACKAGE__->config->{traits} = [ 'OffensiveToo' ];
 
     has fortune_command      => (is => 'rw', lazy_build => 1);
     has fortune_command_opts => (is => 'rw', lazy_build => 1);
