@@ -3,12 +3,12 @@
 =head2 Introduction
 
 Because Catalyst is a rapidly evolving project, packages supplied by
-operating system vendors like Debian, Fedora, Ubuntu and many others have
+operating system vendors like Debian, Fedora, Ubuntu, and many others have
 historically been outdated compared to the stable versions.  In effect,
 this limited users of Debian's package management system to outdated versions
 of this software.
 
-In 2009, thanks to the efforts of Matt S. Trout and many others, Debian's
+In 2009, thanks to the efforts of Matt S Trout and many others, Debian's
 Catalyst packages have been improving.  The idea that Debian's Perl packages
 are outdated is an idea that is itself becoming obsolete.  There are many
 situations where system-wide Debian packages (and similarly, Ubuntu packages)
@@ -36,10 +36,10 @@ savings, especially when one considers rebuilding due to upgrades.
 
 =item 3
 
-No unnecessary updates: if an update only affects the Win32 platform for
+No unnecessary updates: if an update only affects the Win32 platform, for
 example, it does not make sense to waste bandwidth downloading and installing
 it.  Our process separates packages with bugfixes and feature additions from
-those that have no functional difference to users, saving time, bandwidth
+those that have no functional difference to users, saving time, bandwidth,
 and administrative overhead.
 
 =item 4
@@ -47,13 +47,13 @@ and administrative overhead.
 Only packages offered by Debian are supported by Debian: if there are bugs
 in your Debian software, it is our responsibility to help identify and
 correct them.  Often this means coordinating with the upstream software
-developers (ie, the Catalyst community) and working toward a solution
+developers (i.e. the Catalyst community) and working toward a solution
 together - but our team takes care of this on your behalf.
 
 =item 5
 
 Updates occur with the rest of your system: while upgrading your system
-using aptitude, synaptic or another package management tool, your Perl
+using aptitude, synaptic, or another package management tool, your Perl
 packages will be updated as well.  This prevents issues where a system
 administrator forgets to update CPAN packages periodically, leaving your
 systems vulnerable to potential security issues.
@@ -76,9 +76,9 @@ yield the greatest benefit for everyone.
 
 =head2 Disadvantages
 
-As with all good things, thare are naturally some situations where using
-Debian Perl Packages (or, indeed, most operating-system managed packages)
-is either impossible, impractical or undesirable.
+As with all good things, there are naturally some situations where using
+Debian Perl packages (or, indeed, most operating-system managed packages)
+is either impossible, impractical, or undesirable.
 
 =over
 
@@ -108,16 +108,16 @@ fixes installed).
 
 =item *
 
-Less useful in a non-homogenous environment: if you use various different
-operating systems, it can be easier to maintain an internal CPAN Mirror
-(especially a Mini CPAN installation) than a Debian repository, Ubuntu
-repository, Fedora/RedHat repository, etc.
+Less useful in a non-homogeneous environment: if you use different
+operating systems, it can be easier to maintain a single internal CPAN
+mirror (especially a mini-CPAN installation) than a Debian repository,
+Ubuntu repository, Fedora/RedHat repository, etc.
 
 =back
 
 For my purposes, I use Debian packages for everything because the benefits
 outweigh the perceived costs. However, this is not the case for everyone in
-all situations, so it is important to understand that Debian Perl Packages
+all situations, so it is important to understand that Debian Perl packages
 are not a panacea.
 
 =head2 Quality Assurance
@@ -127,11 +127,12 @@ our users.  Chief among them is the Package Entropy Tracker (PET), a dashboard
 that shows information like the newest upstream versions of modules.  Our bug
 reports are available in Debian's open bug reporting system.
 
-If you have any requests for Catalyst-related modules (or other Perl modules)
-that you'd like packaged for Debian, please contact either myself (via IRC
-or email) or file a "Request For Package" (RFP) bug. If you have general
-questions or would like to chat with us, you're welcome to visit us at any
-time - we hang around on irc.debian.org, #debian-perl.
+If you have any requests for Catalyst-related modules (or other Perl
+modules) that you'd like packaged for Debian, please either contact me
+directly (via IRC or email) or file a "Request For Package" (RFP)
+bug. If you have general questions or would like to chat with us, you're
+welcome to visit us at any time - we hang around on irc.debian.org,
+#debian-perl.
 
 =head1 SEE ALSO
 
@@ -189,11 +190,11 @@ Jonathan Yu E<lt>jawnsy@cpan.orgE<gt>
 
 =head1 ACKNOWLEDGMENTS
 
-Thanks to Matt S. Trout (mst) for working so closely with the group to help
+Thanks to Matt S Trout (mst) for working so closely with the group to help
 both communities achieve our goal of increasing Catalyst's profile. Also
 thanks to Bogdan Lucaciu (zamolxes) for inviting us to contribute this
 article, and Florian Ragwitz (rafl) for his review and feedback.
 
 Everything that is good in nature comes from cooperation. Neither Catalyst,
-nor Perl, nor Debian Perl Packages could exist without the contributions of
+nor Perl, nor Debian Perl packages could exist without the contributions of
 countless others. We all stand on the shoulders of giants.
