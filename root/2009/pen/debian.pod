@@ -40,8 +40,8 @@ savings, especially when one considers rebuilding due to upgrades.
 
 =item 3
 
-No unnecessary updates: if an update contains only changes to documentation
-or tests, it does not make sense to waste bandwidth downloading and installing
+No unnecessary updates: if an update only affects the Win32 platform for
+example, it does not make sense to waste bandwidth downloading and installing
 it.  Our process separates packages with bugfixes and feature additions from
 those that have no functional difference to users, saving time, bandwidth
 and administrative overhead.
@@ -67,7 +67,8 @@ systems vulnerable to potential security issues.
 Important changes are always indicated during package upgrades: if there are
 changes to the API of a library which can potentially break applications, a
 supplied Debian.NEWS file will display a notice (either in a dialog box or
-on the command line) indicating these changes.
+on the command line) indicating these changes. You will need to install the
+"apt-listchanges" utility to see these.
 
 =back
 
@@ -76,6 +77,12 @@ and the Catalyst community, which is a trend we'd like to see continue for
 many years to come.  As with any open source project, communicating the needs
 of both communities and continuing to work together as partners will ultimately
 yield the greatest benefit for everyone.
+
+=head2 Disadvantages
+
+As with all good things, thare are naturally some situations where using
+Debian Perl Packages (or, indeed, most operating-system managed packages)
+is either impossible, impractical or undesirable.
 
 =head2 Quality Assurance
 
@@ -98,8 +105,59 @@ time - we hang around on irc.debian.org, #debian-perl.
 
 Our IRC channel, irc.debian.org (OFTC), channel #debian-perl
 
+=item *
+
+Package Entropy Tracker (L<http://pkg-perl.alioth.debian.org/cgi-bin/pet.cgi>)
+is a dashboard where we can see what needs to be updated. It allows us (and
+others, if interested!) to easily monitor our workflow, and also contains
+links to our repository.
+
+=item *
+
+Our welcome page (L<http://wiki.debian.org/Teams/DebianPerlGroup/Welcome>)
+talks about what we do and how you (yes you!) can join. You don't need to
+be a Debian Developer to join the group (actually, I'm not yet a DD and yet
+I maintain 300+ packages through the group).
+
+=item *
+
+This guide (L<http://pkg-perl.alioth.debian.org/howto/RFP.html>) explains
+how to file a Request For Package (RFP) bug, so that the modules you use
+can be added to the Debian archive. Note that Debian is subject to many
+restrictions, so issues like inadequate copyright information may prevent
+the package from entering the archive.
+
+=back
+
+=head1 STATISTICS
+
+Here are some statistics of note:
+
+=over
+
+=item *
+
+We maintain over 1400+ packages as of today. For our QA report, see:
+L<http://qa.debian.org/developer.php?login=pkg-perl-maintainers@lists.alioth.debian.org&comaint=yes>
+
+=item *
+
+We have quite a few active members; probably around 10 or 20. The full
+list: L<https://alioth.debian.org/project/memberlist.php?group_id=30274>
+
 =back
 
 =head1 AUTHOR
 
 Jonathan Yu E<lt>jawnsy@cpan.orgE<gt>
+
+=head1 ACKNOWLEDGMENTS
+
+Thanks to Matt S. Trout (mst) for working so closely with the group to help
+both communities achieve our goal of increasing Catalyst's profile. Also
+thanks to Bogdan Lucaciu (zamolxes) for inviting us to contribute this
+article, and Florian Ragwitz (rafl) for his review and feedback.
+
+Everything that is good in nature comes from cooperation. Neither Catalyst,
+nor Perl, nor Debian Perl Packages could exist without the contributions of
+countless others. We all stand on the shoulders of giants.
