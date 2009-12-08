@@ -21,12 +21,12 @@ installing packages manually:
 
 =over
 
-=item 1.
+=item *
 
 Unattended installation: the majority of our packages require absolutely no
 user interaction during installation, in contrast to installs via CPAN. 
 
-=item 2.
+=item *
 
 Quicker installs for binary packages: since binary packages are pre-built,
 installing the package is as simple as unpacking the package and installing
@@ -34,7 +34,7 @@ the files to the appropriate locations.  When many modules need to be built
 (as with Catalyst and MojoMojo), this can result in a significant time
 savings, especially when one considers rebuilding due to upgrades. 
 
-=item 3.
+=item *
 
 No unnecessary updates: if an update only affects the Win32 platform, for
 example, it does not make sense to waste bandwidth downloading and installing
@@ -42,7 +42,7 @@ it.  Our process separates packages with bugfixes and feature additions from
 those that have no functional difference to users, saving time, bandwidth,
 and administrative overhead.
 
-=item 4.
+=item *
 
 Only packages offered by Debian are supported by Debian: if there are bugs
 in your Debian software, it is our responsibility to help identify and
@@ -50,7 +50,7 @@ correct them.  Often this means coordinating with the upstream software
 developers (i.e. the Catalyst community) and working toward a solution
 together - but our team takes care of this on your behalf.
 
-=item 5.
+=item *
 
 Updates occur with the rest of your system: while upgrading your system
 using aptitude, synaptic, or another package management tool, your Perl
@@ -58,7 +58,7 @@ packages will be updated as well.  This prevents issues where a system
 administrator forgets to update CPAN packages periodically, leaving your
 systems vulnerable to potential security issues.
 
-=item 6.
+=item *
 
 Important changes are always indicated during package upgrades: if there are
 changes to the API of a library which can potentially break applications, a
