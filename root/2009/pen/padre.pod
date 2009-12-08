@@ -1,0 +1,140 @@
+
+=head1 Developing Catalyst Applications with Padre
+
+And what an exciting year for Perl this was! From Catalyst going Moose to all the web buzz Perl got with the L<Iron Man Challenge|http://ironman.enlightenedperl.org/> and L<new|http://blogs.perl.org/> L<site|http://www.perl.org/> L<designs|http://perldoc.perl.org/>, the worldwide Perl community has never been as integrated, and programming was never this easy and fun.
+
+One of the projects that really took off this year was L<Padre, the Perl IDE|http://padre.perlide.org>. And in today's Advent Calendar we're gonna know a little more about it and how it can be used to write web applications in our favorite framework :-)
+
+=head2 What is Padre?
+
+Padre is an Integrated Development Environment (IDE) written in Perl and specially crafted to aid Perl development, from simple beginner scripts to complex applications.
+
+=begin pod:xhtml
+
+<img src="http://padre.perlide.org/static/splash.png" alt="Padre logo" />
+
+=end pod:xhtml
+
+While Padre is still a rather young application itself, it is growing amazingly fast. We have already seen over 50 CPAN releases and more than 9500 commits from 49 different contributors all around the world and, much like the Catalyst project, that list just keeps getting bigger and bigger.
+
+One of Padre's main features is the ability to add even more functionality to it via an extensible plugin system.
+
+And that's precisely what we did.
+
+=head2 Enter Padre::Plugin::Catalyst
+
+L<Padre::Plugin::Catalyst|http://search.cpan.org/perldoc?Padre::Plugin::Catalyst> integrates Catalyst development and Padre, (hopefully) improving the programmer's experience.
+
+=begin pod:xhtml
+
+<img src="/calendar/static/images/2009/padre/padre_plugin_catalyst.png" alt="The Padre Catalyst Plugin, in all its glory" />
+
+The Catalyst plugin has already been translated to Arabic, Brazilian Portuguese, Chinese (Traditional), Dutch, French, German, Japanese, Polish, Russian and Spanish (thanks everyone!), so there is no excuse not to try it :)
+
+=end pod:xhtml
+
+=head3 Installation
+
+   cpan> install Padre::Plugin::Catalyst
+
+If you already have L<Padre|http://search.cpan.org/perldoc?Padre> and L<Catalyst::Devel|http://search.cpan.org/perldoc?Catalyst::Devel> installed, this should go really smooth. Otherwise, you might want to check your system's L<installation instructions for Padre|http://padre.perlide.org/download.html>, as it requires the occasionally complicated to install wxWidgets's development files.
+
+Once it's installed, fire up Padre and go to "Plugins->Plugin Manager" menu option. You should see a window with all installed plugins listed, including ours, with a miniaturized version of the Catalyst logo.
+
+=begin pod:xhtml
+
+<img src="/calendar/static/images/2009/padre/plugin_manager.png" alt="Padre's Plugin Manager" />
+
+=end pod:xhtml
+
+To enable the Catalyst Plugin, just double click on it, or select it and click on the "Enable" button of the Plugin Manager window.
+
+=head2 What can we do already?
+
+First thing you'll notice after enabling the Catalyst Plugin is a big "Catalyst Dev Server" panel in the bottom of your main Padre window - probably next to the "Output" one.
+
+This panel lets you toggle your application's development web server and monitor its output. You can even set it to automatically restart the server when files get modified by checking the "auto-restart" box.
+
+You'll also notice a new "Catalyst" menu entry under "Plugins". This menu lets you create and manipulate your Catalyst apps, and also provides quick access to the framework's extensive online documentation.
+
+=begin pod:xhtml
+
+<img src="/calendar/static/images/2009/padre/menu.png" alt="Padre's Catalyst Plugin Menu" />
+
+=end pod:xhtml
+
+The following options are available:
+
+=head3 'New Catalyst Application'
+
+As the name states, this option lets you create a new Catalyst application in a directory of your choosing. Keep an eye in Padre's C<Output> panel, as all information regarding the newly created project will be displayed there.
+
+=begin pod:xhtml
+
+<img src="/calendar/static/images/2009/padre/newapp.png" alt="Creating a new application" />
+
+=end pod:xhtml
+
+=head3 'Create new...'
+
+B<Note:> The options below only work if your active document belongs to a Catalyst project!
+
+The Catalyst helpers let you automatically create stub classes for your application's MVC components. With this menu option not only can you select your component's name but also its type. For instance, if you select "create new view" and have the L<Catalyst::Helper::View::TT> module installed on your system, the "TT" type will be available for you).
+
+Of course, the available components are:
+
+=over 4
+
+=item * 'Model'
+
+=item * 'View'
+
+=item * 'Controller'
+
+=back
+
+=begin pod:xhtml
+
+<img src="/calendar/static/images/2009/padre/create_model.png" alt="creating a new Model for our app" />
+
+=end pod:xhtml
+
+=head3 'Start/Stop Web Server'
+
+Just like the button in the "Catalyst Dev Server" panel, this two options let you toggle your application's dev server.
+
+=head3 'Update Application Scripts'
+
+If the server panel tells you you're running an old script whenever you start the development server, you can use this option to update your application's scripts. Make sure to look at Padre's C<Output> panel afterwards for information on what changed.
+
+=head3 'Catalyst Online References'
+
+If you're a beginner in the Catalyst world, you might find this menu option particularly useful. Not only it gives you quick access to several of the Catalyst's online references and documentation (such as the Catalyst Tutorial), it also has an item called 'Catalyst Community Live Support', which will point your default web browser to an IRC web interfacte connected directly to #catalyst in irc.perl.org, where you can ask your question to real humans who hang around there.
+
+=head2 Dynamic context-menu item: 'Open Template'
+
+=begin pod:xhtml
+
+<img src="/calendar/static/images/2009/padre/context_menu.png" alt="a new 'Open Template' option appear in the document's context menu" />
+
+=end pod:xhtml
+
+As the Catalyst plugin starts to explore the actual document, a new feature emerged: if your action sets a template, right-clicking on the line where it is set will trigger a new option, "Open Template", which will open the template file right there in your editor.
+
+
+=head2 To infinity... and beyond!
+
+Even though the Catalyst plugin for Padre is really young, it already shows a lot of potential. Combining the power of an IDE such as Padre to your Catalyst development process is bound to yield some awesome results. 
+
+That said, we could really use your help! Take Padre and the Catalyst Plugin for a spin, and let us know what you love, things you hated, stuff you miss, and whatever you can come up with that might help Catalyst development under Padre. Bug reports and wishlists are always welcome - patches even more!
+
+C<Padre::Plugin::Catalyst> is being developed in L<Padre's main repository|http://svn.perlide.org/padre/trunk/Padre-Plugin-Catalyst/>, and we all hang around in #padre (irc.perl.org), so make sure to drop by and give us some feedback. 
+
+Well, that's it for today. I really hope you enjoyed it :-)
+
+Happy Holidays, everyone! And happy hacking!
+
+=head2 Author
+
+Breno G. de Oliveira C<< <garu@cpan.org> >>
+
