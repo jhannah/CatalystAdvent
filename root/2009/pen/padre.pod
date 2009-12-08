@@ -29,9 +29,9 @@ L<Padre::Plugin::Catalyst|http://search.cpan.org/perldoc?Padre::Plugin::Catalyst
 
 <img src="/calendar/static/images/2009/padre/padre_plugin_catalyst.png" alt="The Padre Catalyst Plugin, in all its glory" />
 
-The Catalyst plugin has already been translated to Arabic, Brazilian Portuguese, Chinese (Traditional), Dutch, French, German, Japanese, Polish, Russian and Spanish (thanks everyone!), so there is no excuse not to try it :)
-
 =end pod:xhtml
+
+The Catalyst plugin has already been translated to Arabic, Brazilian Portuguese, Chinese (Traditional), Dutch, French, German, Japanese, Polish, Russian and Spanish (thanks everyone!), so there is no excuse not to try it :)
 
 =head3 Installation
 
