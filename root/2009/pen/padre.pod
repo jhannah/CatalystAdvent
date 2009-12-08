@@ -11,15 +11,15 @@ Padre is an Integrated Development Environment (IDE) written in Perl and special
 
 =begin pod:xhtml
 
-<img src="http://padre.perlide.org/static/splash.png" alt="Padre logo" />
+<img src="/calendar/static/images/2009/padre/splash.png" alt="Padre logo" />
 
 =end pod:xhtml
 
 While Padre is still a rather young application itself, it is growing amazingly fast. We have already seen over 50 CPAN releases and more than 9500 commits from 49 different contributors all around the world and, much like the Catalyst project, that list just keeps getting bigger and bigger.
 
-One of Padre's main features is the ability to add even more functionality to it via an extensible plugin system.
+Padre was created by L<Gábor Szabó|http://szabgab.com> to help Perl beginners and people who are more comfortable working outside of the command line, in a full-fledged IDE available in all major operating systems - it even has L<pre-built packages|http://padre.perlide.org/download.html> for Windows, MacOS X and some Linux distros. Padre supports class outlining, quick module creation, has integrated Perl documentation, CPAN integration, and also gives you code refatoring options like lexically renaming variables and extracting subroutines. Even if you're a long time vim/emacs user, it is definitely worth a try! In fact, one of Padre's great features is that, being written in Perl 5 itself, it is very enpowering knowing that you can easily extend and fix your IDE whenever you find something you miss or don't like about it. Other killer feature for developers is Padre's ability to add even more functionality to it via an extensible plugin system.
 
-And that's precisely what we did.
+And that's precisely what we did :-)
 
 =head2 Enter Padre::Plugin::Catalyst
 
