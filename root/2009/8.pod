@@ -198,3 +198,4 @@ article, and Florian Ragwitz (rafl) for his review and feedback.
 Everything that is good in nature comes from cooperation. Neither Catalyst,
 nor Perl, nor Debian Perl packages could exist without the contributions of
 countless others. We all stand on the shoulders of giants.
+
