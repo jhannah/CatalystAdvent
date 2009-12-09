@@ -7,14 +7,11 @@ Articles structure
 Confirmed ideas:
   - Plack + Catalyst - miyagawa (or an editor with miyagawa's help) 
   - External authentication (Openid, oauth) - Cosmin Budrica
-  - Padre::Plugin::Catalyst - garu
-  - js grid - jquery/ajax/json/moose roles -  Ian Docherty i
-  - Configuration layouts: customizing your app per user/host/env/etc. Wallace Reis 
+  - js grid - jquery/ajax/json/moose roles -  Ian Docherty
   - database lookup functions working over SOAP  - Ian Sillitoe 
   - dbic api - nperez
   - gitalyst - ztz
   - mojomojo -dandv
-  - component traits - caelum
   - querylog - zamolxes
   - openid - cwest
   - DBIx::Class::ResultSet::WithMetaData - lukes
@@ -50,3 +47,6 @@ Done articles
  - FBConnect (authentication, API examples ) - Cosmin Budrica
  - debian + catalyst  - jawnsy
  - GSoC stuffs - dhoss
+  - Padre::Plugin::Catalyst - garu
+  - Configuration layouts: customizing your app per user/host/env/etc. Wallace Reis 
+  - component traits - caelum
