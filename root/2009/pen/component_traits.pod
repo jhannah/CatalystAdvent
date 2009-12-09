@@ -1,7 +1,7 @@
 =head1 Loadable Traits for Catalyst Components
 
 Over the past few months we've developed a loadable traits system for
-L<Catalyst> components. Components are Models, Views and Controllers.
+L<Catalyst> components. Components are Models, Views, and Controllers.
 
 Traits are L<Moose::Role>s, that are applied to classes dynamically.
 
@@ -118,8 +118,8 @@ Just put the following into the C<.conf>:
 We turned off the C<OffensiveToo> trait, added the C<Russian> trait and set an
 attribute that was defined in a trait directly from the config file.
 
-Hopefully this demonstrats some of the power of using L<Moose::Role>s in your
-L<Catalyst> applications.
+Hopefully this demonstrates some of the power of using L<Moose::Role>s
+in your L<Catalyst> applications.
 
 See also the C<Catalyst::ActionRole::> namespace for other awesome applications
 of L<Moose::Role>s.
