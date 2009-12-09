@@ -75,15 +75,18 @@ thus, in your app class
     __PACKAGE__->config( 'Plugin::ConfigLoader' => { file => __PACKAGE__->path_to('conf') } );
 
 that will load a config file under C<conf> dir in your app's homedir based on
-current sysuser and hostname and you could even set the C<CONFIG_ENV_SUFFIX>
-env var, thus it would be appended to the config filename.
+current sysuser and hostname (e.g. myapp_wreis_hercule.conf), and you could even set the
+C<CONFIG_ENV_SUFFIX> env var, thus it would be appended to the config local suffix
+(e.g. myapp_wreis_hercule_staging.conf).
 
 Remember that you are still able to load a specific config file at any time by
 setting MYAPP_CONFIG=/path/to/config/file or CATALYST_CONFIG env var.
 
-=head1 See Also
+=head1 SEE ALSO
 
-L<Advent Calendar 2007-15>, L<Catalyst Advent Calendar 2008-10>, L<Catalyst::Plugin::ConfigLoader::Multi>.
+L<Catalyst Advent Calendar 2007-15|http://www.catalystframework.org/calendar/2007/15>,
+L<Catalyst Advent Calendar 2008-10|http://www.catalystframework.org/calendar/2008/10>, 
+L<Catalyst::Plugin::ConfigLoader::Multi>.
 
 =head1 AUTHOR
 
