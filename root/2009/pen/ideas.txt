@@ -14,8 +14,8 @@ Confirmed ideas:
   - mojomojo -dandv
   - querylog - zamolxes
   - openid - cwest
-  - DBIx::Class::ResultSet::WithMetaData - lukes
-  - DBIC::Fixtures - lukes
+  - DBIx::Class::ResultSet::WithMetaData - lukes (done before 11th Dec)
+  - DBIC::Fixtures - lukes (maybe before 20th Dec, but no promises)
   - "Bullet proof search" - Matija Grabnar: http://zanshin.matija.com/twiki/bin/view/Main/BulletProofSearch
   - dbic txns - frew
   - DBIx::Class::Helpers - frew
