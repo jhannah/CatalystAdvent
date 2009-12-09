@@ -9,7 +9,7 @@ Confirmed ideas:
   - External authentication (Openid, oauth) - Cosmin Budrica
   - js grid - jquery/ajax/json/moose roles -  Ian Docherty
   - database lookup functions working over SOAP  - Ian Sillitoe 
-  - dbic api - nperez
+  - dbic api - nperez (after the 14th)
   - gitalyst - ztz
   - mojomojo -dandv
   - querylog - zamolxes
