@@ -1,23 +1,29 @@
 =head1 How DBIx::Class::ResultSet::WithMetaData can help keep your controllers clean
 
-=head2 What on earth is DBIx::Class::ResultSet::WithMetaData?
+=head2 A little note on code cleanliness
 
-If you're familar with DBIx::Class, you'll know that one of its best
-features is the ability to chain resultsets together to add more data,
-like this:
+When you started using Catalyst with DBIx::Class I'm betting that you generated a
+resultset in your controller, then passed it to your view (TT for example) then
+iterated through it. In short you ended up doing loads of really complicated shit in
+your TT templates. As you probably learnt, this is really bad as you eventually end
+up with complicated and messy templates that are hard to maintain. You should be
+doing your data preparation in Perl, then passing some nicely formatted datastructure
+to your view to happily render with a minimum of logic.
+
+A nice approach is to harness the resultset chaining magic that DBIx::Class provides
+to build up your resultset in reusable stages, so first you add some data:
 
   my $new_rs = $rs->search({}, { prefetch => [qw/artist/] });
 
-Or maybe to restrict your search a bit, like this:
+And then restrict it a bit:
 
-  my $new_rs = $rs->search({ price => { '>' => 6 } });
+  my $newer_rs = $new_rs->search({ price => { '>' => 6 } });
 
-Then use DBIx::Class::ResultClass::HashRefInflator to dump the
-resultset to a array of hashrefs. Put that in your stash for your
-view to process later, like this:
+And then use DBIx::Class::ResultClass::HashRefInflator to dump the resultset to a
+array of hashrefs and put that in your stash:
 
-  $rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
-  my @tunes = $rs->all;
+  $newer_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
+  my @tunes = $newer_rs->all;
 
   # [{
   #    'id' => 1,
@@ -38,13 +44,16 @@ view to process later, like this:
 
   $c->stash->{tunes} = \@tunes;
 
-So that's really great. It's much better to pass an already formatted
-data structure to your view then it is to pass a resultset to your
-view (I'm thinking TT specifically). Your code will be more
-maintainable if you process the data before it gets to the view.
+And then your view can just iterate through the datastructure without having to deal
+with row objects or pull in more data from the database. And that's really
+great. It's much better to pass a already formatted datastructure to your view then
+it is to pass a resultset to your view as your application will be much more
+maintainable if you're doing the data processing in Perl.
 
-What if you need to add some stuff to the datastructure that isn't in
-the database?  Probably you'll end up doing something like this:
+So anyway, this approach of building up the resultset in stages is great If you're
+just prefetching, or otherwise adding data that's in the database, but what if you
+need to add some stuff to the datastructure that isn't in the database? Probably
+you'll end up doing something like this:
 
   $rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
   my @tunes = $rs->all;
@@ -54,50 +63,56 @@ the database?  Probably you'll end up doing something like this:
     # and so on, adding more stuff to the row's hashref
   }
 
-Commonly you'll do that in the controller, which is bad, because you
-should keep your logic in the model. When you realise this is
-bad you'll move it to the model, maybe you'll make a resultset method
-and call it from your controller like this:
+Commonly you'll do that in the controller, which is bad, because you should be
+keeping your logic in the model. When you realise this is bad you'll move it to the
+model, maybe you'll make a resultset method and call it from your controller like
+this:
 
   my $formatted_tunes = $rs->get_formatted_arrayref;
   $c->stash->{tunes} = $formatted_tunes;
 
-Which is sort of better, until you realise that another action needs
-to reuse this method. This time you need more stuff, so maybe you
-extend your method like this:
+Which is sort of better, until you realise that in another action you need to reuse
+this method from somewhere else in your application, but this time you need more
+stuff, so maybe you extend your method like this:
 
   my $formatted_tunes_with_extra_stuff = $rs->get_formatted_arrayref( with_extra_stuff => 1 );
   $c->stash->{tunes} = $formatted_tunes_with_extra_stuff;
 
-And then in another action you realise you need the same thing, but
-with a different scoring mechanism:
+And then in another action you realise you need the same thing, but with a different
+scoring mechanism:
 
-  my $formatted_tunes_with_extra_stuff_and_a different_scoring_mechanism = $rs->get_formatted_arrayref( with_extra_stuff => 1, scoring => 'different' );
+  my $formatted_tunes_with_extra_stuff_and_a different_scoring_mechanism =
+    $rs->get_formatted_arrayref( with_extra_stuff => 1, scoring => 'different' );
 
-And soon your get_formatted_arrayref method is unmaintainable. I
-thought that it would be cool if I could add the extra stuff by
-chaining resultsets together:
+And soon your get_formatted_arrayref method is unmaintainable. I thought that it
+would be cool if I could just add this extra stuff by chaining resultsets together:
 
   my $formatted_tunes = $rs->with_score->display;
-  my $formatted_tunes_with_extra_stuff = $rs->with_score->with_extra_stuff->display;
-  my $formatted_tunes_with_extra_stuff_and_a different_scoring_mechanism = $rs->with_score( mechanism => 'different' )->with_extra_stuff->display;
 
-And until you display it, it's still just a resultset, with the usual
+  my $formatted_tunes_with_extra_stuff =
+     $rs->with_score->with_extra_stuff->display;
+
+  my $formatted_tunes_with_extra_stuff_and_a different_scoring_mechanism =
+     $rs->with_score( mechanism => 'different' )->with_extra_stuff->display;
+
+And until you call display on it, it's still just a resultset, with the usual
 resultset methods:
 
-  my $formatted_tunes = $rs->with_score->with_extra_stuff->search({}, { prefetch => 'artist' })->display;
+  my $formatted_tunes = $rs->with_score
+                           ->with_extra_stuff
+                            ->search({}, { prefetch => 'artist' })
+                            ->display;
 
-DBIx::Class::ResultSet::WithMetaData allows you to do this - you can
-attach extra metadata to your resultset without flattening it to a
-data structure. This allow you to isolate formatting in separate
-methods in a relatively clean way that promotes reuse.
+DBIx::Class::ResultSet::WithMetaData allows you to do this - you can attach extra
+meta data to your resultset without first flattening it to a datastructure, which
+will allow you to separate your formatting out to separate methods in a relatively
+clean way that promotes reuse.
 
 =head2 Whoa there, how do I add my own resultset methods?
 
-Use a custom resultset, which is just a subclass of the usual
-DBIx::Class::ResultSet. There are two ways to add custom resultsets:
-ideally, you'll use load_namespaces in your DBIx::Class::Schema
-class, like this:
+You need to use a custom resultset, which is just a subclass of the usual
+DBIx::Class::ResultSet. There's two ways to add custom resultsets: ideally, you'll be
+using load_namespaces in your DBIx::Class::Schema class, like this:
 
   package MyApp::Schema;
 
@@ -108,13 +123,12 @@ class, like this:
       resultset_namespace => 'ResultSet',
   );
 
-In this case your custom resultsets will be automatically picked up
-from MyApp::Schema::ResultSet::*. If you are not using load_namespaces,
-you are foolish. Despite that you can still make it work. Have
-a look at this:
+In which case your custom resultsets will be automatically picked up from
+MyApp::Schema::ResultSet::*. If you're not using load_namespaces, then you're
+foolish, but despite that you can still make it work. Have a look at this:
 http://search.cpan.org/~frew/DBIx-Class-0.08114/lib/DBIx/Class/ResultSource.pm#resultset_class
 
-A super simple resultset class might look like this:
+And a super simple resultset class might look like this:
 
   package MyApp::Schema::ResultSet::Tune;
 
@@ -127,6 +141,7 @@ A super simple resultset class might look like this:
 
   sub display {
     my ($self) = @_;
+
     $rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
     my @return = $rs->all;
     return \@return;
@@ -134,31 +149,17 @@ A super simple resultset class might look like this:
 
   1;
 
-This provides the display method on your Tune resultsets. Like so:
+Which provides a display method on your Tune resultsets. Like so:
 
   my $displayed = $schema->resultset('Tune')->display;
 
 =head2 So down to business, what does DBIx::Class::ResultSet::WithMetaData actually provide?
 
-It provides two methods. The first is the display method to flatten to
-a data structure, so you don't need to add that. This is equivalent to
-the resultset class given above:
+The key method is called add_row_info, which allows you to attach the extra meta
+data to the rows. For example in the first section we were adding a score to
+each. You could do that like this:
 
   package MyApp::Schema::ResultSet::Tune;
-
-  use strict;
-  use warnings;
-
-  use DBIx::Class::ResultClass::HashRefInflator;
-  use Moose;
-  extends 'DBIx::Class::ResultSet::WithMetaData';
-
-  1;
-
-The second method is called add_row_info, and it allows you to attach
-extra metadata to the rows. In the first section of this entry we
-added a score to each row. With DBIx:Class::ResultSet::WithMetaData
-you could do it like this:
 
   ...
 
@@ -169,58 +170,94 @@ you could do it like this:
 
     foreach my $row ($self->all) {
       my $score = $self->score_map->{ $row->id };
-		  $self->add_row_info(id => $row->id, info => { score => $score });
+      $self->add_row_info(id => $row->id, info => { score => $score });
     }
   }
 
   ...
 
-Elsewhere, say in your controller, you call $rs->with_score->display
-to get the flattened data structure. Note that display is the method
-that does the magic, when you call display everything you've added via
-add_row_info is merged with the row's hashref.
+The only other method you need to worry about is the display method, which flattens
+the resultset to a datastructure, much like using
+DBIx::Class::ResultClass::HashRefInflator. But it also merges the extra info attached
+using add_row_info. For example
+
+  my @tunes = $tune_rs->with_score->display;
+
+  # [{
+  #    'id' => 1,
+  #    'name' => 'Catchy tune',
+  #    'price' => '7',
+  #    'score' => '1.7',
+  #  },
+  #  {
+  #    'id' => 2,
+  #    'name' => 'Not so catchy tune',
+  #    'price' => '7.5'
+  #    'score' => '1.2'
+  #  }]
 
 =head2 So how does this keep my code clean again?
 
-These are super simple examples. If you have a fairly complex
-application, like say, every Catalyst application I've ever built,
-then you might be building up complex chains to format your data ready
-for the view. You'll be adding all sorts of extra stuff. Look at
-this bad boy I've taken from one of my apps:
+These are super simple examples. If you have a fairly complex application, like say,
+every Catalyst application I've ever built, then you might be building up complex
+chains to format your data ready for the view. You'll be add adding all sorts of
+extra stuff. Look at this bad boy I've taken from one of my apps:
 
-  $c->stash->{products} = $rs->with_images->with_primary_image->with_seller->with_primary_category->with_related_products->with_options->with_token->display;
+  $c->stash->{products} = $rs->with_images
+                             ->with_primary_image
+                             ->with_seller
+                             ->with_primary_category
+                             ->with_related_products
+                             ->with_options
+                             ->with_token
+                             ->display;
 
-In another part of the application I need the products but with less
-info, so I reuse what I've made already:
+In another part of the application I need the products but with less info, but I can
+just easily reuse what I already have:
 
-  $c->stash->{products} = $rs->with_images->with_primary_image->with_seller->with_token->display;
+  $c->stash->{products} = $rs->with_images
+                             ->with_primary_image
+                             ->with_seller
+                             ->with_token
+                             ->display;
 
-This might look complicated, but it's quite elegant compared with
-writing a mega method with a ton of flags determining whether or not
-to include different information in the data structure, or writing
-separate methods for each use case.
+This might look complicated, but it's quite elegant when compared with writing one mega method which accepts a ton of flags determining whether or not to include different bits of info to the datastructure, or writing separate methods for each usecase, or doing it in the templates, or doing it in the controller.
 
 To summarise:
-- You're not doing your data pre-processing in the view where it doesn't belong
-- You're not doing it in the controller where it doesn't belong
-- You've split your formatting into reusable methods inside the model
-- You'll sleep well at night and your colleagues won't hate you too much
+
+=over 4
+
+=item *
+
+you're not doing your data pre-processing in the view where it doesn't belong
+
+=item *
+
+you're not doing it in the controller where it doesn't belong either
+
+=item *
+
+you've split up your formatting into reusable methods inside the model
+
+=item *
+
+you'll sleep well at night and your colleagues won't hate you do much
+
+=back
 
 =head2 It's not very efficient though is it?
 
-Not really, no. You'll find that you're looping through the resultset
-repeatedly to format it. If you're working with large resultsets, this
-might not be for you. But my general attitude is that you should make
-the code work in a maintainable and clean way, and then optimise for
-performance. Don't start coding yourself a mess until you know
-the clean alternatives are slow.
+It's not really, no. You'll find that you're looping through the resultset repeatedly
+in order to format it, if you're working with large resultsets, this might not be for
+you. But my general attitude is that you should make the code work in a maintainable
+and clean way, and then optimise for performance. Don't start coding yourself into a
+mess before you know the clean alternatives are slow.
 
 =head2 And it's fairly experimental.
 
-Although used in production on a couple of my applications, this
-technique is still newish and experimental. It's simple enough so
-improvements and optimsations shouldn't hard, and I'm liberal
-with commit bits and co-maint rights.
+Although used in production on a couple of my applications, it's still newish and
+kind of experimental. But it's simple enough so improvements and optimsations
+shouldn't hard to make and I'm liberal with commit bits and comaint rights.
 
 =head1 AUTHOR
 
