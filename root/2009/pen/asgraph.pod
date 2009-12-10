@@ -1,8 +1,13 @@
 =head1 A Catalyst Carol
 
-Sometimes our Catalyst applications are so large, with such complex business rules, that we can get a little overwhelmed by the myriad of components and structures, or otherwise become just too concentrated in a given subset we might loose perspective of the big picture. Well, fear not!
+Sometimes our Catalyst applications are so large, with such complex
+business rules, that we get a little overwhelmed by their myriad
+components. Or maybe we concentrate so hard on one portion that we
+lose perspective on the big picture. Well, fear not!
 
-There are several visualization helper tools available in the Perl world, and in today's Advent Calendar, in the spirit of Dicken's Holiday masterpiece and MVC, we'll look closer into three of them!
+The Perl world offers several visualization tools. In today's Advent
+Calendar, in the spirit of Dicken's Holiday masterpiece and MVC, we'll
+look closer into three of them!
 
 =head2 Ghost...erm...Graph of Model Past
 
@@ -14,7 +19,12 @@ There are several visualization helper tools available in the Perl world, and in
   ) or die SQL::Translator->error;
   $translator->translate;
 
-If you are using Catalyst with the ever popular DBIx::Class (DBIC) and rather fetch database information from the schema modules, rejoice! All you have to do is choose C<< SQL::Translator::Parser::DBIx::Class >> as the parser, and pass the loaded schema inside the parser_args parameter. Below we describe not only that, but also provide the producer with some customization via C<< producer_args >>:
+If you are using Catalyst with the ever popular DBIx::Class (DBIC) and
+would rather fetch database information from the schema modules,
+rejoice! Use C<< SQL::Translator::Parser::DBIx::Class >> as the
+parser, and pass the loaded schema in the "parser_args" parameter. The
+code below shows this and gives the producer some customization via
+C<< producer_args >>:
 
   use SQL::Translator;
 
@@ -43,7 +53,12 @@ If you are using Catalyst with the ever popular DBIx::Class (DBIC) and rather fe
   );
   $graph->run;
   
-B<Note:> As Khisanth pointed out, this module uses MooseX::Declare and has no "package" information, so the CPAN indexer won't index it, and the shell won't find it. Until this is fixed by the author, you'll need to ask for the package's full path (e.g. C<< install FRANCKC/CatalystX-Dispatcher-AsGraph-0.02.tar.gz >> to install it, or just fetch the tarball directly from the web.
+B<Note:> As Khisanth pointed out, this module uses MooseX::Declare and
+has no "package" information, so the CPAN indexer won't index it, and
+the shell won't find it. Until this is fixed by the author, you'll
+need to install using the package's full path (e.g. C<< install
+FRANCKC/CatalystX-Dispatcher-AsGraph-0.02.tar.gz >>), or fetch the
+tarball directly from the web.
 
 =head2 Graph of Template Future
 
@@ -51,7 +66,11 @@ B<Note:> As Khisanth pointed out, this module uses MooseX::Declare and has no "p
 
   my $graph = Template::AsGraph->graph('mytemplate.tt2');
 
-However, if you need a way to understand how your templates fit together, it probably means that their chains, structures and flows are so intricated you dynamically load several bits and pieces from all over the place depending on what data is passed to them by the Controller. Don't worry: the C<graph> method can also receive any TT configurations as its second argument, and variables as a third:
+If you need a way to understand how your templates fit together, it
+probably means their flow is so intricate that you dynamically load
+bits and pieces depending on the data passed in by the
+Controller. Don't worry: the C<graph> method can also receive TT
+configurations as the second argument, and variables as the third:
 
   use Template::AsGraph;
 
@@ -67,13 +86,14 @@ However, if you need a way to understand how your templates fit together, it pro
        foo => 'bar',
        bar => 'baz', 
   );
-  # alternatively, if you have a Catalyst context object lying around,
-  # you can do just like View::TT and try something like:
-  # my %vars = ( %{ $c->stash() }, 
-  #              c    => $c, 
-  #              base => $c->req->base, 
-  #              name => $c->config->{name} 
-  #            );
+
+Alternatively, if you have a Catalyst context object lying around, you
+can do like View::TT:
+  my %vars = ( %{ $c->stash() }, 
+                  c    => $c, 
+                  base => $c->req->base, 
+                  name => $c->config->{name} 
+             );
 
   my $graph = Template::AsGraph->graph('mytemplate.tt2', \%config, \%vars);
 
