@@ -1,14 +1,16 @@
 =head1 Configuration layouts
 
-One of most common use cases is the need to parametrize an application's config in
-a way it includes your credentials and/or the environment's data (for example: db host/port,
-use of frontend proxy or not, caching, require-ssl, etc). It is simple to achieve until
-your project starts to getting bigger.
+One of most common use cases is the need to parametrize an
+application's config in a way it includes your credentials and/or the
+environment's data (for example: db host/port, use of frontend proxy
+or not, caching, require-ssl, etc). It is simple to achieve until your
+project starts to getting bigger.
 
 =head2 Catalyst::Plugin::ConfigLoader
 
-The ConfigLoader plugin gives you the chance to load the config by using its suffix approach
-which will look for a local config file if you specify it in the following order of preference:
+The ConfigLoader plugin gives you the chance to load the config by
+using its suffix approach which will look for a local config file if
+you specify it in the following order of preference:
 
 =over
 
@@ -20,11 +22,13 @@ which will look for a local config file if you specify it in the following order
 
 =back
 
-By default the suffix value is C<local>, which will load C<myapp_local.conf>, but if for example
-C<$ENV{ MYAPP_CONFIG_LOCAL_SUFFIX }> is set to C<testing>, ConfigLoader will try and load C<myapp_testing.conf>
-instead of C<myapp_local.conf>.
+By default the suffix value is C<local>, which will load
+C<myapp_local.conf>, but if for example C<$ENV{
+MYAPP_CONFIG_LOCAL_SUFFIX }> is set to C<testing>, ConfigLoader will
+try and load C<myapp_testing.conf> instead of C<myapp_local.conf>.
 
-Or you could even load local files for each config set directly from your main file like:
+Or you could even load local files for each config set directly from
+your main file like:
 
     # load db config file, in Config::General format
     <Model::Database>
@@ -34,13 +38,15 @@ Or you could even load local files for each config set directly from your main f
         </connect_info>
     </Model::Database>
 
-Both of these approaches gets in your way when you have X number of applications with Y number of
-developers and Z number of boxes foreach environment (devel, testing, staging and production) to manage.
+Both of these approaches gets in your way when you have X number of
+applications with Y number of developers and Z number of boxes foreach
+environment (devel, testing, staging and production) to manage.
 
 =head2 MyCompany::Plugin::ConfigLoader
 
-So, all you just need to do is extend the C<get_config_local_suffix> method from ConfigLoad plugin
-and implement your own logic of loading config files to fit in your requirements.
+So, all you just need to do is extend the C<get_config_local_suffix>
+method from ConfigLoad plugin and implement your own logic of loading
+config files to fit in your requirements.
 
 For example
 
@@ -74,13 +80,15 @@ thus, in your app class
 
     __PACKAGE__->config( 'Plugin::ConfigLoader' => { file => __PACKAGE__->path_to('conf') } );
 
-that will load a config file under C<conf> dir in your app's homedir based on
-current sysuser and hostname (e.g. myapp_wreis_hercule.conf), and you could even set the
-C<CONFIG_ENV_SUFFIX> env var, thus it would be appended to the config local suffix
+that will load a config file under C<conf> dir in your app's homedir
+based on current sysuser and hostname (e.g. myapp_wreis_hercule.conf),
+and you could even set the C<CONFIG_ENV_SUFFIX> env var, thus it would
+be appended to the config local suffix
 (e.g. myapp_wreis_hercule_staging.conf).
 
-Remember that you are still able to load a specific config file at any time by
-setting MYAPP_CONFIG=/path/to/config/file or CATALYST_CONFIG env var.
+Remember that you are still able to load a specific config file at any
+time by setting MYAPP_CONFIG=/path/to/config/file or CATALYST_CONFIG
+env var.
 
 =head1 SEE ALSO
 
