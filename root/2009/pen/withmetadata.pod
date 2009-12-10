@@ -2,7 +2,7 @@
 
 =head2 A little note on code cleanliness
 
-When you started using Catalyst with DBIx::Class I'm betting that you generated a
+When you started using Catalyst with C<DBIx::Class> I'm betting that you generated a
 resultset in your controller, then passed it to your view (TT for example) then
 iterated through it. In short you ended up doing loads of really complicated shit in
 your TT templates. As you probably learnt, this is really bad as you eventually end
@@ -10,7 +10,7 @@ up with complicated and messy templates that are hard to maintain. You should be
 doing your data preparation in Perl, then passing some nicely formatted datastructure
 to your view to happily render with a minimum of logic.
 
-A nice approach is to harness the resultset chaining magic that DBIx::Class provides
+A nice approach is to harness the resultset chaining magic that C<DBIx::Class> provides
 to build up your resultset in reusable stages, so first you add some data:
 
   my $new_rs = $rs->search({}, { prefetch => [qw/artist/] });
@@ -19,7 +19,7 @@ And then restrict it a bit:
 
   my $newer_rs = $new_rs->search({ price => { '>' => 6 } });
 
-And then use DBIx::Class::ResultClass::HashRefInflator to dump the resultset to a
+And then use C<DBIx::Class::ResultClass::HashRefInflator> to dump the resultset to a
 array of hashrefs and put that in your stash:
 
   $newer_rs->result_class('DBIx::Class::ResultClass::HashRefInflator');
@@ -103,7 +103,7 @@ resultset methods:
                             ->search({}, { prefetch => 'artist' })
                             ->display;
 
-DBIx::Class::ResultSet::WithMetaData allows you to do this - you can attach extra
+C<DBIx::Class::ResultSet::WithMetaData> allows you to do this - you can attach extra
 meta data to your resultset without first flattening it to a datastructure, which
 will allow you to separate your formatting out to separate methods in a relatively
 clean way that promotes reuse.
@@ -111,8 +111,8 @@ clean way that promotes reuse.
 =head2 Whoa there, how do I add my own resultset methods?
 
 You need to use a custom resultset, which is just a subclass of the usual
-DBIx::Class::ResultSet. There's two ways to add custom resultsets: ideally, you'll be
-using load_namespaces in your DBIx::Class::Schema class, like this:
+C<DBIx::Class::ResultSet>. There's two ways to add custom resultsets: ideally, you'll be
+using load_namespaces in your C<DBIx::Class::Schema class>, like this:
 
   package MyApp::Schema;
 
@@ -178,7 +178,7 @@ each. You could do that like this:
 
 The only other method you need to worry about is the display method, which flattens
 the resultset to a datastructure, much like using
-DBIx::Class::ResultClass::HashRefInflator. But it also merges the extra info attached
+C<DBIx::Class::ResultClass::HashRefInflator>. But it also merges the extra info attached
 using add_row_info. For example
 
   my @tunes = $tune_rs->with_score->display;
