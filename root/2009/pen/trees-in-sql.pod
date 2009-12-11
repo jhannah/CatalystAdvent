@@ -1,0 +1,3 @@
+=head1 Trees in SQL
+
+Everyone wants to be able to have sane recursive data structures and pretty hierarchical data in their databases.  However, SQL only sees data as sets.  This makes it extremely hard to get any sort of tree structure inside a database, without either creating a tree, serializing it, and storing it thusly, or using one of a few tricks some very clever database engineers have synthesized.
