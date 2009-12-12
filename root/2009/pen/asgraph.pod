@@ -42,6 +42,27 @@ C<< producer_args >>:
 
   $translator->translate;
 
+You can even go crazy and make a Catalyst action that generates the
+diagram of the current project's schema:
+
+  sub schema : Local {
+      my ( $self, $c ) = @_;
+
+      my $translator = SQL::Translator->new(
+          parser        => 'SQL::Translator::Parser::DBIx::Class',
+          data          => $c->model('DB')->schema,
+          producer      => 'Diagram',
+          producer_args => {
+              output_type => 'png',
+              title       => 'MyApp Schema',
+          },
+      ) or die SQL::Translator->error;
+
+      $c->res->content_type('image/png');
+      $c->res->body( $translator->translate );
+
+  }
+
 
 =head2 Graph of Controller Present
 
