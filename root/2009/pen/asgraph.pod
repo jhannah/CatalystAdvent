@@ -6,7 +6,7 @@ components. Or maybe we concentrate so hard on one portion that we
 lose perspective on the big picture. Well, fear not!
 
 The Perl world offers several visualization tools. In today's Advent
-Calendar, in the spirit of Dicken's Holiday masterpiece and MVC, we'll
+Calendar, in the spirit of Dickens' Holiday masterpiece and MVC, we'll
 look closer into three of them, while using a standard 
 L<MojoMojo|http://mojomojo.org/> installation to illustrate the results.
 
@@ -81,17 +81,16 @@ The result? Well, see for yourself :)
 
 =head2 Graph of Controller Present
 
-Maybe model data is not your (only) issue there, and your application's 
-controllers and actions grow so much they urge for documentation, for a 
-developer's quick reference guide or maybe even some refactoring. While 
-Catalyst's controller structure usually points at good organizing 
-practices, there might be occasional bumps on the road, and it's always
-best to stay on the safe side.
+Maybe model data is not your (only) issue, and your application's
+controllers and actions grew so much they need more documentation, a
+developer's quick reference guide, or even some refactoring. While
+Catalyst's controller structure usually points a programmer toward
+good organization, there might be occasional bumps on the road.
 
 Fortunately for us, L<Franck Cuny|http://lumberjaph.net/blog/> uploaded 
 to CPAN a handy module called
 L<CatalystX::Dispatcher::AsGraph|http://search.cpan.org/perldoc?CatalystX::Dispatcher::AsGraph>, 
-which can turn all your private actions into a nifty directed graph in
+which can turn your private actions into a nifty directed graph in
 just a few lines of code!
 
   use CatalystX::Dispatcher::AsGraph;
@@ -103,16 +102,15 @@ just a few lines of code!
   $graph->run;
 
 If the code above is successful, C<$graph> now holds a Graph::Easy object
-storing the requested actions graph. We can use the 'dot' external program
-to easily output the result as a png file:
+storing the actions graph. We can use the 'dot' external program
+to output the result as a png file:
 
   if ( open( my $png, '|-', 'dot -Tpng -o ' . $graph->output ) ) {
       print $png $graph->graph->as_graphviz;
       close $png;
   }
 
-
-The demo program, bundled with the distribution, does exactly that but
+A demo program, bundled with the distribution, does exactly that but
 takes advantage of C<MooseX::GetOpt> to let you specify the module's
 parameters as command-line options.
 
@@ -132,9 +130,9 @@ or fetch the tarball directly from the web.
 
 =head2 Graph of Template Future
 
-Just like its predecessors in this article, you can also view your 
-entire template's structure as a directed graph. The 
-L<Template::AsGraph|http://search.cpan.org/perldoc?Template::AsGraph> 
+Just like schema and actions, you can view your entire template
+structure as a directed graph. The
+L<Template::AsGraph|http://search.cpan.org/perldoc?Template::AsGraph>
 module can be easily invoked to generate such data from any template
 quite easily:
 
@@ -143,19 +141,18 @@ quite easily:
   my $graph = Template::AsGraph->graph('mytemplate.tt2');
 
 The returned C<$graph> is a C<Graph::Easy> object, which you can turn
-into a png file just like you did with the Controller one:
+into a png file just like you did with the Controller graph:
 
   if ( open( my $png, '|-', 'dot -Tpng -o templatechart.png ) ) {
       print $png $graph->graph->as_graphviz;
       close $png;
   }
 
-
-However, if you need a way to understand how your templates fit 
-together, it probably means their flow is so intricate that you 
-dynamically load bits and pieces depending on the data passed in 
-by the Controller. Don't worry: the C<graph> method can also receive 
-TT configurations as the second argument, and variables as the third:
+If you need a way to understand how your templates fit together, it
+probably means their flow is so intricate that you dynamically load
+bits and pieces depending on the data passed in by the
+Controller. Don't worry: the C<graph> method can also receive TT
+configurations as the second argument, and variables as the third:
 
   use Template::AsGraph;
 
@@ -192,10 +189,11 @@ can do just like View::TT:
 
 =head2 Conclusion
 
-By generating and analyzing all three graphs, we hope you get a better 
-understanding of your own applications. Remember what you did right, 
-review what could be better, and act upon it. This way, you are bound 
-to become a better developer, which is the spirit of the season :)
+We hope you get a better understanding of your applications by
+generating and analyzing graphs of their schema, actions, and
+templates.  Remember what you did right, review what could be better,
+and act upon it. This way, you are bound to become a better developer,
+which is the spirit of the season :)
 
 
 =head2 Authors
