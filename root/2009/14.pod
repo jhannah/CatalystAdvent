@@ -200,8 +200,6 @@ and act upon it. This way, you are bound to become a better developer,
 which is the spirit of the season :)
 
 
-=head2 Authors
+=head2 Author
 
 Breno G. de Oliveira C<< <garu@cpan.org> >>
-
-Bogdan Lucaciu C<< zamolxes@sinapticode.com >>
