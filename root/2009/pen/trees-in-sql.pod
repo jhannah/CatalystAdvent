@@ -68,4 +68,6 @@ at least currently, to implement and maintain.
 
 Have fun!
 
--Devin "dhoss" Austin
+=head1 AUTHOR
+
+Devin "dhoss" Austin
