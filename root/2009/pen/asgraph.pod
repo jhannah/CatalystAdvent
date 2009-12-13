@@ -14,7 +14,7 @@ L<MojoMojo|http://mojomojo.org/> installation to illustrate the results.
 
 The amazing L<SQL::Translator|http://search.cpan.org/perldoc?SQL::Translator> 
 module can easily show you what your application's Schema looks like 
-directly from your database - be it MySQL, Oracle, PostreSQL, SQLite, 
+directly from your database schema - be it MySQL, Oracle, PostreSQL, SQLite, 
 or any of the several other database parsers available. Just specify 
 it in the 'from' field, while choosing 'GraphViz' as destination.
 
@@ -25,7 +25,7 @@ it in the 'from' field, while choosing 'GraphViz' as destination.
           to   => 'GraphViz',
   ) or die SQL::Translator->error;
 
-  $translator->translate;
+  $translator->translate( 'MySchema.sql' );
 
 If you are using Catalyst with the ever popular DBIx::Class (DBIC) and
 would rather fetch database information from the schema modules,
