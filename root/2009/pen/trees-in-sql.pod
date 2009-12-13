@@ -7,12 +7,14 @@ serializing it, and storing it thusly, or using one of a few tricks some very cl
 
 I've been on a bit of a journey for a while go figure out a sane way to this, and the fine folks of #dbix-class pointed me toward materialized paths.
 Materialized paths are a very simple method to store a 'tree' structure in a database.  You have a path to your requested node
-stored in a column in your database.  It looks something like this: 1.1.2.3.1.  This path points to the first child of the third child
-of the second child of the first child of the root node.  It's pretty simple, as the SQL looks something like 
+stored in a column in your database.  It looks something like this: 1.1.2.  This path points to the second child of the first child of the root node.  It's pretty simple, as the SQL looks something like 
     
-	SELECT node FROM table where path = '1.1.2.3.%';
+	SELECT node FROM table where path LIKE '1.1.%';
 
-Neat eh?
+This grabs everything that has a path like 1.1.something, meaning they all share a parent that's path is 1.1. 
+This consitutes the direct set of children of this node.  This gives you a full path that you can traverse up and down to 
+retrieve the information you want.  Think "nested threads" or "nested categories".  Neat eh?
+
 
 Ribasushi (Peter Rabbitson) and I have been working on DBIx::Class::Tree::Ordered::MatPath for this very reason.  It currently takes
 and extends DBIx::Class::Ordered to create and manipulate materialized paths. It's pretty raw right now, as I've got a lot of tests to write,
@@ -23,6 +25,43 @@ You can view it here: http://dev.catalyst.perl.org/svnweb/Catalyst/browse/trunk/
 via svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/SmallBoard.  You'll want to make sure you deploy it to the SQLite db
 (or, if you feel like hacking it some, change the model to point at the db type of your choice) using the script/smallboard_deploy.pl script
 (which is also an example of how the new ScriptRunner scripts can be written!)
+
+Here's a bit of the code that accomplishes this:
+
+    package SmallBoard::Schema::Result::Thread;
+    use base qw/DBIx::Class/;
+    __PACKAGE__->load_components(qw/ Tree::Ordered::MatPath Core /);
+    __PACKAGE__->table ('nested');
+    __PACKAGE__->add_columns (
+        thread_id => { data_type => 'int', is_auto_increment => 1 },
+        title => { data_type => 'varchar' },
+        content => { data_type => 'text' },
+        parent_id => { data_type => 'int', is_nullable => 1 },
+        path => { data_type => 'varchar' },
+    );
+
+    __PACKAGE__->set_primary_key ('thread_id');
+
+    __PACKAGE__->has_many ('children', __PACKAGE__, 'parent_id');
+    __PACKAGE__->belongs_to ('parent', __PACKAGE__, 'parent_id');
+
+    __PACKAGE__->position_column ('path');
+    __PACKAGE__->grouping_column ('parent_id');
+    1;
+
+
+Basically, you load up the MatPath stuff as a component (__PACKAGE__->load_components(qw/ Tree::Ordered::MatPath Core /);), 
+and set up your table.  The main thing to look at is making sure you have a column to keep track of parent ids and the row's
+path.  Those are used by ::Ordered to group and move things around in the path/tree, which is the bulk of the materialized
+path manipuation work.  Creating a record is pretty standard, and MatPath takes care of the path building for you.
+Here's how you add a child to a given parent:
+
+    my $reply = $c->model('Board::Thread')->create($params);
+    $reply->update({  parent_id => $parent->thread_id }) or die "Error :$!";
+
+This is obviously done using the $c->model(...) approach via Catalyst, but that's just saying $schema->resultset(...) in essence.
+What this does is create a new record, then update it so that its parent_id now matches its parent's thread id. That's it.
+It's thankfully a very simple process that saves a lot of stress on your database server and helps keep things neat and tidy.
 
 There are many forms of trees that you can stuff into a database and trick it into manipulating.  Materialized paths are the easiest,
 at least currently, to implement and maintain.
