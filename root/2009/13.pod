@@ -81,4 +81,4 @@ Have fun!
 
 =head1 AUTHOR
 
-Devin "dhoss" Austin
+Devin "dhoss" Austin L<dhoss@cpan.org>
