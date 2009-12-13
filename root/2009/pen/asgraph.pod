@@ -151,7 +151,6 @@ into a png file just like you did with the Controller one:
   }
 
 
-
 However, if you need a way to understand how your templates fit 
 together, it probably means their flow is so intricate that you 
 dynamically load bits and pieces depending on the data passed in 
