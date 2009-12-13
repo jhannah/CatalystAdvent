@@ -1,3 +1,32 @@
 =head1 Trees in SQL
 
-Everyone wants to be able to have sane recursive data structures and pretty hierarchical data in their databases.  However, SQL only sees data as sets.  This makes it extremely hard to get any sort of tree structure inside a database, without either creating a tree, serializing it, and storing it thusly, or using one of a few tricks some very clever database engineers have synthesized.
+Everyone wants to be able to have sane recursive data structures and pretty hierarchical data in their databases.  
+However, SQL only sees data as sets. 
+This makes it extremely hard to get any sort of tree structure inside a database, without either creating a tree, 
+serializing it, and storing it thusly, or using one of a few tricks some very clever database engineers have synthesized.
+
+I've been on a bit of a journey for a while go figure out a sane way to this, and the fine folks of #dbix-class pointed me toward materialized paths.
+Materialized paths are a very simple method to store a 'tree' structure in a database.  You have a path to your requested node
+stored in a column in your database.  It looks something like this: 1.1.2.3.1.  This path points to the first child of the third child
+of the second child of the first child of the root node.  It's pretty simple, as the SQL looks something like 
+    
+	SELECT node FROM table where path = '1.1.2.3.%';
+
+Neat eh?
+
+Ribasushi (Peter Rabbitson) and I have been working on DBIx::Class::Tree::Ordered::MatPath for this very reason.  It currently takes
+and extends DBIx::Class::Ordered to create and manipulate materialized paths. It's pretty raw right now, as I've got a lot of tests to write,
+but it is complete enough that I've been able to put together a small Catalyst app using DBIx::CLass::Tree::Ordered::MatPath and create a
+small threaded message board.
+
+You can view it here: http://dev.catalyst.perl.org/svnweb/Catalyst/browse/trunk/examples/SmallBoard/, or checkout the source to run it
+via svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/SmallBoard.  You'll want to make sure you deploy it to the SQLite db
+(or, if you feel like hacking it some, change the model to point at the db type of your choice) using the script/smallboard_deploy.pl script
+(which is also an example of how the new ScriptRunner scripts can be written!)
+
+There are many forms of trees that you can stuff into a database and trick it into manipulating.  Materialized paths are the easiest,
+at least currently, to implement and maintain.
+
+Have fun!
+
+-Devin "dhoss" Austin
