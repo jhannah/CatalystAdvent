@@ -5,7 +5,7 @@ Articles structure
   - ending: further reading, stuff we didn't include but you should know about, alternatives, caveats
 
 Confirmed ideas:
-  - Plack + Catalyst - miyagawa (or an editor with miyagawa's help) 
+  - Plack + Catalyst - miyagawa (or an editor with miyagawa's help) - dhoss volunteers if need be 
   - External authentication (Openid, oauth) - Cosmin Budrica
   - js grid - jquery/ajax/json/moose roles -  Ian Docherty
   - database lookup functions working over SOAP  - Ian Sillitoe 
