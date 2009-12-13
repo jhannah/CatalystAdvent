@@ -29,8 +29,8 @@ and extends DBIx::Class::Ordered to create and manipulate materialized paths. It
 but it is complete enough that I've been able to put together a small Catalyst app using DBIx::CLass::Tree::Ordered::MatPath and create a
 small threaded message board.
 
-You can view it here: http://dev.catalyst.perl.org/svnweb/Catalyst/browse/trunk/examples/SmallBoard/, or checkout the source to run it
-via svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/SmallBoard.  You'll want to make sure you deploy it to the SQLite db
+You can view it here: L<http://dev.catalyst.perl.org/svnweb/Catalyst/browse/trunk/examples/SmallBoard/>, or checkout the source to run it
+via C<svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/SmallBoard>.  You'll want to make sure you deploy it to the SQLite db
 (or, if you feel like hacking it some, change the model to point at the db type of your choice) using the script/smallboard_deploy.pl script
 (which is also an example of how the new ScriptRunner scripts can be written!)
 
@@ -58,7 +58,7 @@ Here's a bit of the code that accomplishes this:
     1;
 
 
-Basically, you load up the MatPath stuff as a component (__PACKAGE__->load_components(qw/ Tree::Ordered::MatPath Core /);), 
+Basically, you load up the MatPath stuff as a component (C<__PACKAGE__->load_components(qw/ Tree::Ordered::MatPath Core /);>), 
 and set up your table.  The main thing to look at is making sure you have a column to keep track of parent ids and the row's
 path.  Those are used by ::Ordered to group and move things around in the path/tree, which is the bulk of the materialized
 path manipuation work.  Creating a record is pretty standard, and MatPath takes care of the path building for you.
@@ -67,7 +67,7 @@ Here's how you add a child to a given parent:
     my $reply = $c->model('Board::Thread')->create($params);
     $reply->update({  parent_id => $parent->thread_id }) or die "Error :$!";
 
-This is obviously done using the $c->model(...) approach via Catalyst, but that's just saying $schema->resultset(...) in essence.
+This is obviously done using the C<$c->model(...)> approach via Catalyst, but that's just saying C<$schema->resultset(...)> in essence.
 What this does is create a new record, then update it so that its parent_id now matches its parent's thread id. That's it.
 It's thankfully a very simple process that saves a lot of stress on your database server and helps keep things neat and tidy.
 
