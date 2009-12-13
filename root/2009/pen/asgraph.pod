@@ -1,15 +1,22 @@
 =head1 A Catalyst Carol
 
 Sometimes our Catalyst applications are so large, with such complex
-business rules, that we get a little overwhelmed by their myriad
+business rules, that we could get a little overwhelmed by their myriad
 components. Or maybe we concentrate so hard on one portion that we
 lose perspective on the big picture. Well, fear not!
 
 The Perl world offers several visualization tools. In today's Advent
 Calendar, in the spirit of Dicken's Holiday masterpiece and MVC, we'll
-look closer into three of them!
+look closer into three of them, while using a standard 
+L<MojoMojo|http://mojomojo.org/> installation to illustrate the results.
 
 =head2 Ghost...erm...Graph of Model Past
+
+The amazing L<SQL::Translator|http://search.cpan.org/perldoc?SQL::Translator> 
+module can easily show you what your application's Schema looks like 
+directly from your database - be it MySQL, Oracle, PostreSQL, SQLite, 
+or any of the several other database parsers available. Just specify 
+it in the 'from' field, while choosing 'GraphViz' as destination.
 
   use SQL::Translator;
 
@@ -17,6 +24,7 @@ look closer into three of them!
           from => 'MySQL',
           to   => 'GraphViz',
   ) or die SQL::Translator->error;
+
   $translator->translate;
 
 If you are using Catalyst with the ever popular DBIx::Class (DBIC) and
@@ -63,35 +71,92 @@ diagram of the current project's schema:
 
   }
 
+The result? Well, see for yourself :)
+
+=begin pod:xhtml
+
+<img src="/calendar/static/images/2009/asgraph/mojomojo-schema.png" alt="MojoMojo's default schema" />
+
+=end pod:xhtml
 
 =head2 Graph of Controller Present
+
+Maybe model data is not your (only) issue there, and your application's 
+controllers and actions grow so much they urge for documentation, for a 
+developer's quick reference guide or maybe even some refactoring. While 
+Catalyst's controller structure usually points at good organizing 
+practices, there might be occasional bumps on the road, and it's always
+best to stay on the safe side.
+
+Fortunately for us, L<Franck Cuny|http://lumberjaph.net/blog/> uploaded 
+to CPAN a handy module called
+L<CatalystX::Dispatcher::AsGraph|http://search.cpan.org/perldoc?CatalystX::Dispatcher::AsGraph>, 
+which can turn all your private actions into a nifty directed graph in
+just a few lines of code!
 
   use CatalystX::Dispatcher::AsGraph;
    
   my $graph = CatalystX::Dispatcher::AsGraph->new(
         appname => 'MyApp',
-        output  => 1,
+        output  => 'myactions.png',
   );
   $graph->run;
-  
+
+If the code above is successful, C<$graph> now holds a Graph::Easy object
+storing the requested actions graph. We can use the 'dot' external program
+to easily output the result as a png file:
+
+  if ( open( my $png, '|-', 'dot -Tpng -o ' . $graph->output ) ) {
+      print $png $graph->graph->as_graphviz;
+      close $png;
+  }
+
+
+The demo program, bundled with the distribution, does exactly that but
+takes advantage of C<MooseX::GetOpt> to let you specify the module's
+parameters as command-line options.
+
 B<Note:> As Khisanth pointed out, this module uses MooseX::Declare and
 has no "package" information, so the CPAN indexer won't index it, and
 the shell won't find it. Until this is fixed by the author, you'll
-need to install using the package's full path (e.g. C<< install
-FRANCKC/CatalystX-Dispatcher-AsGraph-0.02.tar.gz >>), or fetch the
-tarball directly from the web.
+need to install using the package's full path (e.g. 
+C<< install FRANCKC/CatalystX-Dispatcher-AsGraph-0.02.tar.gz >>), 
+or fetch the tarball directly from the web.
+
+=begin pod:xhtml
+
+<img src="/calendar/static/images/2009/asgraph/mojomojo-controllers.png" alt="MojoMojo's private actions" />
+
+=end pod:xhtml
+
 
 =head2 Graph of Template Future
+
+Just like its predecessors in this article, you can also view your 
+entire template's structure as a directed graph. The 
+L<Template::AsGraph|http://search.cpan.org/perldoc?Template::AsGraph> 
+module can be easily invoked to generate such data from any template
+quite easily:
 
   use Template::AsGraph;
 
   my $graph = Template::AsGraph->graph('mytemplate.tt2');
 
-If you need a way to understand how your templates fit together, it
-probably means their flow is so intricate that you dynamically load
-bits and pieces depending on the data passed in by the
-Controller. Don't worry: the C<graph> method can also receive TT
-configurations as the second argument, and variables as the third:
+The returned C<$graph> is a C<Graph::Easy> object, which you can turn
+into a png file just like you did with the Controller one:
+
+  if ( open( my $png, '|-', 'dot -Tpng -o templatechart.png ) ) {
+      print $png $graph->graph->as_graphviz;
+      close $png;
+  }
+
+
+
+However, if you need a way to understand how your templates fit 
+together, it probably means their flow is so intricate that you 
+dynamically load bits and pieces depending on the data passed in 
+by the Controller. Don't worry: the C<graph> method can also receive 
+TT configurations as the second argument, and variables as the third:
 
   use Template::AsGraph;
 
@@ -109,7 +174,8 @@ configurations as the second argument, and variables as the third:
   );
 
 Alternatively, if you have a Catalyst context object lying around, you
-can do like View::TT:
+can do just like View::TT:
+
   my %vars = ( %{ $c->stash() }, 
                   c    => $c, 
                   base => $c->req->base, 
@@ -117,6 +183,20 @@ can do like View::TT:
              );
 
   my $graph = Template::AsGraph->graph('mytemplate.tt2', \%config, \%vars);
+
+=begin pod:xhtml
+
+<img src="/calendar/static/images/2009/asgraph/mojomojo-templates.png" alt="one of MojoMojo's templates" />
+
+=end pod:xhtml
+
+
+=head2 Conclusion
+
+By generating and analyzing all three graphs, we hope you get a better 
+understanding of your own applications. Remember what you did right, 
+review what could be better, and act upon it. This way, you are bound 
+to become a better developer, which is the spirit of the season :)
 
 
 =head2 Authors
