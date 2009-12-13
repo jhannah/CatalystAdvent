@@ -1,10 +1,12 @@
 =head1 Trees in SQL
 
+=head2 Trees? In /my/ SQL?
 Everyone wants to be able to have sane recursive data structures and pretty hierarchical data in their databases.  
 However, SQL only sees data as sets. 
 This makes it extremely hard to get any sort of tree structure inside a database, without either creating a tree, 
 serializing it, and storing it thusly, or using one of a few tricks some very clever database engineers have synthesized.
 
+=head2 But why?
 I've been on a bit of a journey for a while go figure out a sane way to this, and the fine folks of #dbix-class pointed me toward materialized paths.
 Materialized paths are a very simple method to store a 'tree' structure in a database.  You have a path to your requested node
 stored in a column in your database.  It looks something like this: 1.1.2.  This path points to the second child of the first child of the root node.  It's pretty simple, as the SQL looks something like 
@@ -15,7 +17,7 @@ This grabs everything that has a path like 1.1.something, meaning they all share
 This consitutes the direct set of children of this node.  This gives you a full path that you can traverse up and down to 
 retrieve the information you want.  Think "nested threads" or "nested categories".  Neat eh?
 
-
+=head2 Neato Burrito!  Let's see some code!
 Ribasushi (Peter Rabbitson) and I have been working on DBIx::Class::Tree::Ordered::MatPath for this very reason.  It currently takes
 and extends DBIx::Class::Ordered to create and manipulate materialized paths. It's pretty raw right now, as I've got a lot of tests to write,
 but it is complete enough that I've been able to put together a small Catalyst app using DBIx::CLass::Tree::Ordered::MatPath and create a
@@ -63,6 +65,7 @@ This is obviously done using the $c->model(...) approach via Catalyst, but that'
 What this does is create a new record, then update it so that its parent_id now matches its parent's thread id. That's it.
 It's thankfully a very simple process that saves a lot of stress on your database server and helps keep things neat and tidy.
 
+=head2 Oh lawds that's cool
 There are many forms of trees that you can stuff into a database and trick it into manipulating.  Materialized paths are the easiest,
 at least currently, to implement and maintain.
 
