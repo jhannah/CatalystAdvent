@@ -186,7 +186,7 @@ can do just like View::TT:
 
 =begin pod:xhtml
 
-<img src="/calendar/calendar/static/images/2009/asgraph/mojomojo-templates.png" alt="one of MojoMojo's templates" />
+<img src="/calendar/static/images/2009/asgraph/mojomojo-templates.png" alt="one of MojoMojo's templates" />
 
 =end pod:xhtml
 
