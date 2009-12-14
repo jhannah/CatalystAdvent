@@ -1,0 +1,78 @@
+=head1 Transactions and DBIx::Class
+
+Database transactions help ensure the integrity and consistency of your data.
+Here I will present a few (contrived) examples where they are useful.
+
+=head2 Atomicity
+
+Often a Model operation, in the sense of business logic, requires a group of
+related actual database operations. You want these to be atomic, that is if any
+single operation in the group fails, then the whole group fails and your data
+remains consistent.
+
+Suppose you wrote some code such as:
+
+    sub create_user : Local {
+        my ($self, $c) = @_;
+
+        my ($username, $first_name, $last_name, $token_id) =
+            @{ $c->req->params }{qw/username first_name last_name token_id/};
+
+        unless ($c->model('Token')->validate($token_id)) {
+            $c->flash->{error} = "Bad token: $token_id";
+            $c->detach('/error');
+        }
+
+        my $user = $c->model('DB::User')->create({
+            username => $username,
+            first_name => $first_name,
+            last_name => $last_name,
+        });
+
+        $user->add_to_tokens({ token_id => $token_id });
+
+        $c->flash->{message} = "Created user ${username}!";
+    }
+
+Looks perfectly reasonable, but there are two operations here, one which
+creates a user entry, and one that creates a token entry for it.
+
+What could possibly go wrong between them? Lots of things, such as your web
+server going down in flames, your database server crashing, and so on. While
+the chances of this are slight, repairing erroneous data in a database is a
+painful, expensive and hazardous process.
+
+Also we had to use an unnatural control flow here, normally we'd validate the
+token before it is created, rather than before the user is created.
+
+Enter C<txn_do>, from L<DBIx::Class::Schema>.
+
+    $c->model('DB')->txn_do(sub {
+        my $user = $c->model('DB::User')->create({
+            username => $username,
+            first_name => $first_name,
+            last_name => $last_name,
+        });
+
+        $c->model('Token')->validate($token_id) or die "Bad token: $token_id";
+
+        $user->add_to_tokens({ token_id => $token_id });
+    });
+
+Now the operation is atomic, your user entries as well as any related
+entries are guaranteed to be consistent, and we are using a more natural
+control flow.
+
+Any exceptions from C<txn_do> are rethrown, and ideally you'd clean them up in
+your C<end> handler, by getting them from C<< $c->error >>. But in some cases
+you may want to wrap it in an eval (or one of L<Try::Catch>, L<Try::Tiny>) to
+detach in order to short-circuit a chain for example.
+
+=head2 Isolation
+
+=head2 Nested Transactions
+
+=head1 AUTHOR
+
+Caelum: Rafael Kitover <rkitover@cpan.org>
+
