@@ -1,0 +1,49 @@
+
+=head1 The Catalyst config system, what you need to know.
+
+I assume everyone has read wreis' excelent advent article about how to do
+B<really flexible> things with L<Catalyst::Plugin::ConfigLoader>, right?
+(L<Catalyst Advent Calendar 2007-15|http://www.catalystframework.org/calendar/2009/XX>)
+
+This article is for anyone just starting out who looked at that and was confused.
+
+So I'm going to present a I<really simple> (i hope), guide to how config works,
+and a couple of simple patterns and techniques for successfully using it in your
+applications.
+
+So, lets start at the start - I'll step back, and explain what I'd like to
+achieve:
+
+=begin
+
+=item *
+
+=back
+
+=head2 Catalyst config
+
+Each L<Component|Catalyst::Component> is
+
+* Config inheritance/overriding
+* What formats are available
+* Default config file
+
+=head2 Config loading
+
+* myapp_local.conf
+CONFIG_LOCAL_SUFFIX
+
+=head2 A strategy
+
+Move user settable settings out into config file
+Leave them commented out so the app explodes??
+Expect generation of _local.conf for DB settings.
+svn/git ignore
+
+=head2 An example
+
+Gitalist Pod
+
+=head1 AUTHOR
+
+ Tomas Doran (t0m) <bobtfish@bobtfish.net>

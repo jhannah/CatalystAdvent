@@ -1,0 +1,28 @@
+
+=head1 Delivering static media with Catalyst
+
+=head2 Why?
+
+One use uris
+
+Time limited uris
+
+Too much media to fix on one physical machine
+
+=head2 How
+
+->serve_static_file is a great start, but.
+
+X-Accel-Redirect
+
+X-Sendfile
+
+=head2 Example
+
+Example web server config for static
+
+Example web server config for reproxying
+
+Example code snippet.
+
+
