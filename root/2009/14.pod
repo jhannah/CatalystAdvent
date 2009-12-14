@@ -204,4 +204,4 @@ which is the spirit of the season :)
 
 Breno G. de Oliveira C<< <garu@cpan.org> >>
 
-Bogdan Lucaciu C<< zamolxes@sinapticode.ro >>
+Bogdan Lucaciu C<< bogdan@sinapticode.ro >>
