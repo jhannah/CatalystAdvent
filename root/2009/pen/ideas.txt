@@ -5,7 +5,7 @@ Articles structure
   - ending: further reading, stuff we didn't include but you should know about, alternatives, caveats
 
 Confirmed ideas:
-  - Plack + Catalyst - miyagawa (or an editor with miyagawa's help) - dhoss volunteers if need be 
+  - Plack + Catalyst - miyagawa (or an editor with miyagawa's help) - dhoss volunteers is on it
   - External authentication (Openid, oauth) - Cosmin Budrica
   - js grid - jquery/ajax/json/moose roles -  Ian Docherty
   - database lookup functions working over SOAP  - Ian Sillitoe 
@@ -37,6 +37,10 @@ Editors
 Volunteers
   - Tomas Doran (8th or later - one article about CatalystX::SimpleLogin , + maybe others)
   - aristotle - anything :) ( unicode, http, xml whatever) 
+
+Articles in progress:
+ - Plack + Catalyst - dhoss
+ - DBIx::Class::InstancePerContext? - zamolxes and dhoss? groditi?
 
 Done articles
  - matt's opening article
