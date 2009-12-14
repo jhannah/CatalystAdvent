@@ -63,11 +63,19 @@ Now the operation is atomic, your user entries as well as any related
 entries are guaranteed to be consistent, and we are using a more natural
 control flow.
 
-Any exceptions from C<txn_do> are rethrown, and ideally you'd clean them up in
-your C<end> handler, by getting them from C<< $c->error >>, or using something
-like L<Catalyst::Action::RenderView::ErrorHandler>. But in some cases you may
-want to wrap it in an eval (or one of L<Try::Catch>, L<Try::Tiny>) to detach in
-order to short-circuit a chain for example.
+Any exceptions from C<txn_do> are rethrown and a C<ROLLBACK> is issued, leaving
+the database untouched by the enclosed code.
+
+Exceptions can be cleaned up in your C<end> handler, by getting them from C<<
+$c->error >>, or using something like
+L<Catalyst::Action::RenderView::ErrorHandler>. But in some cases you may want
+to wrap them in an eval (or one of L<Try::Catch>, L<Try::Tiny>) to detach in
+order to, for example, short-circuit a chain.
+
+It is also recommended to factor out database code into the relevant
+L<DBIx::Class::ResultSet> methods. ResultSet classes go into e.g. the
+C<lib/MyApp/Schema/ResultSet> directory, next to your C<Result> directory and
+inherit from C<DBIx::Class::ResultSet>.
 
 =head2 Nested Transactions
 
@@ -111,6 +119,11 @@ this feature, see L<DBIx::Class::Storage::DBI> for details.
 In this example, we are validating a batch of URLs, if any single URL fails it
 will not be added to any tables in the database, if they all fail then nothing
 will be added to the database.
+
+=head2 Transactions, a good idea!
+
+As you can see, database transactions and C<txn_do> can make your code safer
+and simpler.
 
 =head1 AUTHOR
 
