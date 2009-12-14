@@ -63,8 +63,8 @@ Now the operation is atomic, your user entries as well as any related
 entries are guaranteed to be consistent, and we are using a more natural
 control flow.
 
-Any exceptions from C<txn_do> are rethrown and a C<ROLLBACK> is issued, leaving
-the database untouched by the enclosed code.
+Any exceptions from C<txn_do> are re-thrown and a C<ROLLBACK> is issued,
+leaving the database untouched by the enclosed code.
 
 Exceptions can be cleaned up in your C<end> handler, by getting them from C<<
 $c->error >>, or using something like
@@ -76,6 +76,50 @@ It is also recommended to factor out database code into the relevant
 L<DBIx::Class::ResultSet> methods. ResultSet classes go into e.g. the
 C<lib/MyApp/Schema/ResultSet> directory, next to your C<Result> directory and
 inherit from C<DBIx::Class::ResultSet>.
+
+=head2 txn_scope_guard
+
+A different control flow for transactions is possible with C<txn_scope_guard>,
+from L<DBIx::Class::Storage>.
+
+With this method, an object is created and a transaction is started; if the
+object goes out of scope before C<< ->commit >> is called on it, via an
+exception or any other means, a C<ROLLBACK> will be issued.
+
+This can be useful if you don't want to deal with catching exceptions from
+C<txn_do>.
+
+Here's the previous example using C<txn_scope_guard>:
+
+    sub create_user : Local {
+        my ($self, $c) = @_;
+
+        my ($username, $first_name, $last_name, $token_id) =
+            @{ $c->req->params }{qw/username first_name last_name token_id/};
+
+        my $scope_guard = $c->model('DB')->txn_scope_guard;
+
+        my $user = $c->model('DB::User')->create({
+            username => $username,
+            first_name => $first_name,
+            last_name => $last_name,
+        });
+
+        unless ($c->model('Token')->validate($token_id)) {
+            $c->flash->{error} = "Bad token: $token_id";
+            $c->detach('/error');
+        }
+
+        $user->add_to_tokens({ token_id => $token_id });
+
+        $c->flash->{message} = "Created user ${username}!";
+
+        $scope_guard->commit;
+    }
+
+Here on C<< $c->detach >> the C<$scope_guard> goes out of scope, and a
+C<ROLLBACK> is issued, as well as on any exception. The changes are committed
+at the end of the action.
 
 =head2 Nested Transactions
 
@@ -122,8 +166,8 @@ will be added to the database.
 
 =head2 Transactions, a good idea!
 
-As you can see, database transactions and C<txn_do> can make your code safer
-and simpler.
+As you can see, the L<DBIx::Class> facilities for database transactions can
+make your code safer and simpler.
 
 =head1 AUTHOR
 
