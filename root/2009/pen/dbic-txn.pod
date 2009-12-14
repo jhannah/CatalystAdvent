@@ -87,7 +87,10 @@ object goes out of scope before C<< ->commit >> is called on it, via an
 exception or any other means, a C<ROLLBACK> will be issued.
 
 This can be useful if you don't want to deal with catching exceptions from
-C<txn_do>.
+C<txn_do>.  Another reason you might choose to use C<txn_scope_guard> over
+C<txn_do> is that C<txn_do> will attempt to reconnect to the database and
+re-run your code if you lost your connection; C<txn_scope_guard> does not
+have this overhead.
 
 Here's the previous example using C<txn_scope_guard>:
 
