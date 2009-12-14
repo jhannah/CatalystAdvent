@@ -64,13 +64,53 @@ entries are guaranteed to be consistent, and we are using a more natural
 control flow.
 
 Any exceptions from C<txn_do> are rethrown, and ideally you'd clean them up in
-your C<end> handler, by getting them from C<< $c->error >>. But in some cases
-you may want to wrap it in an eval (or one of L<Try::Catch>, L<Try::Tiny>) to
-detach in order to short-circuit a chain for example.
-
-=head2 Isolation
+your C<end> handler, by getting them from C<< $c->error >>, or using something
+like L<Catalyst::Action::RenderView::ErrorHandler>. But in some cases you may
+want to wrap it in an eval (or one of L<Try::Catch>, L<Try::Tiny>) to detach in
+order to short-circuit a chain for example.
 
 =head2 Nested Transactions
+
+Many databases support a feature called 'savepoints', which are nested
+transactions. They allow you to roll back a group of operations that are part
+of a larger group of operations.
+
+L<DBIx::Class> supports savepoints for the MySQL, Oracle, Postgres, MSSQL
+and Sybase databases.
+
+You have to add C<< auto_savepoint => 1 >> to your C<connect_info> to enable
+this feature, see L<DBIx::Class::Storage::DBI> for details.
+
+    sub validate_batch : Local {
+        my ($self, $c) = @_;
+        my @urls = split "\n", $c->req->param('urls');
+
+        $c->model('DB')->txn_do(sub {
+            my $batch = $c->user->add_to_batches({});
+            my $validated_count = 0;
+
+            for my $url (@urls) {
+                try {
+                    $c->model('DB')->txn_do(sub {
+                        my $url = $c->model('DB::Url')->find_or_create({ url => $url });
+                        my $result = $c->model('Validator')->validate($url);
+                        $batch->add_to_urls({ url => $url->id, result => $result });
+                        $validated_count++;
+                    });
+                } catch {
+                    push @{ $c->flash->{errors} }, $_;
+                }
+            }
+
+            die "Could not validate any URLs" unless $validated_count;
+
+            $batch->update({ url_count => $validated_count });
+        });
+    }
+
+In this example, we are validating a batch of URLs, if any single URL fails it
+will not be added to any tables in the database, if they all fail then nothing
+will be added to the database.
 
 =head1 AUTHOR
 
