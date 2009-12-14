@@ -14,12 +14,9 @@ Confirmed ideas:
   - mojomojo -dandv
   - querylog - zamolxes (any time now) 
   - openid - cwest (sat, dec 12)
-  - DBIx::Class::ResultSet::WithMetaData - lukes (done before 11th Dec)  (dec 12) 
   - DBIC::Fixtures - lukes (maybe before 20th Dec, but no promises)
-  - "Bullet proof search" - Matija Grabnar: http://zanshin.matija.com/twiki/bin/view/Main/BulletProofSearch
-  - dbic txns - frew (drafts saturday 12, morning)
+  - dbic txns - caelum, dec 15 
   - DBIx::Class::Helpers - frew 
-  - CatalystX::Dispatcher::AsGraph / Template::AsGraph / SQL::Translator::Producer::Diagram  - garu + zamolxes ( dec 14th?)
 
 Ideas looking for authors
   - Catalyst::TraitFor::Model::DBIC::Schema::Caching / DBIx::Class::Cursor::Cached
@@ -51,3 +48,5 @@ Done articles
  - Configuration layouts: customizing your app per user/host/env/etc. Wallace Reis (dec 11 )
  - component traits - caelum
  - trees in sql - dhoss
+ - DBIx::Class::ResultSet::WithMetaData - lukes (done before 11th Dec)  (dec 12) 
+ - CatalystX::Dispatcher::AsGraph / Template::AsGraph / SQL::Translator::Producer::Diagram  - garu + zamolxes ( dec 14th?)
