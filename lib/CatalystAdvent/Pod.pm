@@ -6,7 +6,13 @@ sub new {
     my $class = shift;
     $Pod::Xhtml::SEQ{L} = \&seqL;
 
-    $class->SUPER::new(@_);
+    $class->SUPER::new(
+        StringMode   => 1,
+        FragmentOnly => 1,
+        MakeIndex    => 0,
+        TopLinks     => 0,
+        @_
+    );
 }
 
 sub textblock {

@@ -29,6 +29,10 @@ a year, display the "tip" for a given day and generate RSS feeds.
 
 =head1 METHODS
 
+=head2 base
+
+Base action for this controller that all other actions are attached to.
+
 =head2 index
 
 Detaches to the "year" display for the current year.
@@ -87,12 +91,7 @@ sub day : Chained('base') PathPart('') Args(2) {
     my $mtime      = ( stat $file )->mtime;
     my $cached_pod = $c->cache->get("$file $mtime");
     if ( !$cached_pod ) {
-        my $parser = CatalystAdvent::Pod->new(
-            StringMode   => 1,
-            FragmentOnly => 1,
-            MakeIndex    => 0,
-            TopLinks     => 0
-        );
+        my $parser = CatalystAdvent::Pod->new();
 
         open my $fh, '<:utf8', $file or die "Failed to open $file: $!";
         $parser->parse_from_filehandle($fh);
@@ -171,12 +170,7 @@ sub feed : Chained('base') Args() {
     );
 
     for my $day ( @entry ) {
-        my $parser = CatalystAdvent::Pod->new(
-            StringMode   => 1,
-            FragmentOnly => 1,
-            MakeIndex    => 0,
-            TopLinks     => 0
-        );
+        my $parser = CatalystAdvent::Pod->new();
 
         my $file = q{}. $path{$day};
         open my $fh, '<:utf8', $file or die "Failed to open $file: $!";
