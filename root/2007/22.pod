@@ -49,6 +49,8 @@ A L<DBIx::Class::Row> representing an actual row of data resulting
 from a database query. This could be and entire row, or just certain
 fields as restricted by a ResultSet.
 
+=back
+
 =head1 SETUP
 
 To create a new set of DBIx::Class L<DBIx::Class::ResultSource>

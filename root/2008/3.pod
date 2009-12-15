@@ -244,8 +244,6 @@ action.
 
  $cc->add_to_datasets($ds);
 
-=end pod::xhtml
-
 =begin pod::xhtml
 
 <p>

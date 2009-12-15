@@ -68,7 +68,7 @@ than without, for the most part Moose greatly increases the read- and
 write-ability of your code.  See the L<Moose::Cookbook> for many
 examples.
 
-=AUTHORS
+=head1 AUTHORS
 
 Kieren Diment <zarquon@cpan.org>
 Robert 'phaylon' Sedlacek <rs@474.at>

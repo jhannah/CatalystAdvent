@@ -85,6 +85,8 @@ I was using previously.
 
 =item L<http://www.w3.org/TR/xhtml-media-types/>
 
+=back
+
 =head1 AUTHOR
 
 Tomas Doran (t0m) <bobtfish@bobtfish.net>

@@ -471,6 +471,8 @@ Edit lib/Controller/Photos.pm to match this file:
     <p>[% photo.caption %]</p>
     <div>&laquo;<a href="[% c.uri_for("/photos") %]">back</a>
 
+=back
+
 =head2 FormFu
 
 And last but not least, the required HTML::FormFu files:
@@ -509,6 +511,8 @@ And last but not least, the required HTML::FormFu files:
       HTMLScrubber
 
 Voila! There you have it. Go nuts.
+
+=back
 
 =head1 AUTHOR
 
