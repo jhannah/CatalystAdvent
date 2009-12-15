@@ -196,6 +196,12 @@ sub feed : Global {
     $c->res->body( $feed->as_string );
 }
 
+=head2 format_date_w3cdtf
+
+Formats a date as an ISO8601 date string.
+
+=cut
+
 sub format_date_w3cdtf { strftime '%Y-%m-%dT%H:%M:%SZ', gmtime $_[0] }
 
 =head1 AUTHORS

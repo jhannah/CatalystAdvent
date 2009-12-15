@@ -28,6 +28,12 @@ sub begin : Private {
     $c->stash->{now} = DateTime->now();
 }
 
+=head2 end
+
+Renders a view if needed.
+
+=cut
+
 sub end : ActionClass('RenderView') {}
 
 1;

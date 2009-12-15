@@ -1,13 +1,3 @@
-#!/usr/bin/perl
-# Pod.pm 
-# Copyright (c) 2006 Jonathan Rockway <jrockway@cpan.org>
-
-=head1 NAME
-
-CatalystAdvent::Pod - parse POD into XHTML + metadata
-
-=cut
-
 package CatalystAdvent::Pod;
 use base 'Pod::Xhtml';
 use strict;
@@ -39,7 +29,7 @@ sub command {
 
     $self->{_title} = $paragraph
         if $command eq 'head1' and not defined $self->{_title};
-    
+
     $self->{_in_author_block} = 1
         if $command =~ /^head/ and $paragraph =~ /AUTHOR/;
 
@@ -53,15 +43,15 @@ sub seqL {
     my $kind = $self->{LinkParser}->type;
     my $targ = $self->{LinkParser}->node;
     my $text = $self->{LinkParser}->text;
-    
+
     if ($kind eq 'hyperlink'){
 	return $self->SUPER::seqL($link);
     }
-    
+
     $targ ||= $text;
     $text = Pod::Xhtml::_htmlEscape($text);
     $targ = Pod::Xhtml::_htmlEscape($targ);
-    
+
     return qq{<a href="http://search.cpan.org/perldoc?$targ">$text</a>};
 }
 
@@ -70,4 +60,40 @@ sub summary { $_[0]->{_first_paragraph} }
 sub author  { $_[0]->{_author} }
 sub email   { $_[0]->{_email} }
 1;
+
+=head1 NAME
+
+CatalystAdvent::Pod - parse POD into XHTML + metadata
+
+=head1 METHODS
+
+=over
+
+=item author
+
+=item command
+
+=item email
+
+=item new
+
+=item seqL
+
+=item summary
+
+=item textblock
+
+=item title
+
+=back
+
+=head1 AUTHOR
+
+    Jonathan Rockway <jrockway@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2006 Jonathan Rockway
+
+=cut
 
