@@ -35,7 +35,9 @@ Detaches to the "year" display for the current year.
 
 =cut
 
-sub index : Private {
+sub base : Chained('/base') PathPart('') CaptureArgs(0) {}
+
+sub index : Chained('base') PathPart('') Args(0) {
     my ( $self, $c ) = @_;
     opendir DIR, $c->path_to('root') or die "Error opening root: $!";
     my @years = sort grep { /\d{4}/ } readdir DIR;
@@ -51,8 +53,9 @@ Displays the calendar for any given year
 
 =cut
 
-sub year : Regex('^(\d{4})$') {
+sub year : Chained('base') PathPart('') Args(1) {
     my ( $self, $c, $year ) = @_;
+    $c->detach( '/calendar/index' ) unless $year =~ /^\d{4}$/;
     $year ||= $c->req->snippets->[0];
     $c->res->redirect( $c->uri_for('/') )
         unless ( -e $c->path_to( 'root', $year ) );
@@ -68,10 +71,10 @@ pod to html.
 
 =cut
 
-sub day : Regex('^(\d{4})/(\d\d?)$') {
+sub day : Chained('base') PathPart('') Args(2) {
     my ( $self, $c, $year, $day ) = @_;
-    $year ||= $c->req->snippets->[0];
-    $day  ||= $c->req->snippets->[1];
+    $c->detach( '/calendar/index' ) unless $year =~ /^\d{4}$/;
+    $c->detach( '/calendar/index' ) unless $day =~ /^\d{1,2}$/;
 
     $c->detach( 'year', [$year] )
         unless ( -e ( my $file = $c->path_to( 'root', $year, "$day.pod" ) ) );
@@ -107,9 +110,9 @@ Forwards to the "feed" URI to maintain compatibility with bookmarked aggregators
 
 =cut
 
-sub rss : Global {
+sub rss : Chained('base') Args() {
     my ( $self, $c, $year ) = @_;
-    $c->forward('feed', [ $year ] );
+    $c->forward('feed', $year );
 }
 
 =head2 feed 
@@ -118,10 +121,10 @@ Generates an XML feed (Atom) of tips for the given year.
 
 =cut
 
-sub feed : Global {
+sub feed : Chained('base') Args() {
     my ( $self, $c, $year ) = @_;
+    $c->detach( '/calendar/index' ) unless $year =~ /^\d{4}$/;
     $year ||= $c->stash->{now}->year;
-    $year ||= $c->req->snippets->[0];
     $c->res->redirect( $c->uri_for('/') )
         unless ( -e $c->path_to( 'root', $year ) );
 

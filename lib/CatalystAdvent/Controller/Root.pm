@@ -16,14 +16,14 @@ sub default : Private {
     $c->detach( '/calendar/index' );
 }
 
-=head2 begin
+=head2 base
 
 Simply adds the current date to the stash for some operations needed
 across various methods.
 
 =cut
 
-sub begin : Private {
+sub base : Chained('/') PathPart('') CaptureArgs(0) {
     my( $self, $c )  = @_;
     $c->stash->{now} = DateTime->now();
 }
