@@ -1,4 +1,4 @@
-=head1 A Catalyst Carol
+=head1 Graphing Your Catalyst Application
 
 Sometimes our Catalyst applications are so large, with such complex
 business rules, that we could get a little overwhelmed by their myriad
@@ -13,10 +13,10 @@ L<MojoMojo|http://mojomojo.org/> installation to illustrate the results.
 =head2 Ghost...erm...Graph of Model Past
 
 The amazing L<SQL::Translator|http://search.cpan.org/perldoc?SQL::Translator> 
-module can easily show you what your application's Schema looks like 
+module can easily show you what your application's schema looks like 
 directly from your database schema - be it MySQL, Oracle, PostreSQL, SQLite, 
 or any of the several other database parsers available. Just specify 
-it in the 'from' field, while choosing 'GraphViz' as destination.
+it in the "from" field, while choosing "GraphViz" as destination.
 
   use SQL::Translator;
 
@@ -27,7 +27,7 @@ it in the 'from' field, while choosing 'GraphViz' as destination.
 
   $translator->translate( 'MySchema.sql' );
 
-If you are using Catalyst with the ever popular DBIx::Class (DBIC) and
+If you are using Catalyst with the ever-popular DBIx::Class (DBIC) and
 would rather fetch database information from the schema modules,
 rejoice! Use C<< SQL::Translator::Parser::DBIx::Class >> as the
 parser, and pass the loaded schema in the "parser_args" parameter. The
@@ -104,7 +104,7 @@ just a few lines of code!
   $graph->run;
 
 If the code above is successful, C<$graph> now holds a Graph::Easy object
-storing the actions graph. We can use the 'dot' external program
+storing the actions graph. We can use the C<dot> external program
 to output the result as a png file:
 
   if ( open( my $png, '|-', 'dot -Tpng -o ' . $graph->output ) ) {
@@ -134,7 +134,7 @@ or fetch the tarball directly from the web.
 
 =head2 Graph of Template Future
 
-Just like schema and actions, you can view your entire template
+Just like the schema and actions, you can view your entire template
 structure as a directed graph. The
 L<Template::AsGraph|http://search.cpan.org/perldoc?Template::AsGraph>
 module can be easily invoked to generate such data from any template

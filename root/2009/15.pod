@@ -1,14 +1,23 @@
 =head1 Transactions and DBIx::Class
 
-Database transactions help ensure the integrity and consistency of your data.
-Here I will present a few (contrived) examples where they are useful.
+Database transactions help ensure the integrity and consistency of your
+data.  In brief, a transaction wraps a group of related data operations
+which must function together or the entire group will fail. The classic
+example is a purchase made by check: the amount of the payment must be
+added to the recipient's bank account and removed from the payer's bank
+account together. If the database crashes, or if either operation fails,
+the entire transaction will fail, and the database will be unaffected.
+
+Here I will present a few (contrived) examples where they are
+useful.
 
 =head2 Atomicity
 
-Often a Model operation, in the sense of business logic, requires a group of
-closely related (or dependent) database operations.  These should be
-atomic.  That is if any single operation in the group fails, then the whole
-group of operations will fail and your data remains consistent.
+Often a Model operation, in the sense of business logic, requires a
+group of closely related (or dependent) database operations.  These
+should be atomic.  That is, if any single operation in the group fails,
+then the whole group of operations will fail and your data remains
+consistent.
 
 Suppose you wrote some code such as:
 
@@ -41,10 +50,11 @@ creates a user entry, and one that creates a token entry for it.
 What could possibly go wrong between them? Lots of things, such as the web
 server going down in flames, the database server crashing, alien invasion, and
 so on. While the chances of this are small, repairing erroneous data in a
-database is a painful, expensive and hazardous process.
+database is a painful, expensive, and hazardous process.
 
-Also we had to use an unnatural control flow here, normally we'd validate the
-token before it is created, rather than before the user is created.
+Also, we had to use an unnatural control flow here: normally we'd
+validate the token before it is created, rather than before the user is
+created.
 
 Enter C<txn_do>, from L<DBIx::Class::Schema>.
 
@@ -76,7 +86,7 @@ in order to short-circuit a chain for example.
 It is also recommended to factor out database code into the relevant
 L<DBIx::Class::ResultSet> methods. ResultSet classes go into the
 C<lib/MyApp/Schema/ResultSet> directory (for example), next to the C<Result>
-directory and inherit from C<DBIx::Class::ResultSet>.
+directory, and inherit from C<DBIx::Class::ResultSet>.
 
 =head2 txn_scope_guard
 
@@ -90,7 +100,7 @@ exception or any other means, a C<ROLLBACK> will be issued.
 This can be useful if you don't want to deal with catching exceptions from
 C<txn_do>.  Another reason you might choose to use C<txn_scope_guard> over
 C<txn_do> is that C<txn_do> will attempt to reconnect to the database and
-re-run your code if you lost your connection; C<txn_scope_guard> does not
+re-run your code if you lose your connection; C<txn_scope_guard> does not
 have this overhead.
 
 Here's the previous example using C<txn_scope_guard>:
@@ -127,7 +137,7 @@ at the end of the action.
 
 =head2 Nested Transactions
 
-Many databases support a feature called 'savepoints', which are nested
+Many databases support a feature called "savepoints", which are nested
 transactions. They allow you to roll back a group of operations that are part
 of a larger group of operations.
 
@@ -164,9 +174,9 @@ this feature:  see L<DBIx::Class::Storage::DBI> for details.
         });
     }
 
-In this example, we are validating a batch of URLs, if any single URL fails it
-will not be added to any tables in the database, if they all fail then nothing
-will be added to the database.
+In this example, we are validating a batch of URLs. If any single URL
+fails, it will not be added to any tables in the database; if they all
+fail, nothing will be added to the database.
 
 =head2 Transactions, a good idea!
 
