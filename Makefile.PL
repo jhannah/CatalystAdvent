@@ -8,17 +8,18 @@ license('perl');
 
 include('ExtUtils::AutoInstall');
 
-requires( Catalyst => '5.60' );
-requires( 'Catalyst::Plugin::DefaultEnd' );
-requires( 'Catalyst::Plugin::Unicode' );
-requires( 'Catalyst::Plugin::Cache' => '0.08' );
-requires( 'DateTime' );
-requires( 'File::stat' );
-requires( 'Pod::Xhtml' );
-requires( 'Calendar::Simple' );
-requires( 'XML::Atom::SimpleFeed' );
-requires( 'HTTP::Date' );
-requires( 'List::Util' );
+requires Catalyst => '5.80';
+requires 'Catalyst::Plugin::DefaultEnd';
+requires 'Catalyst::Plugin::Unicode';
+requires 'Catalyst::Plugin::Cache' => '0.08';
+requires 'Catalyst::Plugin::Static::Simple';
+requires 'DateTime';
+requires 'File::stat';
+requires 'Pod::Xhtml';
+requires 'Calendar::Simple';
+requires 'XML::Atom::SimpleFeed';
+requires 'HTTP::Date';
+requires 'List::Util';
 
 catalyst_files();
 
