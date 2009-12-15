@@ -1,0 +1,78 @@
+=head1 A Tour of DBIx::Class::Helpers
+
+=head2 Hello!
+
+L<DBIx::Class> is one of the most popular ORM's used in Perl and Catalyst
+development; it is remarkably flexible and useful.  But with all that
+flexibility there is a price that gets paid.  Often things that are super
+short in other ORM's are overly complex in L<DBIx::Class>.
+L<DBIx::Class::Helpers> aims at solving many of those problems as succinctly
+as possible.  As our good friend mst would say, it should help you get down to
+the pub sooner than later :-)
+
+So without further ado, I will start with the first, most basic helper...
+
+=head2 Decontextualize
+
+L<DBIx::Class::Helper::Decontextualize> has the longest name of any of the
+helpers, but the most basic functionality; all it does is take away the context
+sensitivity of C<< $rs->search >>.  Why would a person ever want to do that?
+I often write code like the following:
+
+ $rs = $self->schema->resultset('Parts');
+ return $self->sort(
+   $self->paginate($rs)
+ );
+
+Unfortunately, this often means that instead of passing another ResultSet to
+C<< $self->sort >>, I end up passing The Database instead.  This has confounded
+myself and a number of my coworkers enough that I'd rather just call
+C<< $rs->all >> if I need the actual results.
+
+=head2 JoinTable
+
+L<DBIx::Class::Helper::JoinTable> was one of the first components in this
+suite.  It's name should make it's purpose fairly obvious, but the basic idea
+is that any time you have a many-to-many relationship you must have a table
+joining those two sets of items together.  An example could be Users and Roles.
+Users have many Roles; Roles have many Users.  The most "Correct" way to do
+this is with a join table.  I won't go into depth with that here since this is
+is really a survey course, but L<DBIx::Class::Helper::JoinTable> should make
+creating join tables extremely easy.  And because L<DBIx::Class> allows us to
+call C<add_columns> more than once, it's a cinch to have a join table with more
+data in the join than just the relationship.  (An example of when one might
+want that would be an award given from some school.  We have a Person table, a
+School table, an Award table, and a Person_Award table, which should just have
+a join to Person and Award, as well as a date and maybe some other information
+about why the Person deserves this Award.)
+
+=head2 Random
+
+L<DBIx::Class::Helper::Random> exists to serve a fairly basic need; to pick
+random rows from a given table.  Currently it will only return a single row,
+but soon, hopefully, L<DBIx::Class> will support the necesary machinations to
+allow for returning a proper ResultSet of random rows.
+
+=head2 SubClass
+
+L<DBIx::Class::Helper::SubClass> is certainly the most complex of all of these
+components, but I would argue that it is the most important as well.  This
+component allows B<almost> seamless subclassing, of C<DBIx::Class>
+ResultSources.  It does things like
+C<< __PACKAGE__->table( __PACKAGE->table ) >>, which are annoying and unsightly,
+as well as more complex things, like recreating relationships based on the
+parent class.
+
+=head2 VirtualView
+
+L<DBIx::Class::Helper::VirtualView> is probably the most conceptually complex
+of these components.
+
+=head2 Extensibility
+
+You could make a better JoinTable, etc.
+
+=head1 Author
+
+Arthur Axel "fREW" Schmidt <frioux@gmail.com>
+
