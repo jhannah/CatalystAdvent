@@ -112,7 +112,7 @@ Forwards to the "feed" URI to maintain compatibility with bookmarked aggregators
 
 sub rss : Chained('base') Args() {
     my ( $self, $c, $year ) = @_;
-    $c->forward('feed', $year );
+    $c->go('feed', [$year] );
 }
 
 =head2 feed 
@@ -123,8 +123,8 @@ Generates an XML feed (Atom) of tips for the given year.
 
 sub feed : Chained('base') Args() {
     my ( $self, $c, $year ) = @_;
-    $c->detach( '/calendar/index' ) unless $year =~ /^\d{4}$/;
     $year ||= $c->stash->{now}->year;
+    $c->detach( '/calendar/index' ) unless $year =~ /^\d{4}$/;
     $c->res->redirect( $c->uri_for('/') )
         unless ( -e $c->path_to( 'root', $year ) );
 
