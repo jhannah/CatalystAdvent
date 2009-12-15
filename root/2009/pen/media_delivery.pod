@@ -41,26 +41,80 @@ the internet is something that web servers are very good at scaling to do.
 
 So the planned architecture will be something like:
 
-=item *
-
-Catalyst application running as FastCGI with a limited number of workers
+=over
 
 =item *
 
-Light weight web server config with C<X-Accel-Redirect> or C<X-Sendfile> support.
+Request comes into your web server
+
+=item *
+
+Request is sent to your Catalyst application running as FastCGI.
+
+=item *
+
+Application validates the request, increments any counters necessary
+and issues a response with C<X-Accel-Redirect> or C<X-Sendfile> header set.
+
+=item *
+
+Your web server takes care of serving the content back to the user as
+specified by that header.
+
+=back
+
+So the key is this <X-Accel-Redirect> or C<X-Sendfile> thing - these are just
+a header that you get your application to send in the response (which one you
+use depends which web server you're running).
+
+After sending this (headers only) response, your application server is freed
+up and able to get on with handling the next request.
 
 =head3 A note on web servers
 
+This topic appears to be something that people get very excited about, but for
+the purposes of this discussion - whichever web server you prefer is likely to
+work fine, I'll go through the common choices below.
+
+=head4 Apache
+
 Apache is generally thought of as I<big>, but this is very much to do with what
-modules you have loaded and what MPM you're using.
+modules you have loaded and what MPM you're using. A lightweight Apache is perfectly
+acceptable to be serving content with. C<mod_xsendfile> provides the C<X-Sendfile>
+support.
 
-X-Accel-Redirect
+=head4 Lighttpd
 
-X-Sendfile
+Lighttpd has simpler config to apache if you're writing a 'new' one, but your
+sysadmins are also less likely know their way around administering it.
+Has X-SendFile support as standard.
 
-=head2 Example
+=head4 nginx
 
-Example web server config for static
+Works differently (and uses a different header) to either of the above.
+L<X-Accel-Redirect> actually doesn't logicially send a file from disk,
+it internally redirects the request to another path known by the web server,
+bypassing ACL checking.
+
+This means that the correct header to send is web server configuration
+dependent, which is a disadvantage, but as nginx can act as a proxy as well as
+a web server, this can also be more powerful, as nginx can proxy for a backend
+content server.
+
+=head4 perlbal
+
+Perl based load balancer which supports an C<X-REPROXY-URL> header to allow
+you to reproxy content to a backend content server.
+
+Not covered in this article as I don't have any experience with it myself, and
+you still need a web server to serve your main application.
+
+=head2 Examples
+
+This example is going to show using C<nginx>, to reproxy a C<MogileFS> installation,
+as that's a what I'm using in production to deliver 150Tb of content at high speed :)
+
+=head3 nginx config
 
 Example web server config for reproxying
 
@@ -68,4 +122,20 @@ Example code snippet for one use uris.
 
 Example code snippet for timed uris.
 
+=head2 SEE ALSO
 
+L<http://blog.lighttpd.net/articles/2006/07/02/x-sendfile>
+
+L<http://wiki.nginx.org/NginxXSendfile>
+
+L<http://tn123.ath.cx/mod_xsendfile/>
+
+L<http://www.danga.com/perlbal/>
+
+L<http://github.com/vkholodkov/nginx-mogilefs-module>
+
+L<http://www.danga.com/mogilefs/>
+
+=head2 AUTHOR
+
+  Tomas Doran (t0m) <bobtfish@bobtfish.net>
