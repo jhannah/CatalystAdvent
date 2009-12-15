@@ -20,7 +20,7 @@ to the user is a bad idea - think protected .pdf documents, think time limited U
 single use (or n-use) download URIs.
 
 Also, how about you have too much media to fit on one physical machine and you're using
-something like MogileFS. XXX FIXME LINK
+something like L<http://danga.com/mogilefs/>. 
 
 =head2 How?
 
