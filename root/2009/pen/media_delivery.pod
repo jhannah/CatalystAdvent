@@ -116,11 +116,82 @@ as that's a what I'm using in production to deliver 150Tb of content at high spe
 
 =head3 nginx config
 
-Example web server config for reproxying
+    http {
+        include       /etc/nginx/mime.types;
+        access_log  /var/log/nginx/access.log;
 
-Example code snippet for one use uris.
+        sendfile           on;
+        keepalive_timeout  65;
+        tcp_nodelay        on;
 
-Example code snippet for timed uris.
+        gzip on;
+
+        server {
+            listen 80;
+            root /opt/FileServer/webroot;
+
+            location / {
+                include /etc/nginx/fastcgi_params;
+                fastcgi_pass unix:/tmp/fileserver.socket;
+                access_log   off;
+            }
+
+            location /private/mogile/ {
+                internal;
+                mogilefs_tracker 1.1.1.1:7001;
+                mogilefs_domain mydomain;
+                mogilefs_pass {
+                   proxy_pass $mogilefs_path;
+                   proxy_hide_header Content-Type;
+                   proxy_buffering off;
+                }
+                access_log   off;
+            }
+        }
+    }
+
+=head3 Example code snippet for generating timed uris.
+
+    method generate_timed_uri (%p) {
+        $p{ttl} ||= 60 * 60 * 24 * 7; # Default to a week
+    
+        my $id = Math::BaseCalc->new(digits => ['a' .. 'z'])->to_base( $self->id ); # The primary key of the row
+
+        my $secret = $self->secret; # This is a random secret string associated with
+                                    # (but not related to the contents of) the file object
+
+        # Generate a time rounded off to last expiry point, then 2x forward of the TTL.
+        $time = Math::BaseCalc->new(digits => ['a' .. 'z'])->to_base( (time() % $ttl) + $ttl * 2 );
+
+        my $hash = Digest::SHA1::sha1_hex($self->secret . '-' . $time);
+        
+        return '/file/' . join('/', $hash, $time, $id, $self->filename . '.' . $self->extension);
+    }
+
+=head3 Example code snippet for serving timed uris.
+
+    sub file : Local {
+        my ($self, $c, $hash, $time, $id) = @_;
+
+        $id = Math::BaseCalc->new(digits => ['a' .. 'z'])->from_base($id);
+    
+        my $file = eval { $schema->resultset('File')->find($id) }
+            or return $self->error_notfound($c);
+       
+        return $self->error_notfound($c)
+            unless $hash eq Digest::SHA1::sha1_hex($file->secret . '-' . $time)
+
+        # Time embedded in the URL is the latest time this image is valid.
+        $expire_time = Math::BaseCalc->new(digits => ['a' .. 'z'])->from_base($time);
+        if ($expire_time < time()) {
+            return $self->error_expired($c, $file);
+        }
+        $c->res->header('Content-Type', $file->mimetype);
+        $c->res->header('Accept-Ranges', 'none');
+
+        my $redirect_to = '/private/mogile/' . $file->mogile_id;
+        $c->res->header('X-Accel-Redirect' => $redirect_to);
+    }
 
 =head2 SEE ALSO
 
