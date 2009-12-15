@@ -24,9 +24,35 @@ something like L<http://danga.com/mogilefs/>.
 
 =head2 How?
 
-Well, if your app is small, and as a first implementation, then using the
-L<serve_static_file|Catalyst::Plugin::Static::Simple/serve_static_file> method is a good way to
-start when prototyping your system.
+As a first implementation, then using the
+L<serve_static_file|Catalyst::Plugin::Static::Simple/serve_static_file>
+method is a good way to start.
+
+If your app is small and for internal company use only, then you quite possibly never need
+to go any further...
+
+However, if you're serving large files and likely to have an appreciable number of users,
+then sending bytes in perl just won't scale..
+
+=head2 Scaleing
+
+The key to scaleing is to do things using the minimum resources possible. Sending bytes across
+the internet is something that web servers are very good at scaling to do.
+
+So the planned architecture will be something like:
+
+=item *
+
+Catalyst application running as FastCGI with a limited number of workers
+
+=item *
+
+Light weight web server config with C<X-Accel-Redirect> or C<X-Sendfile> support.
+
+=head3 A note on web servers
+
+Apache is generally thought of as I<big>, but this is very much to do with what
+modules you have loaded and what MPM you're using.
 
 X-Accel-Redirect
 
