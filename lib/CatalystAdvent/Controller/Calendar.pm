@@ -48,23 +48,35 @@ sub index : Chained('base') PathPart('') Args(0) {
     closedir DIR;
 
     my $year = pop @years || $c->stash->{now}->year;
-    $c->forward( 'year', [$year] );
+    $c->go( $self->action_for('year'), [$year], []);
+}
+
+=head2 get_year
+
+Gets relevant calendar data for any given year
+
+=cut
+
+sub get_year : Chained('base') PathPart('') CaptureArgs(1) {
+    my ( $self, $c, $year ) = @_;
+
+    $c->detach( '/calendar/index' ) unless $year =~ /^\d{4}$/;
+
+    $c->res->redirect( $c->uri_for('/') )
+        unless ( -d $c->path_to( 'root', $year ) );
+
+    $c->stash->{year}     = $year;
+    $c->stash->{calendar} = calendar( 12, $year );
 }
 
 =head2 year
 
-Displays the calendar for any given year
+Displays the per-year page.
 
 =cut
 
-sub year : Chained('base') PathPart('') Args(1) {
-    my ( $self, $c, $year ) = @_;
-    $c->detach( '/calendar/index' ) unless $year =~ /^\d{4}$/;
-    $year ||= $c->req->snippets->[0];
-    $c->res->redirect( $c->uri_for('/') )
-        unless ( -e $c->path_to( 'root', $year ) );
-    $c->stash->{year}     = $year;
-    $c->stash->{calendar} = calendar( 12, $year );
+sub year : Chained('get_year') PathPart('') Args(0) {
+    my ($self, $c) = @_;
     $c->stash->{template} = 'year.tt';
 }
 
@@ -75,15 +87,14 @@ pod to html.
 
 =cut
 
-sub day : Chained('base') PathPart('') Args(2) {
-    my ( $self, $c, $year, $day ) = @_;
-    $c->detach( '/calendar/index' ) unless $year =~ /^\d{4}$/;
+sub day : Chained('get_year') PathPart('') Args(1) {
+    my ( $self, $c, $day ) = @_;
     $c->detach( '/calendar/index' ) unless $day =~ /^\d{1,2}$/;
 
+    my $year = $c->stash->{year};
     $c->detach( 'year', [$year] )
         unless ( -e ( my $file = $c->path_to( 'root', $year, "$day.pod" ) ) );
-    $c->stash->{calendar} = calendar( 12, $year );
-    $c->stash->{year}     = $year;
+
     $c->stash->{day}      = $day;
     $c->stash->{template} = 'day.tt';
 
