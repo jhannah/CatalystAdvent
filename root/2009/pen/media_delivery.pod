@@ -20,7 +20,17 @@ to the user is a bad idea - think protected .pdf documents, think time limited U
 single use (or n-use) download URIs.
 
 Also, how about you have too much media to fit on one physical machine and you're using
-something like L<http://danga.com/mogilefs/>. 
+something like L<http://danga.com/mogilefs/>.
+
+=head3 Why not cache?
+
+That's a good question - generally you can deliver static media any way you want to
+by putting a cache (such as varnish) in front of your application and letting it
+handle most of the static hits (as static assets will be cached by it) is a great solution.
+
+However, in some cases (specifically one use URIs, when you want to check ACLs and
+when you want to log all accesses to a resource) then it's not possible to perform
+any sort of caching in front of your application as that will defeat the purpose.
 
 =head2 How?
 
@@ -109,10 +119,20 @@ you to reproxy content to a backend content server.
 C<X-REPROXY-URL> is not covered in this article as I don't have any experience
 with it myself, and you still need a web server to serve your main application.
 
-=head2 Examples
+=head2 Example
 
-This example is going to show using C<nginx>, to reproxy a C<MogileFS> installation,
+Here is a worked example is going to show using C<nginx>, to reproxy a C<MogileFS> installation,
 as that's a what I'm using in production to deliver 150Tb of content at high speed :)
+
+In this case I'm using the MogileFS module for nginx (L<see below|/SEE ALSO>) to serve
+the actual content.
+
+It should be noted that C<MogileFS> isn't trivial to install or maintain, but
+if you're prepared to expend the time and expertise then it is an extremely cost
+effective solution to file storage on a large scale.
+
+You can, however, have a B<much> simpler infrastructure serving media from a directory
+on local disk if the amount of content you're delivering isn't huge.
 
 =head3 nginx config
 
@@ -152,9 +172,13 @@ as that's a what I'm using in production to deliver 150Tb of content at high spe
 
 =head3 Example code snippet for generating timed uris.
 
+This method assumes that it's being called on a file object which stores various pieces
+of metadata about a file.
+
     method generate_timed_uri (%p) {
         $p{ttl} ||= 60 * 60 * 24 * 7; # Default to a week
     
+        # Turn integers into strings to save space in the URIs (and make them less obvious)
         my $id = Math::BaseCalc->new(digits => ['a' .. 'z'])->to_base( $self->id ); # The primary key of the row
 
         my $secret = $self->secret; # This is a random secret string associated with
@@ -163,6 +187,7 @@ as that's a what I'm using in production to deliver 150Tb of content at high spe
         # Generate a time rounded off to last expiry point, then 2x forward of the TTL.
         $time = Math::BaseCalc->new(digits => ['a' .. 'z'])->to_base( (time() % $ttl) + $ttl * 2 );
 
+        # Note this is theoretically cryptographically weak, should really use HMAC.
         my $hash = Digest::SHA1::sha1_hex($self->secret . '-' . $time);
         
         return '/file/' . join('/', $hash, $time, $id, $self->filename . '.' . $self->extension);
@@ -171,6 +196,8 @@ as that's a what I'm using in production to deliver 150Tb of content at high spe
 =head3 Example code snippet for serving timed uris.
 
     sub file : Local {
+        # Note we ignore the filename in the URI generated above, it is just there
+        # to make the uri look 'normal'..
         my ($self, $c, $hash, $time, $id) = @_;
 
         $id = Math::BaseCalc->new(digits => ['a' .. 'z'])->from_base($id);
@@ -186,9 +213,15 @@ as that's a what I'm using in production to deliver 150Tb of content at high spe
         if ($expire_time < time()) {
             return $self->error_expired($c, $file);
         }
+        # NOTE: In this case as you know when the URI expires, it is possible
+        #       to serve cache headers and have the hot items cached by your
+        #       front end proxy. This is meant to be a simple example and so
+        #       this is left as an exercise for the reader :)
         $c->res->header('Content-Type', $file->mimetype);
         $c->res->header('Accept-Ranges', 'none');
 
+        # Note: this matches the path in the nginx config above.
+        #       With X-Sendfile, it would be the filename on disk instead.
         my $redirect_to = '/private/mogile/' . $file->mogile_id;
         $c->res->header('X-Accel-Redirect' => $redirect_to);
     }
