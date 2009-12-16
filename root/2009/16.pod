@@ -5,49 +5,45 @@
 
 Why would you want to deliver static media with Catalyst at all?
 
-Generally you use the L<Static::Simple|Catalyst::Plugin::Static::Simple>
-plugin to serve assets (.css and image files) from the C</root/static> directory.
-However for production it is recommended that your web server
-directly serve static content. This is B<much> more efficient.
+Generally you use the L<Static::Simple|Catalyst::Plugin::Static::Simple> plugin
+to serve assets like css and image files.  These are almost always located in
+the C</root/static> directory.  However for production it is recommended that
+your web server serve static content directly. This is B<much> more efficient.
 
-Using an entire application server process (i.e. a perl process) to serve static media
-is a massive waste of resources, especially if you're not using a front-end proxy.
-Your web server ends up with a heavyweight perl process tied up sending bytes to
-a user rather than doing useful work.
+Using an entire application server process (i.e. a perl process) to serve
+static media is a massive waste of resources, especially if you're not using a
+front-end proxy.  Your web server ends up with this heavyweight  process tied
+up sending bytes to a user rather than doing useful work.
 
-However, there are a number of cases where unconditionally serving the static content
-to the user is a bad idea - think of protected .pdf documents, time limited URIs,
-single use (or n-use) download URIs, etc.
+However, there are a number of cases where unconditionally serving the static
+content to the user is a bad idea - think of protected .pdf documents, time
+limited URIs, single use (or n-use) download URIs, etc.
 
 =head3 What about a cache?
 
-That's a good question - putting a cache (such as L<varnish|http://varnish.projects.linpro.no/>)
-in front of your application and letting it handle most of the requests for static content
-is a great solution.
-
-However, in some cases (specifically one use URIs, when you want to check ACLs and
-when you want to log all accesses to a resource) then it is not possible to perform
-any sort of caching in front of your application as you won't be able to perform the
-checks you need to at that layer.
+That's a good question - putting a cache (such as
+L<varnish|http://varnish.projects.linpro.no/>) in front of your application and
+letting it handle most of the requests for static content is a great
+solution. However, in some cases (specifically for single use URIs, when you
+want to check ACLs and/or log all accesses to a resource), it is not possible
+to perform any sort of caching in front of your application as you won't be
+able to perform the checks you need to at that layer.
 
 =head2 How?
 
 As a first implementation, using the
-L<serve_static_file|Catalyst::Plugin::Static::Simple/serve_static_file>
-method is a good way to start.
-
-If your app is small and for internal company use only, then you quite possibly never need
-to go any further...
-
-However, if you're serving large files and likely to have an appreciable number of users,
-then sending bytes in Perl just won't scale.
+L<serve_static_file|Catalyst::Plugin::Static::Simple/serve_static_file> method
+is a good way to start.  If your app is small and for internal company use
+only, then that's probably all that you need to do.  However, if you're serving
+large files and likely to have a significant number of users, then sending
+bytes in Perl just won't scale.
 
 =head2 Scaling
 
-The key to scaling is doing things with the minimum resources possible. Sending bytes across
-the internet is something that web servers are very good at doing efficiently.
-
-For access controlled static files, scalable request handling will be something like:
+The key to scaling is doing things with the minimum resources possible. Sending
+bytes across the internet is something that web servers are very good at doing
+efficiently.  For access controlled static files, scalable request handling
+will be something like:
 
 =over
 
@@ -61,8 +57,9 @@ Request is sent to your Catalyst application running as FastCGI.
 
 =item *
 
-Application validates the request, increments any counters necessary
-and issues a response with C<X-Accel-Redirect> or C<X-Sendfile> header set.
+Application validates the request, processes internal logic (e.g. logging and
+counters) then issues a response with C<X-Accel-Redirect> or C<X-Sendfile>
+header set.
 
 =item *
 
@@ -81,26 +78,27 @@ is freed up and able to get on with handling the next request.
 =head3 A note on web servers
 
 This topic appears to be something that people get very excited about, but for
-the purposes of this discussion, any web server you prefer is likely to
+the purposes of this discussion, your favourite webserver is likely to
 work fine. I'll go through the common choices below.
 
 =head4 Apache
 
-Apache is generally thought of as I<big>, but this is very much to do
-with what modules you have loaded and what MPM (Multi-Processing
-Module) you're using. A lightweight Apache is perfectly acceptable to
-serve content. C<mod_xsendfile> provides the C<X-Sendfile> support.
+Apache is generally thought of as I<big>, but this is very much dependent on
+ the modules that you have loaded, and what MPM (Multi-Processing Module)
+ you're using. A lightweight Apache is perfectly acceptable to serve
+ content. C<mod_xsendfile> provides the C<X-Sendfile> support.
 
 =head4 Lighttpd
 
-Lighttpd has simpler config compared to Apache if you're writing a
-'new' one, but your sysadmins are also less likely know their way
-around administering it. Lighttpd has X-SendFile support as standard.
+Lighttpd has simpler config compared to Apache if you're setting it up from
+scratch.  On the other hand your system administrators are also less likely
+know their way around it. Lighttpd has X-SendFile support as
+standard.
 
 =head4 nginx
 
-Works differently (and uses a different header) to either of the above.
-L<X-Accel-Redirect> actually doesn't logically send a file from disk,
+This server works differently (and uses a different header) to either of the
+above.  L<X-Accel-Redirect> actually doesn't logically send a file from disk,
 it internally redirects the request to another path known by the web server,
 bypassing ACL checking.
 
@@ -120,17 +118,17 @@ with it myself, and you still need a web server to serve your main application.
 =head2 Example
 
 Here is a worked example using C<nginx>, to reproxy a C<MogileFS> installation,
-as that's a what I'm using in production to deliver 150Tb of content at high speed :)
-
-In this case I'm using the MogileFS module for nginx (L<see below|/SEE ALSO>) to serve
-the actual content.
+as that's a what I'm using in production to deliver 150Tb of content at high
+speed :) In this case I'm using the MogileFS module for nginx (L<see below|/SEE
+ALSO>) to serve the actual content.
 
 It should be noted that C<MogileFS> isn't trivial to install or maintain, but
-if you're prepared to expend the time and expertise then it is an extremely cost
-effective solution to file storage on a large scale.
+if you're prepared to expend the time and expertise then it is an extremely
+cost effective solution to file storage on a large scale.
 
-You can, however, have a B<much> simpler infrastructure serving media from a directory
-on local disk if the amount of content you're delivering isn't huge.
+However, it is possible to have a B<much> simpler infrastructure to serve media
+from a directory on a local disk if the amount of content you're delivering
+isn't huge.
 
 =head3 nginx config
 
@@ -170,44 +168,53 @@ on local disk if the amount of content you're delivering isn't huge.
 
 =head3 Example code snippet for generating timed uris.
 
-This method assumes that it's being called on a file object which stores various pieces
-of metadata about a file.
+This method assumes that it's being called on a file object which stores
+various pieces of metadata about a file.
 
     method generate_timed_uri (%p) {
         $p{ttl} ||= 60 * 60 * 24 * 7; # Default to a week
-    
-        # Turn integers into strings to save space in the URIs (and make them less obvious)
-        my $id = Math::BaseCalc->new(digits => ['a' .. 'z'])->to_base( $self->id ); # The primary key of the row
 
-        my $secret = $self->secret; # This is a random secret string associated with
-                                    # (but not related to the contents of) the file object
+        # Turn integers into strings to save space in the URIs
+        # (and make them less obvious)
 
-        # Generate a time rounded off to last expiry point, then 2x forward of the TTL.
-        $time = Math::BaseCalc->new(digits => ['a' .. 'z'])->to_base( (time() % $ttl) + $ttl * 2 );
+        # Get the primary key of the row
+        my $id = Math::BaseCalc->new(digits => ['a' .. 'z'])->
+              to_base( $self->id );
 
-        # Note this is theoretically cryptographically weak, should really use HMAC.
+        # Make a random secret string associated with the file object.
+        # This string not related to the contents of the file
+        my $secret = $self->secret;
+
+        # Generate a time rounded off to last expiry point
+        # then 2x forward of the TTL.
+        my $time = Math::BaseCalc->new(digits => ['a' .. 'z'])->
+                               to_base( (time() % $ttl) + $ttl * 2 );
+
+        # Note this is theoretically cryptographically weak,
+        # we should really use HMAC.
         my $hash = Digest::SHA1::sha1_hex($self->secret . '-' . $time);
-        
+
         return '/file/' . join('/', $hash, $time, $id, $self->filename . '.' . $self->extension);
     }
 
 =head3 Example code snippet for serving timed uris.
 
     sub file : Local {
-        # Note we ignore the filename in the URI generated above, it is just there
-        # to make the uri look 'normal'..
+        # Note that we ignore the filename in the URI generated above.
+        # It is just there to make the uri look 'normal'..
         my ($self, $c, $hash, $time, $id) = @_;
 
         $id = Math::BaseCalc->new(digits => ['a' .. 'z'])->from_base($id);
-    
+
         my $file = eval { $schema->resultset('File')->find($id) }
             or return $self->error_notfound($c);
-       
+
         return $self->error_notfound($c)
             unless $hash eq Digest::SHA1::sha1_hex($file->secret . '-' . $time)
 
-        # Time embedded in the URL is the latest time this image is valid.
+        # The time embedded in the URL is the latest time this image is valid.
         $expire_time = Math::BaseCalc->new(digits => ['a' .. 'z'])->from_base($time);
+
         if ($expire_time < time()) {
             return $self->error_expired($c, $file);
         }
@@ -215,6 +222,7 @@ of metadata about a file.
         #       to serve cache headers and have the hot items cached by your
         #       front end proxy. This is meant to be a simple example and so
         #       this is left as an exercise for the reader :)
+
         $c->res->header('Content-Type', $file->mimetype);
         $c->res->header('Accept-Ranges', 'none');
 
