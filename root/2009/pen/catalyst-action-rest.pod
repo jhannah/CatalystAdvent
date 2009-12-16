@@ -1,7 +1,7 @@
 =head1 Writing REST web services with Catalyst::Controller::REST
 
-This article is a small update to the this precedent article
-L<http://www.catalystframework.org/calendar/2006/9>.
+This article is a minor update to the 2006 entry about L<Catalyst::Controller::REST>,
+which can be found at L<http://www.catalystframework.org/calendar/2006/9>.
 
 =head1 What is REST
 
@@ -178,7 +178,7 @@ L<http://www.catalystframework.org/calendar/2006/9>
 
 L<http://en.wikipedia.org/wiki/REST>
 
-L<http://search.cpan.org/perldoc?Catalyst::Action::REST>
+L<http://search.cpan.org/perldoc?Catalyst::Controller::REST>
 
 =head1 Author
 
