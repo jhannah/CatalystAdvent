@@ -20,7 +20,6 @@ requires 'Calendar::Simple';
 requires 'XML::Atom::SimpleFeed';
 requires 'HTTP::Date';
 requires 'List::Util';
-requires 'Template::Plugin::DateTime'; # EWWWWW
 
 test_requires 'Test::More' => '0.88';
 
