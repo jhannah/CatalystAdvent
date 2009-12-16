@@ -1,22 +1,24 @@
-=head1 Writing REST webservices with Catalyst::Controller::REST
+=head1 Writing REST web services with Catalyst::Controller::REST
+
+This article is a small update to the this precedent article
+L<http://www.catalystframework.org/calendar/2006/9>.
 
 =head1 What is REST
 
-REST means REpresentational State Transfer. The REST approach is using
-the HTTP verbs (GET, PUT, POST, DELETE) to interact with a webservice,
-using the content type of the request to determine the format of the
-response and then mapping the URI to a resource. Look at this simple
-query:
+REST means REpresentational State Transfer. The REST approach is using the
+HTTP verbs (GET, PUT, POST, DELETE) to interact with a web service, using the
+content type of the request to determine the format of the response and then
+mapping the URI to a resource. Look at this simple query:
 
     curl -X GET -H "Content-type: application/json" http://baseuri/book/1
 
-The query asks (GET) for the book (the resource) with the id of 1, and
-wants the response (C<Content-type>) in JSON.
+The query asks (GET) for the book (the resource) with the id of 1, and wants
+the response (C<Content-type>) in JSON.
 
 =head1 Using Catalyst::Controller::REST
 
-The L<Catalyst::Controller::REST> module helps us easily create REST
-webservices in Catalyst. 
+The L<Catalyst::Controller::REST> module helps us easily create REST web
+services in Catalyst. 
 
 =head2 HTTP Verbs
 
