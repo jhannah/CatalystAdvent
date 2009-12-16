@@ -1,6 +1,6 @@
-=head1 Writing REST webservices with Catalyst::Action::REST
+=head1 Writing REST webservices with Catalyst::Controller::REST
 
-=head2 What is REST
+=head1 What is REST
 
 REST means REpresentational State Transfer. The REST approach is using
 the HTTP verbs (GET, PUT, POST, DELETE) to interact with a webservice,
@@ -13,12 +13,12 @@ query:
 The query asks (GET) for the book (the resource) with the id of 1, and
 wants the response (C<Content-type>) in JSON.
 
-=head2 Using Catalyst::Action::REST
+=head1 Using Catalyst::Controller::REST
 
-The L<Catalyst::Action::REST> module helps us easily create REST
+The L<Catalyst::Controller::REST> module helps us easily create REST
 webservices in Catalyst. 
 
-=head3 HTTP Verbs
+=head2 HTTP Verbs
 
 First you declare a new resource:
 
@@ -50,12 +50,12 @@ book():
 Now if C<$id> is missing book_GET() and book_POST() will not be
 called.
 
-=head3 Serialization
+=head2 Serialization
 
-A nice feature of L<Catalyst::Action::REST> is automatic serialization
+A nice feature of L<Catalyst::Controller::REST> is automatic serialization
 and deserialization. You don't need to serialize the response, or know
 how the data sent to you were serialized. When a client makes a
-request, L<Catalyst::Action::REST> attempts to find the appropriate
+request, L<Catalyst::Controller::REST> attempts to find the appropriate
 content-type for the query. It looks for:
 
 =over 4
@@ -70,7 +70,7 @@ header. This value can be set:
 
 =item B<Content-type from the HTTP request parameter>
 
-For GET requests, L<Catalyst::Action::REST> also checks the query's
+For GET requests, L<Catalyst::Controller::REST> also checks the query's
 C<Content-type> parameter:
 
     http://www.example.com/book/id?content-type=application/json
@@ -81,22 +81,22 @@ header.
 
 =item B<Accept-Content from the HTTP::Request>
 
-Finally if nothing is found, L<Catalyst::Action::REST> extracts
+Finally if nothing is found, L<Catalyst::Controller::REST> extracts
 content-type from Accept-Content in the HTTP request.
 
 =back
 
-=head3 HTTP Helpers
+=head2 HTTP Helpers
 
-L<Catalyst::Action::REST> comes with helpers to generate the
+L<Catalyst::Controller::REST> comes with helpers to generate the
 appropriate HTTP response to a query. When you receive a POST query
 and you create a new entry, you can use the C<status_created> helper,
 to generate an HTTP response with code 201. If a request
 returned no record, you can use C<status_bad_request> to return a 404.
 
-=head3 Configuration
+=head2 Configuration
 
-L<Catalyst::Action::REST> is usable without any configuration. You can
+L<Catalyst::Controller::REST> is usable without any configuration. You can
 also customize many of its parts. When you 
 
     $self->status_ok($c, entity => {foo => 'bar'});
@@ -120,7 +120,7 @@ for a requested content-type, this one is used:
 
     __PACKAGE__->config('default'   => 'application/json');
 
-=head2 Writing a simple controller
+=head1 Writing a simple controller
 
 Imagine you have a nice website with a database, and you want to
 provide users an easy way to access data.
@@ -170,8 +170,15 @@ provide users an easy way to access data.
 
     1;
 
-=head2 SEE ALSO
+=head1 SEE ALSO
 
 L<http://www.catalystframework.org/calendar/2006/9>
 
 L<http://en.wikipedia.org/wiki/REST>
+
+L<http://search.cpan.org/perldoc?Catalyst::Action::REST>
+
+=head1 Author
+
+Franck Cuny <franck@lumberjaph.net>
+
