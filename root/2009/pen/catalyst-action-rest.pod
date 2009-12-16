@@ -2,20 +2,21 @@
 
 =head2 What is REST
 
-REST means REpresentational State Transfer. The REST approach is to use the
-HTTP verbs (GET, PUT, POST, DELETE) to interact with a webservice; the content
-type of the request to determine the format of the response; and to map the
-URI to a resource. This can be represented by this simple query:
+REST means REpresentational State Transfer. The REST approach is using
+the HTTP verbs (GET, PUT, POST, DELETE) to interact with a webservice,
+using the content type of the request to determine the format of the
+response and then mapping the URI to a resource. Look at this simple
+query:
 
     curl -X GET -H "Content-type: application/json" http://baseuri/book/1
 
-The query ask (GET) for the book (the ressource) with the id 1, and want the
-response (the content-type) in JSON.
+The query asks (GET) for the book (the resource) with the id of 1, and
+wants the response (C<Content-type>) in JSON.
 
-=head2 Using of Catalyst::Action::REST
+=head2 Using Catalyst::Action::REST
 
-The Catalyst::Action::REST module is here to help us to easily create REST
-webserivce in Catalyst. 
+The L<Catalyst::Action::REST> module helps us easily create REST
+webservices in Catalyst. 
 
 =head3 HTTP Verbs
 
@@ -23,20 +24,20 @@ First you declare a new resource:
 
     sub book : Local : ActionClass('REST') { }
 
-Then the subroutines for the method you want to handle for that resource:
+Then subroutines for the methods you want to handle that resource:
 
-    sub book_GET {
-    }
+    sub book_GET { }
 
-    sub book_POST {
-    }
+    sub book_POST { }
 
-The first method will be executed each time you call the "book" resource,
-whatever the HTTP method is. Catalyst will now dispatch to the subroutine that
-have the appropriate name. So, when you call GET on the resource /book/, first
-it will go through the book subroutine, then the book_GET subroutine. If an id
-is always required to access the book resource (for GET and POST), you can put
-some code to check this in the book sub:
+Catalyst dispatches to the subroutine with the apropriate name. The
+book() subroutine will be executed each time you request the book
+resource, whatever the HTTP method is. For example, when you call GET
+on /book/, first Catalyst goes to the book subroutine,
+then the book_GET subroutine.
+
+If an ID is required to access the book resource, check for it in
+book():
 
     sub book : Local : ActionClass('REST') {
         my ($self, $c, $id) = @_;
@@ -46,86 +47,87 @@ some code to check this in the book sub:
         }
     }
 
-Then book_GET and book_POST subroutines will never be called if the argument id
-is missing.
+Now if C<$id> is missing book_GET() and book_POST() will not be
+called.
 
 =head3 Serialization
 
-One of the best feature of this module, it's that it handle all the
-serialization/deserialization part for you. You don't need to know how the
-response have to be serialized before sending back to the client, or how the
-data sent to you were serilazed. 
-
-When a client make a request, Catalyst::Action::REST will try to find the
-appropriate content-type for this query from:
+A nice feature of L<Catalyst::Action::REST> is automatic serialization
+and deserialization. You don't need to serialize the response, or know
+how the data sent to you were serialized. When a client makes a
+request, L<Catalyst::Action::REST> attempts to find the appropriate
+content-type for the query. It looks for:
 
 =over 4
 
-=item B<content-type from the HTTP request>
+=item B<Content-type from the HTTP request header>
 
-It tries to find in the HTTP header of the request the content-type. This
-value can be set like this:
+It tries to find the C<Content-type> of the request in the in the HTTP
+header. This value can be set:
 
     my $req = HTTP::Request(GET => 'http://...');
     $req->header('Content-Type' => 'application/json');
 
-=item B<content-type from the parameter>
+=item B<Content-type from the HTTP request parameter>
 
-If the content-type is not found using the HTTP::Request, it will check the
-content-type parameter:
+For GET requests, L<Catalyst::Action::REST> also checks the query's
+C<Content-type> parameter:
 
     http://www.example.com/book/id?content-type=application/json
 
-This is nice, because you can do a request for a specific content type from
-your browser, without needing to change the content-type value from the
+This is nice, because you can do a request for a specific content-type
+from your browser, without changing the content-type value of the
 header.
 
 =item B<Accept-Content from the HTTP::Request>
 
-Finaly, if nothing is found, it will extract the value from the Accept-Content
-from the HTTP request.
+Finally if nothing is found, L<Catalyst::Action::REST> extracts
+content-type from Accept-Content in the HTTP request.
 
 =back
 
 =head3 HTTP Helpers
 
-Catalyst::Action::REST comes with many helper to generate the appropriate HTTP
-response to a query. When you receive a POST query, and you create a new entry
-from this, you can use the C<status_created> helper, that will generate an
-HTTP response with a code HTTP code 201. If a request got no record, you can
-use the C<status_bad_request> to return a 404.
+L<Catalyst::Action::REST> comes with helpers to generate the
+appropriate HTTP response to a query. When you receive a POST query
+and you create a new entry, you can use the C<status_created> helper,
+to generate an HTTP response with code 201. If a request
+returned no record, you can use C<status_bad_request> to return a 404.
 
 =head3 Configuration
 
-You can use Catalyst::Action::REST without doing any specific configuration.
-But you can easily customize most of it's parts. When you do
-C<$self->status_ok($c, entity => {foo => 'bar'})>, the content of entity will
-be set in the 'rest' key of the stash. You can change the name of this key:
+L<Catalyst::Action::REST> is usable without any configuration. You can
+also customize many of its parts. When you 
+
+    $self->status_ok($c, entity => {foo => 'bar'});
+
+the content of entity will be set in the 'rest' key of the stash. You
+can change the name of this key:
 
     __PACKAGE__->config('stash_key' => 'my_rest_key');
 
-By default, various serialisations are supported (JSON, YAML, but also
-storable, XML, ...). You may want to limit only some format for your
-application:
+Various serializations are supported: JSON, YAML, storable, XML,
+etc. You might want to limit your application to a subset of these
+formats.
 
     __PACKAGE__->config(map => {
         'text/x-yaml' => 'YAML',
         'application/json' => 'JSON',
     });
 
-It's also possible to force a default serializer. If no serializer is found
-for a requested content-type, this is the one that will be used.
+It is possible to force a default serializer. If no serializer is found
+for a requested content-type, this one is used:
 
     __PACKAGE__->config('default'   => 'application/json');
 
 =head2 Writing a simple controller
 
-You have a nice website with a database, and you want to provides to your user
-an easy way to access some data. 
+Imagine you have a nice website with a database, and you want to
+provide users an easy way to access data.
 
     package BookStore::Controller::API::REST;
     use Moose;
-    BEGIN { extends 'Catalyst::Controller::REST' };
+    BEGIN { extends 'Catalyst::Controller::REST'};
 
     sub book : Local : ActionClass('REST') { }
 
@@ -136,9 +138,12 @@ an easy way to access some data.
             $c->detach();
         }
 
-        # do something clever
-        my $book = ... $self->status_ok( $c,
-            entity => { author => $book->author, title => $book->title } );
+        # do something clever
+        my $book = ... 
+        $self->status_ok( 
+            $c,
+            entity => { author => $book->author, title => $book->title } 
+        );
     }
 
     sub book_POST {
