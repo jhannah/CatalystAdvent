@@ -1,0 +1,118 @@
+=head1 Keeping Your Model Reusable
+
+=head2 Introduction
+
+Catalyst's MVC (Model/View/Controller) structure gently guides us to
+separate the code handling the various aspects of our application, without
+insisting that we do the right thing.
+
+Good advice, and an oft-heard refrain, is to avoid creating fat controllers.
+What makes a controller fat?  The inclusion of code concerned with doing
+the work your application is built to do.  If you were building an app to
+translate text from one languate to another, the code performing the 
+translation logic should be neatly wrapped up in a model.
+
+This approach improves your life in a variety of ways.  The resulting code
+is easier to understand, easier to debug, and easier to test.  Taken one
+step further, it also makes it trivial to re-use.
+
+=head2 Gitalist
+
+Gitalist began as a project to implement gitweb (the Git web viewer) as a
+Catalyst application.  While the main aim was to produce a web application,
+we knew that we'd want to be able to write other, non-web tools that had
+access to the same functionality.
+
+With this in mind, we needed our Catalyst model (C<Gitalist::Model::GitRepos>)
+to serve as a thin layer of glue connecting our real model (C<Gitalist::Git>)
+into the application.  Fortunately, this is incredibly easy.
+
+=head2 The Real Model
+
+First, we implement the real model.  In Gitalist, we needed to represent 
+both an individual git repository (a Project), and the directory containing
+a collection of Projects (a Repo).
+
+A simplified version of the Repo class looks like this:
+
+  use MooseX::Declare;
+
+  class Gitalist::Git::Repo {
+    has path     => ( isa => Dir, required => 1 );
+    has projects => ( isa        => ArrayRef['Gitalist::Git::Project'],
+                      required   => 1,
+                      lazy_build => 1 );
+
+    method _build_projects {
+      # return an array of each git repository found.
+    }
+
+    method get_project ($project_name) {
+      my $project_path = $self->path->subdir($project_name);
+      return Gitalist::Git::Project->new( $project_path );
+    }
+  }
+
+While the actual code is more complex, there's no trace of Catalyst in
+sight - exactly as it should be!  This class can readily be used in other
+other applications, and is very easy to test.
+
+=head2 The Catalyst Model
+
+If all our actual logic is contained in the real model, it follows that our
+Catalyst model will contain none.  Sure enough, we do the minimum amount
+of work required to create an instance of C<Gitalist::Git::Repo>. 
+  
+  package Gitalist::Model::GitRepos;
+  use Moose;
+
+  extends 'Catalyst::Model';
+  with 'Catalyst::Component::InstancePerContext';
+
+  use Gitalist::Git::Repo;
+
+  has repo_dir => ( isa => Str, is => 'ro', lazy_build => 1 );
+  sub _build_repo_dir {
+    # code to determine the value of repo_dir
+  }
+
+  sub build_per_context_instance {
+     my ($self, $app) = @_;
+
+     Gitalist::Git::Repo->new(repo_dir => $self->repo_dir);
+  }
+
+We used L<Catalist::Component::InstancePerContext> which will run
+C<build_per_context_instance> for each new request.  This suits Gitalist,
+but for other uses it may be preferable for your model to persist between
+requests - in that case, L<Catalyst::Model::Adaptor> is what you'll need.
+
+=head2 The Controller
+
+With the model in place, the controller is straightforward.  If we've done
+everything right, we shouldn't even notice that our model exists outside
+Catalyst.  Sure enough, something like the below will do what you expect.
+
+  sub project : Chained('base') CaptureArgs(1) {
+    my($self, $c, $project_name) = @_;
+
+    my $project = $c->model->('GitRepos')->get_project($project_name);
+    $c->detach('/error_404') unless $project;
+
+    $c->stash( Project => $project );
+  }
+
+=head2 Further reading
+
+L<Catalyst::Component::InstancePerContext>
+L<Catalyst::Model::Factory::PerRequest>
+L<Catalyst::Model::Adapter>
+
+L<Gitalist::Model::GitRepos>
+
+=head1 AUTHOR
+
+Zac Stevens <zts@cryptocracy.com>
+
+
+

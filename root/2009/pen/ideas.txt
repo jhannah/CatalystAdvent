@@ -8,7 +8,7 @@ Articles in progress:
  - Plack + Catalyst - dhoss
  - DBIx::Class::InstancePerContext & DBIx::Class::Schema::RestrictWithObject   - zamolxes and dhoss? groditi?
  - DBIx::Class::Helpers - frew 
- - gitalyst - zts
+ - gitalist - zts
  - ribasushi multicreate
  - config for beginners (t0m)
 
