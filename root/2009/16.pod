@@ -16,21 +16,18 @@ is a massive waste of resources, especially if you're not using a front-end prox
 a user rather than doing useful work).
 
 However, there are a number of cases where just unconditionally serving the static content
-to the user is a bad idea - think protected .pdf documents, think time limited URIs, think
-single use (or n-use) download URIs.
+to the user is a bad idea - think of protected .pdf documents, time limited URIs,
+single use (or n-use) download URIs, etc.
 
-Also, how about you have too much media to fit on one physical machine and you're using
-something like L<http://danga.com/mogilefs/>.
+=head3 What about a cache?
 
-=head3 Why not cache?
-
-That's a good question - generally you can deliver static media any way you want to
-by putting a cache (such as varnish) in front of your application and letting it
-handle most of the static hits (as static assets will be cached by it) is a great solution.
+That's a good question - putting a cache (such as varnish) in front of your application
+and letting it handle most of the requests for static content is a great solution.
 
 However, in some cases (specifically one use URIs, when you want to check ACLs and
-when you want to log all accesses to a resource) then it's not possible to perform
-any sort of caching in front of your application as that will defeat the purpose.
+when you want to log all accesses to a resource) then it is not possible to perform
+any sort of caching in front of your application as you won't be able to perform the
+checks you need to at that layer.
 
 =head2 How?
 
