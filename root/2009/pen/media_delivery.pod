@@ -21,8 +21,9 @@ single use (or n-use) download URIs, etc.
 
 =head3 What about a cache?
 
-That's a good question - putting a cache (such as varnish) in front of your application
-and letting it handle most of the requests for static content is a great solution.
+That's a good question - putting a cache (such as L<varnish|http://varnish.projects.linpro.no/>)
+in front of your application and letting it handle most of the requests for static content
+is a great solution.
 
 However, in some cases (specifically one use URIs, when you want to check ACLs and
 when you want to log all accesses to a resource) then it is not possible to perform
