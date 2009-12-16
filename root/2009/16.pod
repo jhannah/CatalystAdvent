@@ -1,14 +1,15 @@
 
-=head1 Delivering static media with Catalyst
+=head1 Delivering Static Media with Catalyst
 
 =head2 Why?
 
 Why would you want to deliver static media with Catalyst at all?
 
-Generally you use the L<Static::Simple|Catalyst::Plugin::Static::Simple> plugin
-to serve assets like css and image files.  These are almost always located in
-the C</root/static> directory.  However for production it is recommended that
-your web server serve static content directly. This is B<much> more efficient.
+Generally you use the L<Static::Simple|Catalyst::Plugin::Static::Simple>
+plugin to serve assets like css and image files.  These are almost
+always located in the C</root/static> directory.  However for production
+use, it is recommended that your web server serve static content
+directly. This is B<much> more efficient.
 
 Using an entire application server process (i.e. a perl process) to serve
 static media is a massive waste of resources, especially if you're not using a
@@ -22,12 +23,13 @@ limited URIs, single use (or n-use) download URIs, etc.
 =head3 What about a cache?
 
 That's a good question - putting a cache (such as
-L<varnish|http://varnish.projects.linpro.no/>) in front of your application and
-letting it handle most of the requests for static content is a great
-solution. However, in some cases (specifically for single use URIs, when you
-want to check ACLs and/or log all accesses to a resource), it is not possible
-to perform any sort of caching in front of your application as you won't be
-able to perform the checks you need to at that layer.
+L<varnish|http://varnish.projects.linpro.no/>) in front of your
+application and letting it handle most of the requests for static
+content is a great solution. However, in some cases (specifically for
+single use URIs, when you want to check ACLs and/or log all accesses to
+a resource), it is not possible to perform any sort of caching in front
+of your application, because you won't be able to perform the checks you
+need to at that layer.
 
 =head2 How?
 
@@ -41,8 +43,8 @@ bytes in Perl just won't scale.
 =head2 Scaling
 
 The key to scaling is doing things with the minimum resources possible. Sending
-bytes across the internet is something that web servers are very good at doing
-efficiently.  For access controlled static files, scalable request handling
+bytes across the Internet is something that web servers are very good at doing
+efficiently.  For access-controlled static files, scalable request handling
 will be something like:
 
 =over
@@ -58,7 +60,7 @@ Request is sent to your Catalyst application running as FastCGI.
 =item *
 
 Application validates the request, processes internal logic (e.g. logging and
-counters) then issues a response with C<X-Accel-Redirect> or C<X-Sendfile>
+counters) then issues a response with a C<X-Accel-Redirect> or C<X-Sendfile>
 header set.
 
 =item *
@@ -78,26 +80,27 @@ is freed up and able to get on with handling the next request.
 =head3 A note on web servers
 
 This topic appears to be something that people get very excited about, but for
-the purposes of this discussion, your favourite webserver is likely to
+the purposes of this discussion, your favourite web server is likely to
 work fine. I'll go through the common choices below.
 
 =head4 Apache
 
-Apache is generally thought of as I<big>, but this is very much dependent on
- the modules that you have loaded, and what MPM (Multi-Processing Module)
- you're using. A lightweight Apache is perfectly acceptable to serve
- content. C<mod_xsendfile> provides the C<X-Sendfile> support.
+Apache is generally thought of as I<big>, but this is very much
+dependent on the modules that you have loaded, and what MPM
+(Multi-Processing Module) you're using. A lightweight Apache is
+perfectly acceptable to serve content. C<mod_xsendfile> provides the
+C<X-Sendfile> support.
 
 =head4 Lighttpd
 
-Lighttpd has simpler config compared to Apache if you're setting it up from
-scratch.  On the other hand your system administrators are also less likely
-know their way around it. Lighttpd has X-SendFile support as
-standard.
+Lighttpd has simpler configuration compared to Apache if you're setting
+it up from scratch.  On the other hand, your system administrators are
+also less likely know their way around it. Lighttpd has X-SendFile
+support as standard.
 
 =head4 nginx
 
-This server works differently (and uses a different header) to either of the
+This server works differently (and uses a different header) from either of the
 above.  L<X-Accel-Redirect> actually doesn't logically send a file from disk,
 it internally redirects the request to another path known by the web server,
 bypassing ACL checking.
@@ -109,22 +112,22 @@ backend content server.
 
 =head4 perlbal
 
-Perl based load balancer which supports an C<X-REPROXY-URL> header to allow
-you to reproxy content to a backend content server.
+This is a Perl-based load balancer which supports an C<X-REPROXY-URL>
+header to allow you to reproxy content to a backend content server.
 
 C<X-REPROXY-URL> is not covered in this article as I don't have any experience
 with it myself, and you still need a web server to serve your main application.
 
 =head2 Example
 
-Here is a worked example using C<nginx>, to reproxy a C<MogileFS> installation,
-as that's a what I'm using in production to deliver 150Tb of content at high
+Here is a working example using C<nginx>, to reproxy a C<MogileFS> installation,
+as that's what I'm using in production to deliver 150Tb of content at high
 speed :) In this case I'm using the MogileFS module for nginx (L<see below|/SEE
 ALSO>) to serve the actual content.
 
 It should be noted that C<MogileFS> isn't trivial to install or maintain, but
 if you're prepared to expend the time and expertise then it is an extremely
-cost effective solution to file storage on a large scale.
+cost-effective solution to file storage on a large scale.
 
 However, it is possible to have a B<much> simpler infrastructure to serve media
 from a directory on a local disk if the amount of content you're delivering
@@ -166,7 +169,7 @@ isn't huge.
         }
     }
 
-=head3 Example code snippet for generating timed uris.
+=head3 Example code snippet for generating timed URIs.
 
 This method assumes that it's being called on a file object which stores
 various pieces of metadata about a file.
@@ -197,11 +200,11 @@ various pieces of metadata about a file.
         return '/file/' . join('/', $hash, $time, $id, $self->filename . '.' . $self->extension);
     }
 
-=head3 Example code snippet for serving timed uris.
+=head3 Example code snippet for serving timed URIs.
 
     sub file : Local {
         # Note that we ignore the filename in the URI generated above.
-        # It is just there to make the uri look 'normal'..
+        # It is just there to make the uri look 'normal'.
         my ($self, $c, $hash, $time, $id) = @_;
 
         $id = Math::BaseCalc->new(digits => ['a' .. 'z'])->from_base($id);

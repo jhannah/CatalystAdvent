@@ -2,7 +2,7 @@
 
 =head2 A little note on code cleanliness
 
-When you started using Catalyst with C<DBIx::Class> I'm betting that you
+When you started using Catalyst with C<DBIx::Class>, I'm betting that you
 generated a resultset in your controller, then passed it to your view
 (TT for example), then iterated through it. In short you ended up doing
 loads of really complicated stuff in your TT templates. As you probably
