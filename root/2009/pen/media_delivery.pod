@@ -7,15 +7,15 @@ Why would you want to deliver static media with Catalyst at all?
 
 Generally you use the L<Static::Simple|Catalyst::Plugin::Static::Simple>
 plugin to serve assets (.css and image files) from the C</root/static> directory.
-However for production use you are recommended to configure your webserver
-to directly serve the static content as this is B<much> more efficient.
+However for production it is recommended that your web server
+directly serve static content. This is B<much> more efficient.
 
 Using an entire application server process (i.e. a perl process) to serve static media
-is a massive waste of resources, especially if you're not using a front-end proxy
-(as your web server ends up with a heavyweight perl process tied up sending bytes to
-a user rather than doing useful work).
+is a massive waste of resources, especially if you're not using a front-end proxy.
+Your web server ends up with a heavyweight perl process tied up sending bytes to
+a user rather than doing useful work.
 
-However, there are a number of cases where just unconditionally serving the static content
+However, there are a number of cases where unconditionally serving the static content
 to the user is a bad idea - think of protected .pdf documents, time limited URIs,
 single use (or n-use) download URIs, etc.
 
@@ -31,7 +31,7 @@ checks you need to at that layer.
 
 =head2 How?
 
-As a first implementation, then using the
+As a first implementation, using the
 L<serve_static_file|Catalyst::Plugin::Static::Simple/serve_static_file>
 method is a good way to start.
 
@@ -39,14 +39,14 @@ If your app is small and for internal company use only, then you quite possibly 
 to go any further...
 
 However, if you're serving large files and likely to have an appreciable number of users,
-then sending bytes in perl just won't scale.
+then sending bytes in Perl just won't scale.
 
 =head2 Scaling
 
-The key to scaling is to do things using the minimum resources possible. Sending bytes across
-the internet is something that web servers are very good at scaling to do.
+The key to scaling is doing things with the minimum resources possible. Sending bytes across
+the internet is something that web servers are very good at doing efficiently.
 
-So the planned architecture will be something like:
+For access controlled static files, scalable request handling will be something like:
 
 =over
 
@@ -70,9 +70,9 @@ specified by that header.
 
 =back
 
-So the key is this C<X-Accel-Redirect> or C<X-Sendfile> thing - these are just
-headers that you get your application to send in the response (which one you
-use depends which web server you're running).
+The key is this C<X-Accel-Redirect> or C<X-Sendfile> thing - these are just
+headers that your application sends as the response. Which one you
+use depends which web server you're running.
 
 After sending this response (headers only, no content), your application server
 is freed up and able to get on with handling the next request.
@@ -80,32 +80,32 @@ is freed up and able to get on with handling the next request.
 =head3 A note on web servers
 
 This topic appears to be something that people get very excited about, but for
-the purposes of this discussion - whichever web server you prefer is likely to
-work fine, I'll go through the common choices below.
+the purposes of this discussion, any web server you prefer is likely to
+work fine. I'll go through the common choices below.
 
 =head4 Apache
 
-Apache is generally thought of as I<big>, but this is very much to do with what
-modules you have loaded and what MPM you're using. A lightweight Apache is perfectly
-acceptable to be serving content with. C<mod_xsendfile> provides the C<X-Sendfile>
-support.
+Apache is generally thought of as I<big>, but this is very much to do
+with what modules you have loaded and what MPM (Multi-Processing
+Module) you're using. A lightweight Apache is perfectly acceptable to
+serve content. C<mod_xsendfile> provides the C<X-Sendfile> support.
 
 =head4 Lighttpd
 
-Lighttpd has simpler config to apache if you're writing a 'new' one, but your
-sysadmins are also less likely know their way around administering it.
-Has X-SendFile support as standard.
+Lighttpd has simpler config compared to Apache if you're writing a
+'new' one, but your sysadmins are also less likely know their way
+around administering it. Lighttpd has X-SendFile support as standard.
 
 =head4 nginx
 
 Works differently (and uses a different header) to either of the above.
-L<X-Accel-Redirect> actually doesn't logicially send a file from disk,
+L<X-Accel-Redirect> actually doesn't logically send a file from disk,
 it internally redirects the request to another path known by the web server,
 bypassing ACL checking.
 
 This means that the correct header to send depends on your web server
-configuration, which is a disadvantage, but as nginx can act as a proxy as well
-as a web server, this can also be more powerful, as nginx can proxy for a
+configuration, which is a disadvantage. But nginx can act as a proxy as well
+as a web server. This is a powerful advantage, as nginx can proxy for a
 backend content server.
 
 =head4 perlbal
@@ -118,7 +118,7 @@ with it myself, and you still need a web server to serve your main application.
 
 =head2 Example
 
-Here is a worked example is going to show using C<nginx>, to reproxy a C<MogileFS> installation,
+Here is a worked example using C<nginx>, to reproxy a C<MogileFS> installation,
 as that's a what I'm using in production to deliver 150Tb of content at high speed :)
 
 In this case I'm using the MogileFS module for nginx (L<see below|/SEE ALSO>) to serve
