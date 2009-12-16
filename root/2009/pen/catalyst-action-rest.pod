@@ -30,7 +30,7 @@ Then subroutines for the methods you want to handle that resource:
 
     sub book_POST { }
 
-Catalyst dispatches to the subroutine with the apropriate name. The
+Catalyst dispatches to the subroutine with the appropriate name. The
 book() subroutine will be executed each time you request the book
 resource, whatever the HTTP method is. For example, when you call GET
 on /book/, first Catalyst goes to the book subroutine,
