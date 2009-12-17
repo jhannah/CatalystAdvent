@@ -57,7 +57,7 @@ and
 
 =head2 The Turn
 
-Say some XML describing a modest CD collection needs to be parssed and stuffed
+Say some XML describing a modest CD collection needs to be parsed and stuffed
 in the above tables, while preserving relational integrity. A seasoned
 programmer will sigh, drink some coffee and write the following code:
 
@@ -206,7 +206,7 @@ before we attempt to make this work as expected - patches welcome!
 =item
 
 The L<find_or_create|DBIx::Class::ResultSet/find_or_create> use mentioned 
-above can result in some strange behaviour. Consider:
+above can result in some strange behavior. Consider:
 
  my $cd_data = {
    artist_id => $some_artist->id,
