@@ -9,7 +9,6 @@ Articles in progress:
  - DBIx::Class::InstancePerContext & DBIx::Class::Schema::RestrictWithObject   - zamolxes and dhoss? groditi?
  - DBIx::Class::Helpers - frew 
  - gitalist - zts
- - ribasushi multicreate
  - config for beginners (t0m)
 
 Articles structure
@@ -60,3 +59,4 @@ Done articles
  - DBIx::Class::ResultSet::WithMetaData - lukes (done before 11th Dec)  (dec 12) 
  - CatalystX::Dispatcher::AsGraph / Template::AsGraph / SQL::Translator::Producer::Diagram  - garu + zamolxes ( dec 14th?)
  - dbic txns - caelum, dec 15 
+ - dbic multicreate - ribasushi, dec 17
