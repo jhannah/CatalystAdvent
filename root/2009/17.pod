@@ -1,4 +1,4 @@
-=head1 Efficiently create multiple related rows in DBIx::Class
+=head1 Efficiently Create Multiple Related Rows in DBIx::Class
 
 This article will talk about something seemingly simple and boring - 
 inserting new rows into your database. If you frequent 
@@ -59,7 +59,7 @@ and
 
 Say some XML describing a modest CD collection needs to be parsed and stuffed
 in the above tables, while preserving relational integrity. A seasoned
-programmer will sigh, drink some coffee and write the following code:
+programmer will sigh, drink some coffee, and write the following code:
 
  for my $chunk (@data) {
 
@@ -91,8 +91,8 @@ This is better, but it suffers from a number of deficiencies:
 
 =item
 
-If the XML contained Tracks of individual CDs we would need a 2nd nested
-loop, which may result in another loop and so on.
+If the XML contained Tracks of individual CDs we would need a second nested
+loop, which may result in another loop, and so on.
 
 =item
 
@@ -129,7 +129,7 @@ turn such structures back to related rows. All you have to do is augment the
 hashref you normally pass to L<DBIx::Class::ResultSet/create> with a 
 structure representing the related row(s), keyed off the B<relationship 
 name>. The structure will be either another hashref (for single-type 
-relationships i.e. L<belongs_to|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ARelationship#belongs_to>, 
+relationships, i.e. L<belongs_to|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ARelationship#belongs_to>, 
 L<has_one|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ARelationship#has_one>, 
 L<might_have|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ARelationship#might_have>) or an arrayref of 
 hashrefs for L<has_many|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ARelationship#has_many> (relationship of 
@@ -152,13 +152,13 @@ supplied:
  }
 
 which was properly taken apart and inserted in the appropriate tables using 
-the appropriate foreign keys as one would expect. In addition since 
+the appropriate foreign keys as one would expect. In addition, since 
 L<create()|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3AResultSet#create> is a single call, L<DBIx::Class> 
 takes care of making it atomic by dutifully wrapping the entire operation in 
 a L<transaction|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3AManual%3A%3ACookbook#TRANSACTIONS>.
 
 The same logic applies to L<DBIx::Class::ResultSet/populate> which happily 
-accepts an arrayref of hashrefs as the creation argument. In fact you can 
+accepts an arrayref of hashrefs as the creation argument. In fact, you can 
 bootstrap a poor man's replication by simply dumping a 
 L<ResultSet|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3AResultSet> via 
 L<DBIx::Class::ResultClass::HashRefInflator>, and feeding the result straight 
@@ -177,24 +177,28 @@ relationships? For example:
  ...and so on
 
 Won't L<DBIx::Class> attempt to create the same producer several times? 
-Fortunately no: any creation attempt over a 
+Fortunately, no: any creation attempt over a 
 L<belongs_to|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ARelationship#belongs_to> relationship will be 
 executed via a L<DBIx::Class::ResultSet/find_or_create>, thus allowing 
-everything to just work. For the brave there is an L<example pushing all 
+everything to Just Work. For the brave there is an L<example pushing all 
 conceivable limits|http://cpansearch.perl.org/src/FREW/DBIx-Class-0.08115/t/multi_create/torture.t>.
 
-=head2 But there got to be *some* caveats...?
+=head2 But there must be *some* caveats...?
 
 =over
 
 =item
 
-Currently this works for L<create()|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3AResultSet#create> only. 
-While L<find_or_create()|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3AResultSet#find_or_create> will be 
-executed on L<belongs_to|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ARelationship#belongs_to> relationships, 
-the final goal is nothing more than new row creation. This means that e.g. 
-passing a nested structure to L<DBIx::Class::ResultSet/update_or_create> will 
-not do anything close to what you would expect.
+Currently this works for
+L<create()|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3AResultSet#create>
+only.  While
+L<find_or_create()|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3AResultSet#find_or_create>
+will be executed on
+L<belongs_to|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ARelationship#belongs_to>
+relationships, the final goal is nothing more than new row
+creation. This means, for example, that passing a nested structure to
+L<DBIx::Class::ResultSet/update_or_create> will not do anything close to
+what you would expect.
 
 =item
 
@@ -224,7 +228,7 @@ above can result in some strange behavior. Consider:
 
 If the I<vague genre> genre already exists, L<DBIx::Class> will B<not> 
 descend to check if the I<oddball cd> is in fact created. This has not yet 
-caused anyone grief, thus there is no motivation for the (non trivial) fix.
+caused anyone grief, thus there is no motivation for the (non-trivial) fix.
 
 =back
 
@@ -250,7 +254,7 @@ Merge create and update into the logical multi_update_or_create !
 =back
 
 If you have tuits or simply ideas - you are always welcome to hang out on 
-IRC, and start a discussion (or snatch a commit-bit and start hacking)
+IRC, and start a discussion (or snatch a commit-bit and start hacking).
 
 Happy search()ing!
 
