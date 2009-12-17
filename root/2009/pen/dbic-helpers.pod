@@ -2,23 +2,23 @@
 
 =head2 Hello!
 
-L<DBIx::Class> is one of the most popular ORM's used in Perl and Catalyst
-development; it is remarkably flexible and useful.  But with all that
-flexibility there is a price to be paid.  Often things that are concise in other
-ORM's are overly complex in L<DBIx::Class>.
+L<DBIx::Class> is one of the most popular ORMs used in Perl and
+Catalyst development; it is remarkably flexible and useful. But there
+is a price for that flexibility. Often things that are concise in
+other ORMs are complex in L<DBIx::Class>.
 
-L<DBIx::Class::Helpers> aims at solving many of those problems as succinctly
-as possible.  As our good friend mst might say, they should allow you to code
-less so you can get down to the pub earlier :-)
+L<DBIx::Class::Helpers> aim at solving the complexity problem as
+succinctly as possible. As our good friend mst might say, they allow
+you to code less so you can get down to the pub earlier :-)
 
 So without further ado, I will start with the first, most basic helper...
 
 =head2 IgnoreWantarray
 
-L<DBIx::Class::Helper::IgnoreWantarray> has the longest name of any of the
-helpers, but the most basic functionality; all it does is take away the context
-sensitivity of C<< $rs->search >>.  Why would a person ever want to do that?
-I often write code like the following:
+L<DBIx::Class::Helper::IgnoreWantarray> has the longest name, but the
+most basic functionality: it takes away the context
+sensitivity of C<< $rs->search >>.  Why would a person ever want to do
+that?  I often write code like the following:
 
  return $self->sort(
    $self->paginate(
@@ -26,71 +26,73 @@ I often write code like the following:
    )
  );
 
-Unfortunately, this often means that instead of passing another ResultSet to
-C<< $self->sort >>, I end up passing The Database instead.  This has confounded
-myself and a number of my coworkers enough that I'd rather just call
-C<< $rs->all >> if I need the actual results.
+Unfortunately, this often means that instead of passing another
+resultset to C<< $self->sort >>, I end up passing the database
+instead.  This confounds me and my coworkers enough that I'd rather
+call C<< $rs->all >> if I need the actual results.
 
 =head2 JoinTable
 
-L<DBIx::Class::Helper::JoinTable> was one of the first components in this
-suite.  It's name should make it's purpose fairly obvious, but the basic idea
-is that any time you have a many-to-many relationship you must have a table
-joining those two sets of items together.  An example could be Users and Roles.
-Users have many Roles; Roles have many Users.  The most "Correct" way to do
-this is with a join table.  I won't go into depth with that here since this is
-is really a "survey course", but L<DBIx::Class::Helper::JoinTable> should make
-creating join tables extremely easy.  And because L<DBIx::Class> allows us to
-call C<add_columns> more than once, it's a cinch to have a join table with more
-data in the join than just the relationship.
+L<DBIx::Class::Helper::JoinTable> was one of the first components in
+the Helper suite.  Its name should make its purpose obvious. Any time
+you have a many-to-many relationship, you must have a table joining
+those two sets of items.  An example could be users and roles.  Users
+have many roles; roles have many users.  The correct way to program
+this relationship is with a join
+table. L<DBIx::Class::Helper::JoinTable> makes creating these tables
+extremely easy.  And because L<DBIx::Class> allows us to call
+C<add_columns> more than once, it's a cinch to add data other than the
+relationship.
 
-An example of when one might want that would be an award given from some school.
-We have a Student table, a School table, an Award table, and a Student_Award
-table. The last of which should just have a join to Person and Award, as well as
-a date and maybe some other information about why the Person deserves this
-Award.
+An example might be an award given from a school. We have a Student
+table, a School table, an Award table, and a Student_Award table. The
+Student_Award table should join Student and Award, but might as well
+contain the date the award was conferred and maybe some information
+about why the student received the award.
 
 =head2 Random
 
-L<DBIx::Class::Helper::Random> exists to serve a fairly basic need: to pick
-random rows from a given table.  Currently it only returns a single row, but
-soon, hopefully, L<DBIx::Class> will support the necessary machinations to
-allow for returning a proper ResultSet of random rows.
+L<DBIx::Class::Helper::Random> exists to serve a fairly basic need:
+picking random rows from a given table. Currently it only returns a
+single row, but soon, hopefully, L<DBIx::Class> will support the
+necessary machinations to return a resultset of random rows.
 
 =head2 SubClass
 
-L<DBIx::Class::Helper::SubClass> is certainly the most complex of all of these
-components, but I would argue that it is the most important as well.  This
-component allows B<almost> seamless subclassing, of C<DBIx::Class>
-ResultSources.  It does things like
-C<< __PACKAGE__->table( __PACKAGE->table ) >>, which are annoying and unsightly,
-as well as more complex things, like recreating relationships based on the
-parent class.
+L<DBIx::Class::Helper::Subclass> is certainly the most complex of
+these components, but I would argue it is the most important as
+well. This component allows B<almost> seamless subclassing of
+C<DBIx::Class> ResultSources.  It does things like C<<
+__PACKAGE__->table( __PACKAGE__->table ) >>, which are annoying and
+unsightly, as well as more complex things, like recreating
+relationships based on the parent class.
 
-The reasoning behind L<DBIx::Class::Helper::SubClass> is that where I work I'd
-like to define a set of tables for Authorization code (Users, Roles,
-Permissions, JoinTables between those, and more) and not have to copy paste the
-definitions to all of our disparate projects.  This helper solves that problem
-quite nicely.  Another reason I could see using this module is when you want to
-define a table without certain columns (TEXT columns come to mind.)  Instead
-of redefining the whole table again with the TEXT columns in another place, you
-might use this helper to subclass the one without the TEXT columns and add TEXT
-columns to the child class.
+At work I'd like to define a set of tables for authorization - users,
+roles, permissions, and join tables between them. I do not want to
+copy and paste this code to our many disparate
+projects. L<DBIx::Class::Helper::SubClass> solves the problem nicely. 
+
+Another reason to use this helper is to define a table without certain
+columns (TEXT columns come to mind.)  Instead of redefining the table
+with the TEXT columns in another place, you might use this helper to
+subclass the one without the TEXT columns and add TEXT columns to the
+child class.
+
 
 =head2 VirtualView
 
-L<DBIx::Class::Helper::VirtualView> is probably the most conceptually complex
-of these components.  The purpose is mostly to clean up the returned data from
-a ResultSet.  I won't go into all the gory details here.  For an idea of how it
-works see the POD and tests.
+L<DBIx::Class::Helper::VirtualView> is the most conceptually complex
+of the Helper components. Its purpose is mostly to clean up data
+returned from a resultset. I won't go into all the gory details here.
+For an idea of how it works see the POD and tests.
 
 =head2 Extensibility
 
-In writing these as much as possible I've tried to make parts overrideable in
-the spirit of L<DBIx::Class>.  So for example, if you don't like the way that
-JoinTables have an underscore between table names, you could subclass
+In writing these components I've tried to make parts override-able in
+the spirit of L<DBIx::Class>. For example, if you do not like that
+join tables have an underscore between table names, you could subclass
 L<DBIx::Class::Helper::JoinTable>, override C<set_table>, and then use your
-subclassed module instead.
+subclassed module to name your tables as you please.
 
 =head1 Author
 
