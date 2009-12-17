@@ -2,9 +2,9 @@
 
 This article will talk about something seemingly simple and boring - 
 inserting new rows into your database. If you frequent 
-C<irc.perl.org#dbix-class> you probably have heard of the misterious 
-MultiCreate. Yet are not entirely sure if it can bring you fame and money. 
-Are you watching closely?
+C<irc.perl.org#dbix-class> you probably have heard of the mysterious 
+MultiCreate, yet you are not entirely sure if it can bring you fame and money.
+Watch closely to find out.
 
 =head2 The Pledge
 
@@ -57,9 +57,9 @@ and
 
 =head2 The Turn
 
-Say some XML describing a modest CD collection needs parsing and stuffing 
-in the above tables, while preserving relational integrity. The seasoned 
-programmer will sigh, drink some coffee and do:
+Say some XML describing a modest CD collection needs to be parssed and stuffed
+in the above tables, while preserving relational integrity. A seasoned
+programmer will sigh, drink some coffee and write the following code:
 
  for my $chunk (@data) {
 
@@ -75,8 +75,8 @@ programmer will sigh, drink some coffee and do:
    }
  }
 
-After the coffee kicks in, perhaps the programmer will remember that he 
-already has declared relationships between Artist and CD. So he will reduce 
+After the coffee kicks in, perhaps the programmer will remember that he
+already has declared relationships between Artist and CD. So he will reduce
 the second inner loop to:
 
  ...
@@ -91,13 +91,13 @@ This is better, but it suffers from a number of deficiencies:
 
 =item
 
-If the XML contained Tracks of individual CDs we would need a 2nd nested 
+If the XML contained Tracks of individual CDs we would need a 2nd nested
 loop, which may result in another loop and so on.
 
 =item
 
-The entire operation probably needs to be wrapped in a transaction - that's 
-yet more boilerplate to cargocult
+The entire operation probably needs to be wrapped in a transaction - that's
+yet more boilerplate to cargo cult from code you've already written elsewhere.
 
 =item
 
@@ -105,12 +105,13 @@ B<It just doesn't feel like DRY>
 
 =back
 
-So the depressed developer sets out to write even more boring dull code, 
-but...
+So the depressed developer sets out to write even more boring dull code.
 
-=head2 The Prestige
 
-... the enlightened coworker arrives, looks at the code and changes it to:
+
+=head2 Meanwhile ...
+
+An enlightened coworker arrives, looks at the code and changes it to:
 
  for my $chunk (@data) {
    my $artist_with_cds = $schema->resultset ('Artist')->create ($chunk);
@@ -160,14 +161,14 @@ a L<transaction|DBIx::Class::Manual::Cookbook/TRANSACTIONS>.
 
 The same logic applies to L<DBIx::Class::ResultSet/populate> which happily 
 accepts an arrayref of hashrefs as the creation argument. In fact you can 
-bootstrap some poor-mans replication by simply dumping a 
+bootstrap a poor man's replication by simply dumping a 
 L<ResultSet|DBIx::Class::ResultSet> via 
 L<DBIx::Class::ResultClass::HashRefInflator>, and feeding the result straight 
-back to L<create()|DBIx::Class::ResultSet/create>, but on a 
+back to L<create()|DBIx::Class::ResultSet/create>, using a 
 L<ResultSet|DBIx::Class::ResultSet> derived from the target 
 L<Schema|DBIx::Class::Schema/resultset>.
 
-=head2 But does it blen... scale?
+=head2 But does it scale?
 
 The example above is rather simple, but what if we have a complex chain of 
 relationships? For example:
@@ -182,8 +183,7 @@ Fortunately no: any creation attempt over a
 L<belongs_to|DBIx::Class::Relationship/belongs_to> relationship will be 
 executed via a L<DBIx::Class::ResultSet/find_or_create>, thus allowing 
 everything to just work. For the brave there is an L<example pushing all 
-conceivable 
-limits|http://cpansearch.perl.org/src/FREW/DBIx-Class-0.08115/t/multi_create/torture.t>.
+conceivable limits|http://cpansearch.perl.org/src/FREW/DBIx-Class-0.08115/t/multi_create/torture.t>.
 
 =head2 But there got to be *some* caveats...?
 
@@ -208,7 +208,7 @@ before we attempt to make this work as expected - patches welcome!
 =item
 
 The L<find_or_create|DBIx::Class::ResultSet/find_or_create> use mentioned 
-above can result in some oddness. Consider:
+above can result in some strange behaviour. Consider:
 
  my $cd_data = {
    artist_id => $some_artist->id,
@@ -223,7 +223,7 @@ above can result in some oddness. Consider:
      ],
    }
  };
- 
+
 If the I<vague genre> genre already exists, L<DBIx::Class> will B<not> 
 descend to check if the I<oddball cd> is in fact created. This has not yet 
 caused anyone grief, thus there is no motivation for the (non trivial) fix.
@@ -241,7 +241,7 @@ expand the existing codebase.
 =item
 
 Port L<DBIx::Class::ResultSet::RecursiveUpdate> to leverage the (substantial) 
-infrastructure facilitating MultiCreate. While some conceptual differences 
+infrastructure behind MultiCreate. While some conceptual differences 
 exist between both modules, they can certainly be resolved during the 
 test-writing phase.
 
