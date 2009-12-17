@@ -4,7 +4,7 @@ This article will talk about something seemingly simple and boring -
 inserting new rows into your database. If you frequent 
 C<irc.perl.org#dbix-class> you probably have heard of the mysterious 
 MultiCreate, yet you are not entirely sure if it can bring you fame and money.
-Watch closely to find out.
+Are you watching closely?
 
 =head2 The Pledge
 
@@ -107,9 +107,7 @@ B<It just doesn't feel like DRY>
 
 So the depressed developer sets out to write even more boring dull code.
 
-
-
-=head2 Meanwhile ...
+=head2 The Prestige
 
 An enlightened coworker arrives, looks at the code and changes it to:
 
@@ -123,7 +121,7 @@ just:
 
  $schema->resultset ('Artist')->populate (\@data);
 
-=head2 The Trick Revealed
+=head1 The Trick Revealed
 
 Just like being able to L<turn ResultSets into nested 
 structures|DBIx::Class::ResultClass::HashRefInflator>, L<DBIx::Class> can 
