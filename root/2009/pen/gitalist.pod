@@ -9,12 +9,14 @@ insisting that we do the right thing.
 Good advice, and an oft-heard refrain, is to avoid creating fat controllers.
 What makes a controller fat?  The inclusion of code concerned with doing
 the work your application is built to do.  If you were building an app to
-translate text from one languate to another, the code performing the 
-translation logic should be neatly wrapped up in a model.
+translate text from one language to another, the code performing the 
+translation logic should be neatly wrapped up in a model, not stuck in
+the controller.
 
 This approach improves your life in a variety of ways.  The resulting code
 is easier to understand, easier to debug, and easier to test.  Taken one
-step further, it also makes it trivial to re-use.
+step further, it also makes it trivial to re-use. Let's see how this can
+work by looking at the example of Gitalist.
 
 =head2 Gitalist
 
@@ -54,7 +56,7 @@ A simplified version of the Repo class looks like this:
   }
 
 While the actual code is more complex, there's no trace of Catalyst in
-sight - exactly as it should be!  This class can readily be used in other
+sight - exactly as it should be!  This class can readily be used in 
 other applications, and is very easy to test.
 
 =head2 The Catalyst Model
@@ -91,7 +93,7 @@ requests - in that case, L<Catalyst::Model::Adaptor> is what you'll need.
 
 With the model in place, the controller is straightforward.  If we've done
 everything right, we shouldn't even notice that our model exists outside
-Catalyst.  Sure enough, something like the below will do what you expect.
+Catalyst.  Sure enough, something like the below will do what you expect:
 
   sub project : Chained('base') CaptureArgs(1) {
     my($self, $c, $project_name) = @_;
@@ -113,6 +115,3 @@ L<Gitalist::Model::GitRepos>
 =head1 AUTHOR
 
 Zac Stevens <zts@cryptocracy.com>
-
-
-
