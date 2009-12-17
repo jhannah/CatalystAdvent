@@ -1,0 +1,261 @@
+=head1 Efficiently create multiple related rows in DBIx::Class
+
+This article will talk about something seemingly simple and boring - 
+inserting new rows into your database. If you frequent 
+C<irc.perl.org#dbix-class> you probably have heard of the misterious 
+MultiCreate. Yet are not entirely sure if it can bring you fame and money. 
+Are you watching closely?
+
+=head2 The Pledge
+
+Let's examine the dreaded Artist/CDs example:
+
+ package MySchema::Artist;
+ 
+ use base 'DBIx::Class::Core';
+
+ __PACKAGE__->table ('artist');
+
+ __PACKAGE__->add_columns (
+   id => {
+     data_type => 'int',
+     is_auto_increment => 1,
+   },
+   name => {
+     data_type => 'varchar',
+   },
+ );
+
+ __PACKAGE__->set_primary_key ('id');
+
+ __PACKAGE__->has_many (cds => 'MySchema::CD', 'artist_id');
+
+and
+
+ package MySchema::CD;
+  
+ use base 'DBIx::Class::Core';
+ 
+ __PACKAGE__->table ('cd');
+
+ __PACKAGE__->add_columns (   
+   id => {
+     data_type => 'int',
+     is_auto_increment => 1,
+   },
+   title => {
+     data_type => 'varchar',
+   },
+   artist_id => {
+     data_type => 'int',
+   },
+ );
+
+ __PACKAGE__->set_primary_key ('id');
+
+ __PACKAGE__->belongs_to (artist => 'MySchema::Artist', 'artist_id');
+
+=head2 The Turn
+
+Say some XML describing a modest CD collection needs parsing and stuffing 
+in the above tables, while preserving relational integrity. The seasoned 
+programmer will sigh, drink some coffee and do:
+
+ for my $chunk (@data) {
+
+   my $artist = $schema->resultset ('Artist')->create ({
+     name => $chunk->artist_name
+   });
+
+   for my $cd_title (@{$chunk->{cds}}) {
+     $schema->resultset ('CD')->create ({
+       title => $cd_title,
+       artist_id => $artist->id,
+     });
+   }
+ }
+
+After the coffee kicks in, perhaps the programmer will remember that he 
+already has declared relationships between Artist and CD. So he will reduce 
+the second inner loop to:
+
+ ...
+   for my $cd_title (@{$chunk->{cds}}) {
+     $artist->create_related ('cds', { title => $cd_title });
+   }
+ ...
+
+This is better, but it suffers from a number of deficiencies:
+
+=over
+
+=item
+
+If the XML contained Tracks of individual CDs we would need a 2nd nested 
+loop, which may result in another loop and so on.
+
+=item
+
+The entire operation probably needs to be wrapped in a transaction - that's 
+yet more boilerplate to cargocult
+
+=item
+
+B<It just doesn't feel like DRY>
+
+=back
+
+So the depressed developer sets out to write even more boring dull code, 
+but...
+
+=head2 The Prestige
+
+... the enlightened coworker arrives, looks at the code and changes it to:
+
+ for my $chunk (@data) {
+   my $artist_with_cds = $schema->resultset ('Artist')->create ($chunk);
+ }
+
+Then looks closer at @data, makes sure it doesn't contain anything 
+L<DBIx::Class> wouldn't know how to handle and changes the entire loop to 
+just:
+
+ $schema->resultset ('Artist')->populate (\@data);
+
+=head2 The Trick Revealed
+
+Just like being able to L<turn ResultSets into nested 
+structures|DBIx::Class::ResultClass::HashRefInflator>, L<DBIx::Class> can 
+turn such structures back to related rows. All you have to do is augment the 
+hashref you normally pass to L<DBIx::Class::ResultSet/create> with a 
+structure representing the related row(s), keyed off the B<relationship 
+name>. The structure will be either another hashref (for single-type 
+relationships i.e. L<belongs_to|DBIx::Class::Relationship/belongs_to>, 
+L<has_one|DBIx::Class::Relationship/has_one>, 
+L<might_have|DBIx::Class::Relationship/might_have>) or an arrayref of 
+hashrefs for L<has_many|DBIx::Class::Relationship/has_many> (relationship of 
+type multi).
+
+When the enlightened coworker did C<< ->create ($chunk) >> he effectively 
+supplied:
+
+ {
+   name => 'somename',
+   cds => [
+     {
+       title => 'cd1',
+     },     
+     {
+       title => 'cd2',
+     },
+     ...
+   ],
+ }
+
+which was properly taken apart and inserted in the appropriate tables using 
+the appropriate foreign keys as one would expect. In addition since 
+L<create()|DBIx::Class::ResultSet/create> is a single call, L<DBIx::Class> 
+takes care of making it atomic by dutifully wrapping the entire operation in 
+a L<transaction|DBIx::Class::Manual::Cookbook/TRANSACTIONS>.
+
+The same logic applies to L<DBIx::Class::ResultSet/populate> which happily 
+accepts an arrayref of hashrefs as the creation argument. In fact you can 
+bootstrap some poor-mans replication by simply dumping a 
+L<ResultSet|DBIx::Class::ResultSet> via 
+L<DBIx::Class::ResultClass::HashRefInflator>, and feeding the result straight 
+back to L<create()|DBIx::Class::ResultSet/create>, but on a 
+L<ResultSet|DBIx::Class::ResultSet> derived from the target 
+L<Schema|DBIx::Class::Schema/resultset>.
+
+=head2 But does it blen... scale?
+
+The example above is rather simple, but what if we have a complex chain of 
+relationships? For example:
+
+ Artist->has_many ('cds', ...)
+ CD->has_many ('cd2producer', ...)
+ CD2Producer->belongs_to ('producer', ...)
+ ...and so on
+
+Won't L<DBIx::Class> attempt to create the same producer several times? 
+Fortunately no: any creation attempt over a 
+L<belongs_to|DBIx::Class::Relationship/belongs_to> relationship will be 
+executed via a L<DBIx::Class::ResultSet/find_or_create>, thus allowing 
+everything to just work. For the brave there is an L<example pushing all 
+conceivable 
+limits|http://cpansearch.perl.org/src/FREW/DBIx-Class-0.08115/t/multi_create/torture.t>.
+
+=head2 But there got to be *some* caveats...?
+
+=over
+
+=item
+
+Currently this works for L<create()|DBIx::Class::ResultSet/create> only. 
+While L<find_or_create|DBIx::Class::ResultSet/find_or_create> will be 
+executed on L<belongs_to|DBIx::Class::Relationship/belongs_to> relationships, 
+the final goal is nothing more than new row creation. This means that e.g. 
+passing a nested structure to L<DBIx::Class::ResultSet/update_or_create> will 
+not do anything close to what you would expect.
+
+=item
+
+The returned object does not always have the proper related objects inserted 
+at the expected slots (similar to the effect of 
+L<prefetch|DBIx::Class::ResultSet/prefetch>). We need a good amount of tests 
+before we attempt to make this work as expected - patches welcome!
+
+=item
+
+The L<find_or_create|DBIx::Class::ResultSet/find_or_create> use mentioned 
+above can result in some oddness. Consider:
+
+ my $cd_data = {
+   artist_id => $some_artist->id,
+   title => 'my cd',
+   genre => {
+     name => 'vague genre',
+     cds => [
+       {
+         title => 'oddball cd',
+         artist_id => $some_other_artist->id,
+       },
+     ],
+   }
+ };
+ 
+If the I<vague genre> genre already exists, L<DBIx::Class> will B<not> 
+descend to check if the I<oddball cd> is in fact created. This has not yet 
+caused anyone grief, thus there is no motivation for the (non trivial) fix.
+
+=back
+
+=head1 What The Future Holds
+
+While the new row creation is mostly done and over with (in fact it delayed 
+the release of the 0.081xx series by several months), there are more ways to 
+expand the existing codebase.
+
+=over
+
+=item
+
+Port L<DBIx::Class::ResultSet::RecursiveUpdate> to leverage the (substantial) 
+infrastructure facilitating MultiCreate. While some conceptual differences 
+exist between both modules, they can certainly be resolved during the 
+test-writing phase.
+
+=item
+
+Merge create and update into the logical multi_update_or_create !
+
+=back
+
+If you have tuits or simply ideas - you are always welcome to hang out on 
+IRC, and start a discussion (or snatch a commit-bit and start hacking)
+
+Happy search()ing!
+
+=head1 Author
+
+Peter Rabbitson <ribasushi@cpan.org>
