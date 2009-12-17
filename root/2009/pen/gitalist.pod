@@ -26,14 +26,15 @@ we knew that we'd want to be able to write other, non-web tools that had
 access to the same functionality.
 
 With this in mind, we needed our Catalyst model (C<Gitalist::Model::GitRepos>)
-to serve as a thin layer of glue connecting our real model (C<Gitalist::Git>)
+to serve as a thin layer of glue connecting our plain model (C<Gitalist::Git>)
 into the application.  Fortunately, this is incredibly easy.
 
-=head2 The Real Model
+=head2 The Plain Model
 
-First, we implement the real model.  In Gitalist, we needed to represent 
+First, we implement the plain model.  In Gitalist, we needed to represent 
 both an individual git repository (a Project), and the directory containing
-a collection of Projects (a Repo).
+a collection of Projects (a Repo; though we don't like this class name, and
+it changes in the next release).
 
 A simplified version of the Repo class looks like this:
 
@@ -61,9 +62,9 @@ other applications, and is very easy to test.
 
 =head2 The Catalyst Model
 
-If all our actual logic is contained in the real model, it follows that our
-Catalyst model will contain none.  Sure enough, we do the minimum amount
-of work required to create an instance of C<Gitalist::Git::Repo>. 
+If all our actual logic is contained in the plain model, it follows that
+our Catalyst model will contain none.  Sure enough, we do the minimum 
+amount of work required to create an instance of C<Gitalist::Git::Repo>. 
   
   package Gitalist::Model::GitRepos;
   use Moose;
@@ -93,7 +94,7 @@ requests - in that case, L<Catalyst::Model::Adaptor> is what you'll need.
 
 With the model in place, the controller is straightforward.  If we've done
 everything right, we shouldn't even notice that our model exists outside
-Catalyst.  Sure enough, something like the below will do what you expect:
+Catalyst.  An action like this will do just what you expect:
 
   sub project : Chained('base') CaptureArgs(1) {
     my($self, $c, $project_name) = @_;
@@ -104,13 +105,13 @@ Catalyst.  Sure enough, something like the below will do what you expect:
     $c->stash( Project => $project );
   }
 
-=head2 Further reading
+=head2 Further Reading
 
-L<Catalyst::Component::InstancePerContext>
-L<Catalyst::Model::Factory::PerRequest>
-L<Catalyst::Model::Adapter>
+Both L<Catalyst::Component::InstancePerContext> and
+L<Catalyst::Model::Factory::PerRequest> can be used to build a new
+model instance for each request.
 
-L<Gitalist::Model::GitRepos>
+For a persistent instance, instead look at L<Catalyst::Model::Adapter>.
 
 =head1 AUTHOR
 
