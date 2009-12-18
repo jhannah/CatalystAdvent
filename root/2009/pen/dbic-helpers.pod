@@ -4,7 +4,7 @@
 
 L<DBIx::Class> is one of the most popular ORMs used in Perl and
 Catalyst development; it is remarkably flexible and useful. But there
-is a price for that flexibility. Often things that are concise in
+is a price for that flexibility: often things that are concise in
 other ORMs are complex in L<DBIx::Class>.
 
 L<DBIx::Class::Helpers> aim at solving the complexity problem as
@@ -16,9 +16,10 @@ So without further ado, I will start with the first, most basic helper...
 =head2 IgnoreWantarray
 
 L<DBIx::Class::Helper::IgnoreWantarray> has the longest name, but the
-most basic functionality: it takes away the context
-sensitivity of C<< $rs->search >>.  Why would a person ever want to do
-that?  I often write code like the following:
+most basic functionality: it takes away the context sensitivity of C<<
+$rs->search >>.  Why would a person ever want to do that? Well, in array
+context, C<< $rs->search >> will return an array of your database. You
+might not want that. I often write code like the following:
 
  return $self->sort(
    $self->paginate(
@@ -29,7 +30,8 @@ that?  I often write code like the following:
 Unfortunately, this often means that instead of passing another
 resultset to C<< $self->sort >>, I end up passing the database
 instead.  This confounds me and my coworkers enough that I'd rather
-call C<< $rs->all >> if I need the actual results.
+call C<< $rs->all >> if I need the actual results. C<IgnoreWantarray>
+makes search always return a resultset.
 
 =head2 JoinTable
 
@@ -73,11 +75,10 @@ copy and paste this code to our many disparate
 projects. L<DBIx::Class::Helper::SubClass> solves the problem nicely. 
 
 Another reason to use this helper is to define a table without certain
-columns (TEXT columns come to mind.)  Instead of redefining the table
-with the TEXT columns in another place, you might use this helper to
-subclass the one without the TEXT columns and add TEXT columns to the
+columns (TEXT columns come to mind). Instead of redefining the table
+with the text columns in another place, you might use this helper to
+subclass the one without the text columns and add text columns to the
 child class.
-
 
 =head2 VirtualView
 
@@ -88,7 +89,7 @@ For an idea of how it works see the POD and tests.
 
 =head2 Extensibility
 
-In writing these components I've tried to make parts override-able in
+In writing these components I've tried to make parts overrideable in
 the spirit of L<DBIx::Class>. For example, if you do not like that
 join tables have an underscore between table names, you could subclass
 L<DBIx::Class::Helper::JoinTable>, override C<set_table>, and then use your
