@@ -111,7 +111,7 @@ Both L<Catalyst::Component::InstancePerContext> and
 L<Catalyst::Model::Factory::PerRequest> can be used to build a new
 model instance for each request.
 
-For a persistent instance, instead look at L<Catalyst::Model::Adapter>.
+For a persistent instance, instead look at L<Catalyst::Model::Adaptor>.
 
 =head1 AUTHOR
 
