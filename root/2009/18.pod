@@ -85,7 +85,7 @@ amount of work required to create an instance of C<Gitalist::Git::Repo>.
      Gitalist::Git::Repo->new(repo_dir => $self->repo_dir);
   }
 
-We used L<Catalist::Component::InstancePerContext> which will run
+We used L<Catalyst::Component::InstancePerContext> which will run
 C<build_per_context_instance> for each new request.  This suits Gitalist,
 but for other uses it may be preferable for your model to persist between
 requests - in that case, L<Catalyst::Model::Adaptor> is what you'll need.
