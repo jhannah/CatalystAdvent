@@ -92,6 +92,12 @@ sub day : Chained('get_year') PathPart('') Args(1) {
     $c->detach( '/calendar/index' ) unless $day =~ /^\d{1,2}$/;
 
     my $year = $c->stash->{year};
+
+    # Don't show articles before the appropriate day, even if they're ready
+    if (!$c->debug && $year == $c->stash->{now}->year) {
+        $c->detach( 'year', [$year] ) unless ($day <= $c->stash->{now}->day);
+    }
+
     $c->detach( 'year', [$year] )
         unless ( -e ( my $file = $c->path_to( 'root', $year, "$day.pod" ) ) );
 
