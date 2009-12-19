@@ -1,0 +1,132 @@
+=head1 An HTTP API in 5 minutes.
+
+Often when developing an interactive application, you find the need to provide a programmatic way for
+other applications / tools to work with your application.  This usually takes the form of an XML
+api of some sort.  There are a number of XML based API systems available, such as XML-RPC, SOAP, etc.
+Often, though, those are overkill for what you need and add unneeded complexity.  I've developed
+a quick and easy way to handle API type requests that works very well and is extremely easy to 
+add to your application.  I use this method when I'm looking for a quick way to access application
+functionality from AJAX or from another application (such as a client's PHP app) because of 
+how simple it is to adding and use.  
+
+I will start by presenting the entire API controller.
+ 
+ package MyApp::Controller::Api;
+ use Moose;
+ use namespace::autoclean;
+ BEGIN { extends 'Catalyst::Controller' }
+ use JSON::XS;
+ use XML::Simple;
+
+ sub api : Chained('/') PathPart('api') CaptureArgs(0) {
+     my ( $self, $c ) = @_;
+    
+     if (!exists($c->stash->{'api_params'})) {
+         $c->stash->{'api_params'} = $c->req->params;
+         if (!exists($c->stash->{'api_params'}{'output'})) {
+             $c->stash->{'api_params'}{'output'} = 'json';
+         }
+     } elsif (!exists($c->stash->{'api_params'}{'output'})) {
+         $c->stash->{'api_params'}{'output'} = 'json';
+     }
+     ## This sets the default response as a failure.  
+     $c->stash->{apiresponse} = { 'processed' => 0, 'status' => 'failed' };
+     
+     ## this part is optional - if you don't need any kind of authentication, you
+     ## can disable this. 
+     if (!$c->stash->{'api_params'}{'authkey'} || 
+          $c->stash->{'api_params'}{'authkey'} ne $c->config->{'notifications'}{'authkey'}) {
+              
+         # we fail authentication, so we dump them out to the auth-failed action
+         $c->stash->{'apiresponse'} = { 'processed' => 0, 'error' => { 'general' => 'service not available' }};
+         $c->detach();
+     }
+ }
+ 
+ sub gettime : Chained('api') PathPart('gettime') Args(0){
+    my ($self, $c) = @_;
+    
+    # do something interesting.
+    my $server_time = scalar localtime;
+    
+    $c->stash->{apiresponse} = { 
+                                 'processed' => 1, 
+                                 'status' => 'OK', 
+                                 'server_time' => $server_time,
+                               };
+                               
+ }
+ 
+ sub end : Private {
+     my ( $self, $c ) = @_;
+     
+     if ($c->stash->{'api_params'}{'output'} eq 'xml') 
+     {
+          my $xml = XML::Simple->new( NoAttr => 1, RootName => 'apiresponse', XMLDecl => 1);
+          $c->response->body($xml->XMLout($c->stash->{'apiresponse'}));
+     } else {
+         my $jsonobject = JSON::XS->new->utf8->pretty(1);
+         my $responsetext = $jsonobject->encode($c->stash->{'apiresponse'});
+         $c->response->body($responsetext);
+     }
+ }
+
+=head2 How it works.
+
+The way this method works, you simply create a new controller and add it to
+your application. The API controller does most of the work via two actions.
+First, the 'api' action provides for some basic setup. All your API calls
+chain off of this. The C<api> action does some basic set up and if appropriate
+does authentication checking.
+
+The authentication check here simply compares a config value, C<authkey>, to
+the authkey provided as a query parameter. You can make this check as complex
+or as simple as you want perhaps involving normal Catalyst authentications, or
+remove it entirely, depending on your usage.
+
+The second action is C<end>. The C<end> action simply examines the 'output'
+parameter (if passed) and decides what format to respond in. The default is to
+respond with a JSON object, but if output is set to 'xml' it will respond with
+a simple XML structure.
+
+=head2 How to use it
+
+In the example above, I added a C<gettime> action chained off of the C<api>
+action. This is a simple routine to tell the calling application the time on
+the server. For the most part, it's self explanatory. The key here is that the
+sub should create a hash in the stash C<apiresponse> which will be returned to
+the calling application.
+
+This information in the C<< $c->stash->{'apiresponse'> >> is returned directly
+to the calling application in whatever format (JSON or XML) that was selected.
+I generally provide two keys inside the C<apiresponse>. The first is
+C<processed> which is simply a true/false which tells whether the requested
+method completed processing normally. The second key is C<status> which I use
+as a success/failed indicator. There is no requirement that you use either of
+these, but I find that they help in both debugging during development and
+tracking down problems in production.
+
+One other addition I make is that within the API I work with C<<
+$c->stash->{'api_params'} >> instead of C<< $c->request->params >>. In the
+root of the chain, C< sub api >, I copy C<< $c->request->params >> to C<<
+$c->stash->{'api_params'} >> if it isn't already set. I do this because it
+makes it exceedingly easy to work with the API calls from within your own
+application. Normally, when you use C<< $c->forward >> the query parameters
+from your original request are present. Using C<< $c->stash->{'api_params'} >>
+means you can call your api internally with whatever arguments you want,
+regardless of what was passed to the original query.
+
+=head2 Don't take my word for it.
+
+This is about the simplest way to handle API actions in a Catalyst application.
+Following the simple conventions I discussed and using the actions shown at the
+beginning of this article will give you a solid and simple to use API system in your 
+application.  
+
+You don't have to take my word for it.  Take the code above and add it to your 
+application, try it out, see what it does.  
+
+
+=head1 AUTHOR
+
+Jay Kuri <jayk@cpan.org>
