@@ -7,7 +7,7 @@ Often, though, those are overkill for what you need and add unneeded complexity.
 a quick and easy way to handle API type requests that works very well and is extremely easy to 
 add to your application.  I use this method when I'm looking for a quick way to access application
 functionality from AJAX or from another application (such as a client's PHP app) because of 
-how simple it is to adding and use.  
+how simple it is to add and use.  
 
 I will start by presenting the entire API controller.
  
@@ -81,7 +81,7 @@ does authentication checking.
 
 The authentication check here simply compares a config value, C<authkey>, to
 the authkey provided as a query parameter. You can make this check as complex
-or as simple as you want perhaps involving normal Catalyst authentications, or
+or as simple as you want perhaps involving normal Catalyst authentication, or
 remove it entirely, depending on your usage.
 
 The second action is C<end>. The C<end> action simply examines the 'output'
@@ -94,8 +94,8 @@ a simple XML structure.
 In the example above, I added a C<gettime> action chained off of the C<api>
 action. This is a simple routine to tell the calling application the time on
 the server. For the most part, it's self explanatory. The key here is that the
-sub should create a hash in the stash C<apiresponse> which will be returned to
-the calling application.
+sub should create a hash in C<< $c->stash->{'apiresponse'} >> which will be 
+returned to the calling application.
 
 This information in the C<< $c->stash->{'apiresponse'> >> is returned directly
 to the calling application in whatever format (JSON or XML) that was selected.
@@ -106,10 +106,10 @@ as a success/failed indicator. There is no requirement that you use either of
 these, but I find that they help in both debugging during development and
 tracking down problems in production.
 
-One other addition I make is that within the API I work with C<<
-$c->stash->{'api_params'} >> instead of C<< $c->request->params >>. In the
-root of the chain, C< sub api >, I copy C<< $c->request->params >> to C<<
-$c->stash->{'api_params'} >> if it isn't already set. I do this because it
+One other addition I make is that within the API I work with 
+C<< $c->stash->{'api_params'} >> instead of C<< $c->request->params >>. In the
+root of the chain, C< sub api >, I copy C<< $c->request->params >> to 
+C<< $c->stash->{'api_params'} >> if it isn't already set. I do this because it
 makes it exceedingly easy to work with the API calls from within your own
 application. Normally, when you use C<< $c->forward >> the query parameters
 from your original request are present. Using C<< $c->stash->{'api_params'} >>
