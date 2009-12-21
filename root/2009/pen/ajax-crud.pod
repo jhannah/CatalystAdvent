@@ -3,7 +3,7 @@
 In this example, we will develop an AJAX CRUD (Create Read Update Delete)
 extension to the Catalyst tutorial.
 
-AJAX stands for Asynchronous Javascript And XML, although these days most
+AJAX stands for Asynchronous JavaScript And XML, although these days most
 people use JSON instead of XML. The idea is to make something that's closer to
 a GUI app rather than a traditional web page.
 
@@ -192,7 +192,7 @@ The Add, Edit and Delete buttons we put at the top of the grid don't work yet.
 
 Let's implement the Delete button.
 
-Expand the C<delete_book> javascript function stub to:
+Expand the C<delete_book> JavaScript function stub to:
 
     function delete_book(button, grid) {
         var total_count = $('.trSelected', grid).length;
@@ -252,7 +252,7 @@ popup form.
 
 A jQuery UI plugin for a popup would probably be nicer for this purpose.
 
-The javascript for the Add and Edit buttons is fairly simple:
+The JavaScript for the Add and Edit buttons is fairly simple:
 
     function add_book(button, grid) {
         var form_div = $('#book_form');
@@ -343,10 +343,25 @@ Now try out the Add and Edit buttons, and you should see the new entries or
 your changes in the grid when you click the submit button. Changing the author
 from Edit doesn't work (tutorial bug...)
 
-=head2 Catalyst and jQuery makes AJAX easy
+=head2 Catalyst and AJAX
 
-As you can see, the Catalyst framework is well suited for making AJAX
-interfaces, and jQuery is awesome.
+The Catalyst framework with components such as L<Catalyst::Controller::REST> or
+L<Catalyst::View::JSON> is well suited for making AJAX interfaces, as I hope
+we've demonstrated.
+
+From the Catalyst side, it's just a matter of serving and receiving JSON (or
+XML) data or serving HTML fragments, preferrably from a well designed URI API
+based on REST.
+
+Here we used tools for the jQuery JavaScript framework, but other frameworks
+work just as well, such as ExtJS, Dojo, YUI, Mootools, etc.. You can also use
+the jQuery selector functionality in combination with these other frameworks,
+with C<jQuery.noConflict> mode if they override C<$>.
+
+There are also higher-level tools such as L<Catalyst::Controller::DBIC::API> to
+automate accessing your L<DBIx::Class> schema from JavaScript, and even
+L<Catalyst::Plugin::AutoCRUD> which auto-generates a complete AJAX CRUD
+interface to your L<DBIx::Class> schema using ExtJS.
 
 =head1 AUTHOR
 
