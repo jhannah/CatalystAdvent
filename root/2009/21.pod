@@ -1,13 +1,16 @@
-=head1 An HTTP API in 5 minutes.
+=head1 An HTTP API in 5 minutes
 
-Often when developing an interactive application, you find the need to provide a programmatic way for
-other applications / tools to work with your application.  This usually takes the form of an XML
-api of some sort.  There are a number of XML based API systems available, such as XML-RPC, SOAP, etc.
-Often, though, those are overkill for what you need and add unneeded complexity.  I've developed
-a quick and easy way to handle API type requests that works very well and is extremely easy to 
-add to your application.  I use this method when I'm looking for a quick way to access application
-functionality from AJAX or from another application (such as a client's PHP app) because of 
-how simple it is to add and use.  
+Often when developing an interactive application, you find the need to
+provide a programmatic way for other applications or tools to work with
+your application. This usually takes the form of an XML API of some
+sort.  There are a number of XML-based API systems available, such as
+XML-RPC, SOAP, etc.  Often, though, those are overkill for what you need
+and add unneeded complexity.  I've developed a quick and easy way to
+handle API-type requests that works very well, and is extremely easy to
+add to your application.  I use this method when I'm looking for a quick
+way to access application functionality from AJAX or from another
+application (such as a client's PHP app) because of how simple it is to
+add and use.
 
 I will start by presenting the entire API controller.
  
@@ -71,7 +74,7 @@ I will start by presenting the entire API controller.
      }
  }
 
-=head2 How it works.
+=head2 How it works
 
 The way this method works, you simply create a new controller and add it to
 your application. The API controller does most of the work via two actions.
@@ -79,10 +82,11 @@ First, the 'api' action provides for some basic setup. All your API calls
 chain off of this. The C<api> action does some basic set up and if appropriate
 does authentication checking.
 
-The authentication check here simply compares a config value, C<authkey>, to
-the authkey provided as a query parameter. You can make this check as complex
-or as simple as you want perhaps involving normal Catalyst authentication, or
-remove it entirely, depending on your usage.
+The authentication check here simply compares a config value,
+C<authkey>, to the authkey provided as a query parameter. You can make
+this check as complex or as simple as you want - perhaps involving
+normal Catalyst authentication - or remove it entirely, depending on
+your usage.
 
 The second action is C<end>. The C<end> action simply examines the 'output'
 parameter (if passed) and decides what format to respond in. The default is to
@@ -98,12 +102,12 @@ sub should create a hash in C<< $c->stash->{'apiresponse'} >> which will be
 returned to the calling application.
 
 This information in the C<< $c->stash->{'apiresponse'> >> is returned directly
-to the calling application in whatever format (JSON or XML) that was selected.
+to the calling application in whatever format (JSON or XML) was selected.
 I generally provide two keys inside the C<apiresponse>. The first is
-C<processed> which is simply a true/false which tells whether the requested
-method completed processing normally. The second key is C<status> which I use
+C<processed>, which is simply a true/false which tells whether the requested
+method completed processing normally. The second key is C<status>, which I use
 as a success/failed indicator. There is no requirement that you use either of
-these, but I find that they help in both debugging during development and
+these, but I find that they help both for debugging during development and for
 tracking down problems in production.
 
 One other addition I make is that within the API I work with 
@@ -116,15 +120,14 @@ from your original request are present. Using C<< $c->stash->{'api_params'} >>
 means you can call your api internally with whatever arguments you want,
 regardless of what was passed to the original query.
 
-=head2 Don't take my word for it.
+=head2 Don't take my word for it
 
 This is about the simplest way to handle API actions in a Catalyst application.
 Following the simple conventions I discussed and using the actions shown at the
-beginning of this article will give you a solid and simple to use API system in your 
-application.  
+beginning of this article will give you a solid and simple-to-use API system in your application.  
 
 You don't have to take my word for it.  Take the code above and add it to your 
-application, try it out, see what it does.  
+application, try it out, and see what it does.  
 
 
 =head1 AUTHOR
