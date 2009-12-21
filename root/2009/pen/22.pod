@@ -153,15 +153,18 @@ Now we need to make an API controller that serves JSON for the grid:
         my %data;
         
         my $rs = $c->model('DB::Book')->search({}, {
-            page => $page,
-            rows => $rows,
             order_by => "$sort_by $sort_order",
         });
         
         $rs = $rs->search_literal("lower($search_by) LIKE ?", lc($search_text))
             if $search_by && $search_text;
 
-        $data{total} = $c->model('DB::Book')->count;
+        my $paged_rs = $rs->search({}, {
+            page => $page,
+            rows => $rows,
+        });
+        
+        $data{total} = $rs->count;
         $data{page}  = $page;
         $data{rows}  = [
             map { +{
@@ -172,7 +175,7 @@ Now we need to make an API controller that serves JSON for the grid:
                     $_->rating,
                     $_->author_list,
                 ]
-            } } $rs->all
+            } } $paged_rs->all
         ];
         
         $self->status_ok($c, entity => \%data);
