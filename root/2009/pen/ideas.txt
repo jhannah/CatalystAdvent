@@ -1,15 +1,13 @@
 Slots:
-20 frew dbic helpers
-21 testing aCiD2
-22 
+22  
 23
 24
 
 Articles in progress:
  - Plack + Catalyst - dhoss
  - DBIx::Class::InstancePerContext & DBIx::Class::Schema::RestrictWithObject   - zamolxes and dhoss? groditi?
- - DBIx::Class::Helpers - frew 
  - config for beginners (t0m)
+ - cidermail - nine
 
 Articles structure
   - most writers don't have tuits for big editorials and guides, so concise articles with snippets of code are recommended
@@ -26,7 +24,6 @@ Confirmed ideas:
   - querylog - zamolxes (any time now) 
   - openid - cwest (sat, dec 12)
   - DBIC::Fixtures - lukes (maybe before 20th Dec, but no promises)
-  - cidermail - nine
 
 Ideas looking for authors
   - Catalyst::TraitFor::Model::DBIC::Schema::Caching / DBIx::Class::Cursor::Cached
