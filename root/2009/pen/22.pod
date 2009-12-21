@@ -3,31 +3,38 @@
 In this example, we will develop an AJAX CRUD (Create Read Update Delete)
 extension to the Catalyst tutorial.
 
-AJAX stands for Asynchronous JavaScript And XML, although these days most
-people use JSON instead of XML. The idea is to make something that's closer to
-a GUI app rather than a traditional web page.
+AJAX stands for Asynchronous JavaScript And XML (although these days
+most people use JSON as a data-interchange format instead of XML). The
+idea is to make a web page, or part of one, something that's less like a
+traditional web page, where an entire page must be loaded from the
+server any time information is changed, and closer to a GUI app, where
+elements of a page can be updated on the fly, without reloading the
+whole page.
 
-=head2 Installing flexigrid
+=head2 Installing Flexigrid
 
-First, get the tutorial tarball from
+First, get the tarball of the Catalyst Tutorial from
 L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/MyApp_Chapter9_FormFu.tgz>.
 
-We'll use flexigrid for our grid, from L<http://www.flexigrid.info/>.
+We're going to use Flexigrid, a jQuery-based data grid, from
+L<http://www.flexigrid.info/>.
 
-From the flexigrid zip, put the contents of C<css/flexigrid/images> and
-C<css/images> into C<root/static/images/flexigrid>.
+Download and unzip the Flexigrid zip file, and put the contents of its
+C<css/flexigrid/images> and C<css/images> directories into the tutorial's
+C<root/static/images/flexigrid> directory.
 
-C<css/flexigrid/flexigrid.css> goes into C<root/static/css>. Edit the file and
-do an C<< %s!url(images/!url(../images/flexigrid/! >> substitution.
+C<css/flexigrid/flexigrid.css> goes into the tutorial's
+C<root/static/css>. Edit the file and do an C<<
+%s!url(images/!url(../images/flexigrid/! >> substitution.
 
 C<flexigrid.js> goes into C<root/static/js>.
 
 Get jQuery from L<http://jqueryjs.googlecode.com/files/jquery-1.3.2.js> and
-save it to C<root/static/js/jquery.js>.
+save it to the tutorial's C<root/static/js/jquery.js>.
 
 =head2 Creating a Grid
 
-Let's make a controller for ajax stuff:
+Let's make a controller for AJAX stuff:
 
     package MyApp::Controller::AJAX;
 
@@ -58,7 +65,7 @@ And an
 
 at the bottom.
 
-This allows not using the wrapper for some pages, as we do here.
+This allows us to skip the wrapper for some pages, as we will do here.
 
 Now for the HTML:
 
@@ -186,12 +193,13 @@ Now we need to make an API controller that serves JSON for the grid:
 Now start the server and go to L<http://localhost:3000/ajax> and you will see a
 lovely AJAX grid of books.
 
-You can click on the magnifying glass icon at the lower left to search by title
-or rating, search by author is left as an excercise for the reader :)
+You can click on the magnifying glass icon at the lower left to search
+by title or rating. Implementing search by author is left as an
+excercise for the reader :)
 
 =head2 Deleting
 
-The Add, Edit and Delete buttons we put at the top of the grid don't work yet.
+The Add, Edit, and Delete buttons we put at the top of the grid don't work yet.
 
 Let's implement the Delete button.
 
@@ -234,14 +242,14 @@ Add to the API controller to support the Delete action:
         $self->status_ok($c, entity => { message => 'success' });
     }
 
-Now restart the server, go back to the grid in your browser and try selecting
-some rows and pressing the Delete button, voila!
+Now restart the server, go back to the grid in your browser and try
+selecting some rows and pressing the Delete button. Voila!
 
 =head2 Adding and Editing
 
 For this part we'll need the jQuery Form plugin, which you can get from
-L<http://jquery.malsup.com/form/jquery.form.js?2.36>. Save it as
-C<root/static/js/jquery.form.js>.
+L<http://jquery.malsup.com/form/jquery.form.js?2.36>. Save it in the
+tutorial app as C<root/static/js/jquery.form.js>.
 
 Add a C<< <script> >> link at the top of C<ajax.tt> for it:
 
@@ -342,9 +350,10 @@ using C<.load> to load the forms as HTML fragments.
         );
     }
 
-Now try out the Add and Edit buttons, and you should see the new entries or
-your changes in the grid when you click the submit button. Changing the author
-from Edit doesn't work (tutorial bug...)
+Now try out the Add and Edit buttons, and you should see the new entries
+or your changes in the grid when you click the submit button. Changing
+the author from Edit doesn't work at the moment; this is a bug in the
+Tutorial.
 
 =head2 Catalyst and AJAX
 
@@ -353,13 +362,13 @@ L<Catalyst::View::JSON> is well suited for making AJAX interfaces, as I hope
 we've demonstrated.
 
 From the Catalyst side, it's just a matter of serving and receiving JSON (or
-XML) data or serving HTML fragments, preferrably from a well designed URI API
+XML) data or serving HTML fragments, preferrably from a well-designed URI API
 based on REST.
 
-Here we used tools for the jQuery JavaScript framework, but other frameworks
-work just as well, such as ExtJS, Dojo, YUI, Mootools, etc.. You can also use
-the jQuery selector functionality in combination with these other frameworks,
-with C<jQuery.noConflict> mode if they override C<$>.
+Here we used tools for the jQuery JavaScript framework, but other
+frameworks work just as well, such as ExtJS, Dojo, YUI, or Mootools. You
+can also use the jQuery selector functionality in combination with these
+other frameworks, with C<jQuery.noConflict> mode if they override C<$>.
 
 There are also higher-level tools such as L<Catalyst::Controller::DBIC::API> to
 automate accessing your L<DBIx::Class> schema from JavaScript, and even
