@@ -1,22 +1,44 @@
 =head1 CiderWebmail
 
-Webmail sucks. We are Perl programmers. We like our mutt or maybe our kmail but at times, webmail is the only thing available. And the only webmailers available are written in PHP and they all have their difficulties and problems. In the Perl republic we have great components: we have Catalyst, we have Mail::IMAPClient, we have MIME::Tools and many more. The only thing missing was an application that pulled these together into a usable application: CiderWebmail
+Webmail sucks. We are Perl programmers. We like our mutt or maybe our
+kmail but at times, webmail is the only thing available. And the only
+webmailers available are written in PHP and they all have their
+difficulties and problems. In the Perl republic we have great
+components: we have Catalyst, we have Mail::IMAPClient, we have
+MIME::Tools and many more. The only thing missing was an application
+that pulled these together into a usable application: CiderWebmail
 
 =head2 What we want
 
-If you live email, your mailbox probably contains some thousands or tens of thousands of messages and being used to the features of modern email clients, these are probably contained injust a few folders.
+If you live email, your mailbox probably contains thousands or tens of
+thousands of messages. Since we're used to the features of modern
+email clients, these thousands are probably contained in only a few
+folders.
 
-Our goal is to being able to handle these mailboxes efficiently like a local client. We want our webmailer to be snappy with folders containing 10_000 messages and you being able to find the message that you need quickly. In short: we really care about the user experience. That means, not having to guess on which one of the 388 pages full of messages the important one is, having near instant reaction time, having configurable and themeable keybindings and an intuitive and if possible beautiful user interface.
+Our goal is to handle these mailboxes efficiently like a local
+client. We want our webmailer to be snappy with folders containing
+10_000 messages so you can quickly find the message that you need. We
+really care about the user experience. That means, not needing to
+guess which one of the 388 pages of messages is the important one,
+near instant response time, configurable and themeable keybindings,
+and an intuitive (possibly beautiful) user interface.
 
 =head2 How is it done?
 
-CiderWebmail is a Catalyst application using L<Mail::IMAPClient> as backend, L<MIME::Tools> to parse messages, L<Petal> as template engine and much JavaScript and AJAX in the front end to make drag &amp; drop and on demand message loading work.
+CiderWebmail is a Catalyst application using L<Mail::IMAPClient> as
+backend, L<MIME::Tools> to parse messages, L<Petal> as template engine
+and JavaScript and AJAX in the front end to make drag &amp; drop and
+on demand message loading work.
 
-We try to write really modern Perl, following the best practices that lead to code that's fun to work with. Thin controllers, no logic in templates, test suite, tidy and documented code.
+We try to write really modern Perl. By following best practices, we
+produce code that's fun to work with. Some of these practices are thin
+controllers, logic-free templates, test suites and tidy, documented
+code.
 
 =head2 What you can do
 
-The current version 1.01 is usable. It works for us and already has some nice features. But it can be improved on all fronts: It needs:
+The current version 1.01 is usable. It works for us and already has
+some nice features. But it can be improved on all fronts: It needs:
 
 =over 
 
@@ -59,13 +81,19 @@ a logo :)
 
 =back
 
-... and much more. Any help is greatly appreciated. We do know that the code is only a part of the whole. A very interesting part to us programmers, but in itself nearly worthless without the rest.
+... and much more. Any help is greatly appreciated. We know that the
+code is only a part of the whole - a very interesting part to us
+programmers, but itself nearly worthless without the rest or the
+project.
 
 =head2 How to start
 
-You can get the code and information at L<http://ciderwebmail.org>. 
-There's a project mailing list, available at L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/cider-webmail>
-If you have any questions, problems, ideas, patches, bug reports or anything else related to CiderWebmail, you can post there and usually will get a reponse quickly.
+You can get the code and information at L<http://ciderwebmail.org>.
+There's a project mailing list, available at
+L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/cider-webmail> If
+you have any questions, problems, ideas, patches, bug reports or
+anything else related to CiderWebmail, you can post there and usually
+receive a quick response.
 
 =head1 AUTHOR
 
