@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>CiderWebmail</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+    <h1>CiderWebmail</h1>
+
+    <p>Webmail sucks. We are Perl programmers. We like our mutt or maybe our kmail but at times, webmail is the only thing available. And the only webmailers available are written in PHP and they all have their difficulties and problems. In the Perl republic we have great components: we have Catalyst, we have Mail::IMAPClient, we have MIME::Tools and many more. The only thing missing was an application that pulled these together into a usable application: CiderWebmail</p>
+
+    <h2>What we want</h2>
+
+    <p>If you live email, your mailbox probably contains some thousands or tens of thousands of messages and being used to the features of modern email clients, these are probably contained injust a few folders.</p>
+    <p>Our goal is to being able to handle these mailboxes efficiently like a local client. We want our webmailer to be snappy with folders containing 10_000 messages and you being able to find the message that you need quickly. In short: we really care about the user experience. That means, not having to guess on which one of the 388 pages full of messages the important one is, having near instant reaction time, having configurable and themeable keybindings and an intuitive and if possible beautiful user interface.</p>
+
+    <h2>How is it done?</h2>
+
+    <p>CiderWebmail is a Catalyst application using Mail::IMAPClient as backend, MIME::Tools to parse messages, Petal as template engine and much JavaScript and AJAX in the front end to make drag &amp; drop and on demand message loading work.</p>
+
+    <p>We try to write really modern Perl, following the best practices that lead to code that's fun to work with. Thin controllers, no logic in templates, test suite, tidy and documented code.</p>
+
+    <h2>What you can do</h2>
+
+    <p>The current version 1.01 is usable. It works for us and already has some nice features. But it can be improved on all fronts: It needs:</p>
+
+    <ul>
+    <li>testing (and tests)</li>
+    <li>more documentation</li>
+    <li>packaging</li>
+    <li>better JavaScript (porting to JQuery?)</li>
+    <li>HTML message creation (yes, some people really want this)</li>
+    <li>more configurability</li>
+    <li>cool features!</li>
+    <li>better design</li>
+    <li>a logo :)</li>
+    </ul>
+
+    <p>... and much more. Any help is greatly appreciated. We do know that the code is only a part of the whole. A very interesting part to us programmers, but in itself nearly worthless without the rest.</p>
+
+    <h2>How to start</h2>
+
+    <p>You can get the code and information at <a href="http://ciderwebmail.org">http://ciderwebmail.org</a>. There's a <a href="http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/cider-webmail">project mailing list</a>. If you have any questions, problems, ideas, patches, bug reports or anything else related to CiderWebmail, you can post there and usually will get a reponse quickly.</p>
+</body>
+</html>
