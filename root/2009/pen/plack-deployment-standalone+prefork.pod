@@ -1,0 +1,79 @@
+=head1 Plack - A Fantastic Layer To Make Your App Deployment Easier
+
+=head3 What is it?
+
+From the documentation:
+
+    Plack is a set of PSGI reference server implementations and helper
+	utilities for Web application frameworks, exactly like Ruby's Rack.
+
+=head3 What is PSGI?
+
+PSGI is an interface between Perl web apps and web servers. This means you have a pretty slick
+and well-rounded platform that allows you to deploy your app as a persistent process while letting
+you point your server software at the running Plack process.  You can *still* run your application
+under FastCGI and such, but all of the communication to the server is handled entirely by PSGI.
+
+=head3 What does it look like?
+
+Starting the process:
+
+    plackup --app yourappname.psgi --server FCGI
+
+Your server configuration (let's use nginx):
+
+    # inside a server {} block
+	location /myapp {
+	    proxy_set_header Host $http_host;
+		proxy_set_header X-Forwarded-Host $http_host;
+	    proxy_set_header X-Real-IP $remote_addr;
+	    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+	    proxy_pass  http://localhost:5000/;   # 5000 is the default plackup port
+	}
+
+
+It's *that* simple.  Now, let's do what we came here for and show you how to hookup Catalyst with Plack,
+running under the Standalone::Prefork engine.
+
+=head3 The Dispatch Script
+
+Plackup wants a dispatch script to fire up and delegate things to your app from.  So, we need to create
+one of these for our simple Catalyst app.
+
+After the usual C<catalyst.pl Placky> mumbo jumbo (for fun, I called this app Placky), we create a file called placky_app.psgi (You can call it whatever
+you want, really).  Copy and paste these lines, and save your file:
+
+    #!/usr/bin/env perl
+    use strict;
+    use Placky;
+
+    Placky->setup_engine('PSGI');
+    my $app = sub { Placky->run(@_) };
+
+Now, let's fire it up and test things:
+
+    squishface:Placky dhoss$ plackup --app script/placky_app.psgi --server Standalone::Prefork
+
+Since we didn't specify a port, you should (after seeing all the Catalyst server startup stuff) see something like this:
+
+    [info] Placky powered by Catalyst 5.80016
+	Plack::Server::Standalone::Prefork: Accepting connections at http://0:5000/
+
+Open up your browser and navigate to http://localhost:5000 and you should see your friendly Catalyst welcome message.
+If so, great success!  You now know how to deploy a Catalyst application under Plack.  There are L<http://plackperl.org/|many server engines>
+that Plack supports right off the bat to allow you to customize your deployment to suit you best.
+
+
+That's all folks, the beauty of simplicity and being robust all wrapped up in one.  Plack/PSGI will really help people ease into deployment
+and manage their application processes.  Don't forget to check out L<the Plack Advent Calendar|http://advent.plackperl.org/> too for cool tips
+and tricks on making Plack even funner.
+
+
+=head1 AUTHOR
+
+Devin Austin
+
+dhoss@cpan.org
+
+
