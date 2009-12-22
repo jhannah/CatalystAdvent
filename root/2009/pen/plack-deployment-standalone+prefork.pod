@@ -16,30 +16,35 @@ under FastCGI and such, but all of the communication to the server is handled en
 
 =head3 What does it look like?
 
+Don't do any of this just yet, as you'll need to set up your script first.  You can do the nginx config now if you'd like,
+but obviously pointing your browser to localhost/myapp/ isn't going to serve up your app unless it's actually running.
+
 Starting the process:
 
-    plackup --app yourappname.psgi --server FCGI
+    plackup -s FCGI yourappname.psgi 
 
 Your server configuration (let's use nginx):
 
     # inside a server {} block
 	location /myapp {
-	    proxy_set_header Host $http_host;
-		proxy_set_header X-Forwarded-Host $http_host;
-	    proxy_set_header X-Real-IP $remote_addr;
-	    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
-	    proxy_pass  http://localhost:5000/;   # 5000 is the default plackup port
+        proxy_pass  http://localhost:5000/;   # 5000 is the default plackup port
 	}
 
 
+Note that if you don't specify a server option (-s), plackup defaults to a standalone server like Catalyst does.
 It's *that* simple.  Now, let's do what we came here for and show you how to hookup Catalyst with Plack,
 running under the Standalone::Prefork engine.
 
 =head3 The Dispatch Script
 
 Plackup wants a dispatch script to fire up and delegate things to your app from.  So, we need to create
-one of these for our simple Catalyst app.
+one of these for our simple Catalyst app. If you're lazy like me, you can also do C<perl scripts/placky_create.pl PSGI> and have
+a helper generate your script for you.
 
 After the usual C<catalyst.pl Placky> mumbo jumbo (for fun, I called this app Placky), we create a file called placky_app.psgi (You can call it whatever
 you want, really).  Copy and paste these lines, and save your file:
@@ -60,8 +65,11 @@ Since we didn't specify a port, you should (after seeing all the Catalyst server
     [info] Placky powered by Catalyst 5.80016
 	Plack::Server::Standalone::Prefork: Accepting connections at http://0:5000/
 
-Open up your browser and navigate to http://localhost:5000 and you should see your friendly Catalyst welcome message.
-If so, great success!  You now know how to deploy a Catalyst application under Plack.  There are L<http://plackperl.org/|many server engines>
+Make sure that after modifying your server configuration you restart nginx/whatever software you happen to be using so the 
+changes take effect.
+
+Open up your browser and navigate to http://localhost/myapp/ and you should see your friendly Catalyst welcome message.
+If so, great success!  You now know how to deploy a Catalyst application under Plack.  There are L<many server engines|http://plackperl.org/>
 that Plack supports right off the bat to allow you to customize your deployment to suit you best.
 
 
@@ -69,6 +77,8 @@ That's all folks, the beauty of simplicity and being robust all wrapped up in on
 and manage their application processes.  Don't forget to check out L<the Plack Advent Calendar|http://advent.plackperl.org/> too for cool tips
 and tricks on making Plack even funner.
 
+Feel free to check out the Placky code here: L<http://dev.catalystframework.org/svnweb/Catalyst/browse/trunk/examples/Placky/> or do
+C< svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Placky >.
 
 =head1 AUTHOR
 
