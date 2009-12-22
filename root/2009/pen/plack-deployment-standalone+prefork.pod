@@ -21,7 +21,7 @@ but obviously pointing your browser to localhost/myapp/ isn't going to serve up 
 
 Starting the process:
 
-    plackup -s FCGI yourappname.psgi 
+    plackup -s Standalone::Prefork yourappname.psgi 
 
 Your server configuration (let's use nginx):
 
@@ -58,7 +58,7 @@ you want, really).  Copy and paste these lines, and save your file:
 
 Now, let's fire it up and test things:
 
-    squishface:Placky dhoss$ plackup --app script/placky_app.psgi --server Standalone::Prefork
+    squishface:Placky dhoss$ plackup -s Standalone::Prefork script/placky_app.psgi
 
 Since we didn't specify a port, you should (after seeing all the Catalyst server startup stuff) see something like this:
 
