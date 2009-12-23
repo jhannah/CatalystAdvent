@@ -61,7 +61,7 @@ necessary machinations to return a resultset of random rows.
 
 =head2 SubClass
 
-L<DBIx::Class::Helper::Subclass> is certainly the most complex of
+L<DBIx::Class::Helper::SubClass> is certainly the most complex of
 these components, but I would argue it is the most important as
 well. This component allows B<almost> seamless subclassing of
 C<DBIx::Class> ResultSources.  It does things like C<<
@@ -72,7 +72,7 @@ relationships based on the parent class.
 At work I'd like to define a set of tables for authorization - users,
 roles, permissions, and join tables between them. I do not want to
 copy and paste this code to our many disparate
-projects. L<DBIx::Class::Helper::SubClass> solves the problem nicely. 
+projects. L<DBIx::Class::Helper::SubClass> solves the problem nicely.
 
 Another reason to use this helper is to define a table without certain
 columns (TEXT columns come to mind). Instead of redefining the table
