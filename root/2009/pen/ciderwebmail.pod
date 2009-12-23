@@ -1,12 +1,17 @@
 =head1 CiderWebmail
 
+We're ending this year's calendar with something most of us dislike,
+but occationally need or at least get in contact with.
+
 Webmail sucks. We are Perl programmers. We like our mutt or maybe our
 kmail but at times, webmail is the only thing available. And the only
 webmailers available are written in PHP and they all have their
-difficulties and problems. In the Perl republic we have great
-components: we have Catalyst, we have Mail::IMAPClient, we have
-MIME::Tools and many more. The only thing missing was an application
-that pulled these together into a usable application: CiderWebmail
+difficulties and problems.
+
+In the Perl republic on the other hand we have great components: we
+have Catalyst, we have Mail::IMAPClient, we have MIME::Tools and many
+more. The only thing missing was an application that pulled these
+together into a usable application: CiderWebmail
 
 =head2 What we want
 
@@ -34,6 +39,23 @@ We try to write really modern Perl. By following best practices, we
 produce code that's fun to work with. Some of these practices are thin
 controllers, logic-free templates, test suites and tidy, documented
 code.
+
+The result looks like this:
+
+=begin pod:xhtml
+
+<a style="border-bottom:none" href="http://ciderwebmail.org/downloads/screenshot-list2.png">
+<img src="http://ciderwebmail.org/downloads/screenshot-list-small.png" alt="CiderWebmail message list" />
+</a>
+
+=end pod:xhtml
+
+=head2 Who is "we"?
+
+We are currently two guys from Austria who happen to host mail servers
+and share a dislike for existing webmailers and the love for Perl.
+Mathias is a full time administrator while I (Stefan) am a full time
+developer.
 
 =head2 What you can do
 
@@ -89,6 +111,7 @@ project.
 =head2 How to start
 
 You can get the code and information at L<http://ciderwebmail.org>.
+
 There's a project mailing list, available at
 L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/cider-webmail> If
 you have any questions, problems, ideas, patches, bug reports or
@@ -97,5 +120,5 @@ receive a quick response.
 
 =head1 AUTHOR
 
-Stefan Seifert  C<< <stefan.seifert@atikon.com> >>
+Stefan Seifert  C<< <nine@detonation.org> >>
 
