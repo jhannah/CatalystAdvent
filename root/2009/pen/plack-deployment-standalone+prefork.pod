@@ -86,4 +86,5 @@ Devin Austin
 
 dhoss@cpan.org
 
-
+Thanks to miyagawa (Tatsuhiko Miyagawa) for putting together this fantastic interface and for reviewing this article to make sure I did his work
+justice :-)
