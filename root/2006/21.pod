@@ -2,6 +2,12 @@
 
 Handle and process multilingual data properly
 
+B<NOTE>: This article was written in 2006. For more up-to-date information
+on Unicode, please see
+L<http://dev.catalystframework.org/wiki/tutorialsandhowtos/using_unicode>.
+In particular, L<Catalyst::Plugin::Unicode::Encoding> is recommended 
+instead of L<Catalyst::Plugin::Unicode>.
+
 =head1 Introduction
 
 As the Internet gains more and more users, it's likely that your site
