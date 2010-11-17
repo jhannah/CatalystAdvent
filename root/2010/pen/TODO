@@ -1,6 +1,51 @@
+Organising:
+  - Bogdan Lucaciu ( bogdan at sinapticode ro , zamolxes on irc)
+  - Devin Austin (devin.austin at gmail com , dhoss on irc)
+
 Article ideas (2010 Calendar):
  - facebook general application development (Getty)
  - Catalyst + Gearman (dhoss)
  - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss)
  - Catalyst + ElasticSearch (dhoss)
- - 
+ - DBIC::Fixtures - lukes (?)
+ - twitter authentication/applications + Catalyst
+ - .... as an Absolute Beginner (tm) could I put in a request for some newbie-friendly Cat-for-dummies entries? - victor from the mailing list
+ - X-Sendfile/X-Accel-Redirect with support for agnostic file location retrieval (aka, file to send could be located on any number of replicated nodes etc.)
+ - Form::Sensible::Reflector::DBIC + Catalyst (dhoss)
+
+Confirmed ideas: 
+ - facebook general application development (Getty)
+ - Catalyst + Gearman (dhoss)
+ - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss)
+ - Catalyst + ElasticSearch (dhoss)
+ - twitter authentication/applications + Catalyst
+
+Ideas looking for authors
+  - Catalyst::TraitFor::Model::DBIC::Schema::Caching / DBIx::Class::Cursor::Cached
+  - Catalyst::TraitFor::Model::DBIC::Schema::Replicated / DBIx::Class::Storage::DBI::Replicated 
+
+Dates needed:
+ - 1
+ - 2
+ - 3
+ - 4
+ - 5
+ - 6
+ - 7 
+ - 8 
+ - 9
+ - 10
+ - 11
+ - 12
+ - 13
+ - 14
+ - 15
+ - 16
+ - 17
+ - 18
+ - 19
+ - 20
+ - 21
+ - 22
+ - 23
+ - 24
