@@ -1,0 +1,6 @@
+Article ideas:
+ - facebook general application development (Getty)
+ - Catalyst + Gearman (dhoss)
+ - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss)
+ - Catalyst + ElasticSearch (dhoss)
+ - 
