@@ -19,6 +19,7 @@ Confirmed ideas:
  - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss)
  - Catalyst + ElasticSearch (dhoss)
  - twitter authentication/applications + Catalyst
+ - Opsview does i18n with Catalyst (Ton Voon)
 
 Ideas looking for authors
   - Catalyst::TraitFor::Model::DBIC::Schema::Caching / DBIx::Class::Cursor::Cached
