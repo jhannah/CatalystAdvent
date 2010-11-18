@@ -16,6 +16,8 @@ Article ideas (2010 Calendar):
  - jqgrid + Catalyst:Controller::REST (dhoss)
  - AWS S3, Mosso Cloudfiles, cloud storage, deployment
  - large scale application deployment, regarding replication, load balancing, etc. 
+ - DBIC pretty printers, console and plack versions
+ - plack middleware goodness for your Catalyst apps
 
 Confirmed ideas: 
  - facebook general application development (Getty)
