@@ -14,6 +14,8 @@ Article ideas (2010 Calendar):
  - Form::Sensible::Reflector::DBIC + Catalyst (dhoss)
  - Test::DBIx::Class
  - jqgrid + Catalyst:Controller::REST (dhoss)
+ - AWS S3, Mosso Cloudfiles, cloud storage, deployment
+ - large scale application deployment, regarding replication, load balancing, etc. 
 
 Confirmed ideas: 
  - facebook general application development (Getty)
@@ -26,6 +28,7 @@ Confirmed ideas:
 Ideas looking for authors
   - Catalyst::TraitFor::Model::DBIC::Schema::Caching / DBIx::Class::Cursor::Cached
   - Catalyst::TraitFor::Model::DBIC::Schema::Replicated / DBIx::Class::Storage::DBI::Replicated 
+  - anything not in "Confirmed Ideas"
 
 Authors:
  - Getty
