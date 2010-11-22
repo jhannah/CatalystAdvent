@@ -18,6 +18,7 @@ Article ideas (2010 Calendar):
  - large scale application deployment, regarding replication, load balancing, etc. 
  - DBIC pretty printers, console and plack versions
  - plack middleware goodness for your Catalyst apps
+ - Catalyst + DBIC + memcached - skaufman
 
 Confirmed ideas: 
  - facebook general application development (Getty)
