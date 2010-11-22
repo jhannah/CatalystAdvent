@@ -19,6 +19,7 @@ Article ideas (2010 Calendar):
  - DBIC pretty printers, console and plack versions
  - plack middleware goodness for your Catalyst apps
  - Catalyst + DBIC + memcached - skaufman
+ - Catalyst + jQuery theme roller - steve@matsch.com
 
 Confirmed ideas: 
  - facebook general application development (Getty)
@@ -41,6 +42,8 @@ Authors:
  - zamolxes (?)
  - frew (?)
  - hercynium
+ - skaufman
+ - steve@matsch.com
 
 Editors: 
  - jester
