@@ -41,7 +41,7 @@ of properly indented SQL dance on your otherwise dull console any time you
 request SQL traces with
 L<DBIC_TRACE|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage.pm#DBIC_TRACE>
 or with
-L<storage-&gt;debug|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage.pm#debug>.
+L<< storage->debug|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage.pm#debug >>.
 Catalyst/Plack users are not left out in the cold either, thanks to
 L<jnap|http://jjnapiorkowski.typepad.com/modern-perl/> and his
 L<Plack::Middleware::Debug::DBIC::QueryLog>, which leverages the same
