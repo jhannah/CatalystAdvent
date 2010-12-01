@@ -2,12 +2,12 @@
 
 Uh-oh, December 1st - time does indeed fly, and it's time to recap what
 has happened in our-favorite-language-land. It is my honor to start off
-this year's advent calendar with a walk through the changelog of one
+this year's Advent Calendar with a walk through the changelog of one
 of the most popular C<M>'s of your C<MVC> - L<DBIx::Class>.
 
 =head2 The Past
 
-So what exciting has happened with your (hopefully) favorite SQL de-hater?
+So what exciting things have happened with your (hopefully) favorite SQL de-hater?
 The answer is - a lot!
 
 First the obligatory numbers: this year up until the latest official release
@@ -33,8 +33,8 @@ do the right thing (these days it even manages to surprise its authors).
 
 Did I mention the mind-numbing SQL? Do you also avoid looking at SQL directly
 with the remaining eye? Well no more! Thanks to
-L<frew|http://blog.afoolishmanifesto.com/>, L<SQL::Abstract> and by proxy
-DBIC now come with an awesome
+L<frew|http://blog.afoolishmanifesto.com/>, L<SQL::Abstract> (and thus by proxy
+DBIC) now comes with an awesome
 L<SQL formatter|http://cpansearch.perl.org/src/RIBASUSHI/SQL-Abstract-1.71/script>.
 Just add C<DBIC_TRACE_PROFILE=console> to your environment and watch a rainbow
 of properly indented SQL dance on your otherwise dull console any time you
@@ -48,7 +48,7 @@ L<Plack::Middleware::Debug::DBIC::QueryLog>, which leverages the same
 awesome formatting capabilities.
 
 But we surely are taxing the RDBMS with these twisted queries, and the DBA
-knows where you live... Fear not! DBIC ships with a wicked join-pruning
+knows where you live.... Fear not! DBIC ships with a wicked join-pruning
 optimizer (akin to the one available in PostgreSQL since 9.0). Of course
 being internal to DBIC it works on any database, and is more efficient since
 it has more metadata about the result sources. Just stack these joins and
@@ -66,7 +66,7 @@ L<Sybase SQL Anywhere|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Stor
 formatters, transaction handlers, savepoints, and other fixups and workarounds
 for minor but irritating RDBMS-specific quirks.
 
-Outside of the main workflow there are more news:
+Outside of the main workflow there is still more news:
 
 Thanks to L<frew|http://blog.afoolishmanifesto.com/> DBIC now has a neat stack
 of handy helpers, organized in the L<DBIx::Class::Helpers> distribution.
@@ -75,7 +75,7 @@ easier. He also managed to write L<DBIx::Class::DeploymentHandler> - a
 replacement for the nice but architecturally limited
 L<DBIx::Class::Schema::Versioned>. While it may seem daunting at first, it is
 well worth a look, as it makes a lot of advanced stuff possible (and even
-easy), like for example in-line data migration during schema upgrades.
+easy), for example in-line data migration during schema upgrades.
 Finally in order to attract more followers of the sugar-club, he spilled some
 L<DBIx::Class::Candy> to make the life of DBIC newcomers sweeter^Weasier.
 
@@ -86,7 +86,7 @@ more database metadata, and quite importantly choose saner names for
 Result Classes and Relationships.
 
 L<goraxe|http://search.cpan.org/~goraxe/> contributed a brand-new fully
-moosified control module L<DBIx::Class::Admin>, making it dead simple to write
+Moosified control module L<DBIx::Class::Admin>, making it dead simple to write
 CLI apps and other control interfaces against your DBIC schema.
 
 Last but not least the
@@ -119,13 +119,13 @@ L<post-LPW hackathon|http://lpw2010hackathon.eventbrite.com/> :)
 
 Well of course the future depends on B<YOU>! The DBIx::Class team is as active
 as ever and is always looking for eager minds striving to make SQL-interaction
-even less hateful :) If you have tuits, ideas, comments or plain old questions
+even less hateful :) If you have tuits, ideas, comments, or plain old questions,
 stop by our hivemind
 L<irc.perl.org#dbix-class|http://chat.mibbit.com/#dbix-class@irc.perl.org>
-and become a part of a stellar community of perl hackers (and hopefully a part
-of the next 1,000 commits :)
+and become a part of a stellar community of Perl hackers (and hopefully a part
+of the next 1,000 commits :) )
 
-On this note I pass the reins to the next advent author. Once again thank you
+On this note I pass the reins to the next Advent author. Once again thank you
 all for the awesome ride so far, and for the great things that are yet to come.
 
 Cheers!
