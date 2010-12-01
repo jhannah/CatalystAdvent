@@ -59,7 +59,7 @@ So you have a DBA - you are most likely using some opinionated commercial
 RDBMS. Thanks to L<Caelum|http://search.cpan.org/~rkitover> DBIC now
 supports oddballs like
 L<Informix|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage/DBI/Informix.pm>,
-L<Firebird/Interbase|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage/DBI/InterBase.pm>,
+L<Firebird and Interbase|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage/DBI/InterBase.pm>,
 L<Sybase ASE|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage/DBI/Sybase/ASE.pm> and
 L<Sybase SQL Anywhere|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage/DBI/SQLAnywhere.pm>. Note that
 "supports" means real support - with proper limit dialects, datetime
