@@ -1,0 +1,134 @@
+=head1 2010 Reflections - The Chainsaw Song
+
+Uh-oh, December 1st - time does indeed fly, and it's time to recap what
+has happened in our-favorite-language-land. It is my honor to start off
+this year's advent calendar with a walk through the changelog of one
+of the most popular C<M>'s of your C<MVC> - L<DBIx::Class>.
+
+=head2 The Past
+
+So what exciting has happened with your (hopefully) favorite SQL de-hater?
+The answer is - a lot!
+
+First the obligatory numbers: this year up until the latest official release
+L<0.08124|http://search.cpan.org/~frew/DBIx-Class-0.08124/> DBIC saw
+code and documentation contributions from 42 (no joke!) people in over 1,000
+commits, touching over 400 files with a total of over 14,000 non-whitespace
+lines of changes! But what do these scary numbers give us?
+
+The killer feature remains L<resultset chaining|DBIx::Class::ResultSet/Chaining_resultsets>,
+but what a facelift it got this year:
+L<searches|DBIx::Class::ResultSet/search>,
+L<relationship traversals|DBIx::Class::ResultSet/search_related>,
+L<set operations|DBIx::Class::Helper::ResultSet::SetOperations/DESCRIPTION>,
+L<subselects|DBIx::Class::ResultSet/as_subselect_rs>,
+L<limits|DBIx::Class::ResultSet/rows>,
+L<column sices|DBIx::Class::ResultSet/get_column>
+(and by the end of this week
+L<custom joins|http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/DBIx-Class.git;a=blob;f=lib/DBIx/Class/Relationship/Base.pm;h=8012dd8fcd9ab5f36f26d555f5303f0c826de328;hb=refs/heads/extended_rels#l128>
+) - all work together in perfect harmony, producing mind-numbing but fully
+functional SQL. Just slap your methods together and DBIC will almost always
+do the right thing (these days it even manages to surprise its authors).
+
+Did I mention the mind-numbing SQL? Do you also avoid looking at SQL directly
+with the remaining eye? Well no more! Thanks to
+L<frew|http://blog.afoolishmanifesto.com/>, L<SQL::Abstract> and by proxy
+DBIC now come with an awesome
+L<SQL formatter|http://cpansearch.perl.org/src/RIBASUSHI/SQL-Abstract-1.71/script>.
+Just add C<DBIC_TRACE_PROFILE=console> to your environment and watch a rainbow
+of properly indented SQL dance on your otherwise dull console any time you
+request SQL traces with L<DBIC_TRACE|DBIx::Class::Storage/DBIC_TRACE> or with
+L<< storage->debug|DBIx::Class::Storage/debug >>. Catalyst/Plack users are not
+left out in the cold either, thanks to
+L<jnap|http://jjnapiorkowski.typepad.com/modern-perl/> and his
+L<Plack::Middleware::Debug::DBIC::QueryLog>, which leverages the same
+awesome formatting capabilities.
+
+But we surely are taxing the RDBMS with these twisted queries, and the DBA
+knows where you live... Fear not! DBIC ships with a wicked join-pruning
+optimizer (akin to the one available in PostgreSQL since 9.0). Of course
+being itnernal to DBIC it works on any database, and is more efficient since
+it has more metadata about the result sources. Just stack these joins and
+nested searches with reckless abandon, and DBIC will do its best to remove
+unreferenced C<LEFT JOIN>'s before sending the coveted query to the RDBMS.
+
+So you have a DBA - you are most likely using some opinionated commercial
+RDBMS. Thanks to L<Caelum|http://search.cpan.org/~rkitover> DBIC now
+supports oddballs like
+L<Informix|DBIx::Class::Storage::DBI::Informix>,
+L<Firebird/Interbase|DBIx::Class::Storage::DBI::InterBase>,
+L<Sybase ASE|DBIx::Class::Storage::DBI::Sybase::ASE> and
+L<Sybase SQL Anywhere|DBIx::Class::Storage::DBI::SQLAnywhere>. Note that
+"supports" means real support - with proper limit dialects, datetime
+formatters, transaction handlers, savepoints, and other fixups and workarounds
+for minor but irritating RDBMS-specific quirks.
+
+Outside of the main workflow there are more news:
+
+Thanks to L<frew|http://blog.afoolishmanifesto.com/> DBIC now has a neat stack
+of handy helpers, organized in the L<DBIx::Class::Helpers> distribution.
+Great for mixing and matching various small utilities to make data retrieval
+easier. He also managed to write L<DBIx::Class::DeploymentHandler> - a
+replacement for the nice but architecturally limited
+L<DBIx::Class::Schema::Versioned>. While it may seem daunting at first, it is
+well worth a look, as it makes a lot of advanced stuff possible (and even
+easy), like for example in-line data migration during schema upgrades.
+Finally in order to attract more followers of the sugar-club, he spilled some
+L<DBIx::Class::Candy> to make the life of DBIC newcomers sweeter^Weasier.
+
+L<Caelum|http://search.cpan.org/~rkitover> adopted
+L<DBIx::Class::Schema::Loader> and taught it neat tricks on all databases he
+could get his hands on. The new generation loaders are more precise, support
+more database metadata, and quite importantly choose saner names for
+Result Classes and Relationships.
+
+L<goraxe|http://search.cpan.org/~goraxe/> contributed a brand-new fully
+moosified control module L<DBIx::Class::Admin>, making it dead simple to write
+CLI apps and other control interfaces against your DBIC schema.
+
+Last but not least the
+L<repository|http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/DBIx-Class.git>
+was migrated from SVN to GIT by the awesome L<Haarg|http://haarg.org/>. He not
+only properly transferred our non-trivial history, he 
+L<blogged|http://blogs.perl.org/users/graham_knop/2010/10/converting-complex-svn-repositories-to-git.html>
+L<his way|http://blogs.perl.org/users/graham_knop/2010/10/converting-complex-svn-repositories-to-git---part-2.html>
+L<through it|http://blogs.perl.org/users/graham_knop/2010/10/converting-complex-svn-repositories-to-git---part-3.html>
+, documenting the bits and pieces necessary to pull off such a complex
+migration. As a direct result of this contributing to DBIC got even easier
+than before - simply fork our
+L<GitHub Mirror|http://github.com/dbsrgits/DBIx-Class>, edit and send pull
+requests directly from your browser without ever needing a checkout!
+
+And many other small and big changes by dedicated individuals - my personal
+gratitude goes to you all for making DBIC the kick-ass project it is today!
+
+=head2 The Present
+
+But the year is not over yet! As I am writing this two major features are
+getting groomed for immediate CPAN release: the already mentioned
+L<custom relationships|http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/DBIx-Class.git;a=blob;f=lib/DBIx/Class/Relationship/Base.pm;h=8012dd8fcd9ab5f36f26d555f5303f0c826de328;hb=refs/heads/extended_rels#l128>
+and C<INSERT ... RETURNING> support for Oracle. Another exciting feature
+may land into master before New Year, but it will deserve its own
+announcement if it materializes. Suffice to say lots of hopes are set for the
+L<post-LPW hackathon|http://lpw2010hackathon.eventbrite.com/> :)
+
+=head2 The Future
+
+Well of course the future depends on B<YOU>! The DBIx::Class team is as active
+as ever and is always looking for eager minds striving to make SQL-interaction
+even less hateful :) If you have tuits, ideas, comments or plain old questions
+stop by our hivemind
+L<irc.perl.org#dbix-class|http://chat.mibbit.com/#dbix-class@irc.perl.org>
+and become a part of a stellar community of perl hackers (and hopefully a part
+of the next 1,000 commits :)
+
+On this note I pass the reigns to the next advent author. Once again thank you
+all for the awesome ride so far, and for the great things that are yet to come.
+
+Cheers!
+
+-- ribasushi, DBIx::Class chainsaw delegate in residence
+
+=head1 AUTHOR
+
+Peter Rabbitson <ribasushi@cpan.org>
