@@ -24,7 +24,7 @@ L<relationship traversals|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/
 L<set operations|http://search.cpan.org/dist/DBIx-Class-Helpers/lib/DBIx/Class/Helper/ResultSet/SetOperations.pm#DESCRIPTION>,
 L<subselects|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#as_subselect_rs>,
 L<limits|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#rows>,
-L<column sices|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#get_column>
+L<column slices|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#get_column>
 (and by the end of this week
 L<custom joins|http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/DBIx-Class.git;a=blob;f=lib/DBIx/Class/Relationship/Base.pm;h=8012dd8fcd9ab5f36f26d555f5303f0c826de328;hb=refs/heads/extended_rels#l128>
 ) - all work together in perfect harmony, producing mind-numbing but fully
