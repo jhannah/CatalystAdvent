@@ -24,7 +24,7 @@ Memcached:
 
 =over
 
-=item * L<Catalyst::Memcached|http://search.cpan.org/perldoc?Cache%3A%3AMemcached>
+=item * L<Cache::Memcached|http://search.cpan.org/perldoc?Cache%3A%3AMemcached>
 
 =item * L<Cache::Memcached::GetParserXS|http://search.cpan.org/perldoc?Cache%3A%3AMemcached%3A%3AGetParserXS>
 
