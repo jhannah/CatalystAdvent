@@ -1,2 +1,0 @@
-=head2 Catalyst and Twitter: Authentication using Twitter's OAuth Mechanism
-=cut
