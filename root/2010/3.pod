@@ -4,13 +4,11 @@ This tutorial will show you how to:
 
 =over
 
-=item * Easily add resultset level caching to your
-Catalyst::Model::DBIC::Schema
-(http://search.cpan.org/perldoc?Catalyst%3A%3AModel%3A%3ADBIC%3A%3ASchema)
+=item * Easily add resultset level caching to your 
+(L<Catalyst::Model::DBIC::Schema|http://search.cpan.org/perldoc?Catalyst%3A%3AModel%3A%3ADBIC%3A%3ASchema>)
 calls.
 
-=item * Move your Catalyst::Plugin::Session
-(http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession) into
+=item * Move your (L<Catalyst::Plugin::Session|http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession>) into
 memcached.
 
 =item * Have a convenient $ctx-E<gt>cache method available for anything
@@ -25,10 +23,10 @@ Memcached:
 =over
 
 =item * Cache::Memcached
-(http://search.cpan.org/perldoc?Cache%3A%3AMemcached)
+(L<http://search.cpan.org/perldoc?Cache%3A%3AMemcached>)
 
 =item * Cache::Memcached::GetParserXS
-(http://search.cpan.org/perldoc?Cache%3A%3AMemcached%3A%3AGetParserXS)
+(L<http://search.cpan.org/perldoc?Cache%3A%3AMemcached%3A%3AGetParserXS>)
 
 =back
 
@@ -37,16 +35,16 @@ Catalyst Plugins:
 =over
 
 =item * Catalyst::Plugin::ConfigLoader
-(http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3AConfigLoader)
+(L<http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3AConfigLoader>)
 
 =item * Catalyst::Plugin::Session
-(http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession)
+(L<http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession>)
 
 =item * Catalyst::Plugin::Cache
-(http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ACache)
+(L<http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ACache>)
 
 =item * Catalyst::Plugin::Session::Store::Cache
-(http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession%3A%3AStore%3A%3ACache)
+(L<http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession%3A%3AStore%3A%3ACache>)
 
 =back
 
@@ -55,7 +53,7 @@ DBIx::Class:
 =over
 
 =item * DBIx::Class::Cursor::Cached
-(http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ACursor%3A%3ACached)
+(L<http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ACursor%3A%3ACached>)
 
 =back
 
