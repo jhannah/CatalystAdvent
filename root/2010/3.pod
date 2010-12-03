@@ -5,10 +5,10 @@ This tutorial will show you how to:
 =over
 
 =item * Easily add resultset level caching to your 
-(L<Catalyst::Model::DBIC::Schema|http://search.cpan.org/perldoc?Catalyst%3A%3AModel%3A%3ADBIC%3A%3ASchema>)
+L<Catalyst::Model::DBIC::Schema|http://search.cpan.org/perldoc?Catalyst%3A%3AModel%3A%3ADBIC%3A%3ASchema>
 calls.
 
-=item * Move your (L<Catalyst::Plugin::Session|http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession>) into
+=item * Move your L<Catalyst::Plugin::Session|http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession> into
 memcached.
 
 =item * Have a convenient $ctx-E<gt>cache method available for anything
@@ -22,11 +22,9 @@ Memcached:
 
 =over
 
-=item * Cache::Memcached
-(L<http://search.cpan.org/perldoc?Cache%3A%3AMemcached>)
+=item * L<Catalyst::Memcached|http://search.cpan.org/perldoc?Cache%3A%3AMemcached>
 
-=item * Cache::Memcached::GetParserXS
-(L<http://search.cpan.org/perldoc?Cache%3A%3AMemcached%3A%3AGetParserXS>)
+=item * L<Cache::Memcached::GetParserXS|http://search.cpan.org/perldoc?Cache%3A%3AMemcached%3A%3AGetParserXS>
 
 =back
 
@@ -34,17 +32,13 @@ Catalyst Plugins:
 
 =over
 
-=item * Catalyst::Plugin::ConfigLoader
-(L<http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3AConfigLoader>)
+=item * L<Catalyst::Plugin::ConfigLoader|http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3AConfigLoader>
 
-=item * Catalyst::Plugin::Session
-(L<http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession>)
+=item * L<Catalyst::Plugin::Session|http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession>
 
-=item * Catalyst::Plugin::Cache
-(L<http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ACache>)
+=item * L<Catalyst::Plugin::Cache|http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ACache>
 
-=item * Catalyst::Plugin::Session::Store::Cache
-(L<http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession%3A%3AStore%3A%3ACache>)
+=item * L<Catalyst::Plugin::Session::Store::Cache|http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ASession%3A%3AStore%3A%3ACache>
 
 =back
 
@@ -52,8 +46,7 @@ DBIx::Class:
 
 =over
 
-=item * DBIx::Class::Cursor::Cached
-(L<http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ACursor%3A%3ACached>)
+=item * L<DBIx::Class::Cursor::Cached|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ACursor%3A%3ACached>
 
 =back
 
@@ -114,26 +107,22 @@ this:
 Pat yourself on the back, you should be done (unless something went
 horribly wrong).
 
+=head1 EXAMPLES
+
     my @sweet_loot = $ctx->model("MyAppDB::Loot")->search({ sweet => 1 },{ cache_for => 300 })->all;
 
-That $rs is now cached for 300 seconds. Look at
-DBIx::Class::Cursor::Cached
-(http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ACursor%3A%3ACached)
+That $rs is now cached for 300 seconds. See the 
+L<DBIx::Class::Cursor::Cached docs|http://search.cpan.org/perldoc?DBIx%3A%3AClass%3A%3ACursor%3A%3ACached>
 for further explanation.
 
     my $cache = $ctx->cache;
     $cache->set('turtles',{ ilike => 'turtles' },600);
     my $do_i_like_turtles = $cache->get('turtles');
 
-That's cached for 600 seconds. See Catalyst::Plugin::Cache
-(http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ACache) for
-the docs.
+That's cached for 600 seconds. L<See Catalyst::Plugin::Cache|http://search.cpan.org/perldoc?Catalyst%3A%3APlugin%3A%3ACache>.
+
+=head1 AUTHOR
+
+--Samuel Kaufman, <skaufman at cpan.org>
 
 =cut
-
-#Pod::HTML2Pod conversion notes:
-#From file memcached-dbix-class.html
-# 3884 bytes of input
-#Mon Nov 22 16:40:36 2010 skaufman
-# No a_name switch not specified, so will not try to render <a name='...'>
-# Will try to render <a href='...'>
