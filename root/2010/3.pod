@@ -1,5 +1,7 @@
 =pod
 
+=head1 Painless Memcached Configuration With Catalyst & DBIx::Class
+
 This tutorial will show you how to:
 
 =over
@@ -16,7 +18,7 @@ else you might want to cache.
 
 =back
 
-B<Dependencies:>
+=head1 DEPENDENCIES
 
 Memcached:
 
@@ -51,6 +53,8 @@ DBIx::Class:
 =back
 
 So dump all those in your Makefile.PL and you're halfway there.
+
+=head1 CONFIGURATION
 
 First we edit your Catalyst app's base package. Open up your version of
 MyApp.pm and add:
