@@ -2,7 +2,7 @@
 
 =head1 Overview
 
-L<http://www.elasticsearch.com|ElasticSearch> is a search engine based on Lucene that has a number of really cool features that in my opinion, elevate it above a number of L<http://lucene.apache.org/solr/|other> L<http://sphinxsearch.com/|search> L<http://www.rectangular.com/kinosearch/|engines>.
+L<ElasticSearch|http://www.elasticsearch.com> is a search engine based on Lucene that has a number of really cool features that in my opinion, elevate it above a number of L<other|http://lucene.apache.org/solr/> L<search|http://sphinxsearch.com/> L<engines|http://www.rectangular.com/kinosearch/>.
 
 For instance, it's schema-less, which some would argue is a bad thing, but the way things are indexed (indexed "things" care called documents) in ElasticSearch allows the user to create a sort of per-document schema much like you would with MongoDB or other document-based storage engines.  It also has an "autodiscovery" features for other ElasticSearch instances on the network.  All you have to do is C<bin/elasticsearch> on the machines you want to cluster and poof, you have a distributed and fault tolerant index.
 
@@ -14,7 +14,7 @@ So! moving forward, let's get into some code and set up.
 
 =item Step 1
 
-Download your desired version and build of ElasticSearch here: L<http://www.elasticsearch.com/download/> (you can also L<http://www.elasticsearch.com/download/master/|build from source>)
+Download your desired version and build of ElasticSearch here: L<http://www.elasticsearch.com/download/> (you can also L<build from source|http://www.elasticsearch.com/download/master/>)
 
 =item Step 2
 
@@ -28,7 +28,7 @@ Start your instances by typing C<bin/elasticsearch> in the root directory where 
 
 =head1 A Simple API Introduction
 
-L<http://search.cpan.org/~drtech/ElasticSearch-0.27/lib/ElasticSearch.pm|ElasticSearch> is the Perl binding to the ElasticSearch REST API, and is written (marvelously) by Clinton Gormley.  It has a few key methods we will be using in this article.
+L<ElasticSearch|http://search.cpan.org/~drtech/ElasticSearch-0.27/lib/ElasticSearch.pm> is the Perl binding to the ElasticSearch REST API, and is written (marvelously) by Clinton Gormley.  It has a few key methods we will be using in this article.
 
 =over 12
 
@@ -46,7 +46,7 @@ Search your indexed data.  Takes an index name, a query type (you can also type 
 
 =back
 
-Okay.  So that's a basic ElasticSearch API.  There are plenty of L<http://www.elasticsearch.com/docs/elasticsearch/rest_api/|examples> on the site you can check out if you feel you need to grok this more thoroughly.  Next, we figure out how to tie this thing to Catalyst.
+Okay.  So that's a basic ElasticSearch API.  There are plenty of L<examples|http://www.elasticsearch.com/docs/elasticsearch/rest_api/s> on the site you can check out if you feel you need to grok this more thoroughly.  Next, we figure out how to tie this thing to Catalyst.
 
 =head1 Catalyst::Model
 
@@ -176,7 +176,9 @@ This will return something like:
           }
        }
     }'
-    {"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":4,"max_score":0.24368995,"hits":[{"_index":"ourindexdeimos","_type":"post","_id":"l_3Jw9PkRz2arFdHO3t5Pg","_score":0.24368995, "_source" : {
+    {"_shards":{"total":5,"successful":5,"failed":0},"hits":{"total":4,"max_score":0.24368995,
+     "hits":[{"_index":"ourindexdeimos","_type":"post","_id":"l_3Jw9PkRz2arFdHO3t5Pg",
+     "_score":0.24368995, "_source" : {
     "thingy":"thingy data"
     }
 
@@ -258,13 +260,14 @@ And there you go.  A very simple, flexible, and relatively fast search engine, w
 
 =head1 Parting notes
 
-ElasticSearch is extremely customizable and tuneable.  You can get a GREAT deal of performance improvement by playing with the indexing options, ranking algorithms, storage and request transports.  All of this is documented again at the L<http://www.elasticsearch.com|ElasticSearch> web site. 
+ElasticSearch is extremely customizable and tuneable.  You can get a GREAT deal of performance improvement by playing with the indexing options, ranking algorithms, storage and request transports.  All of this is documented again at the L<ElasticSearch|http://www.elasticsearch.com> web site. 
 
 One final thought, you can add the portion of the indexer code that actually inserts the document into the search index right after your "commit" portion of your data store for your application.  This way, you get virtually instantaneous indexing of your document upon its creation.
 
 Enjoy folks, I hope you find this as useful as I did!
 
 =head1 AUTHOR
+
 --Devin Austin, <dhoss@cpan.org>
 
 Created using Catalyst 5.80029 on a Mac Book Pro Perl version 5 revision 12 subversion 0
