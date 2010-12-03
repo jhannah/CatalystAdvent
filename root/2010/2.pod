@@ -264,7 +264,8 @@ One final thought, you can add the portion of the indexer code that actually ins
 
 Enjoy folks, I hope you find this as useful as I did!
 
---Devin "dhoss" Austin, 2010.
+=head1 AUTHOR
+--Devin Austin, <dhoss@cpan.org>
 
 Created using Catalyst 5.80029 on a Mac Book Pro Perl version 5 revision 12 subversion 0
 =cut
