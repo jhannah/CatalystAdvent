@@ -1,0 +1,103 @@
+=head1 Adding Simple Excel Support
+
+In this example I will expand on my
+L<http://www.catalystframework.org/calendar/2009/22|last year's advent article>
+on AJAX grids by adding an excel button to download the book list as an Excel
+spreadsheet.
+
+The complete tarball for this example is
+L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/MyApp_Chapter9_flexigrid.tar.gz|here>.
+
+We'll use
+L<http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel|this module>
+to create the Excel spreadsheets.
+
+=head1 The Button
+
+First we need a suitable Excel icon, find one and put it into your
+C<root/static/images> directory. I used
+L<http://www.nc-sco.com/images/excel-icon-small.gif|this one>.
+
+Insert standard disclaimer about not using other people's art without
+permission.
+
+Add the style for the button in the C<< <style> >> section of
+C<root/src/ajax.tt>, like so:
+
+    .flexigrid div.fbutton .excel
+    {
+    background: url([% c.uri_for('/static/images/excel-icon-small.gif') %]) no-repeat center left;
+    }
+
+Add the button in the C<buttons> section of the flexigrid:
+
+    {name: 'Excel', bclass: 'excel', onpress : export_to_excel},
+
+Now we'll write the javascript, as specified in the
+L<http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel#SYNOPSIS|synopsis>.
+
+    function export_to_excel(button, grid) {
+        $('<iframe '                                                  
+         +'src="/api/books?content-type=application%2Fvnd.ms-excel">')
+        .hide().appendTo('body');
+    }
+
+=head2 The Serializer
+
+The serializer is much like any other serializer you would write. It goes into
+the API controller.
+
+At the top, put:
+
+    use POSIX ();
+
+    __PACKAGE__->config->{map}{'application/vnd.ms-excel'} = 'SimpleExcel';
+
+Then the action:
+
+    sub books : Local ActionClass('REST') {}
+
+    sub books_GET {
+        my ($self, $c) = @_;
+       
+        my $rs = $c->model('DB::Book')->search({}, {
+            order_by => ['title']
+        });
+       
+        my @rows = map {
+            [ $_->id, $_->title, $_->rating, $_->author_list ]
+        } $rs->all;
+       
+        my $entity = {
+            header => ['ID', 'Title', 'Rating', 'Authors'],
+            rows => \@rows,
+            filename => 'books-'.POSIX::strftime('%m-%d-%Y', localtime)
+        };
+       
+        $self->status_ok(
+            $c,
+            entity => $entity
+        );
+    }
+
+=head2 Try it out
+
+Start the server with C<script/myapp_server.pl>.
+
+In your browser, open L<http://localhost:3000/ajax>. You will see the books
+grid, click on the excel icon and you should get a file download prompt for the
+Excel file, open it with Excel or OpenOffice.
+
+=head2 TODO
+
+We need an Excel deserializer, so that users can edit the downloaded Excel
+sheets and upload them back. It would also be nice if the ID column was
+highlighted and locked against editing.
+
+If you have any interest in these things, or in working on them, please email
+me, my email is at the bottom. Patches most certainly welcome as well.
+
+=head1 AUTHOR
+
+Caelum: Rafael Kitover <rkitover@cpan.org>
+
