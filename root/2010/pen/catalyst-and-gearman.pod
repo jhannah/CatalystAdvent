@@ -1,0 +1,4 @@
+=head1 Using Gearman with Catalyst to Create a Simple Image Thumbnailer
+
+
+=cut
