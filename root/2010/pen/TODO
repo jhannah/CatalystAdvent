@@ -8,8 +8,8 @@ Organising:
 Article ideas (2010 Calendar):
  - facebook general application development (Getty)
  - Catalyst + Gearman (dhoss)
- - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss)
- - Catalyst + ElasticSearch (dhoss)
+ - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss) - i think davewood is going to take care of this
+ - Catalyst + ElasticSearch (dhoss) - **DONE**
  - DBIC::Fixtures - lukes (?)
  - twitter authentication/applications + Catalyst
  - .... as an Absolute Beginner (tm) could I put in a request for some newbie-friendly Cat-for-dummies entries? - victor from the mailing list
@@ -21,7 +21,7 @@ Article ideas (2010 Calendar):
  - large scale application deployment, regarding replication, load balancing, etc. 
  - DBIC pretty printers, console and plack versions
  - plack middleware goodness for your Catalyst apps
- - Catalyst + DBIC + memcached - skaufman
+ - Catalyst + DBIC + memcached - skaufman - **DONE**
  - Catalyst + jQuery theme roller - steve@matsch.com
 
 Confirmed ideas: 
@@ -53,12 +53,12 @@ Editors:
 
 Dates needed:
  - 1: DONE ("State of the Chainsaw" - ribasushi)
- - 2:      ("Catalyst + OAuth for Twitter" - dhoss [as a fallback, I know others want to write an article for tomorrow])
- - 3
- - 4
+ - 2: DONE ("Catalyst + ElasticSearch" - dhoss [as a fallback, I know others want to write an article for tomorrow])
+ - 3:
+ - 4:
  - 5: t0m
- - 6
- - 7 
+ - 6: DONE ("Excel in Catalyst" - Caelum)
+ - 7:      ("Catalyst and Gearman" - dhoss) 
  - 8 
  - 9
  - 10
@@ -78,6 +78,7 @@ Dates needed:
  - 24
 
 Plan of attack:
+ - wing it
 
 
 People to annoy: 
