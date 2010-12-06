@@ -1,7 +1,7 @@
 =head1 Adding Simple Excel Support
 
 In this example I will expand on my
-L<last year's advent article|http://www.catalystframework.org/calendar/2009/22>
+L<Advent article from last year|http://www.catalystframework.org/calendar/2009/22>
 on AJAX grids by adding a button to download the book list as an Excel
 spreadsheet.
 
@@ -14,7 +14,7 @@ to create the Excel spreadsheets.
 
 =head1 The Button
 
-First we need a suitable Excel icon, find one and put it into your
+First we need a suitable Excel icon. Find one and put it into your
 C<root/static/images> directory. I used
 L<this one|http://www.nc-sco.com/images/excel-icon-small.gif>.
 
@@ -33,7 +33,7 @@ Add the button in the C<buttons> section of the flexigrid:
 
     {name: 'Excel', bclass: 'excel', onpress : export_to_excel},
 
-Now we'll write the javascript, as specified in the
+Now we'll write the JavaScript, as specified in the
 L<synopsis|http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel#SYNOPSIS>.
 
     function export_to_excel(button, grid) {
@@ -87,17 +87,18 @@ Then the action:
 Start the server with C<script/myapp_server.pl>.
 
 In your browser, open L<http://localhost:3000/ajax>. You will see the books
-grid, click on the excel icon and you should get a file download prompt for the
-Excel file, open it with Excel or OpenOffice.
+grid; click on the Excel icon and you should get a file-download prompt for the
+Excel file. Open it with Excel or OpenOffice.
 
 =head2 TODO
 
 We need an Excel deserializer, so that users can edit the downloaded Excel
-sheets and upload them back. It would also be nice if the ID column was
+sheets and upload them back. It would also be nice if the ID column were
 highlighted and locked against editing.
 
-If you have any interest in these things, or in working on them, please email
-me, my email is at the bottom. Patches most certainly welcome as well.
+If you have any interest in these issues, please email me at the address
+below, especially if you are able to do any work on them. Patches most
+certainly welcome as well.
 
 =head1 AUTHOR
 
