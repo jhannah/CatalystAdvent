@@ -42,6 +42,8 @@ L<http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel#SYNOPS
         .hide().appendTo('body');
     }
 
+This initiates the file download.
+
 =head2 The Serializer
 
 The serializer is much like any other serializer you would write. It goes into
