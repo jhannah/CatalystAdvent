@@ -1,22 +1,22 @@
 =head1 Adding Simple Excel Support
 
 In this example I will expand on my
-L<http://www.catalystframework.org/calendar/2009/22|last year's advent article>
+L<last year's advent article|http://www.catalystframework.org/calendar/2009/22>
 on AJAX grids by adding a button to download the book list as an Excel
 spreadsheet.
 
 The complete tarball for this example is
-L<http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/MyApp_Chapter9_flexigrid.tar.gz|here>.
+L<here|http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/MyApp_Chapter9_flexigrid.tar.gz>.
 
 We'll use
-L<http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel|this module>
+L<this module|http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel>
 to create the Excel spreadsheets.
 
 =head1 The Button
 
 First we need a suitable Excel icon, find one and put it into your
 C<root/static/images> directory. I used
-L<http://www.nc-sco.com/images/excel-icon-small.gif|this one>.
+L<this one|http://www.nc-sco.com/images/excel-icon-small.gif>.
 
 Insert standard disclaimer about not using other people's art without
 permission.
@@ -34,7 +34,7 @@ Add the button in the C<buttons> section of the flexigrid:
     {name: 'Excel', bclass: 'excel', onpress : export_to_excel},
 
 Now we'll write the javascript, as specified in the
-L<http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel#SYNOPSIS|synopsis>.
+L<synopsis|http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel#SYNOPSIS>.
 
     function export_to_excel(button, grid) {
         $('<iframe '                                                  
