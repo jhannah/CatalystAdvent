@@ -2,22 +2,234 @@
 
 =head2 SYNOPSIS
 
-L<Gearman> is a distributed job queue system that excels in doing things quickly, and asynchronously run job processes for things that need batch processesing, or those which you don't want your web application having to deal with.  It's quick, and good for things like thumbnailing, which we will be talking about today.
+L<Gearman|http://search.cpan.org/~dormando/Gearman-1.11/> is a distributed job queue system that excels in doing things quickly, and asynchronously run job processes for things that need batch processesing, or those which you don't want your web application having to deal with.  It's quick, and good for things like thumbnailing, which we will be talking about today.
 
 =head2 REQUIREMENTS
 
 =over 12
 
-=item L<Gearman::Server> 
+=item L<Gearman::Server|http://search.cpan.org/~dormando/Gearman-Server-1.11/lib/Gearman/Server.pm> 
 
 This is the actual job server that keeps track of jobs, and what the worker processes connect to. Initialized with C<gearmand>.
 
-=item L<Gearman::Worker>
+=item L<Gearman::Worker|http://search.cpan.org/~dormando/Gearman-1.11/lib/Gearman/Worker.pm>
 
 This is your worker instance, which actually does the job you want done.  HINT:  We want to do thumbnailing, so this will contain the code for creating thumbnails from images.
+
+=item L<Gearman::Client|http://search.cpan.org/~dormando/Gearman-1.11/lib/Gearman/Client.pm>
+
+This connects to the server(s) and communicates what jobs to execute etc.
 
 =item L<Catalyst>
 
 Duh.
+
+=back
+
+=head2 The Process
+
+So, here's how this goes down:
+
+The web browser uploads the image to your Catalyst app.  Catalyst writes out the image to your given directory on the file system, maybe inserts a pointer to that in the database, and then at the same time, creates a job in the Gearman worker pool to create a thumbnail of said image.  Gearman either queues it up because it's working on other images, or it takes care of it right away if it's just twiddling its thumbs.  Then, presto, you have a thumbnail of your image(s)!
+
+Again, a small ascii flowchart of this process should remove all questions you have of this process:
+
+<pre>
+Browser uploads image -> Catalyst writes this to the filesystem 
+                      -> Catalyst creates a job in the Gearman worker pool -> Gearman queues job, then takes care of it -> your thumbnail appears wherever needed!
+                                                                           |
+                                                                         < -
+                        Catalyst doesn't sit and wait for the thumbnail to be created, 
+                        instead, sends confirmation page back to the browser 
+</pre>
+
+
+=head2 Finally, Some Code
+
+Okay, so we need:
+
+=over 12
+
+=item A Server
+
+Simply enough, we just run C<gearmand --daemonize> and we have our server.
+
+
+=item A Worker
+
+Here's the code for the thumbnail job I came up with:
+
+    package Worker;
+    use Moose;
+    use namespace::autoclean;
+    use Gearman::Worker;
+    use Deimos::ConfigContainer;
+    use Imager;
+    use IO::Scalar;
+    use File::Basename;
+
+    has worker => ( 
+        is => 'ro', 
+        isa => 'Gearman::Worker', 
+        required => 1, 
+        lazy => 1,
+        default => sub { Gearman::Worker->new }
+    );
+
+
+    has 'imager' => (
+        is         => 'ro',
+        required   => 1,
+        lazy => 1,
+        default => sub { Imager->new }
+    );
+
+    has 'config' => (
+       is => 'ro',
+       required => 1,
+       lazy => 1,
+       default => sub { # your config object goes here },
+    );
+
+    sub BUILD {
+        my $self = shift;
+        $self->worker->job_servers('127.0.0.1'); 
+        $self->worker->register_function(thumbinate => sub { $self->thumbinate($_[0]->arg) });
+    }
+
+
+    sub thumbinate {
+        my ($self, $file) = @_;
+
+        my $image = $self->imager;
+        my $scaled;
+        if ( $image->read( file => $file ) ) {
+                 $scaled = $image->scale( ypixels => $self->config->{thumbnail_max_height} );
+                 
+                 ## write our image to disk
+                 binmode STDOUT;
+                 $| = 1;
+                 my $data;
+                 $scaled->write( data => \$data, type => 'png'  )
+                   or die $scaled->errstr;
+                 return $file;
+                    
+             } else {
+                 die "file not read, " . $image->errstr;
+             }
+    }
+    1;
+
+Quick breakdown: 
+
+    has worker => ( 
+        is => 'ro', 
+        isa => 'Gearman::Worker', 
+        required => 1, 
+        lazy => 1,
+        default => sub { Gearman::Worker->new }
+    );
+
+This creates our C<Gearman::Worker> object.
+
+    has 'imager' => (
+        is         => 'ro',
+        required   => 1,
+        lazy => 1,
+        default => sub { Imager->new }
+    );
+
+This creates our C<Imager> object, which we use to create the thumbnails.
+
+ sub BUILD {
+        my $self = shift;
+        $self->worker->job_servers('127.0.0.1'); 
+        $self->worker->register_function(thumbinate => sub { $self->thumbinate($_[0]->arg) });
+  }
+
+This tells our C<Gearman::Worker> object that our server (a list of server IPs can be passed here) resides at 127.0.0.1, and registers the job "thumbinate" with the associated job defined in this class, with the proper arguments passed.
+
+    sub thumbinate {
+        my ($self, $file) = @_;
+
+        my $image = $self->imager;
+        my $scaled;
+        if ( $image->read( file => $file ) ) {
+                 $scaled = $image->scale( ypixels => $self->config->{thumbnail_max_height} );
+                 
+                 ## write our image to disk
+                 binmode STDOUT;
+                 $| = 1;
+                 my $data;
+                 $scaled->write( data => \$data, type => 'png'  )
+                   or die $scaled->errstr;
+                 return $file;
+                    
+             } else {
+                 die "file not read, " . $image->errstr;
+             }
+    }
+
+This is where the thumbnailing takes place, and it is the job that we register with Gearman.
+
+=item A Worker Initializer
+
+    #!/usr/bin/env perl
+
+    use strict;
+    use Jobs::Worker;
+
+    my $worker = Jobs::Worker->new;
+    $worker->worker->work while 1;
+
+This acts as the daemon for workers, that basically listens for jobs from the C<gearmand> instance.  Start with C<< perl -Ilib script/jobs.pl 2>workerlog.log & >> or some such.
+
+
+=item A Catalyst app and Model to Glue it all Together
+
+    package MyApp::Model::Job;
+
+    use parent 'Catalyst::Model';
+    use Gearman::Client;
+    use Moose;
+    use namespace::autoclean;
+
+    has 'gearman' => (
+        is => 'ro',
+        isa => 'Gearman::Client',
+        required => 1,
+        lazy => 1,
+        default => sub { Gearman::Client->new }
+    );
+
+    has 'job_servers' => (
+        is => 'ro',
+        required => 1,
+        lazy => 1,
+        default => '127.0.0.1',
+    );
+
+
+
+
+    sub add {
+        my ($self, @tasks) = @_;
+        my $gm = $self->gearman;
+        $gm->job_servers($self->job_servers);
+        my $res = $gm->do_task($tasks[0] => $tasks[1]);
+        return $res;
+    }
+
+    1;
+
+Quick synopsis: 
+
+The important method here is C<add>.  Basically, we set our job servers, and call C<< ->do_task >> with the taskname and the associated job name defined in our worker class.  Not much going on here.
+
+Finally, we need to have code that actually calls this when we upload an image.
+
+
+
+=back
 
 =cut
