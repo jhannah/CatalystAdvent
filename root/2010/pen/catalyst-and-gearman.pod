@@ -228,8 +228,92 @@ The important method here is C<add>.  Basically, we set our job servers, and cal
 
 Finally, we need to have code that actually calls this when we upload an image.
 
+    package MyApp::Controller::Media;
+    # the usual Catalyst controller stuff goes here 
+    
+    # this is actually a method using ActionClass('REST'), so that's where the ->status_* stuff comes from
+    sub add_asset : Local  {  # or Chained, if you prefer like I do
+        my ( $self, $c ) = @_;
+        my $data = $c->req->data || $c->req->params;
+        $c->log->debug( "uploads: " . Dumper $c->req->uploads );
+        return $self->status_bad_request( $c, message => "you must upload a file" )
+          unless $c->req->upload('file') || $c->req->upload('qqfile');
+        my $upload = $c->req->upload('file') || $c->req->upload('qqfile');
+        my $filename = $upload->filename;
+        my $media_type = ( by_suffix $data->{'file'} )[0];
+        try {
+
+            my $media = $c->model('Database::Attachment')->create(
+                {
+                    name => $data->{'name'} || $filename,
+                    owner     => $c->user->get("userid"),
+                    published => $data->{'published'},
+                    mediatype => $media_type, 
+                    file      => $upload->fh,
+                }
+            );
+            $c->log->debug("Thumbnail: " . $media->thumbnail . "");
+            my $thumb;
+            if ( $media_type =~ /^image\/.+/i ) {
+                $c->log->debug("matched image");
+                $thumb = $c->model('Job')->add('thumbinate' => $media->file . "");
+            }
+            if ( $data->{entry} ) {
+                $c->log->debug( "adding an attachment to " . $data->{entry} );
+                $media->add_to_entries( { entry => $data->{entry} } );
+                $c->model('CMS')->entry->publish($data->{entry}) or die "Can't publish entry; $!";
+            }
+
+            return $self->status_created(
+                $c,
+                location => $c->req->uri->as_string,
+                entity   => { message => "file uploaded" }
+            );
+        }
+        catch {
+            return $self->status_bad_request( $c, message => "Failed to save '$filename': $_" );
+        };
+
+    }
+
+There is some extra code in here that describes other things you might do, say, update a record with the thumbnail image's location, check to see if there IS a thumbnail, etc.
+
+The real important bits are: 
+
+=over 4
+
+=item Get the filename 
+
+
+    my $upload = $c->req->upload('file') || $c->req->upload('qqfile');
+    my $filename = $upload->filename;
+
+=item Get the MIME type:
+
+(Obviously you need to C<use MIME::Types qw/by_suffix/;> for this)
+
+     my $media_type = ( by_suffix $data->{'file'} )[0];
+
+=item Create the Job
+
+     if ( $media_type =~ /^image\/.+/i ) {
+            $c->log->debug("matched image");
+            $thumb = $c->model('Job')->add('thumbinate' => $media->file . "");
+     }
+
+=back 
 
 
 =back
+
+And that's that.  You now have the ability to create thumbnails cleanly and smoothly with Gearman and Catalyst.
+
+=head2 Final Notes
+
+Note that some of you may have done this with L<TheSchwartz|http://search.cpan.org/~sixapart/TheSchwartz-1.10/lib/TheSchwartz.pm>.  Which is all good and fine.  However, it's concerned more about reliability than speed.  Gearman doesn't check to make sure jobs got done successfully, but it is much more suited for creating thumbnails because of speed.  Thumbnails can also be trivially recreated if something fails.
+
+=head2 Author
+
+Devin Austin <dhoss@cpan.org>
 
 =cut
