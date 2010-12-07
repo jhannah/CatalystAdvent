@@ -7,7 +7,7 @@ Organising:
 
 Article ideas (2010 Calendar):
  - facebook general application development (Getty)
- - Catalyst + Gearman (dhoss)
+ - Catalyst + Gearman (dhoss) - **DONE**
  - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss) - i think davewood is going to take care of this
  - Catalyst + ElasticSearch (dhoss) - **DONE**
  - DBIC::Fixtures - lukes (?)
@@ -58,12 +58,12 @@ Dates needed:
  - 4: Test::DBIx::Class - dhoss
  - 5: t0m
  - 6: DONE ("Excel in Catalyst" - Caelum)
- - 7:      ("Catalyst and Gearman" - dhoss) 
- - 8:       Form::Sensible::Reflector::DBIC + Catalyst - dhoss 
+ - 7: DONE("Catalyst and Gearman" - dhoss) 
+ - 8:       ("OpsView" - Ton Voon)
  - 9:       jqgrid + Catalyst:Controller::REST - dhoss
- - 10:
+ - 10:      Form::Sensible::Reflector::DBIC + Catalyst - dhoss 
  - 11:
- - 12:
+ - 12:      ("jQueryUI +Catalyst" - Sir and friends)
  - 13:
  - 14:
  - 15: twitter authentication/applications + Catalyst - dhoss
