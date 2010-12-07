@@ -62,7 +62,7 @@ Dates needed:
  - 8:       ("OpsView" - Ton Voon)
  - 9:       jqgrid + Catalyst:Controller::REST - dhoss
  - 10:      Form::Sensible::Reflector::DBIC + Catalyst - dhoss 
- - 11:
+ - 11:      ("Data::SearchEngine" - gphat)
  - 12:      ("jQueryUI +Catalyst" - Sir and friends)
  - 13:
  - 14:
