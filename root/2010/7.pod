@@ -34,14 +34,14 @@ The web browser uploads the image to your Catalyst app.  Catalyst writes out the
 
 Again, a small ascii flowchart of this process should remove all questions you have of this process:
 
-<pre>
-Browser uploads image -> Catalyst writes this to the filesystem 
+
+    Browser uploads image -> Catalyst writes this to the filesystem 
                       -> Catalyst creates a job in the Gearman worker pool -> Gearman queues job, then takes care of it -> your thumbnail appears wherever needed!
                                                                            |
                                                                          < -
                         Catalyst doesn't sit and wait for the thumbnail to be created, 
                         instead, sends confirmation page back to the browser 
-</pre>
+
 
 
 =head2 Finally, Some Code
