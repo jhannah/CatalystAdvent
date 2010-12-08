@@ -26,11 +26,11 @@ Article ideas (2010 Calendar):
 
 Confirmed ideas: 
  - facebook general application development (Getty)
- - Catalyst + Gearman (dhoss)
+ - Catalyst + Gearman (dhoss) ** DONE **
  - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss)
- - Catalyst + ElasticSearch (dhoss)
+ - Catalyst + ElasticSearch (dhoss) ** DONE **
  - twitter authentication/applications + Catalyst
- - Opsview does i18n with Catalyst (Ton Voon)
+ - Opsview does i18n with Catalyst (Ton Voon) - ** DONE **
 
 Ideas looking for authors
   - Catalyst::TraitFor::Model::DBIC::Schema::Caching / DBIx::Class::Cursor::Cached
