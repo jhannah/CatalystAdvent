@@ -1,0 +1,114 @@
+=head1 Input Verification with Data::Manager
+
+=head2 A general commentary on the philosophy of data typing.
+
+I don't believe anybody should be coding without C<use Moose> these days. Moose
+grants so much power with type checking, coercion and attribute handling
+that it's pure folly to not use it. This, I presume, is not a new position.
+
+Where Data::Verifier enters the fray is the adherence to Moose types. Types
+that can easily be defined and extended, as well as use the built-in types. You
+can also use coercions. This allows, at the verification step, a user input
+that resembles "tomorrow at 2pm" into a DateTime object (given sufficiently
+advanced DateTime coercion). It can even become more advanced, by having types
+such as "DateTimeAfterToday" where it checks, post-coercion, that it is indeed
+after the current date.
+
+This is a type of verification and translation of user input that I don't
+believe was made possible (in Perl) before Moose. The guts of Data::Verifier
+reveal just how simple the code can be to accomplish significant work. There is
+the genius of this whole bag of tricks. It's very simple in its utilization, and
+gives much power.
+
+=head2 A brief mention of Data::Manager.
+
+Data::Manager is a glue module that marries Data::Verifier and Message::Stack.
+This handles the automatic parsing of Data::Verifier::Results and returns a
+populated Message::Stack with the configured and correct scopes.
+
+Because of this thin layer of functionality, there isn't much to say about
+Data::Manager.
+
+However, there is a lot to say in how to populate Data::Manager, and here is my
+preferred method!
+
+=head2 Being lazy with Catalyst modeling.
+
+In my applications, I have a Model::DataManager class which just builds out
+a Data::Manager object and returns it (per context, using
+Catalyst::Component::InstancePerContext). It looks at every model in my
+application for a verify attribute and then uses that. This means that I can,
+at any point, directly call C<verify> on the model, or I can use Data::Manager.
+
+And here is the very simple C<instance_per_context> call in my DataManager model:
+
+ with 'Catalyst::Component::InstancePerContext';
+
+ sub build_per_context_instance {
+     my ( $self, $c ) = @_; 
+     # Time to get building! Look through every model and see if it has a
+     # verifier attribute (to be extra safe, inspect the verifier to make
+     # sure that it isa Data::Verifier)
+
+     my %scopes = ();
+     foreach my $name ( $c->models ) {
+         next if $name eq 'DataManager';
+         my $model = $c->model($name);
+         next unless $model->can('meta');
+
+         # This is intentionally naive for the sake of simple examples
+         next unless $model->meta->has_attribute('verifier');
+
+         $scopes{$name} = $model->verifier;
+     }
+     my $dm = Data::Manager->new( verifiers => \%scopes );
+
+     $self->data_manager( $dm );
+
+     return $dm;
+ }
+
+What this gives is a fully populated Data::Manager available at
+C<$c-E<gt>model('DataManager')> for usage. This just uses the model name as
+the scope identifier. In practice, I've found it to be more beneficial to have
+an attribute C<verification_scope> that sets the scope. This can be overridden
+with Catalyst's configuration system, making it more general purpose and
+abstract.
+
+When combined with nested parameters (See L<Catalyst::Plugin::Params::Nested|http://search.cpan.org/dist/Catalyst-Plugin-Params-Nested/lib/Catalyst/Plugin/Params/Nested.pm> the user input (through forms) is formatted like C<name="ModelName.field"> and then verification happens easily:
+
+ my $input = $c->req->params;
+ # Though do verify this is what you expect
+ foreach my $key ( keys %$input ) {
+     if ( ref $input->{$key} eq 'HASH' ) {
+         $c->model('DataManager')->verify( $key, $input->{$key} );
+     }
+ }
+
+I actually have the above in a method in a separate package that extends
+Data::Manager, with some more specific checks that verify that the scope exists
+to verify, and some other enhancements that would really just complicate the
+example. I encourage the reader to build out a model that has all the
+application specific additions to make using Data::Manager simpler and more
+natural to use.
+
+=head2 The results are in!
+
+After you verify through Data::Manager, you have everything readily available.
+
+C<$c-E<gt>model("DataManager")-E<gt>success> being the most obvious of the useful values (which looks at every scope to guarantee success).
+
+From there, you can serialize the results (a hash ref of Data::Verifier
+objects) and use them on failure (both in flash or stash, so you can honor
+Redirect-After-Post best practices).
+
+The other non-obvious benefit is that often times you may find yourself working
+with a form or user-input that covers more than just a single model. This technique allows forms to automatically manage the verification of multiple models and return the results in a sane and packaged format.
+
+
+=head1 AUTHOR
+
+Jay Shirley <jshirley@gmail.com> from L<Cold Hard Code|http://www.coldhardcode.com>
+
+=cut
+
