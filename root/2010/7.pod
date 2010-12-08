@@ -209,9 +209,6 @@ This acts as the daemon for workers, that basically listens for jobs from the C<
         default => '127.0.0.1',
     );
 
-
-
-
     sub add {
         my ($self, @tasks) = @_;
         my $gm = $self->gearman;
