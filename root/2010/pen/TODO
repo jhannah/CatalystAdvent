@@ -59,10 +59,10 @@ Dates needed:
  - 5: t0m
  - 6: DONE ("Excel in Catalyst" - Caelum)
  - 7: DONE("Catalyst and Gearman" - dhoss) 
- - 8:       ("OpsView" - Ton Voon)
- - 9:       jqgrid + Catalyst:Controller::REST - dhoss
- - 10:      Form::Sensible::Reflector::DBIC + Catalyst - dhoss 
- - 11:      ("Data::SearchEngine" - gphat)
+ - 8: DONE   ("Data::SearchEngine" - gphat)
+ - 9: DONE  ("OpsView" - Ton Voon)
+ - 10: DONE ("Data::Manager" - jshirley)      
+ - 11:      Form::Sensible::Reflector::DBIC + Catalyst - dhoss      
  - 12:      ("jQueryUI +Catalyst" - Sir and friends)
  - 13:
  - 14:
