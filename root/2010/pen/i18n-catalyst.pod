@@ -1,0 +1,167 @@
+=head1 Internationalising Catalyst, Part 1
+
+=head2 SYNOPSIS
+
+The internet is a global marketplace. If you want to have your web site reach the widest
+audiences, then you need to make sure your Catalyst application is translatable. This advent calendar entry explains how to create an I18N application using Catalyst::Plugin::I18N, based on lessons we learnt from L<Opsview|http://opsview.com>. We'll follow up with a 2nd entry with some more hints and tips.
+
+=head2 REQUIREMENTS
+
+These were our main requirements for internationalisation: 
+
+=over
+
+=item Gettext
+
+Because there are lots of tools already available and there is no point designing your own message catalog system
+
+=item Language detection rules
+
+We want to the user's preference to take priority, otherwise do browser detection
+
+=item Arbitrary strings as the key 
+
+In our experience, using the English version as the key will cause trouble if there are typos 
+or you need to change the text in future. We like to use a dotted notation that gives an idea of where
+to find the string and what context it is used.
+
+=item Dependable fallback
+
+If string was not available in a different language, it must fall back to the English translation 
+(This was surprisingly tricky. It took about 6 hours to work out where the fallback should happen, but a one line 
+change finally added this functionality: http://lists.scsys.co.uk/pipermail/catalyst-dev/2009-July/001718.html).
+
+=back
+
+=head2 PROCESS
+
+We'll assume you already know the basics of Catalyst, including installation of modules, running the development
+server and adding new controllers and templates.
+
+For a brand new Catalyst application, these are the steps:
+
+  catalyst.pl MyApp
+  cd MyApp
+  vi lib/MyApp.pm
+
+Add I18N and Unicode to the plugin list.
+
+Create a TT view in lib/MyApp/View/TT.pm:
+
+  package MyApp::View::TT;
+  use base 'Catalyst::View::TT';
+  __PACKAGE__->config( { ENCODING => "UTF-8" } );
+  use Template::Filters;
+  $Template::Filters::FILTERS->{escape_js_string} = \&escape_js_string;
+  sub escape_js_string {
+    my $s = shift;
+    $s =~ s/(\\|'|"|\/)/\\$1/g;
+    return $s;
+  }
+  1;
+
+Add a url for a welcome page in lib/Controller/Root.pm:
+
+  sub welcome : Local {}
+
+Then create a template in root/welcome:
+
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+  <html>
+  <body>
+  <h1>[% c.loc("ui.welcome.title.welcome") | html %]</h1>
+  <p>[% c.loc("ui.welcome.text.introduction") | html %]</p>
+  </body>
+  </html>
+
+Startup your dev server and goto http://localhost:3000/welcome. You should get a page with:
+
+  ui.welcome.title.welcome
+  ui.welcome.text.introduction
+
+This is because there is no translation, so the final fallback is to the original message key.
+Now collect all the internationalised texts and create a message catalog, messages.pot:
+
+  mkdir lib/MyApp/I18N
+  xgettext.pl -P perl=* -P tt2=* --output=lib/MyApp/I18N/messages.pot --directory=lib/ --directory=root/
+
+(You don't need all those options, but we found it was a lot quicker if you specified only the file formats you wanted to parse.)
+
+Copy messages.pot to i_default.po and start translating! I have:
+
+  msgid "ui.welcome.text.introduction"
+  msgstr "This is a demonstration of Catalyst's translation abilities"
+
+  msgid "ui.welcome.title.welcome"
+  msgstr "Welcome to Catalyst I18N!"
+
+Make sure you set a suitable CHARSET! If you don't, then Catalyst will raise an error, but it won't say anything useful. We've managed to track down the problem - see https://rt.cpan.org/Ticket/Display.html?id=63722 for a patch to Locale::Maketext::Lexicon that raises a better error message.
+
+You can now restart the dev server. You should see this in the debug output:
+
+  [debug] Initialized i18n "MyApp::I18N"
+
+Going to http://localhost:3000/welcome should now show you:
+
+  Welcome to Catalyst I18N!
+  This is a demonstration of Catalyst's translation abilities
+
+Now to switch languages, we'll add the language selection rules in /auto:
+
+  if ($_ = scalar $c->req->param("lang") ) {
+    $c->languages( $_ );
+  }
+  if ($c->debug) {
+    my $languages = $c->languages;
+    $c->log->debug( "Languages setting: " . Data::Dump::dump($languages) );
+  }
+
+$c->languages is provided by Catalyst::Plugin::I18N. If it is not set, then it will take the browser's language settings and use that. So our implemented rules for language detection above is:
+
+=over
+
+=item *
+
+Use the URL parameter ?lang=
+
+=item *
+
+Otherwise use browser settings
+
+=back
+
+Of course, you could introduce logic based on the URL path or on a cookie setting.
+
+In Opsview, our user's have a language setting in their preferences, so we use that after the ?lang= but before the browser detection (convert_to_arrayref is a little helper function that converts a scalar into an array):
+
+if ( $_ = $c->req->param('lang') || $c->user_exists && $c->user && ( $_ = $c->user->language ) ) ) {
+  my $lang = convert_to_arrayref( $_ );
+  $c->languages( $lang );
+}
+
+So that's the language detection sorted. Let's create some language files! 
+Copy i_default.po to fr.po and change one of the strings. Set the other msgstr to "".
+
+  #: root/welcome:2
+  msgid "ui.welcome.text.introduction"
+  msgstr ""
+
+  #: root/welcome:1
+  msgid "ui.welcome.title.welcome"
+  msgstr "Bienvenue à I18N Catalyst"
+
+Restart the dev server. You need to restart the dev server for every string change - this is because Catalyst loads up all the strings at setup time, so there will be memory used for every language you support.
+
+Go to http://localhost:3000/welcome?lang=fr. You should see the French welcome title, but the English introduction. Note that you will still get the English introduction if you remove the ui.welcome.text.introduction key from the French po file.
+
+To test the browser language selection, in Firefox 3.6 (on the Mac), go to Firefox => Preferences => Content and 
+click on Choose for Languages. 
+You can then add French and move it up above English and then go to http://localhost:3000/welcome. You should now get the French version.
+
+And that's the basics! You can add other language files to try out, but come back for part 2 where we'll show you some more hints and tricks!
+
+=head2 Author
+
+Ton Voon <ton.voon@opsview.com>
+
+=cut
