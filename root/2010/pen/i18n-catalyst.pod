@@ -3,7 +3,7 @@
 =head2 SYNOPSIS
 
 The internet is a global marketplace. If you want to have your web site reach the widest
-audiences, then you need to make sure your Catalyst application is translatable. This advent calendar entry explains how to create an I18N application using Catalyst::Plugin::I18N, based on lessons we learnt from L<Opsview|http://opsview.com>. We'll follow up with a 2nd entry with some more hints and tips.
+audiences, then you need to make sure your Catalyst application is translatable. This advent calendar entry explains how to create an I18N application using Catalyst::Plugin::I18N, based on lessons we learned from L<Opsview|http://opsview.com>. We'll follow up with a 2nd entry with some more hints and tips.
 
 =head2 REQUIREMENTS
 
