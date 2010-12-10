@@ -1,0 +1,144 @@
+=head1 DBIx::Class::InflateColumn::FS and X-Sendfile
+
+In this article I will explain how to elegantly store user submitted HTML code 
+in the filesystem for later delivery with X-Sendfile.
+
+=head1 Storing pages
+
+We are using L<DBIx::Class::InflateColumn::FS> to store content in the filesystem.
+
+=head2 Setting up your schema result class
+
+Code:
+
+MyApp/Schema/Result/Pages.pm
+
+    __PACKAGE__->load_components(qw/InflateColumn::FS Core/);
+    __PACKAGE__->add_columns(
+        id => {
+            data_type         => 'INT',
+            is_auto_increment => 1,
+        },
+        file => {
+            data_type      => 'TEXT',
+            is_fs_column   => 1,
+            fs_column_path => '/var/www/myapp/root/pages',
+        },
+    );
+
+=head2 Passing the content to the schema
+
+If you pass a filehandle to the C<file> column, filesystem management will be handled by 
+DBIx::Class::InflateColumn::FS. So somewhere in your Controller you probably want code like this:
+
+Code:
+
+MyApp/Controller/Pages.pm
+
+    use IO::File;
+    use Carp;
+
+    sub create :Path('create') Args(0) {
+        my ($self, $c) = @_;
+
+        # user submitted html code in a forms textarea
+        # validate form with module of your choice
+        ...
+
+        my $validated_page_code = ...
+
+        # create a temp file
+        $fh = IO::File->new_tmpfile;
+        print {$fh} $validated_page_code
+            or croak 'Couldn't write to temporary file';
+        close $fh
+            or croak 'Couldn't close temporary file';
+        
+        # store page
+        $c->model('DB::Pages')->create({ file => $fh });
+    }
+
+=head1 Delivering pages
+
+Now that the page is stored in our filesystem let's have a look how to 
+deliver the file using X-Sendfile.
+
+X-Sendfile lets the webserver deal with delivery of static files.
+
+The X-Sendfile features is supported by Apache, Lighttpd and nginx 
+(nginx is calling it X-Accel-Redirect though). Here is an Apache configuration.
+
+First, install mod_xsendfile. On Debian based systems use the package system.
+
+    aptitude install libapache2-mod-xsendfile
+
+then enable the module in your apache configuration
+
+    XSendfile On
+
+Now Apache looks for the presence of a X-Sendfile header and delivers the file 
+referenced in the header.
+
+=head2 Setting the X-Sendfile header. 
+
+You might want to put this code into a Role and let your Controller consume it.
+
+Code:
+
+    sub sendfile {
+        my ($self, $c, $file, $content_type) = @_;
+    
+        my $engine = $ENV{CATALYST_ENGINE} || '';
+    
+        # Catalyst development server
+        if ( $engine =~ /^HTTP/ ) {
+            if ( $file->stat && -f _ && -r _ ) {
+                $c->res->body( $file->openr );
+            }
+        }
+    
+        # Deployment with FastCGI
+        elsif ( $engine eq 'FastCGI' ) {
+            $c->res->header('X-Sendfile', $file);
+            $c->res->body("foo"); # MASSIVE HACK: bypass RenderView
+        }
+    
+        # unknown engine
+        else {
+            die "Unknown engine: " . $engine;
+        }
+    
+        $c->res->content_type($content_type);
+        $c->res->content_length( $file->stat->size );
+        $c->res->status(200);
+        $c->detach;
+    }
+
+=head2 the 'send' action
+
+Also in your controller add a send action that 
+sets the X-Sendfile header for the requested file.
+
+Code:
+
+    sub send : Path('send') Args(1) {
+        my ( $self, $c, $page_id ) = @_;
+        
+        # get the requested page from your model
+        my $page = $c->model('DB::Pages')->find($page_id);
+
+        # display error page if requested page doesn't exist
+        $c->detach('/error404') unless $page;
+        
+        # set X-Sendfile header
+        $self->sendfile($c, $page->file, 'text/html');
+    }
+
+=head1 Further Reading
+
+This article is based on the Catayst Cookbook entry 
+L<Controller With Fileupload|http://wiki.catalystframework.org/wiki/wikicookbook/controllerwithfileupload>.
+
+=head1 AUTHOR
+
+davewood: David Schmidt <davewood@gmx.at>
