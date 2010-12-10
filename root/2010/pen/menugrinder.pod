@@ -1,0 +1,200 @@
+=for vim: set tw=80 fo=t noai ts=4 sts=4 et:
+
+=head1 Adding Dynamic Menus to Your App with MenuGrinder
+
+=head2 Overview
+
+L<WWW::MenuGrinder> is a simple framework for working with dynamic menus and
+integrating them into web applications, and it comes with
+L<Catalyst::Model::MenuGrinder> to make it as easy as possible to use with
+Catalyst.
+
+MenuGrinder is designed to make it as easy as possible to create interactive
+menus for your site. With MenuGrinder you can:
+
+=over 4
+
+=item * Highlight the currently-visited page,
+
+=item * Display sidebar menus for different sections of a site,
+
+=item * Show certain menu items or sections only to logged-in users,
+
+=item * Hide or reveal items or sections based on application permissions,
+
+=item * Dynamically add choices or labels to menus based on information from the
+current page,
+
+=item * Write custom plugins to add your own functionality, and
+
+=item * Work with whatever display method suits your design, whether JavaScript
+or plain-HTML, drop-down, sidebar or anything else -- MenuGrinder is
+presentation-agnostic --
+
+=back
+
+And all without writing pages of new code.
+
+=head2 Getting MenuGrinder for Catalyst
+
+Simply install L<Catalyst::Model::MenuGrinder> from CPAN, and the latest version
+of MenuGrinder as well as the Catalyst glue code will be installed.
+
+=head2 Adding MenuGrinder to Your Application
+
+Add a new model to your application:
+
+    package MyApp::Model::Menu;
+
+    use Moose;
+    extends 'Catalyst::Model::MenuGrinder';
+
+    __PACKAGE__->config(
+        menu_config => {
+            plugins => {
+                Loader => 'XMLLoader',
+                on_load => [
+                    'DefaultTarget',
+                ],
+                per_request => [
+                    'ActivePath',
+                ],
+            },
+        },
+        filename => MyApp->path_to(qw(root menu.xml));
+    );
+
+    __PACKAGE__->meta->make_immutable;
+
+If you prefer, of course, you can supply deployment-specific config using your
+app config file instead of C<< __PACKAGE__->config >> -- your choice!
+
+=head2 Displaying the Menu
+
+MenuGrinder doesn't prefer any specific View or way of rendering the menu, but
+we'll be using L<Template Toolkit|Template>, since so many people are familiar
+with it.
+
+First, we need to actually call MenuGrinder and make its output available to the
+template somehow. Most people will do something like this:
+
+    # MyApp/Root.pm
+
+    sub end : ActionClass('RenderView') { # You probably already have this!
+      my ($self, $c) = @_;
+
+      $c->stash->{menu} = $c->model('Menu')->get_menu; # So add this.
+    }
+
+Then you need to render the menu -- how you do it is up to you, but this example
+from the L<Catalyst::Model::MenuGrinder> tests will get you started:
+
+  [% BLOCK menuitem %]
+    <ul [%- IF menu.class %]class="[% menu.class %]"[% END %]>
+    [% FOREACH item = menu.item %]
+    <li [% IF item.active %]class="active"[% END %]>
+      <a href="[% item.target %]">[% item.label %]</a>
+      [% IF item.item %]
+      [% PROCESS menuitem
+        menu = item
+      %]
+      [% END %]
+    </li>
+    [% END %]
+    </ul>
+  [% END %]
+
+  [% PROCESS menuitem %]
+
+If this looks scary, don't worry -- it's just processing the menu structure that
+MenuGrinder outputs recursively, displayin every item. You can place it in your
+main site wrapper, in a header template, or in its own file and INCLUDE it.  It
+creates a simple nested-list HTML structure that's great for debugging -- but it
+also turns into a great drop-down menu using JavaScript menu plugins like
+L<Superfish|http://users.tpg.com.au/j_birch/plugins/superfish/>.
+
+=head2 Creating a Menu
+
+Now that all of the pieces are in place to load and display our menu, we need a
+menu! MenuGrinder has support for different input formats, but currently the
+only one that's fully functional is the XML loader. Create a file in your
+application called C<root/menu.xml> (or whatever you like -- just change the
+configuration of your Model to match). A menu has an outer C<< <menu> >>
+element, which contains a tree of C<< <item> >> elements which may themselves
+contain more C<< <item> >>s. Any other elements you place inside of the 
+C<< <item> >>s will be made available to your templates and plugins. You can use
+whatever you want, but there are a few that are recognized by the default
+plugins, like C<label>, C<location>, and C<target>. Here's a very simple menu:
+
+    <menu>
+        <item>
+            <label>Home</label>
+            <location></location>
+        </item>
+        <item>
+            <label>Clothes</label>
+            <location>clothes</location>
+            <item>
+                <label>Shirts</label>
+                <location>clothes/shirts</location>
+            </tem>
+            <item>
+                <label>Hats</label>
+                <location>clothes/hats</location>
+            </item>
+        </item>
+    </menu>
+
+=head2 Check It Out!
+
+Now we've got a working menu. If you've been following along, or if you've
+checked out the example application (under C<t/MyApp> in the
+L<Catalyst::Model::MenuGrinder> distribution), you can start the application and
+click around to different pages. The plugins that we configured back in the
+"Adding MenuGrinder to Your Application" section will do a few things: the
+C<ActivePath> plugin will automatically find the menu-item that matches the page
+the user is currently visiting, and mark it "active" so that we can highlight it
+with CSS, and the C<DefaultTarget> plugin takes the C<location> elements that
+C<ActivePath> uses and rewrites them into the C<target> attributes that we use
+to create our links.
+
+=head2 Customizing
+
+Not dynamic enough for you? MenuGrinder ships with some more plugins that you
+can add to your configuration to make things interesting:
+
+=over 4
+
+=item * B<HotKey>: Allows you to set quick-access hotkeys for menu items from
+their labels.
+
+=item * B<Localize>: Works with your application's I18N support to display menu
+items in the user's language.
+
+=item * B<RequirePrivilege>: Allows you to show or hide certain items depending
+on the user's privileges (integrates with
+L<Catalyst::Plugin::Authorization::Roles> by default).
+
+=item * B<Variables>: Allows you to use stash variables to control the display
+of menu items.
+
+=back
+
+MenuGrinder is totally plugin-based -- without plugins, it doesn't do anything
+at all! Adding your own functionality to it by writing plugins is absolutely
+painless.
+
+=head2 Contribute!
+
+MenuGrinder has been running production sites (some on the public internet, and
+some internal) for me for nearly two years, and it's been reliable, but it's
+still beta-quality software because I<it needs users other than me>. MenuGrinder
+could totally be better than it is, so please help me by using it, suggesting
+more default plugins, adding the ability to create menu items from action
+attributes like L<CatalystX::Menu::SuckerFish>, or anything else that strikes
+your fancy.
+
+=head1 AUTHOR
+
+Andrew Rodland, <arodland@cpan.org>. Find me on IRC: irc.perl.org #catalyst as
+C<hobbs>.
