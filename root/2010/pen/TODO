@@ -8,7 +8,7 @@ Organising:
 Article ideas (2010 Calendar):
  - facebook general application development (Getty)
  - Catalyst + Gearman (dhoss) - **DONE**
- - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss) - i think davewood is going to take care of this
+ - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss + davewood) - **DONE**
  - Catalyst + ElasticSearch (dhoss) - **DONE**
  - DBIC::Fixtures - lukes (?)
  - twitter authentication/applications + Catalyst
@@ -27,7 +27,7 @@ Article ideas (2010 Calendar):
 Confirmed ideas: 
  - facebook general application development (Getty)
  - Catalyst + Gearman (dhoss) ** DONE **
- - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss)
+ - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss + davewood)
  - Catalyst + ElasticSearch (dhoss) ** DONE **
  - twitter authentication/applications + Catalyst
  - Opsview does i18n with Catalyst (Ton Voon) - ** DONE **
@@ -47,6 +47,7 @@ Authors:
  - hercynium
  - skaufman
  - steve@matsch.com
+ - davewood
 
 Editors: 
  - jester
@@ -62,7 +63,7 @@ Dates needed:
  - 8: DONE   ("Data::SearchEngine" - gphat)
  - 9: DONE  ("OpsView" - Ton Voon)
  - 10: DONE ("Data::Manager" - jshirley)      
- - 11:      Form::Sensible::Reflector::DBIC + Catalyst - dhoss      
+ - 11: DONE (DBIx::Class::InflateColumn::FS and X-Sendfile) - dhoss + davewood
  - 12:      ("jQueryUI +Catalyst" - Sir and friends)
  - 13:
  - 14:
