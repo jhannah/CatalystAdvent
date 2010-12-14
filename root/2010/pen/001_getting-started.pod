@@ -1,0 +1,634 @@
+=head1 Getting Started with Catalyst and jQuery (and jQuery UI)
+
+=head2 A few initial comments
+
+For the duration of this article we'll be assuming that you want to use jQuery
+and jQuery-UI with Catalyst, and that you'll be using the Template Toolkit for
+your templating engine.  Of course, this is perl and There's More Than One Way
+To Do It -- so you can use something else instead of TT, or tweak our 
+suggestions a bit.  If you do, things will probably Just Work.   Have fun, and
+stay DRY.
+
+This article is aimed at developers new to Catalyst and especially Catalyst
+with jQuery.  It is designed to help someone go from 0 to App as quickly as
+possible.
+
+The commands in the article assume you're using Linux.  If you aren't, adjust
+the commands accordingly (or switch to Linux ;).
+
+=head2 Background knowledge
+
+This article assumes you already know some things.  If you don't,
+please follow the provided links to read about a few key topics before continuing
+with this article.  You can probably make it through without knowing some
+of them, but if you're reading this, all of them will make your life easier.
+
+=over
+
+=item Catalyst (L<http://www.catalystframework.org/>)
+
+The perl MVC framework
+
+=item HTML::FormHandler (L<http://search.cpan.org/~gshank/HTML-FormHandler-0.32005/lib/HTML/FormHandler.pm>)
+
+For creating, displaying, and validating forms
+
+=item jQuery (L<http://jquery.com/>)
+
+The Write Less, Do More, JavaScript Library
+
+=item jQuery UI (L<http://jqueryui.com/>)
+
+UI enhancement framework on top of jQuery
+
+=item Template Toolkit (L<http://template-toolkit.org/>)
+
+A fast, flexible and highly extensible template processing system.
+
+=back
+
+=head2 Setting up the project
+
+For our purposes, we'll be working on a project that depicts a pizzaria
+(called, creatively, "Pizzaria") that takes orders online.  
+
+=head3 Choosing a namespace
+
+Because our company is called Pizzaria, we're going to call our app the same.
+Now, we could simply run
+
+	catalyst.pl Pizzaria
+
+and get an application that's set up like this:
+
+	./Pizzaria
+	./Pizzaria/script
+	./Pizzaria/script/...
+	./Pizzaria/lib
+	./Pizzaria/lib/Pizzaria
+	./Pizzaria/lib/Pizzaria/Model
+	./Pizzaria/lib/Pizzaria/View
+	./Pizzaria/lib/Pizzaria/Controller
+	./Pizzaria/lib/Pizzaria/Controller/Root.pm
+	./Pizzaria/lib/Pizzaria.pm
+	./Pizzaria/root
+	./Pizzaria/root/static
+	./Pizzaria/root/static/images
+	./Pizzaria/root/static/images/...
+	./Pizzaria/root/favicon.ico
+	./Pizzaria/t
+	./Pizzaria/t/...
+
+That's fine, but it has one limitation that's sort of needless:  it assumes
+that the web interface is the only one we'll be making.  As a matter of good
+practice, let's just start off right and name it according to what we're
+actually making:  A B<web> interface to our Pizzaria's software.
+
+	$ catalyst.pl Pizzaria::Web
+	created "Pizzaria-Web"
+	created "Pizzaria-Web/script"
+	created "Pizzaria-Web/lib"
+	created "Pizzaria-Web/root"
+	created "Pizzaria-Web/root/static"
+	created "Pizzaria-Web/root/static/images"
+	created "Pizzaria-Web/t"
+	created "Pizzaria-Web/lib/Pizzaria/Web"
+	created "Pizzaria-Web/lib/Pizzaria/Web/Model"
+	created "Pizzaria-Web/lib/Pizzaria/Web/View"
+	created "Pizzaria-Web/lib/Pizzaria/Web/Controller"
+	created "Pizzaria-Web/pizzaria_web.conf"
+	created "Pizzaria-Web/lib/Pizzaria/Web.pm"
+	created "Pizzaria-Web/lib/Pizzaria/Web/Controller/Root.pm"
+	created "Pizzaria-Web/README"
+	...
+
+That's better.  Now when we are ready to create other interfaces to our
+application, it won't require any refactoring; we'll simply be able to add
+Pizzaria::CLI, etc.
+
+Because I like to, I always rename the app's directory to omit the "-Web":
+
+	$ mv Pizzaria-Web Pizzaria
+	$ cd Pizzaria
+
+=head3 Setting up jQuery and jQuery UI
+
+For ease, throughout the remainder of this article, I'll refer to jQuery and
+jQuery UI as "jQuery".  You may, of course, use jQuery without the UI libs,
+and you may use the UI without ever manually utilizing jQuery (though it will
+still be loaded as a dependency, of course), but for our purposes, I'll assume
+that you're going to be using both.
+
+Because jQuery is a client-side JavaScript library, most of the actual use of
+it will be done through the templates.  There's a lot we can do in Catalyst
+to make things easier in jQuery, but we'll have to get to those later.  Let's
+get started.
+
+=head4 The jQuery Frameworks
+
+First, in setting up our repo, we'll create a place for jQuery to live.
+Remember that whatever we put under the ./root/static directory will be
+files that we're expecting to access directly with hyperlinks; that means
+we can effectively consider this something like the "public API" of our 
+application resources.  With that in mind, you want the names to be
+semantically meaningful.  And, as always, Do The Right Thing -- don't 
+take shortcuts =)
+
+We'll have all our javascript live in C<./root/static/javascript/>.  
+Similarly, css will live in C<./root/static/css/>, images in
+C<./root/static/images/>, and so forth.  Our templates will live in 
+C<./root/src/>.
+
+	$	mkdir -p ./root/static/javascript/ext
+
+We'll put all third-party javascript libs in C<./root/static/javascript/ext/>
+and know never to edit anything in there (right? =)  Separating external libs
+that way will also help future maintainers and developers to understand how
+the application is structured.
+
+Next, we'll download the latest, greatest versions of jQuery and jQuery UI
+from their respective web pages (linked above) and unzip them into those 
+directories.  When you're done, your directory structure should look like
+this:
+
+	./root/static/javascript/ext/jquery
+	./root/static/javascript/ext/jquery/jquery-1.4.2.min.js
+	./root/static/javascript/ext/jquery-ui
+	./root/static/javascript/ext/jquery-ui/AUTHORS.txt
+	./root/static/javascript/ext/jquery-ui/jquery-1.4.2.js
+	./root/static/javascript/ext/jquery-ui/ui
+	./root/static/javascript/ext/jquery-ui/docs
+	...
+
+=head4 Plugins (third-party and in-house)
+
+One of the great things about jQuery is the very active user community.  You
+should get into the habit of using jQuery plugins liberally; if you choose
+them well, they're light-weight, efficient, and very effective.  Let's create
+a place for our jQuery plugins to live.
+
+	$ mkdir -p ./root/static/javascript/ext/plugins/jquery
+	$ mkdir -p ./root/static/javascript/ext/plugins/jquery-ui
+
+Of course, if we start using other third-party JavaSCript plugins we can
+just add them.  For example, if we wanted to use CKEditor, as I did for a 
+project at work recently, or Flot, or any other third-party JS lib, 
+it would be very easy simply to add the spaces for it.
+
+	$ # mkdir -p ./root/static/javascript/ext/ckeditor
+	$ # mkdir -p ./root/static/javascript/ext/plugins/ckeditor
+
+and we can just add files into those spaces as we need to.  (I commented out
+the commands below in case someone isn't reading carefully
+and blindly copies/pastes all the commands in this article =)
+
+We're also going to want to be developing internal plugins from time to
+time, probably.  Let's create a place for those to live as well, for the sake
+of completeness.
+
+	$ mkdir -p ./root/static/javascript/plugins/jquery
+
+Now when you want to create a generic jQuery plugin (that's not specific to
+a particular part of your application's view domain) just drop it into that
+directory.
+
+Great -- now we're ready to get started with our app development.
+
+=head2 Data is everything
+
+Your data is everything.  You can always fix a bad flow of logic in your
+controller, or even fix a bunk interface to your models... but if you have
+bad data, you're stuck.  For that reason, you should be thinking of your
+application as a data management process.  Everything in your application
+is about how you create, retreive, update, or delete data (CRUD).
+
+=head3 The Schema
+
+For our purposes, let's assume that you're using MySQL (L<http://www.mysql.com/>)
+with L<DBIx::Class> and creating your schema with L<DBIx::Class::Schema::Loader>.
+Further, we'll just assume you've already created your schema using the
+following SQL:
+
+	CREATE TABLE IF NOT EXISTS `user` (
+		id INT(64) NOT NULL AUTO_INCREMENT,
+		password VARCHAR(32) NOT NULL default '',
+		email VARCHAR(32) NOT NULL default '',
+		first_name VARCHAR(32) NOT NUL default '',,
+		last_name VARCHAR(32) NOT NUL default '',,
+		registered TIMESTAMP NOT NULL DEFFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+		PRIMARY KEY (`id`),
+		UNIQUE (`email`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+	CREATE TABLE IF NOT EXISTS `order` (
+		id INT(64) NOT NULL AUTO_INCREMENT,
+		user INT(64) NOT NULL DEFAULT '',
+		total INT(64) NOT NULL DEFAULT 0,
+		created_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (`user`) REFERENCES `user` (`id`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+	-- ... and so on with tables for specials, toppings, or whatever.
+
+=head2 Inputs matter
+
+If the way you store data is critical, then just as critical is the way you
+B<acquire> it.  In a web app, much of the time, that's going to be done
+through the venerable HTML form.
+
+=head3 Defining Forms
+
+Forms are critical.  They control what information we take in, and when we
+validate our data, we validate what's come through our forms.  In fact, 
+forms are so critical we don't want them to be treated as second-class
+elements of our application; they are key components that deserve focused
+attention and first-class status.
+
+Now, for the most part forms we use in one interface are unlikely to be used
+others (when was the last time you filled out a form in a CLI?).  For that 
+reason, we're going to create a namespace in which to keep our forms; a
+dedicated library wing just for web forms.  All forms will go into this
+namespace, and no forms will be created without them.  Remember:  forms are 
+first-class members of our application; they are the user's interface to 
+our database, and our interface to the users.
+
+We'll keep our forms in Pizzaria::Web::Form.  For example, if we want a form
+to create/register a new user, it might be in Pizzaria::Web::Form::User::Register, or
+if we want to update a user's profile, we could create a new form in
+Pizzaria::Web::Form::User::Update.
+
+	$ mkdir -p ./lib/Pizzaria/Web/Form
+
+With a little forethought, we can definitely save ourselves a lot of
+repetition.  We already said that the two main functions we want users to
+be able to do is register as users and modify their profiles.  It seems
+very likely that both forms will have a lot of fields in common, and 
+that we'll want the same restraints on fields shared by both forms.  So
+how do we usually do that?  Subclassing.  We're going to use the same
+concept here.  Let's create a form object for C<Pizzaria::Web::Form::User>,
+C<Pizzaria::Web::Form::User::Register>, and C<Pizzaria::Web::Form::User::Update>,
+in which our core functionality is described in the first, and the latter
+two contain only overriding modifications to the base class.
+
+Let's create a form for creating new users.
+
+	$ mkdir -p ./lib/Pizzaria/Web/Form/User
+	$ touch ./lib/Pizzaria/Web/Form/User.pm
+	$ touch ./lib/Pizzaria/Web/Form/User/Register.pm
+	$ touch ./lib/Pizzaria/Web/Form/User/Update.pm
+
+Great.  Next, let's create our base class in C<Pizzaria::Web::Form::User>.  
+Before you go any further, read this excellent introduction to 
+HTML::FormHandler (L<http://www.catalyzed.org/2010/03/an-introduction-to-formhandler.html>)
+if you haven't already.  We're lifting code from there I<en masse> and life
+will be easier for you if you understand what's covered there =)
+
+...
+
+Our ::User package now looks like this:
+
+	package Pizzaria::Web::Form::User;
+
+	use HTML::FormHandler::Moose;
+	extends 'HTML::FormHandler::Model::DBIC';
+	with 'HTML::FormHandler::Render::Table';
+
+	has '+item_class' => (default => 'User');
+
+	has_field 'first_name' => (type => 'Text');
+	has_field 'last_name'  => (type => 'Text');
+	has_field 'email'      => (	
+		type => 'Email',
+		required => 1,
+		unique => 1,
+	);
+	has_field 'password'         => (type => 'Password');
+	has_field 'password_confirm' => (type => 'PasswordConf');
+
+	has '+unique_messages' =>	(
+		default => sub { 
+			{email => 'Email already registered'}
+		}
+	);
+
+	no HTML::FormHandler::Moose;
+	__PACKAGE__->meta->make_immutable;
+	1;
+
+Notice that we've omitted the "submit" field.  That's because this base class
+is never going to be used directly; it's just a foundation for our other user
+form classes.  Now we create our registration form:
+
+	package Pizzaria::Web::Form::User::Register;
+	
+	use HTML::FormHandler::Moose;
+	extends 'Pizzaria::Web::Form::User';
+	
+	has_field 'submit' => ( type => 'Submit', value => 'Register' );
+
+	no HTML::FormHandler::Moose;
+	__PACKAGE__->meta->make_immutable;
+	1;
+
+That was easy.  We just added a submit button and ... we're done.  The rest
+of the fields were inherited from the base class.  Now, when we want to create
+the registration form, we just create an instance of this class and
+render/validate/whatever it.  Let's make our user update form as well.
+
+	package Pizzaria::Web::Form::User::Update;
+	
+	use HTML::FormHandler::Moose;
+	extends 'Pizzaria::Web::Form::User';
+	
+	has_field 'submit' => (type => 'Submit', value => 'Update profile');
+
+	no HTML::FormHandler::Moose;
+	__PACKAGE__->meta->make_immutable;
+	1;
+
+Drop-dead simple.  We just changed name of the form (C<...::User::Update> and the
+value of the submit button, and we're done.  All of our forms can be created and
+controlled with that much ease.
+
+=head3 Rendering forms
+
+When it's time to render our forms in our controllers, we can just do this:
+
+	package Pizzaria::Web::Controller::Registration;
+	use Moose;
+	use namespace::autoclean;
+
+	use Pizzaria::Web::Form::User::Register;
+
+	sub index :Chained('/') :PathPart('register') :Args(0) {
+		my ($self, $c) = @_;
+
+		### Or you could do this in /auto or something.
+		$c->stash->{forms} = {};
+
+		### Create our registration form.
+		$c->stash->{forms}->{register} = Pizzaria::Web::Form::User::Register->new();
+
+		### Process the form with any parameters that were submitted when the page
+		### was requested.
+		$c->stash->{forms}->{register}->process(params => {%{$c->request->parameters}});
+	}
+
+	1;
+
+Then in our template (C<./root/src/registration/index.tt>:
+
+	...
+	<div id="register-new-user">
+	[% forms.register.render %]
+	</div>
+	...
+
+Which, for reference, renders our form something like this:
+
+	<div id="register-new-user">
+	<form id="form576" method="post" >
+	<table>
+		
+		<tr>
+			<td><label class="label" for="first_name">First name: </label></td>
+			<td><input type="text" name="first_name" id="first_name" value="" /></td>
+		</tr>
+		
+		<tr>
+			<td><label class="label" for="last_name">Last name: </label></td>
+			<td><input type="text" name="last_name" id="last_name" value="" /></td>
+		</tr>
+		
+		<tr>
+			<td><label class="label" for="email">Email: </label></td>
+			<td><input type="text" name="email" id="email" value="" /></td>
+		</tr>
+			
+		<tr>
+			<td><label class="label" for="password">Password: </label></td>
+			<td><input type="password" name="password" id="password" value="" /></td>
+		</tr>
+		
+		<tr>
+			<td><label class="label" for="password_confirm">Password confirm: </label></td>
+			<td><input type="password" name="password_confirm" id="password_confirm" value="" /></td>
+		</tr>
+		
+		<tr>
+			<td><input type="submit" name="submit" id="submit" value="Register" /></td>
+		</tr>
+	
+	</table>
+	</form>
+	</div>
+
+=head2 What about jQuery? (a.k.a.:  Plugins!)
+
+Ok, good for us; we can create forms easily ... but how about integration with
+jQuery?
+
+Great question.  Let's look at some ways we can spiffy-up our forms with jQuery.
+As we mentioned before, when you think jQuery, you should first think:  Plugins!
+
+jQuery's plugin community is like a decentralized CPAN.  If you want to do it,
+there's probably a plugin for it.  If you want to do it differently, leverage
+existing code to work for you.
+
+Let's take a look at some particular plugins.
+
+=head3 Unobtrusive AJAX with the C<ajaxForm> plugin
+
+If you're like me, you want lots of things to be happening with AJAX.  It lets
+you take advantage of the REST aspects of your app, lets you fire off asynchronous
+events, looks cool, and brings about world peace.  But how can we use forms 
+rendered through L<HTML::FormHandler> and L<the Template Toolkit|Template> (L<http://template-toolkit.org/>)
+to make AJAX calls?
+
+Thankfully, someone who calls himself I<malsup> thought of that and gave us a
+terrific solution:  the ajaxForm plugin (L<http://jquery.malsup.com/form/>)!
+
+First, of course, unzip the plugin into your javascript plugins directory and
+make sure it's getting loaded into the page in your template.
+
+Given the form (depicted previously), we can create a JavaScript file for the
+page in C<./root/static/javascript/register/index.tt>:
+
+	// Create an enclosure that localizes the jQuery framework into the $
+	// variable to avoid collisions with other frameworks.
+	;(function ($) {
+	
+		// Execute this function when the document has finished loading and 
+		// is ready for processing.
+		$(document).ready(function () {
+			
+			// Ajaxify our form.  Find it with a CSS 3 selector.
+			$("#register-new-user form").ajaxForm({
+				beforeSubmit: function () { /* ... */ }
+			,	success:      function () { /* ... */ }
+			})
+
+		})
+
+	})(jQuery)
+
+That's it =)  Now you can convert any form on your page to an AJAX form
+in a couple of lines of code.  For extra credit, you can use this to
+degrade gracefully in the event that the user has JavaScript disabled:
+the form still loads, but works as a regular cgi-style page submission!
+
+=head3 C<jQuery.ajax()> for REST
+
+So, you're big into REST, eh?  No problem =)  As you may know, not all
+browsers handle DELETE and PUT requests (and jQuery doesn't provide extra
+sugar for them).  With a tiny bit of footwork, though, we can side-step the
+issue.
+
+jQuery lets you submit forms via GET, POST, PUT, and DELETE.  Sugar is
+provided for GET and POST, but I don't use them to keep things uniform
+with my PUT and DELETE request.  Let's PUT a user from our registration
+form.
+
+	;(function ($) {
+		// Passing in a function is the same as passing it into $(document).ready()
+		$(function () {
+			
+			// Find the form
+			$("#register-new-user form")
+				// Hook into the "on-submit" handler.  Inside this function, "this"
+				// refers to the form element.
+				.submit(function () {
+
+					function _handleSuccess (data, textStatus, XMLHttpRequest) {
+						// ...
+					}
+
+					function _handleError (XMLHttpRequest, textStauts, errorThrown) {
+						// ...
+					}
+
+					$.ajax({
+						url:  $(this).attr("action")
+					, type: "PUT"
+					, data: $(this).serialize()
+					, dataType: "json"
+					,	success:	_handleSuccess
+					,	error:    _handleError
+					})
+				})
+		})
+	})
+
+=head3 Roll your own input tabbing
+
+That's all well and good, but what about tabbing?  Our users hate it when the
+tabbing is ordered counter-intuitively.  Tabbing should happen in the order
+of rendering on the page, right?  Easy enough:
+
+	;(function ($) {
+		$(function () {
+
+			// Start our tab indexing at 1.
+			var tab_index = 1;
+
+			// Use CSS3 selectors to get every element we want to be included 
+			// in the tab train.  Let's exclude hidden fields for obvious reasons.
+			$('input,select,button,textarea').not(':hidden')
+				.each(function () {
+					$(this).attr("tabindex", tabindex++);
+				})
+		})
+	})(jQuery)
+
+Yep; that's it.  Now your page's form elements will tab in order of rendering
+on the page.  Of course, you could make it more complex -- I'll leave it as an
+exercise to the reader to figure out how to derange his own forms.
+
+=head3 C<Datepicker> (jQuery UI core plugin)
+
+What if we want our user to register his birthday as well, so we can send him 
+a coupon for free pizza?  Easy.  Of course, go add the right fields to your
+form and the DB.  After that, we'll use jQuery UI's core plugin I<Datepicker>
+(L<http://jqueryui.com/demos/datepicker/>) to do the heavy lifting.
+
+Let's assume that your form input has the attribute C<class="date">.  We'll
+just attach the date-picker plugin to everything that's an C<input> tag with that class:
+
+	;(function ($) {
+		$(function () {
+			$("input.date").datepicker();
+		})
+	})(jQuery)
+
+All done =)  It has sensible defaults to let you navigate the calendar with
+the keyboard, supports localization, allows for hooking, and vast arrays of
+customization.  Check out the demo at (L<http://jqueryui.com/demos/datepicker/>)
+for more information.
+
+=head3 Complex Layouts with C<UI.Layout>
+
+"Oh! Oh!" you pine, "I need a complex layout with many panes and fancy things!
+Alas and alack, now I am lost!"
+
+But no!  Check out the venerable UI.Layout plugin (L<http://layout.jquery-dev.net/>)
+for jQuery.  It can help you get a multi-paned, collapsible, spectacular
+layout with relatively little markup.  It's a I<little> too involved to go
+into in this article, but look at the demos and you'll see everything you
+need to get started.  It turns out it plays nicely with Catalyst and you
+can do magic things with the stash to keep your views simple, your 
+controllers light, and your users happy.
+
+=head2 Exercises for the Reader
+
+This has been a I<very> light introduction to using jQuery with Catalyst
+applications.  The goal here is to get you past the hurdles of getting
+started with jQuery.  With a bit of imagination, you can do some really
+neat things; and the interplay between Catalyst and jQuery can be really
+productive.
+
+The real win comes when you realize that your HTML should be 
+I<semantically meaningful> without any concerns for display.  Separate your
+concerns: let Catalyst manage your data and render your pages, let 
+CSS handle your display, and let JavaScript handle your interface behaviors.
+
+Every time you find yourself violating one of those boundaries, spend the 
+extra ten minutes or two hours to find the root of the problem and solve it
+correctly, and you'll find that over time your development and debugging 
+time and costs drop, and most of your development time is on enhancements.
+
+Do the Right Thing =)
+
+=head2 Further Reading
+
+A few of suggestions:
+
+=over 
+
+=item Check out the jQuery API (L<http://api.jquery.com/>).
+
+=item Peruse the jQuery UI demos (L<http://jqueryui.com/>).
+
+=item Look at L<HTML::FormHandler> (but don't use dynamic forms =)
+
+=back
+
+Play around with it!  With Catalyst and jQuery, you can get a stable, nice
+looking app running in no time.  You already knew that.
+
+There's a chance that I'll be extending this to a more thorough and complete
+set of tutorials.  If I do, you'll be able to find them at my blog 
+(L<http://snugglepunk.blogspot.com>).
+
+=head1 Author(s)
+
+Sir Robert Burbridge <sirrobert@gmail.com>
+
+=head2 Contributors
+
+Steve Schafer
+
+=head1 Final words
+
+Merry Christmas!
+
+=cut
