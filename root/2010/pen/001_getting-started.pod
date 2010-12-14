@@ -619,6 +619,10 @@ There's a chance that I'll be extending this to a more thorough and complete
 set of tutorials.  If I do, you'll be able to find them at my blog 
 (L<http://snugglepunk.blogspot.com>).
 
+=head2 Get the Files
+
+For your convenience, the files are located here: L<https://github.com/sirrobert/CatalystAdvent-jQueryUI.git>
+
 =head1 Author(s)
 
 Sir Robert Burbridge <sirrobert@gmail.com>
