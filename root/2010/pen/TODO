@@ -1,0 +1,281 @@
+MAKE SURE THAT WE INCLUDE THE VERSION NUMBER IN ALL POSTS FROM HERE ON OUT FOR NOT ONLY CATALYST BUT OTHER MODULES USED.
+ - at some point I'd like to make this effective retroactively.
+
+Organising:
+  - Bogdan Lucaciu ( bogdan at sinapticode ro , zamolxes on irc)
+  - Devin Austin (devin.austin at gmail com , dhoss on irc)
+
+Article ideas (2010 Calendar):
+ - facebook general application development (Getty)
+ - Catalyst + Gearman (dhoss) - **DONE**
+ - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss + davewood) - **DONE**
+ - Catalyst + ElasticSearch (dhoss) - **DONE**
+ - DBIC::Fixtures - lukes (?)
+ - twitter authentication/applications + Catalyst
+ - .... as an Absolute Beginner (tm) could I put in a request for some newbie-friendly Cat-for-dummies entries? - victor from the mailing list
+ - X-Sendfile/X-Accel-Redirect with support for agnostic file location retrieval (aka, file to send could be located on any number of replicated nodes etc.)
+ - Form::Sensible::Reflector::DBIC + Catalyst (dhoss)
+ - Test::DBIx::Class
+ - jqgrid + Catalyst:Controller::REST (dhoss)
+ - AWS S3, Mosso Cloudfiles, cloud storage, deployment
+ - large scale application deployment, regarding replication, load balancing, etc. 
+ - DBIC pretty printers, console and plack versions
+ - plack middleware goodness for your Catalyst apps
+ - Catalyst + DBIC + memcached - skaufman - **DONE**
+ - Catalyst + jQuery theme roller - steve@matsch.com
+
+Confirmed ideas: 
+ - facebook general application development (Getty)
+ - Catalyst + Gearman (dhoss) ** DONE **
+ - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss + davewood)
+ - Catalyst + ElasticSearch (dhoss) ** DONE **
+ - twitter authentication/applications + Catalyst
+ - Opsview does i18n with Catalyst (Ton Voon) - ** DONE **
+
+Ideas looking for authors
+  - Catalyst::TraitFor::Model::DBIC::Schema::Caching / DBIx::Class::Cursor::Cached
+  - Catalyst::TraitFor::Model::DBIC::Schema::Replicated / DBIx::Class::Storage::DBI::Replicated 
+  - anything not in "Confirmed Ideas"
+
+Authors:
+ - Getty
+ - dhoss
+ - Ton Voon
+ - edenc (tentative)
+ - zamolxes (?)
+ - frew (?)
+ - hercynium
+ - skaufman
+ - steve@matsch.com
+ - davewood
+
+Editors: 
+ - jester
+
+Dates needed:
+ - 1: DONE ("State of the Chainsaw" - ribasushi)
+ - 2: DONE ("Catalyst + ElasticSearch" - dhoss [as a fallback, I know others want to write an article for tomorrow])
+ - 3: AWS S3, Mosso Cloudfiles, cloud storage, deployment (i'll write these missing spaces - dhoss) 
+ - 4: Test::DBIx::Class - dhoss
+ - 5: t0m
+ - 6: DONE ("Excel in Catalyst" - Caelum)
+ - 7: DONE("Catalyst and Gearman" - dhoss) 
+ - 8: DONE   ("Data::SearchEngine" - gphat)
+ - 9: DONE  ("OpsView" - Ton Voon)
+ - 10: DONE ("Data::Manager" - jshirley)      
+ - 11: DONE (DBIx::Class::InflateColumn::FS and X-Sendfile) - dhoss + davewood
+ - 12:      ("jQueryUI +Catalyst" - Sir and friends)
+ - 13:
+ - 14:
+ - 15: twitter authentication/applications + Catalyst - dhoss
+ - 16
+ - 17
+ - 18
+ - 19
+ - 20
+ - 21
+ - 22
+ - 23
+ - 24
+
+Plan of attack:
+ - wing it
+
+
+People to annoy: 
+Catalyst-Plugin-Session-Store-FastMmap|SSCAFFIDI
+Catalyst-TraitFor-Request-PerLanguageDomains|BOBTFISH
+Catalyst-View-Haml|GARU
+Catalyst-Plugin-Params-Demoronize|DIZ
+Catalyst-Plugin-Log-Dispatch|SHOT
+Catalyst-Plugin-Session-Store-KiokuDB|MADZ
+Catalyst-Helper-Controller-DBIC-API-REST|AMIRI
+Catalyst-Plugin-Sitemap|YANICK
+Catalyst-Controller-HTML-FormFu|CFRANKS
+Catalyst-ActionRole-ExpiresHeader|AJGB
+Catalyst-Plugin-Log4perl-Simple|MOOLI
+Catalyst-Plugin-RunAfterRequest|FLORA
+Catalyst-ActionRole-BuildDBICResult|JJNAPIORK
+Catalyst-Plugin-Alarm|KARMAN
+Catalyst-Model-KiokuDB|FLORA
+Catalyst-Authentication-Credential-RPX|KENTNL
+Catalyst-Plugin-Server|JLMARTIN
+Catalyst-Plugin-HTML-Scrubber|HIDE
+Catalyst-Plugin-Server-JSONRPC|JLMARTIN
+Catalyst-Plugin-Compress-Bzip2|BOBTFISH
+Catalyst-Plugin-Compress-Zlib|BOBTFISH
+Catalyst-Authentication-Credential-OAuth|BOBTFISH
+Catalyst-Plugin-I18N-DBI|MDIETRICH
+Catalyst-View-PDF-Reuse|JONALLEN
+Catalyst-Plugin-I18N|BOBTFISH
+Catalyst-ControllerRole-Resources-Verbs|RSRCHBOY
+CatalystX-Dispatcher-AsGraph|FRANCKC
+Catalyst-Plugin-LeakTracker|NUFFIN
+Catalyst-View-TT-Alloy|PERLER
+Catalyst-Controller-Atompub|TAKERU
+Catalyst-Model-WebService-Solr|BRICAS
+Catalyst-Model-Estraier|TAKERU
+Catalyst-ActionRole-MatchRequestMethod|FLORA
+Catalyst-Plugin-Scheduler|BRICAS
+Catalyst-Controller-DBIC-Transaction|DRUOSO
+Catalyst-Plugin-Session-Store-Delegate|BOBTFISH
+Catalyst-TraitFor-Request-ProxyBase|BOBTFISH
+Catalyst-Plugin-Captcha|DIEGOK
+Catalyst-View-MicroTemplate|DMAKI
+Catalyst-Plugin-Session-Store-BerkeleyDB|FLORA
+Catalyst-TraitFor-Controller-Ping|NPEREZ
+Catalyst-Plugin-ConfigLoader-MultiState|SYBER
+Catalyst-Authentication-Realm-Adaptor|FLORA
+Catalyst-Plugin-AutoSession|ICYDEE
+CatalystX-LeakChecker|FLORA
+Catalyst-View-RRDGraph|JLMARTIN
+Catalyst-Plugin-Session-Store-DBI|FLORA
+Catalyst-Plugin-Upload-Digest|AVAR
+Catalyst-Plugin-Unicode|BOBTFISH
+Catalyst-Vew-GD-Thumbnail|UGEXE
+Catalyst-Plugin-SwiffUploaderCookieHack|TRWWW
+Catalyst-ActionRole-CheckTrailingSlash|NUCLON
+Catalyst-Authentication-Credential-HTTP|BOBTFISH
+Catalyst-Plugin-ConfigLoader-Remote|JSHIRLEY
+Catalyst-TraitFor-Request-XMLHttpRequest|FLORA
+Catalyst-Plugin-Assets|RKRIMEN
+CatalystX-CRUD-View-Excel|KARMAN
+CatalystX-CRUD-Controller-RHTMLO|KARMAN
+Catalyst-Plugin-Session-FastMmap|BOBTFISH
+Catalyst-Plugin-LogWarnings|BOBTFISH
+Catalyst-Plugin-Cache-Memcached|BOBTFISH
+Catalyst-Model-CDBI|BOBTFISH
+Catalyst-TraitFor-Request-Params-Hashed|CUB
+Catalyst-TraitFor-Model-DBIC-Shortcut|CUB
+CatalystX-Profile|CYCLES
+Catalyst-Plugin-Devel-ModuleVersions|ANDREMAR
+Catalyst-Plugin-DebugCookie|JGOULAH
+Catalyst-Plugin-AutoRestart|JGOULAH
+Catalyst-View-JavaScript|PERLER
+Catalyst-Plugin-SubRequest|BOBTFISH
+Catalyst-Plugin-UploadProgress|MRAMBERG
+Catalyst-Plugin-Authentication|FLORA
+Catalyst-Plugin-Session-PerUser|BOBTFISH
+Catalyst-View-REST-YAML|BOBTFISH
+Catalyst-View-REST-XML|BOBTFISH
+Catalyst-Plugin-Textile|BOBTFISH
+Catalyst-Plugin-Pluggable|BOBTFISH
+Catalyst-Plugin-HTML-Widget|BOBTFISH
+Catalyst-Plugin-Ajax|BOBTFISH
+Catalyst-TraitFor-Controller-Breadcrumb-Followed|ICYDEE
+Catalyst-TraitFor-Model-DBIC-Schema-QueryLog|FAYLAND
+catalyst-traitfor-controller-breadcrumb-followed|ICYDEE
+Catalyst-Controller-RateLimit|GUGU
+Catalyst-Plugin-Snippets|BOBTFISH
+Catalyst-Helper-View-TT-Bootstrap-YUI|JSHIRLEY
+Catalyst-Plugin-AccessLog|ARODLAND
+Catalyst-Model-Bitcoin|PKAROUKIN
+Catalyst-Manual|ZARQUON
+Catalyst-Authentication-Credential-OpenID|ASHLEY
+Catalyst-Plugin-Log-Log4perl|PRAVUS
+Catalyst-Plugin-Session|BOBTFISH
+Catalyst-Plugin-Session-State-URI|BOBTFISH
+Catalyst-Plugin-Log-Handler|PEPE
+Catalyst-ActionRole-NotCacheableHeaders|AJGB
+Catalyst-TraitFor-Model-DBIC-Schema-QueryLog-AdoptPlack|JJNAPIORK
+Catalyst-Plugin-CustomErrorMessage|JKUTEJ
+CatalystX-Component-Traits|BOBTFISH
+Catalyst-Authentication-Credential-YubiKey|TJC
+Catalyst-Model-LDAP-FromAuthentication|BOBTFISH
+CatalystX-FacebookURI|NACHBAUR
+Catalyst-Plugin-Params-Nested|BOBTFISH
+Catalyst-Plugin-FormValidator-Simple|DHOSS
+Catalyst-Controller-POD|PERLER
+Catalyst-Example-InstantCRUD|WREIS
+Catalyst-TraitFor-Model-DBIC-Schema-ConnectInfo-Several|CUB
+CatalystX-Controller-Pluggable|DHOUSTON
+Catalyst-Engine-Stomp|PMOONEY
+Catalyst-Plugin-Session-Store-MongoDB|SVOELKEL
+Catalyst-Plugin-Cache|BOBTFISH
+Catalyst-Plugin-AutoCRUD|OLIVER
+Catalyst-Plugin-ErrorCatcher-ActiveMQ-Stomp|JTANG
+CatalystX-CMS|KARMAN
+Catalyst-Plugin-Singleton|MRAMBERG
+CatalystX-Debug-ResponseHeaders|BOBTFISH
+CatalystX-Debug-RequestHeaders|BOBTFISH
+Catalyst-Plugin-Compress|XINMING
+Catalyst-Model-Xapian|MRAMBERG
+Catalyst-Model-MenuGrinder|ARODLAND
+Catalyst-TraitFor-Controller-DBIC-DoesPaging|FREW
+Catalyst-Plugin-Static-Simple-ByClass|KARMAN
+Catalyst-Model-SWISH|KARMAN
+Catalyst-Plugin-DBIC-Schema-Profiler|YAMAMOTO
+Catalyst-Plugin-ErrorCatcher|CHISEL
+Catalyst-View-GD-Barcode|YANA
+Catalyst-Model-MultiAdaptor|KITANO
+Catalyst-Authentication-Credential-RemoteHTTP|NIGELM
+Catalyst-Action-RenderView-ErrorHandler|ANDREMAR
+CatalystX-Widget-Paginator|LONERR
+Catalyst-Model-Facebook|GETTY
+Catalyst-Plugin-I18N-PathPrefix|MENDEL
+Catalyst-View-JavaScript-Minifier-XS|FREW
+Catalyst-Controller-reCAPTCHA|ZARQUON
+Catalyst-Controller-ActionRole|FLORA
+Catalyst-Plugin-ConfigLoader|BRICAS
+Catalyst-Controller-LeakTracker|WREIS
+Catalyst-Plugin-Bread-Board|FLORA
+Catalyst-Authentication-Credential-CAS|PRAVUS
+Catalyst-Controller-Combine|WKI
+CatalystX-Controller-Sugar-ActionPack|JHTHORSEN
+Catalyst-Plugin-ConfigLoader-Environment|DHOSS
+Catalyst-Controller-SOAP|DRUOSO
+Catalyst-Model-SOAP|DRUOSO
+CatalystX-Plugin-Blurb|ASHLEY
+Catalyst-Controller-MovableType|OKKO
+Catalyst-TraitFor-Controller-LocaleSelect|DIEGOK
+Catalyst-TraitFor-Controller-jQuery-jqGrid|ICYDEE
+Catalyst-Model-Memcached|CATONE
+Catalyst-Plugin-Static-Simple|MSTROUT
+CatalystX-Test-Recorder|PERLER
+Catalyst-Plugin-Widget|LONERR
+Catalyst-Plugin-PageCache|TIMB
+CatalystX-Declare|JJNAPIORK
+Catalyst-Engine-Apache|FLORA
+Catalyst-Authentication-Store-DBI-ButMaintained|ECARROLL
+Catalyst-View-Tenjin|IDOPEREL
+Catalyst-Model-Adaptor|BOBTFISH
+Catalyst-Engine-PSGI|MIYAGAWA
+Catalyst-Helper-AuthDBIC|ZARQUON
+Catalyst-Devel|BOBTFISH
+Catalyst-Model-Sedna|DRUOSO
+Catalyst-View-Excel-Template-Plus|RBO
+Catalyst-ActionRole-RequireSSL|ELLIOTT
+Catalyst-View-HTML-Zoom|CYCLES
+Catalyst-Model-DBI|ALEXP
+CatalystX-CRUD-YUI|KARMAN
+Catalyst-Authentication-Store-LDAP-AD-Class|FILIN
+CatalystX-I18N|MAROS
+Catalyst-View-HTML-Mason|RBUELS
+Catalyst-View-JSON|MIYAGAWA
+Catalyst-Controller-WrapCGI|RKITOVER
+Catalyst-Plugin-Unicode-Encoding|BOBTFISH
+CatalystX-Controller-Sugar|JHTHORSEN
+Catalyst-View-Component-SubInclude|BOBTFISH
+CatalystX-CRUD|KARMAN
+Catalyst-View-ByCode|WKI
+Catalyst-Authentication-Store-DBIx-Class|BOBTFISH
+Catalyst-Model-MongoDB|GETTY
+Catalyst-View-TT|ABRAXXA
+Catalyst-Authentication-Store-LDAP|BOBTFISH
+Catalyst-Controller-DirectoryDispatch|AGORMAN
+CatalystX-DebugFilter|BPHILLIPS
+CatalystX-Features|RODRIGO
+CatalystX-AppBuilder|DMAKI
+Catalyst-Action-REST|BOBTFISH
+CatalystX-SimpleLogin|BOBTFISH
+Catalyst-View-Xslate|DMAKI
+Catalyst-Controller-DBIC-API|ABRAXXA
+Catalyst-Model-DBIC-Schema|RKITOVER
+Catalyst-View-GD-Thumbnail|UGEXE
+Catalyst-Plugin-FormValidator|DHOSS
+Catalyst-Example-InstantCRUDStylish|HERNAN
+CatalystX-ExtJS|PERLER
+Catalyst-Model-REST|KAARE
+Catalyst-Runtime|BOBTFISH
+Catalyst-View-Email|DHOSS
+ 
