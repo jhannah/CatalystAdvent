@@ -11,7 +11,7 @@ Article ideas (2010 Calendar):
  - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss + davewood) - **DONE**
  - Catalyst + ElasticSearch (dhoss) - **DONE**
  - DBIC::Fixtures - lukes (?)
- - twitter authentication/applications + Catalyst
+ - twitter authentication/applications + Catalyst - ** DONE **
  - .... as an Absolute Beginner (tm) could I put in a request for some newbie-friendly Cat-for-dummies entries? - victor from the mailing list
  - X-Sendfile/X-Accel-Redirect with support for agnostic file location retrieval (aka, file to send could be located on any number of replicated nodes etc.)
  - Form::Sensible::Reflector::DBIC + Catalyst (dhoss)
@@ -29,7 +29,7 @@ Confirmed ideas:
  - Catalyst + Gearman (dhoss) ** DONE **
  - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss + davewood) - ** DONE **
  - Catalyst + ElasticSearch (dhoss) ** DONE **
- - twitter authentication/applications + Catalyst
+ - twitter authentication/applications + Catalyst - ** DONE ** 
  - Opsview does i18n with Catalyst (Ton Voon) - ** DONE **
 
 Ideas looking for authors
@@ -67,9 +67,9 @@ Dates needed:
  - 12: DONE ("menugrinder" - hobbs)      
  - 13: Mosso Cloudfiles + Cat - dhoss
  - 14: DONE ("jQueryUI +Catalyst" - Sir and friends)
- - 15: Form::Sensible::Reflector::DBIC + Cat - dhoss
- - 16: Catalyst + jQgrid and Catalyst::Controller::REST
- - 17
+ - 15: DONE ("twitter" - dpetrov)
+ - 16: Catalyst + jQgrid and Catalyst::Controller::REST - dhoss
+ - 17: Form::Sensible::Reflector::DBIC + Cat - dhoss
  - 18
  - 19
  - 20
