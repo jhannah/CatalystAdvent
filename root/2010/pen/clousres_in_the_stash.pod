@@ -88,10 +88,29 @@ If you do this once per request, then your application will quickly run out of m
 Whilst this looks somewhat more baroqe than the previous version, it won't leak any
 memory, and is tremendously useful.
 
+=head2 Sugar
+
+The latest (0.36) version of L<Catalyst::View::TT> has some syntax sugar to make
+adding closures much easier. You don't get the flexibility of being able to change them
+during the request cycle, but for most cases that isn't needed.
+
+In your view configuration, you declare which methods on your view class will be exposed:
+
+    expose_methods => [qw/uri_for_css/],
+
+and you then implement the method (in your View class), without having to worry
+about circular references through the context object, E.g.
+
+    sub uri_for_css {
+        my ($self, $c, $filename) = @_;
+        # Additional complexity here - this is a trivial example!
+        return $c->uri_for('/static/css/' . $filename);
+    }
+
 =head2 Further thoughts and ideas.
 
-The great thing about a stashed closure is that you can have entirely different implementations
-of it for different parts of your site (without needing to add a method on your MyApp object with
+Other great things about a stashed closures is that you can have entirely different implementations
+of them for different parts of your site (without needing to add a method on your MyApp object with
 horrible conditional logic in it).
 
 If you're using Chained dispatch, then you can fill in a default closure at the base of your
@@ -101,7 +120,7 @@ for more specific / customised parts of your application.
 As the closures are code refs, it is in fact entirely possible to further customise them by wrapping
 them inside another code ref which does some further work.
 
-For example:
+For example (building in the C<ContextClosure> example):
 
     my $old = $c->stash->{uri_with_secure};
     $c->stash( uri_with_secure => sub { my $uri = $old->(@_); $uri->path('/sekrit' . $uri->path); return $uri });
