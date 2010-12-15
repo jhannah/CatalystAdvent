@@ -1,0 +1,240 @@
+=head1 Access the Twitter API through Catalyst
+
+=head1 Overview
+
+=head2 What is twitter?
+
+Twitter is a social networking and microblogging service that allows you to
+post your status updates by sending short text messages 140 characters in
+length, called "tweets", to your friends, or "followers."
+
+=head2 What we need to know before start using the L<Twitter API|http://apiwiki.twitter.com>?
+
+The good news is is that there is already a Perl interface to the Twitter API
+(L<Net::Twitter|http://search.cpan.org/~mmims/Net-Twitter-3.14002/lib/Net/Twitter.pod>)
+which is based on
+L<Moose|http://search.cpan.org/~drolsky/Moose-1.21/lib/Moose.pm>. Also,
+Net::Twitter::Lite is alternative, which does not depends on Net::Twitter or
+Moose, however in our article we are going to use Net::Twitter.
+
+Second, since 31st August 2010 Twitter anounced the L<death of the Basic Authentication|http://groups.google.com/group/twitter-api-announce/browse_thread/thread/c03fa2b1ae90d2a9>.
+
+Twitter now requires L<OAuth authentication|http://dev.twitter.com/pages/auth>
+for access to their API.
+
+
+=head2 What is OAuth authentication?
+
+We'll try to exaplin in a few steps what exactly is a OAuth authentication. If
+you need more information about the 
+L<OAuth FAQ|http://dev.twitter.com/pages/oauth_faq> and  the 
+L<Beginner's Guide to OAuth|http://hueniverse.com/oauth/> from Hueniverse will
+be a great place to start from.
+
+1. Sending a GET request to the Twitter request token url asking for a request
+token pass
+.......
+..
+.
+not sure for that part
+
+
+=head2 Dependencies
+
+=over
+
+=item * L<Net::Twitter|http://search.cpan.org/dist/Net-Twitter/lib/Net/Twitter.pod>
+
+=item * L<Session|http://search.cpan.org/~bobtfish/Catalyst-Plugin-Session-0.31/lib/Catalyst/Plugin/Session.pm>
+
+=item * L<Session::State::Cookie|http://search.cpan.org/~mstrout/Catalyst-Plugin-Session-State-Cookie-0.17/lib/Catalyst/Plugin/Session/State/Cookie.pm>
+
+=item * L<Session::Store::FastMmap|http://search.cpan.org/~sscaffidi/Catalyst-Plugin-Session-Store-FastMmap-0.14/lib/Catalyst/Plugin/Session/Store/FastMmap.pm>
+
+=back
+
+=head2 I am bored of reading, show me some code...
+
+First of all we need to L<register a new application|http://dev.twitter.com/>
+at the twitter developers site in order to obtain the consumer key and secret.
+
+We'll start doing our application from scratch as it was requested in the
+mailing list.
+
+    [dpetrov@pc335: ~]$ catalyst.pl CatalystAdvent::Twitter
+    created "CatalystAdvent-Twitter"
+    created "CatalystAdvent-Twitter/script"
+    ...
+
+than we'll create a simple view:
+
+    [dpetrov@pc335: ~]$ cd CatalystAdvent-Twitter/script/ && ./catalystadvent_twitter_create.pl view Web TT
+
+Than we'll put our consumer key and cosumer secret into
+C<catalystadvent_twitter.conf>. If you omit the callback configuration, by
+default you'll be redirected to C</twitter_callback>
+(note: you need to replace these with yours)
+
+    <twitter>
+        consumer_key     iIlNngv1KdV6XzNYkoLA
+        consumer_secret  exQ94pBpLXFcyttvLoxU2nrktThrlsj580zjYzmoM
+        callback         /twitter_will_redirect_here
+    </twitter>
+
+Now we'll open C<lib/CatalystAdvent/Twitter.pm>
+First we'll import C<Net::Twitter> and C<Data::Dumper> at the top.
+
+...then we'll load the plugins which we need:
+
+    Session
+    Session::State::Cookie
+    Session::Store::FastMmap
+
+...then we'll add a few helper modules which will make our work easier.
+
+    sub twitter {
+        my $self = shift;
+        
+        # return saved object or create new Net::Twitter
+        return $self->{twitter} 
+            ||= Net::Twitter->new(traits => [qw/API::REST OAuth/], %{$self->config->{twitter}});
+    }
+    
+    # authorize and save in session token information
+    sub twitter_authorize {
+        my $self = shift;
+        
+        my $callback
+            = $self->uri_for($self->config->{twitter}{callback}||'/twitter_callback');
+        my $auth_url = $self->twitter->get_authorization_url(callback => $callback);
+        
+        $self->session->{request_token       } = $self->twitter->request_token;
+        $self->session->{request_token_secret} = $self->twitter->request_token_secret;
+    
+        $self->res->redirect($auth_url);
+    }
+    
+    # verify the callback and save the access_token and access_token_secret
+    sub oauth_callback {
+        my $self = shift;
+    
+        my $request_token = $self->req->param('oauth_token');
+        my $verifier      = $self->req->param('oauth_verifier');
+    
+        die 'Internal Error: Something is really really wrong'
+            unless $self->session->{request_token} eq $request_token;
+    
+        $self->twitter->request_token($request_token);
+        $self->twitter->request_token_secret($self->session->{request_token_secret});
+    
+        $self->log->debug("twitter: oauth_token    => $request_token") if $self->debug;
+        $self->log->debug("twitter: oauth_verifier => $verifier")      if $self->debug;
+    
+        my ($access_token, $access_token_secret) 
+            = $self->twitter->request_access_token(verifier => $verifier);
+        
+        $self->log->debug("twitter: access_token        => $access_token")        if $self->debug;
+        $self->log->debug("twitter: access_token_secret => $access_token_secret") if $self->debug;
+    
+        $self->session->{access_token}        = $access_token;
+        $self->session->{access_token_secret} = $access_token_secret;
+    
+        my $redirect_to = $self->session->{redirect_to} || $self->uri_for('/');
+        $self->res->redirect($redirect_to);
+    }
+
+Now we need to open our Root controller.
+
+First we'll define the twitter_callback url
+
+    sub callback :Local {
+        my ($self, $c) = @_;
+        
+        return $c->oauth_callback();
+    }
+
+
+...than we'll create a controller which we'll display our last five tweets.
+
+    sub last_tweets :Local {
+        my ( $self, $c ) = @_;
+
+        # redirect to twitter if not authorized
+        unless ($c->session->{access_token_secret}) {
+            # redirect me here back after the callback
+            $c->session->{redirect_to} = $c->uri_for('/last_tweets');
+            return $c->twitter_authorize();
+        }
+        # get Net::Twitter object
+        my $twitter = $c->twitter;
+        $twitter->access_token($c->session->{access_token});
+        $twitter->access_token_secret($c->session->{access_token_secret});
+
+        my $count  = $c->req->param('count') || 5;
+        my $tweets = eval { $twitter->user_timeline({ count => $count, }) };
+        if ($@) {
+            # debug and show some error message
+        }
+        else {
+            $c->stash->{tweets} = $tweets;
+        }
+    }
+
+... and another controller to update our status
+
+    # update my twitter status
+    sub say :Local {
+        my ($self, $c) = @_;
+    
+        # redirect to twitter if not authorized
+        unless ($c->session->{access_token_secret}) {
+            $c->session->{redirect_to} = $c->uri_for('/say');
+            return $c->twitter_authorize();
+        }
+    
+        # get Net::Twitter object
+        my $twitter = $c->twitter;
+        $twitter->access_token($c->session->{access_token});
+        $twitter->access_token_secret($c->session->{access_token_secret});
+        
+        my $status = $c->req->param('status') || 'new status from my cat app';
+        $twitter->update({ status => $status });
+        
+        $c->res->redirect( $c->uri_for('/last_tweets') );
+    }
+
+Now all we need is just to add our template to show our last five tweets.
+We need to create root/last_tweets.tt
+
+    <html>
+    <body>
+    [% FOREACH tweet IN tweets %]
+        <div>
+            <img src="[% tweet.user.profile_image_url %]" style="float: left;
+    padding-right: 8px;"/>
+            <span style="font-weight: bold">[% tweet.user.screen_name %]</span> |
+    [% tweet.user.name %]
+            <div>[% tweet.text %]</div>
+            <div>Said at: [% tweet.created_at %]</div>
+        </div>
+        <hr />
+    [% END %]
+    </body>
+    </html>
+
+=head2 Try it out
+
+Start the Catalyst devolpment server C<script/catalystadvent_twitter_server.pl -d>  
+
+In your browser visit L<http://localhost:3000/last_tweets>. 
+You'll be redirect to Twitter. You'll be asked if you Allow access to your
+account. When you click "Allow" you'll be redirected back to the
+L<http://localhost:3000/last_tweets> where you'll see your last tweets.
+
+Then you can call L<http://localhost:3000/last_tweets?count=10> to see your last
+10 tweets or if you wish to post a new tweet by 
+L<http://localhost:3000/say?status=my%20first%20catalyst%20tweeet>
+
+=head1 Author
+
+Dimitar Petrov <mitakaa@gmail.com>
