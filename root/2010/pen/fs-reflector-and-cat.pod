@@ -1,1 +1,7 @@
 =head2 One Definition, One Place: Form::Sensible::Reflector::DBIC and Catalyst
+
+You've seen the form building frameworks.  You've been there, done that, and hated it.  But what irks you most is that you have to define your forms in multiple places, when you have a data source that has PLENTY of information to give you a quick, albeit simple, form.  Well, I share your frustration, and although I can't say it makes me like forms any more,  L<Form::Sensible::Reflector::DBIC|http://search.cpan.org/dist/Form-Sensible-Reflector-DBIC/> was written by yours truly to ease a LOT of the pain associated with creating forms.
+
+=head2 Where Do I use this Magical Beast?
+
+Well, most of the time, I write my forms in standard, boring old HTML.  This works great, and I can use L<Data::Manager|http://search.cpan.org/dist/Data-Manager/> for my data validation quite easily, but what if I have a project I want done yesterday, that has GIGANTIC forms that I don't feel like going through and creating by hand?  This is a perfect scenario for  L<Form::Sensible::Reflector::DBIC|http://search.cpan.org/dist/Form-Sensible-Reflector-DBIC/>.
