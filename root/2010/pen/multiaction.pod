@@ -67,7 +67,7 @@ You can use the following credentials to log in to the example application:
 
 =over
 
-=item * L<MooseX::MethodAttributes::Role|http://search.cpan.org/~flora/MooseX-MethodAttributes-0.24/lib/MooseX/MethodAttributes/Role.pm>
+=item * L<MooseX::MethodAttributes::Role>
 
 =back
 
@@ -151,9 +151,6 @@ Add the following code to lib/MyApp/Controller/Books.pm:
  	}
  	return undef;
  }
-
-
-
 
 =item * get_args: Private
 
@@ -404,7 +401,7 @@ You should be able to select several books and delete them by clicking the
 
 At this point, we created a generic multi-action-wrapper in our Books-controller.
 The next part of this article shows how to increase reusability by moving
-the code from the controller to a Moose::Role.
+the code from the controller to an L<Moose::Role>.
 
 =head3 Creating the role
 
@@ -421,7 +418,7 @@ the code from the controller to a Moose::Role.
 
  1;
 
-MooseX::MethodAttributes::Role is a extension to Moose::Role, which adds the 
+L<MooseX::MethodAttributes::Role> is a extension to L<Moose::Role>, which adds the 
 ability to define method attributes (like :Private, :Chained ...) in Roles.
 
 =item * Move the code
@@ -486,7 +483,9 @@ by adding
  );
 
 just before
- __PACKAGE__->meta->make_immutable;
+
+  __PACKAGE__->meta->make_immutable;
+
 at the end of the file.
 
 =back
@@ -533,7 +532,7 @@ conditions, and otherwise stick to the original behaviour, you can use Mooses
 "before", "after" and "around" functionality. 
 In the above example, the status message is only changed for "delete" actions.
 All other multiactions will produce the old, generic messages.
-See L<Moose::Manual::MethodModifiers|http://search.cpan.org/~drolsky/Moose-1.21/lib/Moose/Manual/MethodModifiers.pod> for details.
+See L<Moose::Manual::MethodModifiers> for details.
 
 =head2 Reusing the multiaction
 
@@ -546,7 +545,8 @@ multiaction, as described above. Don't forget to update your list-template aswel
 
 =item * adding more multiactions
 
-If you want to use the multiaction-feature with another action, implement you action in your controller, and add a corresponding submit-button to your list
+If you want to use the multiaction-feature with another action, implement you action
+in your controller, and add a corresponding submit-button to your list
 template.
 
 =back
@@ -582,8 +582,6 @@ your actions behaviour on a per-controller basis.
 
 The lack of some missing method modifiers in Roles can be bypassed with
 standart Moose functionality, and without black magic.
-
-
 
 =head1 Author
 
