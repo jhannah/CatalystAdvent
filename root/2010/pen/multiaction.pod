@@ -1,0 +1,592 @@
+=head1 Creating reusable actions with Moose::Role - an example
+
+=head2 overview
+
+Have you ever implemented an action, which operates on one database entry, and 
+later realized 
+that it would be useful to apply this action to several entries at once? 
+
+Since Catalyst applications are, in general, very modular and easy to extend, 
+it is not a big problem to create some kind of wrapper-action, which prepares 
+the appropriate data and forwards to your action. There is nothing wrong about 
+solving the problem that way, but you have to repeat this for every
+action (that shoud be applied to several database entries at once). You will 
+soon realize that most of your wrapper-actions are more or less identical, and 
+writing the same code again and again can be a big pain in the 
+CurseWord.
+
+An other solution would be to ajust your action, but what if you still need 
+that old action (which only operates on one single database entry)? In that 
+case, you have to do a lot of parameter-checking to figure out whether the 
+current request is a single-entry-request or a multi-entry-request. In the 
+worst case, this procedure does not work as you expected and you have to spend 
+a lot of time debugging your code, which is a even bigger pain in the ... 
+You know what I mean! 
+
+This Article describes how to create a generic multi-action which can easily 
+be used as a wrapper for any action, with minimal changes to your code.
+The generic multi-action will be moved from the controller to an extra 
+Moose::Role. Since Roles can easily be applied to any Moose object, the 
+multi-action can be reused in any controller, with minimal effort.
+
+
+Chapter 5 from the Catalyst Tutorial is used as example application (which is 
+some kind of book-database, with the ability to delete single books by calling 
+the delete-action with the books id as parameter). 
+The code provided in this article will add the ability to select several books
+from the list, and delete all of them at once.
+
+=head2 Preparation
+
+This Article is based on the example code provided by the Catalyst tutorial, chapter 5.
+The code can be checked out by running:
+
+ [nomos30] ~/src % svn co http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/MyApp_Chapter5
+
+Make sure you have all dependencies installed by running:
+
+ [nomos30] ~/src % cd MyApp_Chapter5/MyApp
+ [nomos30] ~/src/MyApp_Chapter5/MyApp % perl MakeFile.pl
+ [nomos30] ~/src/MyApp_Chapter5/MyApp % make
+
+After that, you can start the application by running:
+
+ [nomos30] ~/src/MyApp_Chapter5/MyApp % script/myapp_server.pl
+
+You can use the following credentials to log in to the example application:
+
+=over
+
+=item * username: test01
+
+=item * password: mypass
+
+=back
+
+=head2 Dependencies
+
+=over
+
+=item * L<MooseX::MethodAttributes::Role|http://search.cpan.org/~flora/MooseX-MethodAttributes-0.24/lib/MooseX/MethodAttributes/Role.pm>
+
+=back
+
+=head2 Tasks
+
+It is assumed that the relevant controller provides a list-method, which uses 
+TemplateToolkit to display the content. 
+
+=head3 the View
+
+The books-listing should provide:
+
+=over 
+
+=item * checkboxes to select books from the list
+
+=item * a 'delete selected' button
+
+=back
+
+=head3 the Controller
+
+The generic multi-action should:
+
+=over
+
+=item * find out which action to call
+
+=item * find out which database entries have been selected
+
+=item * call the method with the correct parameters
+
+=item * create a status report
+
+=back
+
+=head2 Implementation
+
+=head3 updating the controller
+
+At this point, all modification to the controller is done in lib/MyApp/Controller/Books.pm
+
+To make the code more readable, we will create one action for each of the four Controller-tasks mentioned above.
+
+The following new actions will be created:
+
+=over
+
+=item * get_multiaction: Private
+
+This method will search the requests parameters for possible action names.
+
+=over
+
+=item * arguments: none	
+
+=item * returns: $multiaction OR undef
+
+=item * conventions
+
+The name of the actions provided in the request parameters. The parameters name
+starts with "multi_", followed by the actions name.
+It is important to stick to this convention when udating the view.
+
+=back
+
+Add the following code to lib/MyApp/Controller/Books.pm:
+
+ sub get_multiaction :Private {
+ 	my ($self, $c) = @_;
+ 	foreach (keys %{$c->req->params}){
+ 		# search parameters for possible action names
+ 		if ($_ =~ /^multi_(\w+)$/){
+ 			# check whether the parameter is an action 
+ 			# of the current controller
+ 			if( $self->action_for($1)){
+				# return the actions name
+ 				return $1;
+ 			}
+ 		}
+ 	}
+ 	return undef;
+ }
+
+
+
+
+=item * get_args: Private
+
+This method searches the request parameters for possible Arguments to the
+requested action. It returns a reference to a list, containting CatupreArgs 
+and Args for
+each selected database-entry, or undef if no entries where selected.
+
+=over
+
+=item * arguments: $multiaction
+
+The name of the currently requested action
+
+=item * returns: \[ { captures => [$captureargs], args => [$arguments] } ,...] OR undef
+
+=item * conventions
+
+The request parameters should contain: 
+
+=over
+
+=item * one list called "selected"
+
+containing ids of all selected database entries
+
+=item * one list called "arguments_$i" per selected entry, with $i being the entries id
+
+containing the arguments that should be passed to the requested action, for each
+selected database entry
+
+=item * one list called "captures_$i" per selected entry, with $i being the entries id
+
+containing the "capture arguments"  that should be passed to the requested action, for each selected database entry
+
+=back
+
+The result is returned as a ArrayRef. Each element in this array contains the 
+arguments for one selected entry, stored in a hash. 
+
+=back
+
+=back
+
+Add the following code to lib/MyApp/Controller/Books.pm:
+
+ sub get_args :Private {
+ 	my ($self, $c, $multiaction) = @_;
+	# retrieving selecte entries
+	my @selected = $c->req->param('selected');
+	my @result;
+	# looping over captures and args
+	foreach (@selected){
+		# retrieving catures and args
+		my $captures = [$c->req->param("captures_$_")];
+		my $args = [$c->req->param("arguments_$_")];
+		# storing captures and args in result
+		push @result, {captures => $captures, args => $args};
+
+	}
+	return (@result && @result > 0) ? \@result : undef;
+ } 
+
+=over
+
+=item * create_status_msg :Private
+
+This method should create a status-message for the current multiaction-request.
+
+=over
+
+=item * parameters: 
+
+=over
+
+=item $action
+
+A String, containing the name of the currently requested multiaction
+
+=item $successfull
+
+An  ArrayRef, containting captures and args for all successfully
+executed multiactions
+
+=back
+
+=item * returns: a String
+
+=item * conventions:
+
+It is assumed that the $successfull - parameter has the same form as 
+the ArrayRef returned by "get_args"
+
+=back
+
+=back
+
+Add the following code to lib/MyApp/Controller/Books.pm:
+
+ sub create_status_msg :Private{
+ 	my ($self, $c, $action, $successful) = @_;
+ 	my $msg = join "<br/>", map{
+		"CaptureArgs: " . 
+			join ", ", @{$_->{'captures'}} . 
+		" - Args: ". 
+			join ", ", @{$_->{'args'}}
+		} @$successful;
+ 	return "sucessfully executed $action for: <br/> $msg";
+ }
+
+=over
+
+=item * multiaction :Chained('base') :PathPart('multiaction') :Args(0)
+
+This method will put it all together: It calls "get_multiaction" and 
+"get_args", performs the actual method-call, creates a status report
+and forwards to "list", when all work is finished.
+
+=over
+
+=item * parameters: none
+
+=item * returns: nothing
+
+=back
+
+=back
+
+
+Add the following code to lib/MyApp/Controller/Books.pm:
+
+ sub multiaction :Chained('base') :PathPart('multiaction') :Args(0) {
+
+ 	my ($self, $c) = @_;
+ 	# make sure that the current request is a "POST" request
+ 	if( $c->req->method eq 'POST'){
+ 		# try to find the requested multiaction
+ 		my $multiaction = $c->forward('get_multiaction');
+ 		if($multiaction){
+ 			# try to find the requested parameters
+ 			my $selected = $c->forward('get_args', $multiaction);
+ 			if($selected){
+ 				my $successful;
+				# loop over all parameters
+ 				foreach(@$selected){
+ 					my $captures = $_->{captures};
+ 					my $args = $_->{args};
+					# call the method
+ 					$c->visit($self, $multiaction, $captures, $args);
+					# store the status information
+ 					push @$successful, $_;
+ 				}
+				 # create a status mesage
+ 				my $status_msg = $c->forward('create_status_msg',[$multiaction, $successful]);
+ 				$c->flash(
+ 					status_msg => $status_msg,
+ 					) if $successful;
+ 			}
+ 			else{
+ 				$c->flash(error_msg => "MULTIACTION CANCELED: no entries selected");
+ 			}
+ 		}
+ 		else{
+ 			$c->flash(error_msg => "MULTIACTION CANCELED: unknown mutliaction");
+ 		}
+ 	}
+ 	else{
+ 		$c->flash(error_msg => "MULTIACTION CANCELED: not a POST request");
+ 	}
+ 	$c->response->redirect($c->uri_for($self->action_for('list')));
+ }
+
+
+=head3 updating the view
+
+To realized the tasks described above, edit root/src/books/list.tt2, and 
+
+=over
+
+=item * add just before the <table> tag:
+
+ <form method="POST" action="[% c.uri_for(c.controller.action_for('multiaction')) %]" />
+
+=item * add just after the </table> tag:
+ 
+ </form>
+
+=item * edit the line containing the table-header tags, and add a submit-button for the delete-action. after this, the section should look like this:
+
+
+ <tr>
+ <th>Title</th><th>Rating</th><th>Author(s)</th><th>Links</th>
+ <th><input type="submit" name="multi_delete", value="delete selected"</th>
+ </tr>
+
+=item * add a checkbox for each displayed database-entry. Add, just before the </tr> tag inside the FOEARCH-loop:
+
+ <td> <input type="checkbox" name="captures" value="[% book.id %]"/> </td>
+ <input type="hidden" name="captures_[% book.id %]" value="[% book.id %]"/>
+ <input type="hidden" name="arguments_[% book.id %]" value="[% book.id %]"/>
+
+=back
+
+after this, your list.tt2 should look like this:
+
+ [% META title = 'Book List' -%]
+
+ <form method="POST" action="[% c.uri_for(c.controller.action_for('multiaction')) %]" />
+ <table>
+ <tr>
+ <th>Title</th><th>Rating</th><th>Author(s)</th><th>Links</th>
+ <th><input type="submit" name="multi_delete", value="delete selected"</th>
+ </tr>
+ [% # Display each book in a table row %]
+ [% FOREACH book IN books -%]
+   <tr>
+     <td>[% book.title %]</td>
+     <td>[% book.rating %]</td>
+     <td>
+       [% # Print count and author list using Result Class methods -%]
+       ([% book.author_count | html %]) [% book.author_list | html %]
+     </td>
+     <td>
+       [% # Add a link to delete a book %]
+       <a href="[% c.uri_for(c.controller.action_for('delete'), [book.id]) %]">Delete</a>
+     </td>
+     <td> <input type="checkbox" name="captures" value="[% book.id %]"/> </td>
+     <input type="hidden" name="captures_[% book.id %]" value="[% book.id %]"/>
+     <input type="hidden" name="arguments_[% book.id %]" value="[% book.id %]"/>
+   </tr>
+ [% END -%]
+ </table>
+ </form>
+ <p>
+   <a href="[% c.uri_for('/login') %]">Login</a>
+   <a href="[% c.uri_for(c.controller.action_for('form_create')) %]">Create</a>
+ </p>
+
+=head2 Test the multiaction:
+
+Start the test-application, and point your browser to
+ localhost:3000/books/list
+
+You should be able to select several books and delete them by clicking the 
+"delete selected" button
+
+=head2 Increasing reusability
+
+At this point, we created a generic multi-action-wrapper in our Books-controller.
+The next part of this article shows how to increase reusability by moving
+the code from the controller to a Moose::Role.
+
+=head3 Creating the role
+
+=over
+
+=item * Create the file lib/MyApp/MultiAction.pm and add the following Content:
+
+
+ package MyApp::MultiAction;
+ 
+ use MooseX::MethodAttributes::Role;
+ use namespace::autoclean;
+
+
+ 1;
+
+MooseX::MethodAttributes::Role is a extension to Moose::Role, which adds the 
+ability to define method attributes (like :Private, :Chained ...) in Roles.
+
+=item * Move the code
+
+Remove all new created code from lib/MyApp/Controller/Books.pm and paste it to
+lib/MyApp/MultiAction.pm, after "use namespace::autoclean", but before "1;"
+
+=item * Adapt the code
+
+=over
+
+=item * Change the methodattribute from multiaction to ":Action"
+
+After that the first line of your multiaction-method should look like this:
+
+ sub multiaction :Action {   
+
+=item * Add requirements
+
+Because our Role itself is not a Catalyst Controller, we have to make sure 
+that the required methods - list and action_for - are present. Add
+
+ requires qw/list action_for/;
+
+anywhere between "use namespace::autoclean" and "1;". After that, our Role can
+only be applied to Objects which provide this two methods.
+
+=back
+
+=back
+
+=head3 Using the role
+
+At this point, all new functionality has moved from our controller to a Moose::Role.
+The only thing left is to apply the role to our controller:
+
+Open lib/MyApp/Controller/Books.pm again and
+
+=over
+
+=item * Make the controller to use the role
+
+by adding
+
+ with 'MyApp::MultiAction';
+
+after the BEGIN section at the top of the file.
+
+Note: the with-statement MUST NOT be included in the BEGIN section, because this 
+would make the perl interpreter to apply the role BEFORE the list-method has 
+been interpreted, which would result in a compile time error.
+
+
+=item * Activate the generic multiaction in the controller
+
+by adding
+
+ __PACKAGE__->config(
+ 	action=> {      
+ 		multiaction => {Chained => 'base', PathPart => 'multiaction', Args => 0}, 
+ 	},
+ );
+
+just before
+ __PACKAGE__->meta->make_immutable;
+at the end of the file.
+
+=back
+
+=head2 Test the Role
+
+Start the test-application, and point your browser to
+ localhost:3000/books/list
+
+You should be able to select several books and delete them by clicking the 
+"delete selected" button, just as before.
+ 
+=head2 Adapt the behaviour of "multiaction" for a single controller
+
+In addition to a better code structure, implenting a helper-action for every
+identified task has another big benefit: You can change the behaviour of
+every task, by just overriding the corresponding method in your controller.
+
+EXAMPLE: The status-report created by our Role is very generic - and very ugly.
+We can change the report for our deleted Books by overiding the "create_status_msg"
+method in lib/MyApp/Controller/Books.pm.
+
+Open the file and add the following code:
+
+
+ around create_status_msg => sub{
+ 	my ($orig,$self, $c, $action, $successful) = @_;
+ 	if( $action eq 'delete'){
+ 		my $msg = join "<br/>", map{ join ", ", @{$_->{'captures'}}} @$successful;
+ 		return "sucessfully deleted all books with the following ids: <br/> $msg";
+        }
+        else{
+       		return $self->$orig($c,$action,$successful);
+	}
+ 
+ };
+
+Note: Methods implemented in Roles can not be overridden with the "override" and
+"augment" pragmas provided by Moose. (This is, because these methods are not 
+inherited from a parent class. They are implemented in the calling class itself.)
+If you don't need the original method at all, you can just redefine the complete
+method in your controller. If you only want to change the behaviour under certain 
+conditions, and otherwise stick to the original behaviour, you can use Mooses
+"before", "after" and "around" functionality. 
+In the above example, the status message is only changed for "delete" actions.
+All other multiactions will produce the old, generic messages.
+See L<Moose::Manual::MethodModifiers|http://search.cpan.org/~drolsky/Moose-1.21/lib/Moose/Manual/MethodModifiers.pod> for details.
+
+=head2 Reusing the multiaction
+
+=over
+
+=item * using the role in a different controller
+
+To use the role in another controller, just apply the role to it, and activate the 
+multiaction, as described above. Don't forget to update your list-template aswell.
+
+=item * adding more multiactions
+
+If you want to use the multiaction-feature with another action, implement you action in your controller, and add a corresponding submit-button to your list
+template.
+
+=back
+
+=head2 Notes:
+
+When implementing the multiaction as described above, most of your code
+is generic and reusable, but the templates used in this example are very simple.
+As long as your actions expect the entries ids as arguments or captureargs, 
+everything is fine. If your actions need more complex parameters, you have
+to improve your templates. If different actions need very different sets of parameters,
+you have to adapt your get_args-method. The name of the requested action is passed
+as a parameter to get_args. Use it to find out what arguments you have to provide.
+
+
+=head2 Conclusion
+
+It is possible to apply an action to several datasets at once, by creating
+a generic wrapper-method which calculates the correct parameters and
+calls the requested action.
+
+Moving actions from the Controller to a Moose::Role is one possibility to 
+make you code reuseable for any controller.
+One benefit of using roles is, that they can easily be applied to any Moose
+object, as long as this object fulfills all of the roles requirements.
+The Objects do not even have to be Catalyst Controllers. If you want to
+use your code in a Catalyst-independent application, you can do so. All you have
+to care about is, that you code passes the correct parameters to the roles methods.
+
+Splitting an action into several (more or less) atomic methods 
+makes your code more readable and adds the possibility to finetune
+your actions behaviour on a per-controller basis.
+
+The lack of some missing method modifiers in Roles can be bypassed with
+standart Moose functionality, and without black magic.
+
+
+
+=head1 Author
+
+Lukas Thiemeier <lukas@thiemeier.net>
+
+http://public.thiemeier.net
