@@ -1,0 +1,216 @@
+=head1 Internationalising Catalyst, Part 2
+
+=head2 SYNOPSIS
+
+In part one (L<http://www.catalystframework.org/calendar/2010/9>), we showed you how to add internationalisation to your Catalyst application. Now
+we'll show you some of the hints and tips that we've learnt while developing Opsview (L<http://opsview.com>).
+
+=head2 KEY NAMES
+
+We like the message key names to give an idea of where in the 
+application this message is used. Although xgettext.pl will
+list the file it was found and the line number, you don't really want your translators to have to dig their way
+through the code to understand. So given two pieces of information - the key and the default English text -
+this should be enough for a translator to change the text appropriately.
+
+We use keys like:
+
+  ui.menu.section.status
+  ui.event.title
+  ui.admin.contact.edit.label.confirmPassword
+  ui.admin.edit.button.submitChanges
+  messages.access.noAuthToStatusApi
+
+We deliberately use camelCase as this parses a bit better than the usual perl multi_word_phrases convention.
+
+=head2 GENERATED KEYS
+
+As c.loc() just needs a string parameter, you can pass in variables. For instance, we have the list of
+menu items stored in a configuration file, so our code has:
+
+  c.loc("ui.menu.section.$ident")
+
+This is caught by xgettext.pl, but you can just ignore it in i_default.po. But what about the actual strings?
+
+The xgettext routine to find 
+the list of keys will remove any keys that it cannot find in the controllers or template files - this is
+a feature, otherwise you will just keep growing the list of translation strings and translators will be 
+annoyed that they are translating strings that are no longer in use.
+
+As you need to store the list of possible strings somewhere, we decided to create a dummy 
+template file to hold the keys.  In Opsview, we create a root/dummy template with:
+
+  [%
+  c.loc("ui.menu.section.status")
+  c.loc("ui.menu.entry.hostgrouphierarchy")
+  ...
+  %]
+
+This lists all the possible options. The xgettext routine will then find it in this dummy file 
+and then it is just another string to translate. 
+
+=head2 VARIABLES
+
+Variables work as you would expect. The only thing to watch out for is the default way of 
+specifying variables is via [_1] in the perl code, but the .po files will have %1.
+
+An example in Opsview is in the template as:
+
+  c.loc("ui.state.service.downtime.help.schedulesDowntime [_1] [_2]", object.name, object.hostname )
+
+This generates an entry of:
+
+  msgid "ui.state.service.downtime.help.schedulesDowntime %1 %2"
+  msgstr "Schedules downtime for the service %1 on host %2"
+
+=head2 FILTERING
+
+This advice applies for all generated pages. However, it is good practise for translation strings otherwise
+a poor translation could break your application.
+
+In part one (L<http://www.catalystframework.org/calendar/2010/9>), there was a template filter called escape_js_string. 
+Template Toolkit also ships with an html filter.
+Based on where your strings appear in the web page, they should be escaped appropriately to stop invalid characters
+from affecting your code. For instance:
+
+  <script type="text/javascript">alert("[% c.loc("ui.help.welcomeText") | escape_js_string %]")</script>
+  <a href="http://opsview.com" 
+    alt="[% c.loc("ui.help.opsviewLink") | html %]"
+    onclick="alert('[% c.loc("ui.help.confirmLink") | escape_js_string | html %]')">
+  [% c.loc("ui.help.clickMe") | html %]
+  </a>
+
+The text in the <script> tag needs to be escaped (ui.help.welcomeText could have </script> within it). The alt tag
+needs to be escaped by the html filter. Finally, the onclick needs to be filtered by javascript first, then by html
+because it is within the context of an HTML element.
+
+Doing this will stop bad translation strings from causing unintended side effects.
+
+Sometimes you may need to put html in the strings. In these cases, we make sure the key contains 
+the word "html", so that translators know that we are expecting html in the text - 
+beware, you are at the mercy of your translators!
+
+=head2 HELPER METHODS
+
+We have 2 helper methods in Opsview/Web.pm.
+
+=over 4
+
+=item translate
+
+This always returns the i_default version of a certain string. This is commonly used for our audit log entries, 
+which need to be in a specific language as it is not a per user setting.
+
+  sub translate {
+    my $c = shift;
+    Opsview::Web::I18N::i_default->maketext(@_);
+  }
+
+We specifically chose C<translate> because this is one of the keywords that xgettext.pl picks up, so it 
+automatically gets into your po files.
+
+If you use this consistently in your application and introduce a system langauge setting, then you can change
+all your translations at once to a different language.
+
+=item ifloc
+
+This returns undef if translated version is the same as the initial string - this means no translation was found.
+
+  sub ifloc {
+    my $c           = shift;
+    my $id          = $_[0];
+    my $translation = $c->loc(@_);
+    return undef if ( $translation eq $id );
+    return $translation;
+  }
+
+We use this in situations where variables are used which we won't ever have a chance of knowing about.
+For example, in Opsview you define notifications by email, mobile or RSS, but someone could extend it
+with Jabber or IRC or Facebook.
+
+  c.ifloc("ui.admin.notificationmethod.variable.$variable_lc") || String.replace("_"," ").capital;
+
+We only add entries in our dummy template for the variables we support, but using ifloc allows a user
+to add their own message string.
+
+=back
+
+=head2 GETTING A LIST OF SUPPORTED LANGUAGES
+
+Catalyst::Plugin::I18N has a method called installed_languages, which will return a hashref with 
+all the languages it supports. It does this by scanning for MyApp/I18N/*.po files, and then using
+I18N::LangTags::List to convert the name to the language name.
+
+So a new translation file just needs to be dropped into the correct location and on application restart
+the list of supported languages increases!
+
+=head2 GENERATE AUTOMATIC TRANSLATIONS!
+
+When you are starting with internationalisation, you need to know that your application is working as you
+expect, but you (or at least I) can only speak English. Use this script to get Google to help you - it will 
+pass the English phrase and then populate the msgstr with the response from Google's translate service.
+This is quite awesome the first time you run it, until you get a native speaker to tell you that the
+phrases are completely wrong. But it's good for testing!
+
+Thanks to the fantastic WebService::Google::Language module.
+
+Script available here: L<https://secure.opsera.com/wsvn/wsvn/opsview/tags/release-3.9.1/opsview-web/utils/auto_translate>.
+
+=head2 RENAMING A STRING KEY
+
+Occasionally we need to rename a key to make more sense. Use this script which will rename the key
+and do it for all language files - this saves your translators from further headache!
+
+Script available here: L<https://secure.opsera.com/wsvn/wsvn/opsview/tags/release-3.9.1/opsview-web/utils/rename_string>.
+
+=head2 CHECKING FOR MISSING STRINGS
+
+There's a small perl script called validate_i_default to confirm there are no strings untranslated in
+i_default.po. You can add exceptions to this script, for strings that are not meant to be translated, usually auto generated strings.
+
+Script available here: L<https://secure.opsera.com/wsvn/wsvn/opsview/tags/release-3.9.1/opsview-web/utils/validate_i_default>.
+
+=head2 UPDATING STRINGS IN OTHER LANGUAGES
+
+We have another perl script called add_new_strings, which adds new strings in i_default.po to all the other
+language files with a default value of "". This means that translators can pick up their language file and 
+most translation programs will list the strings with no translations, making it easier to 
+identify the outstanding work.
+
+Locale::Maketext::Simple will also discard any msgid where the msgstr is empty, so there's no cost there.
+
+Script available here: L<https://secure.opsera.com/wsvn/wsvn/opsview/tags/release-3.9.1/opsview-web/utils/add_new_strings>.
+
+=head2 WRAP UP THE CHECKS INTO A MAKEFILE RULE
+
+The last two above can be added into a makefile rule:
+
+  gettext:
+    xgettext.pl -P perl=* -P tt2=* --output=lib/Opsview/Web/I18N/messages.pot --directory=lib/ --directory=root/
+    msgmerge --no-location --no-wrap --no-fuzzy-matching --update lib/Opsview/Web/I18N/i_default.po lib/Opsview/Web/I18N/messages.pot
+    # This is quick, so run it everytime
+    $(MAKE) gettext-test
+    # Check for missing strings
+    utils/validate_i_default
+    # Update all po files with new strings
+    utils/add_new_strings
+
+  gettext-test:
+    for i in lib/Opsview/Web/I18N/*.po; do msgfmt --output=/dev/null $$i || exit 1; done
+
+So now our workflow is reduced down to:
+
+  Add a string
+  Add the i_default.po version
+  Run make gettext
+  Commit
+
+=head2 CONCLUSION
+
+Adding language support shouldn't be hard, and we've reduced it as much as we can. So go forth and spread the Catalyst love in many different languages!
+
+=head2 AUTHOR
+
+Ton Voon <ton.voon@opsview.com>
+
+=cut
