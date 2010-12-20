@@ -19,7 +19,7 @@ That's what you're here for, right? :-)
 My favorite ORM, but Form::Sensible::Reflector provides a base reflector class you could write a reflector for just about anything.
 This is what will be used specifically, as it gave me the best options data structure-wise from database<->forms.
 
-=item Form::Sensible::Reflector::DBIC
+=item L<Form::Sensible::Reflector::DBIC|http://search.cpan.org/dist/Form-Sensible-Reflector-DBIC/>
 
 This will be doing most of the work, at least generating the form.
 
@@ -209,15 +209,29 @@ The template to display this:
 
 And that's really it.  Basically, I've tried to keep the SQL data types relatively intuitive.  If a column is supposed to take a textfield's worth of data, it's probably a textfield.  If it's got options, you get to decide what it should be.  At this point, things like C<enum> are C<< <select> >> fields. Form::Sensible is very flexible in allowing you to specify what you want to look like what, so post-creation, you can even munge the fields to look like what you want.
 
+We get a form like this: 
+
+=begin html
+
+<img src="/static/images/2010/form-sensible-reflector-dbic-example.png" alt="" />
+
+=end html
+
+You'll notice that I've used L<TinyMCE|http://moxiecode.com/products_tinymce.php> for the main textarea.  What's great about Form::Sensible is it creates sensible divs for your CSS to be styled, and since TinyMCE just uses the DOM, you just point it at whatever id or element you want styled as a WYSIWYG editor.
+
+
 That's really it folks.  Form::Sensible::Reflector::DBIC only does a few things: 
 
 =over 12
 
-=item Set up a bridge between Form::Sensible and DBIx::Class
+=item *
+Set up a bridge between Form::Sensible and DBIx::Class
 
-=item Allow you to have form definitions in one place, as opposed to two or three, like other systems might have you do.
+=item * 
+Allow you to have form definitions in one place, as opposed to two or three, like other systems might have you do.
 
-=item Quickly display your form without much fuss.
+=item *
+Quickly display your form without much fuss.
 
 =back
 
