@@ -1,0 +1,611 @@
+=head1 Catalyst::Controller::REST, jQgrid, and You.
+
+Datagrids are a pretty big thing nowadays.  Every reasonable JavaScript framework has a solution for creating them, and for good reason.  You can get a really simple, data-agnostic CRUD interface up and running that has quick sorting features, pagination, bulk create/delete/update, and easy search features.  These are all extremely useful for situations in which you have large datasets you have to deal with in big chunks at a time.  Tangible scenarios include admin interfaces, store product inventory lists, email listings, etc.  This is all good and gravy, given we have a JavaScript UI solution to *displaying* the data, but how do we get data *into* it, reasonbly, and extensibly? We use my good friend L<Catalyst::Controller::REST|http://search.cpan.org/~bobtfish/Catalyst-Action-REST-0.87/lib/Catalyst/Controller/REST.pm>.  Folks have talked about this fella before, but not exactly in this capacity. See, things like flexigrid from jQuery also give you a nice grid interface, but the CRUD factor isn't quite as easy as with jQgrid.  So I'd like to take some time and explain how to use jQgrid for your datagrid instances, and show you why it's a bit easier.
+
+=head2 PACKING LIST
+
+=over 12
+
+=item Catalyst::Controller::REST
+
+    cpanm Catalyst::Controller::REST
+
+Voila.  One down, a few more to go!
+
+=item A Data Source.
+
+Ours will be a database, hooked up via L<DBIx::Class|http://search.cpan.org/dist/DBIx-Class/>.  Yours can be anything, as long as it can be coerced into the data structure we'll be talking about here shortly.
+
+=item jQgrid
+
+Put together the options you want here: L<http://www.trirand.com/blog/?page_id=6>, download, and be happy. For this specific example, jQuery UI addons, Form Editing, Cell Editing, and Inline/In Place Editing will be used, but it is up to you whether you want to include these or not.
+
+=back
+
+=head2 Putting it all Together
+
+So, I trust you have a basic Catalyst app all ready to go, in preparation and anticipation for this article, ready to go since you've been waiting with untold excitement since my last article.  Great!  Let's get going.
+
+This specific example will be a entry management "panel" for a high-traffic, many post blog.
+
+Let's create a controller that will serve as our CRUD interface to the jQgrid:
+
+    package MyApp::Controller::RESTYCrud;
+    use Moose;
+    use namespace::autoclean;
+    use Try::Tiny;
+    BEGIN { extends 'Catalyst::Controller::REST'; }
+
+    ## start of our Chained actions
+    sub base : Chained('/') PathPart('entry') CaptureArgs(0) {
+    } 
+    
+    ## initial URL pathpart, grabs all posts
+    sub index : Chained('base') PathPart('') Args(0) ActionClass('REST') {
+      my ( $self, $c ) = @_;
+      my $data = $c->req->data || $c->req->params;
+
+    ## things get a wee bit funky here, as jQgrid wants to keep it real, and keep it simple, by having a sort of
+    ## input-agnostic data structure for its grid.  Simply put, it wants a JSON representation of a table, 
+    ## with cells, rows, cell indices, sort order, number of rows, and page number.
+
+      my $order =
+        ( exists( $data->{sidx} ) && exists( $data->{sord} ) )
+        ? $data->{sidx} . " " . $data->{sord}
+        : "{ -desc => [ qw/created_at/ ] }";
+      my $rs = $c->model("Database::Entry")->search(
+        {},
+        {
+            rows => $data->{rows} || 10,
+            page => $data->{page} || 1,
+            order_by => $order
+        }
+      );
+
+    ## quick little method I wrote, not very MVC, to make the above slightly more doable in a sane fashion.
+      my @posts = $self->serialize_posts($c, $rs, $data);
+    
+    ## stuff 'em in the stash  
+      $c->stash( posts => @posts, template => 'entry/index.tt' );
+	
+    } 
+
+    ## as you know, C::C::REST needs an HTTP method defined for each action you want serialized through it.
+    ## this doesn't do much more than grab the posts that are pre-serialized (in the perl data structure sense) and serialize
+    ## them to our desired format (XML, JSON, etc.)
+    sub index_GET {
+      my ( $self, $c ) = @_;
+      my @posts = $c->stash->{posts};
+      return $self->status_ok( $c, entity => @posts );
+    }
+
+    ## simple create action, you decide how you want to present the input UI to the user
+    sub create : Chained('auth_base') PathPart('entry/new') ActionClass('REST') Args(0) {
+      my ( $self, $c ) = @_;
+
+      ## put together input UI here, a form most likely for the GET request
+
+    }
+
+    ## display the aforementioned form
+    sub create_GET {
+      my ( $self, $c ) = @_;
+
+      $self->status_ok( $c, entity => { template => 'entry/create.tt' } );
+
+    }
+
+    ## so, our first bit of CRUD. (the "C" in CRUD)
+    ## All we need to do here is let jQgrid know what action is being performed
+    ## (it checks this by seeing what the parameter "oper" says
+    ## and then actually insert the record, and return some JSON for jQgrid.
+    sub create_POST {
+
+      my ( $self, $c ) = @_;
+      my $data ||= $c->req->data || $c->req->params;
+
+      ## check to see if we're being submit from a form or from jQgrid
+      if ( $data->{'submit'} or $data->{'oper'} eq 'add' ) {
+       try {
+         ## your create logic goes here, try/catch just allows us to gracefully handle errors
+         $c->stash( status => "created", entry => $e );
+
+         ## meat and potatoes right here, 
+         ## 1. return a location, which is the request URI as a string,
+         ## 2. and some sort of identifier for the entry.  
+         ## Everything in entity => {} is serialized.
+         $self->status_created(
+                $c,
+                location => $c->req->uri->as_string,
+                entity   => {
+                    message => "Created post",
+                    entry   => $entry->entryid
+                }
+            );
+        }
+        ## something went wrong, send back a bad request response
+        ## aside: Try::Tiny puts errors caught in $_
+        catch {
+            $self->status_bad_request( $c, message => "Can not create post: $_" );
+        };
+
+    }
+
+  }
+
+  ## view post logic (the "R" in CRUD)
+  ## this should be whatever you need as far as retrieval logic goes.
+  ## this retrieves ONE entry, with a nice RESTful URI such as:
+  ## /entry/1
+  ## this is not an endpoint for Chained, thus it simply sets things up for us.
+  sub get_post : Chained('base') PathPart('') CaptureArgs(1) {
+    my ( $self, $c, $postid ) = @_;
+    my $query;
+
+    ## this is here so we can have a slightly extensible sort of
+    ## query data structure we can pass to our search solution.
+    push @{$query}, { title => $postid };
+
+    my $post = $c->model('CMS')->entry->find_by($query);
+    unless ( defined $post ) {
+        $c->error("Can't find post with that id");
+    }
+
+    $c->stash( post => $post );
+
+  }
+
+  ## "get" endpoint
+  sub view_post : Chained('get_post') PathPart('') Args(0) ActionClass('REST') {
+    my ( $self, $c ) = @_;
+    my $post = $c->stash->{'post'};
+
+    ## post "serialized" in a reasonable perl data structure
+    my $post_serialized = {
+
+        title       => $post->title,
+        body        => $post->body,
+        created_at  => $post->created_at . "",
+        author      => $post->author->userid,
+        type        => $post->type,
+        attachments => \@attachments,
+
+    };
+    $c->stash( post_serialized => $post_serialized, template => "entry/view.tt" );
+
+  }
+
+  ## REST endpoint
+  sub view_post_GET {
+    my ( $self, $c ) = @_;
+    my $post = $c->stash->{'post_serialized'};
+
+    $self->status_ok( $c, entity => {$post} );
+  }
+
+  ## the "D" in CRUD, set up an end point for this
+  sub delete_post : Chained('get_post_authed') PathPart('delete') Args(0) ActionClass('REST') {
+  }
+
+  ## delete a record.  Again, this is up to you to write.
+  sub delete_post_POST {
+    my ( $self, $c ) = @_;
+    ## need to add stuff in to make sure user can delete this post
+    my $post = $c->stash->{'post'};
+
+    $c->model('CMS')->entry->delete( $post->entryid );
+    return $self->status_ok(
+        $c,
+        entity => {
+            status => "Post unpublished",
+            post   => $post,
+            url    => $c->uri_for_action('/entry/index')
+        }
+    );
+  }
+
+  ## the "U" in CRUD
+  ## sorry, D and U got reversed in definition order, but I think you'll cope :-)
+  sub edit_post : Chained('get_post_authed') PathPart('update') Args(0) ActionClass('REST') {
+  }
+
+  sub edit_post_PUT {
+    my ( $self, $c ) = @_;
+    my $post = $c->stash->{'post'};
+    my $data = $c->req->data || $c->req->params;
+
+    $c->model('CMS')
+      ->entry->update( $post->entryid,
+        { body => $data->{body}, published => $data->{published}, title => $data->{title} } );
+    return $self->status_ok( $c, entity => { status => "Post updated", } );
+  }
+
+
+  ## this is a quick utility method, and should go in a model
+  sub serialize_posts {
+    my ( $self, $c, $rs, $data) = @_;
+    my @posts;
+    push @posts, {
+
+        'page' => $data->{page},
+
+        rows      => [],
+        'records' => $rs->count,
+
+        'total' => $rs->pager->last_page,
+
+    };
+    $c->log->debug( "pages: " . $rs->pager->last_page );
+
+    ## jQgrid wants a json structure similar to:
+    ## 
+    ## {
+    ## "page": "1",
+    ## "records": "10",
+    ## "rows": [
+    ##     {
+    ##         "id": 117,
+    ##         "cell": [
+    ##             117,
+    ##             "re:wharrrrgarrgarblll",
+    ##             "2010-12-14T04:00:42",
+    ##             "2010-12-14T04:00:42",
+    ##             "<p>you haff replied!</p>",
+    ##             1,
+    ##             "post"
+    ##         ]
+    ##      }
+    ##  ],
+    ##  "total": 11
+    ## }
+    ## 
+    ## ... which is a long-winded way of saying "I want this in row[cell[index, column1..column$n] with some
+    ## various other details concerning what will be displayed and how.
+    ## the following accomplishes putting it into a perl data structure that one of our XML or JSON serializers can 
+    ## happily deal with. 
+    while ( my $post = $rs->next ) {
+        push @{ $posts[0]->{rows} },
+          {
+            'id'   => $post->entryid,
+            'cell' => [
+                $post->entryid,         $post->title,
+                $post->created_at . "", $post->updated_at . "",
+                $post->body,            $post->published,
+                $post->type,
+            ]
+          };
+
+    }
+
+    return @posts;
+
+  }
+
+  __PACKAGE__->meta->make_immutable;
+
+  1;
+
+That is, more or less, our business logic.  A LOT of that should be put into a model, but that would be a much more involved post that is beyond the scope of the basic premise I'm going for here.
+
+=head2 The jQgrid UI 
+
+So, now we need a template (or two) that defines our grid.
+
+Here is a basic set up that should match the above code reasonably well:
+
+    $(document).ready(function() {
+   
+    var lastsel;
+    $("#tposts").jqGrid({
+        // url that will be used to POST/GET etc unless overridden
+        url: '/entry/by_user/' + [% c.user.get("userid") %],
+        datatype: "json",
+        mtype: "GET",
+        reloadAfterSubmit: true,
+        height: 400,
+        width: 680,
+        pager: $('#posts'),
+        // important, if you want to specify what's sent on the 
+        // grid event.
+        ajaxGridOptions: {
+            contentType: 'application/json'
+        },
+        // same as above, but per-row
+        ajaxRowOptions: {
+            contentType: 'application/json',
+            type: 'PUT'
+        },
+        // we want to serialize our row data to JSON before sending,
+        // so that Catalyst::Controller::REST knows how to respond
+        serializeRowData: function(data) {
+            return JSON.stringify(data);
+        },
+        // quick-and-dirty set up for your columns
+        colNames: ['Entry ID', 'Title', 'Date Created', 'Date Updated', 'Body', 'Published', 'Type'],
+        // this should essentially reflect the columns you want updated appside, for example, they should be
+        // named the same as your database columns you are updating unless you have logic that translates them
+        // properly.
+        colModel: [
+        {
+            name: 'entryid',
+            index: 'entryid',
+            width: 55
+        },
+        {
+            name: 'title',
+            index: 'title',
+            width: 80,
+            align: "right",
+            editable: true
+        },
+        {
+            name: 'created_at',
+            index: 'created_at',
+            width: 90,
+            editable: false
+        },
+        {
+            name: 'updated_at',
+            index: 'updated_at',
+            width: 100,
+            editable: false
+        },
+        // when clicked, this will turn into a textarea.
+        // cool, but I recommend setting up a modal edit window
+        // for anything that's not turning into a simple "<input type='...'"
+        // as it gets EXTREMELY cumbersome to try and edit long bits of text inside a constrained
+        // textarea.
+        {
+            name: 'body',
+            index: 'body',
+            width: 150,
+            sortable: false,
+            edittype: "textarea",
+            editoptions: {
+                rows: "10",
+                cols: "20"
+            },
+            editable: true
+        },
+        {
+            name: 'published',
+            index: 'published',
+            width: 80,
+            align: "right",
+            editable: true,
+            edittype: "select",
+            editoptions: {
+                value: "1:yes;0:no"
+            }
+        },
+        {
+            name: 'type',
+            index: 'type',
+            width: 80,
+            align: "right",
+            editable: true,
+            edittype: "select",
+            editoptions: {
+                value: "post:post;page:page"
+            }
+        }
+        ],
+        // number of rows to be displayed at once
+        rowNum: 10,
+        // steps at which you can change how many rows are shown
+        rowList: [10, 20, 30],
+        // where your arrows for pagination are rendered
+        pager: '#posts',
+        // this should be your primary key in your database, as this is the
+        // default column for sorting
+        sortname: 'entryid',
+        viewrecords: true,
+        // sort of self explanatory, descending or ascending sort order.
+        sortorder: "desc",
+        
+        // important if you want "click-and-edit" functionality.
+        // basically, check if we are "edited", if so, send that data to the server,
+        // and then restore the row, whether edited or just blurred (clicked out of)
+        onSelectRow: function(id) {
+            ajaxGridOptions: {
+                contentType: 'application/json'
+            };
+            rowid = id;
+            if (id && id !== lastsel) {
+                $('#tposts').restoreRow(lastsel);
+                lastSel = id;
+            }
+            $('#tposts').editRow(id, true, '', '', '/entry/' + rowid + '/update');
+        },
+        caption: "Your Posts"
+    });
+
+    $("#tposts").jqGrid('navGrid', '#posts', {edit: false, add: true, del: false, search: true, refresh: true},
+    {},
+    {
+        mtype: "POST",
+        reloadAfterSubmit: true,
+        url: '/entry/new',
+        modal: true
+    },
+    {},
+    {});
+     $("#tposts").jqGrid('gridResize', {});
+  });
+  // delete options, a bit different since by default jQgrid just wants to send GET/POST/PUT/DELETE requests
+  // to ONE url without major hackery.
+  $("#dedata").click(function(){ 
+	var gr = $("#tposts").jqGrid('getGridParam','selrow');
+	if( gr != null ) $("#tposts").jqGrid('delGridRow', gr, { ajaxDelOptions: { contentType: "application/json", mtype: 'POST', }, serializeRowData: function(data) {
+        return JSON.stringify(data);
+    },  "url": '/entry/' + gr + '/delete', "reloadAfterSubmit":"false" });
+	else alert("Please Select Row to delete!");
+  });
+
+
+The template with which to display all this:
+
+  <h2>Manage Entries</h2>
+  <table id="tposts" style="padding-bottom: 10px"></table>
+  <!-- this is where the grid will be rendered -->
+  <div id="posts" style="padding: 10px"></div>
+
+  <br />
+  <div>
+ 
+  <!--
+        As I mentioned, jQgrid wants to send all the requests to one single URL unless you do some major hacking.
+       Therefore, I compromised and added links to create and delete records outside of the jQgrid.
+       I recommend an 'edit' link here as well, as the click and edit textarea can get really cumbersome 
+   -->
+  <div class=""><a href="[% c.uri_for_action('/entry/create', { "width"=>"50%", "height"=>"75%"}) %]" class="new-entry">Create an entry</a>
+  <div class="ui-icon-scissors"></div><a href="#" id="dedata">Delete selected row</a>
+
+  </div>
+   <div id="modalWindow" class="jqmWindow"> 
+        <div id="jqmTitle"> 
+            <button class="jqmClose"> 
+               X
+            </button> 
+            <span id="jqmTitleText">Title of modal window</span> 
+        </div> 
+        <iframe id="jqmContent" src=""> 
+        </iframe> 
+    </div>
+  <script type="text/javascript">
+  <!--
+    this should be the name of whatever you put the previous javascript in.
+  -->
+  [% PROCESS 'entry/entry_grid.js.tt' %]
+  </script>
+
+   <!-- 
+        Bonus!  Remember the modal window stuff I talked about? Here's a quick way to accomplish that:
+   -->
+
+  <script type="text/javascript">
+  // thanks to http://pixeline.be/experiments/ThickboxToJqModal/ for this
+  $(document).ready(function(){
+
+	var closeModal = function(hash)
+	    {
+	        var $modalWindow = $(hash.w);
+
+	        $modalWindow.fadeOut('2000', function()
+	        {
+	            hash.o.remove();
+	            //refresh parent
+
+	            if (hash.refreshAfterClose === 'true')
+	            {
+
+	                window.location.href = document.location.href;
+	            }
+	        });
+	    };
+	    var openInFrame = function(hash)
+	    {
+	        var $trigger = $(hash.t);
+	        var $modalWindow = $(hash.w);
+	        var $modalContainer = $('iframe', $modalWindow);
+	        var myUrl = $trigger.attr('href');
+	        var myTitle = $trigger.attr('title');
+	        var newWidth = 0, newHeight = 0, newLeft = 0, newTop = 0;
+	        $modalContainer.html('').attr('src', myUrl);
+	        $('#jqmTitleText').text(myTitle);
+	        myUrl = (myUrl.lastIndexOf("#") > -1) ? myUrl.slice(0, myUrl.lastIndexOf("#")) : myUrl;
+	        var queryString = (myUrl.indexOf("?") > -1) ? myUrl.substr(myUrl.indexOf("?") + 1) : null;
+
+	        if (queryString != null && typeof queryString != 'undefined')
+	        {
+	            var queryVarsArray = queryString.split("&");
+	            for (var i = 0; i < queryVarsArray.length; i++)
+	            {
+	                if (unescape(queryVarsArray[i].split("=")[0]) == 'width')
+	                {
+	                    var newWidth = queryVarsArray[i].split("=")[1];
+	                }
+	                if (escape(unescape(queryVarsArray[i].split("=")[0])) == 'height')
+	                {
+	                    var newHeight = queryVarsArray[i].split("=")[1];
+	                }
+	                if (escape(unescape(queryVarsArray[i].split("=")[0])) == 'jqmRefresh')
+	                {
+	                    // if true, launches a "refresh parent window" order after the modal is closed.
+
+	                    hash.refreshAfterClose = queryVarsArray[i].split("=")[1]
+	                } else
+	                {
+
+	                    hash.refreshAfterClose = false;
+	                }
+	            }
+	            // let's run through all possible values: 90%, nothing or a value in pixel
+	            if (newHeight != 0)
+	            {
+	                if (newHeight.indexOf('%') > -1)
+	                {
+
+	                    newHeight = Math.floor(parseInt($(window).height()) * (parseInt(newHeight) / 100));
+
+	                }
+	                var newTop = Math.floor(parseInt($(window).height() - newHeight) / 2);
+	            }
+	            else
+	            {
+	                newHeight = $modalWindow.height();
+	            }
+	            if (newWidth != 0)
+	            {
+	                if (newWidth.indexOf('%') > -1)
+	                {
+	                    newWidth = Math.floor(parseInt($(window).width() / 100) * parseInt(newWidth));
+	                }
+	                var newLeft = Math.floor(parseInt($(window).width() / 2) - parseInt(newWidth) / 2);
+
+	            }
+	            else
+	            {
+	                newWidth = $modalWindow.width();
+	            }
+
+	            // do the animation so that the windows stays on center of screen despite resizing
+	            $modalWindow.css({
+	                width: newWidth,
+	                height: newHeight,
+	                opacity: 0
+	            }).jqmShow().animate({
+	                width: newWidth,
+	                height: newHeight,
+	                top: newTop,
+	                left: newLeft,
+	                marginLeft: 0,
+	                opacity: 1
+	            }, 'slow');
+	        }
+	        else
+	        {
+	            // don't do animations
+	            $modalWindow.jqmShow();
+	        }
+
+	    }
+
+
+    $('#modalWindow').jqm({
+            trigger:'a.new-entry',
+            target: '#jqmContent',
+	        onHide: closeModal,
+	        onShow: openInFrame
+	});
+  });
+  </script>
+
+
+Phew!  That's pretty much the gist of it.  There are a LOT of other things you can do, but if you're lazy like me and just wanted to have this all spat out and done, that's all you need. It's a little counterintuitive at times, but I figured it out, and it's really not as bad as it could be.
+
+Anyway, enjoy!
+
+=head1 AUTHOR
+
+Devin Austin <dhoss@cpan.org>
