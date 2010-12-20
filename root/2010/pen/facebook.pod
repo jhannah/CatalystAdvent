@@ -1,0 +1,126 @@
+=head1 Integrating Facebook into your Catalyst application
+
+In this article I want to try to give you a small overview of what is it about 
+L<http://www.facebook.com/|Facebook> in general, and also about how you can 
+easily make a real Facebook application, and some hints about how you 
+integrate Facebook into your website (for this part you dont actually need 
+Catalyst, but I want to cover it for the overview)
+
+=head2 A small overview of Facebook
+
+To understand what you want from Facebook, you must first see what Facebook 
+offers you.
+
+Facebook themself give an overview of all this on the following 
+L<http://developers.facebook.com/|Facebook Developers> Page. For you as
+Catalyst developer, we can split them into 2 relevant parts: 
+
+The first is the pure website integration of Facebook elements, which is 
+covered by the L<http://developers.facebook.com/plugins/|Social Plugins> and
+the L<http://developers.facebook.com/docs/guides/web|Facebook for Webpages>
+guides on Facebook Developers.
+
+The second is the usage of the APIs of Facebook. Over this way you can read or
+modify the Facebook data. Facebook uses here three for us relevant access ways:
+L<http://developers.facebook.com/docs/reference/api/|Graph API>,
+L<http://developers.facebook.com/docs/reference/fql/|Facebook Query Language>
+and the soon hopefully outdated 
+L<http://developers.facebook.com/docs/reference/rest/|Old REST API>.
+
+=head1 Integration ways
+
+Lets play through some cases and explain what you need todo for making them
+happen.
+
+=head2 Adding a "Like" button
+
+For the like button and many others of the 
+L<http://developers.facebook.com/plugins/|Social Plugins>, you dont even need
+an account or application registered on Facebook. The only thing, you need
+todo is adding the specific B<iframe>. In the past, you was also able todo
+this via FBML, but this is official deprecated and will be dropped by Facebook
+at some point. It misses features and will not get new ones.
+
+The B<iframe> solution would look like this inside your L<Template::Toolkit>
+L<Catalyst::View::TT> template for any page (best written in one line):
+
+  <iframe src="http://www.facebook.com/widgets/like.php?href=[% c.uri_for | uri %]"
+    scrolling="no" frameborder="0"
+    style="border:none; width:450px; height:80px"></iframe>
+
+You could put this into B<facebook/like.tt> and always put it somewhere on all
+pages where you want a like button with:
+
+  [% INCLUDE facebook/like.tt %]
+  
+You can finetune the values for it, see more details on the 
+L<http://developers.facebook.com/docs/reference/plugins/like|Like Button> Page.
+
+=head2 Getting deeper, using the JavaScript SDK
+
+Many social plugins require you to be a real Facebook application. This way
+provides you with an application id, and also gives you the way to manage the
+content produced by this plugins, for example if you like to integrate the
+L<http://developers.facebook.com/docs/reference/plugins/comments|Comments> of
+Facebook.
+
+At first you must add an application to your Facebook acount, which you now
+need for the further integration. You can do this on your
+L<http://www.facebook.com/developers/apps.php|Applications page>. If you want
+to add a new application you will be forced to authenticate yourself with your
+mobile number, or if this doesnt work, with your credit card number. Facebook
+will not charge you anything. Sadly on many mobile networks the short message
+sent by Facebook isn't received, so it could be that it never works for you and
+you must validate with your credit card number.
+
+After you added your application with the
+L<http://www.facebook.com/developers/createapp.php|Set Up New Application>
+button on the L<http://www.facebook.com/developers/apps.php|Applications page>,
+you will be pushed to the setup of the application. You should go there to
+B<Web Site> and give a Site URL and a Site Domain. For example you would give
+B<www.example.com> as Site URL and B<example.com> as Site Domain. With this
+setup you will be able to use this application also on
+B<otherservice.example.com>, if you start splitting up. Of course its also not
+bad to fill up the B<About> section of the setup.
+
+Now you should go B<Back to My Applications> for fetching the informations you
+later need for the further integration. Best is you let this page open, so that
+you always can copy and paste what you need.
+
+For being a Facebook application you need to using the
+L<http://developers.facebook.com/docs/reference/javascript/|Javascript SDK>,
+you need to integrate the following snippet on top inside the <body> tag of 
+your page:
+
+  <div id="fb-root"></div>
+  <script src="http://connect.facebook.net/en_US/all.js"></script>
+  <script>
+    FB.init({
+      appId  : 'YOUR APP ID',
+      status : true, // check login status
+      cookie : true, // enable cookies to allow the server to access the session
+      xfbml  : true  // parse XFBML
+    });
+  </script>
+
+Don't put the JavaScript include in the <head> of your HTML, you will get into
+problems, just add it like Facebook suggests. Of course, you can use other
+locales, if Facebook offers them. Just test it out with replacing B<en_US> with
+your language locales definition (or the one the user has choosen for use on
+your webpage).
+
+Later we will replace the I<hand written> App ID with something that comes out
+of the configuration we use for Catalyst, but this step is not reached so far
+;).
+
+
+
+=head1 See also
+
+L<Facebook::Manual>
+L<Catalyst::Model::Facebook>
+
+=head1 Author
+
+Torsten Raudssus, <torsten@raudssus.de>. You can find me on irc.perl.org 
+#facebook or #catalyst as C<Getty>.
