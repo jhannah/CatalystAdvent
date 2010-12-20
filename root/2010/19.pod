@@ -436,7 +436,9 @@ Here is a basic set up that should match the above code reasonably well:
   // to ONE url without major hackery.
   $("#dedata").click(function(){ 
 	var gr = $("#tposts").jqGrid('getGridParam','selrow');
-	if( gr != null ) $("#tposts").jqGrid('delGridRow', gr, { ajaxDelOptions: { contentType: "application/json", mtype: 'POST', }, serializeRowData: function(data) {
+	if( gr != null ) $("#tposts").jqGrid('delGridRow', gr, { 
+    ajaxDelOptions: { contentType: "application/json", mtype: 'POST', },
+    serializeRowData: function(data) {
         return JSON.stringify(data);
     },  "url": '/entry/' + gr + '/delete', "reloadAfterSubmit":"false" });
 	else alert("Please Select Row to delete!");
