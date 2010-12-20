@@ -14,9 +14,9 @@ Article ideas (2010 Calendar):
  - twitter authentication/applications + Catalyst - ** DONE **
  - .... as an Absolute Beginner (tm) could I put in a request for some newbie-friendly Cat-for-dummies entries? - victor from the mailing list
  - X-Sendfile/X-Accel-Redirect with support for agnostic file location retrieval (aka, file to send could be located on any number of replicated nodes etc.)
- - Form::Sensible::Reflector::DBIC + Catalyst (dhoss)
+ - Form::Sensible::Reflector::DBIC + Catalyst (dhoss) - ** DONE **
  - Test::DBIx::Class
- - jqgrid + Catalyst:Controller::REST (dhoss)
+ - jqgrid + Catalyst:Controller::REST (dhoss) - ** DONE **
  - AWS S3, Mosso Cloudfiles, cloud storage, deployment
  - large scale application deployment, regarding replication, load balancing, etc. 
  - DBIC pretty printers, console and plack versions
@@ -68,12 +68,12 @@ Dates needed:
  - 13: Mosso Cloudfiles + Cat - dhoss
  - 14: DONE ("jQueryUI +Catalyst" - Sir and friends)
  - 15: DONE ("twitter" - dpetrov)
- - 16: Catalyst + jQgrid and Catalyst::Controller::REST - dhoss
- - 17: Form::Sensible::Reflector::DBIC + Cat - dhoss
+ - 16:  
+ - 17: 
  - 18
- - 19
- - 20
- - 21
+ - 19: DONE (Catalyst + jQgrid and Catalyst::Controller::REST) - dhoss
+ - 20: DONE (opsview part 2) - Ton Voon
+ - 21: DONE (Form::Sensible::Reflector::DBIC + Cat) - dhoss
  - 22
  - 23
  - 24
