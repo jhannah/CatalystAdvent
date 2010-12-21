@@ -15,9 +15,9 @@ soon realize that most of your wrapper-actions are more or less identical, and
 writing the same code again and again can be a big pain in the 
 CurseWord.
 
-An other solution would be to ajust your action, but what if you still need 
+An other solution would be to adjust your action, but what if you still need 
 that old action (which only operates on one single database entry)? In that 
-case, you have to do a lot of parameter-checking to figure out whether the 
+case, you have to do a lot of parameter checking to figure out whether the 
 current request is a single-entry-request or a multi-entry-request. In the 
 worst case, this procedure does not work as you expected and you have to spend 
 a lot of time debugging your code, which is a even bigger pain in the ... 
@@ -31,7 +31,7 @@ multi-action can be reused in any controller, with minimal effort.
 
 
 Chapter 5 from the Catalyst Tutorial is used as example application (which is 
-some kind of book-database, with the ability to delete single books by calling 
+some kind of book database, with the ability to delete single books by calling 
 the delete-action with the books id as parameter). 
 The code provided in this article will add the ability to select several books
 from the list, and delete all of them at once.
@@ -73,12 +73,12 @@ You can use the following credentials to log in to the example application:
 
 =head2 Tasks
 
-It is assumed that the relevant controller provides a list-method, which uses 
-TemplateToolkit to display the content. 
+It is assumed that the relevant controller provides a list method, which uses 
+Template::Toolkit to display the content. 
 
 =head3 the View
 
-The books-listing should provide:
+The books listing should provide:
 
 =over 
 
@@ -110,7 +110,7 @@ The generic multi-action should:
 
 At this point, all modification to the controller is done in lib/MyApp/Controller/Books.pm
 
-To make the code more readable, we will create one action for each of the four Controller-tasks mentioned above.
+To make the code more readable, we will create one action for each of the four Controller tasks mentioned above.
 
 The following new actions will be created:
 
@@ -218,7 +218,7 @@ Add the following code to lib/MyApp/Controller/Books.pm:
 
 =item * create_status_msg :Private
 
-This method should create a status-message for the current multiaction-request.
+This method should create a status message for the current multiaction-request.
 
 =over
 
@@ -241,7 +241,7 @@ executed multiactions
 
 =item * conventions:
 
-It is assumed that the $successfull - parameter has the same form as 
+It is assumed that the $successful - parameter has the same form as 
 the ArrayRef returned by "get_args"
 
 =back
@@ -326,7 +326,7 @@ Add the following code to lib/MyApp/Controller/Books.pm:
 
 =head3 updating the view
 
-To realized the tasks described above, edit root/src/books/list.tt2, and 
+To account for the tasks described above, edit root/src/books/list.tt2, and 
 
 =over
 
@@ -338,7 +338,7 @@ To realized the tasks described above, edit root/src/books/list.tt2, and
  
  </form>
 
-=item * edit the line containing the table-header tags, and add a submit-button for the delete-action. after this, the section should look like this:
+=item * edit the line containing the table header tags, and add a submit button for the delete action. after this, the section should look like this:
 
 
  <tr>
@@ -391,7 +391,7 @@ after this, your list.tt2 should look like this:
 
 =head2 Test the multiaction:
 
-Start the test-application, and point your browser to
+Start the test application, and point your browser to
  localhost:3000/books/list
 
 You should be able to select several books and delete them by clicking the 
@@ -432,7 +432,7 @@ lib/MyApp/MultiAction.pm, after "use namespace::autoclean", but before "1;"
 
 =item * Change the methodattribute from multiaction to ":Action"
 
-After that the first line of your multiaction-method should look like this:
+After that the first line of your multiaction method should look like this:
 
  sub multiaction :Action {   
 
@@ -467,9 +467,9 @@ by adding
 
 after the BEGIN section at the top of the file.
 
-Note: the with-statement MUST NOT be included in the BEGIN section, because this 
-would make the perl interpreter to apply the role BEFORE the list-method has 
-been interpreted, which would result in a compile time error.
+Note: the with statement MUST NOT be included in the BEGIN section, because this 
+would make the perl interpreter to apply the role BEFORE the list method has 
+been compiled, which would result in a compile time error.
 
 
 =item * Activate the generic multiaction in the controller
