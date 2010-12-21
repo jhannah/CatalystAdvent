@@ -27,7 +27,7 @@ L<http://developers.facebook.com/docs/reference/fql/|Facebook Query Language>
 and the soon hopefully outdated 
 L<http://developers.facebook.com/docs/reference/rest/|Old REST API>.
 
-=head1 Integration ways
+=head1 Integration
 
 Lets play through some cases and explain what you need todo for making them
 happen.
@@ -56,7 +56,7 @@ pages where you want a like button with:
 You can finetune the values for it, see more details on the 
 L<http://developers.facebook.com/docs/reference/plugins/like|Like Button> Page.
 
-=head2 Getting deeper, using the JavaScript SDK
+=head2 Getting deeper, become an application
 
 Many social plugins require you to be a real Facebook application. This way
 provides you with an application id, and also gives you the way to manage the
@@ -68,7 +68,7 @@ At first you must add an application to your Facebook acount, which you now
 need for the further integration. You can do this on your
 L<http://www.facebook.com/developers/apps.php|Applications page>. If you want
 to add a new application you will be forced to authenticate yourself with your
-mobile number, or if this doesnt work, with your credit card number. Facebook
+mobile number, or if this doesn't work, with your credit card number. Facebook
 will not charge you anything. Sadly on many mobile networks the short message
 sent by Facebook isn't received, so it could be that it never works for you and
 you must validate with your credit card number.
@@ -87,20 +87,73 @@ Now you should go B<Back to My Applications> for fetching the informations you
 later need for the further integration. Best is you let this page open, so that
 you always can copy and paste what you need.
 
-For being a Facebook application you need to using the
-L<http://developers.facebook.com/docs/reference/javascript/|Javascript SDK>,
-you need to integrate the following snippet on top inside the <body> tag of 
-your page:
+=head2 Integrating Catalyst::Model::Facebook
+
+The best way to now use this application informations in Catalyst is
+L<Catalyst::Model::Facebook>. Not just, cause I made it ;), cause its wrapping
+around L<Facebook>, which is really more a wrapper for all existing Facebook
+solutions on CPAN. With a little spice which will help us in the following
+steps.
+
+For making the Model in Catalyst you need to use the create command of your
+application, after installing L<Catalyst::Model::Facebook>:
+
+  script/myapp_create.pl model MyFacebook Facebook APPLICATION_ID_FROM_FACEBOOK APPLICATION_SECRET_FROM_FACEBOOK
+
+Where B<MyFacebook> is the name of the Model you want to generate. If you
+want to use now the Facebook modules L<WWW::Facebook::API> or
+L<Facebook::Graph>. Best is you just install both, so that you never need
+to think about it deeper. Don't forget to also add them to your requirements
+of your application. The Facebook package itself doesnt require both of them,
+but throws an error if you try to use the method of them. I often forget that,
+cause both modules are normally installed in my environment :).
+
+=head2 Using Catalyst::Model::Facebook independent
+
+After you have installed your own L<Catalyst::Model::Facebook>, you can now
+already talk to Facebook and fetch public available informations directly. For
+example you could do this in one controller:
+
+  $c->stash->{gettys_facebook_profile} = $c->model('MyFacebook')->graph->query
+    ->find(100001153174797)
+	->include_metadata
+    ->request
+    ->as_hashref;
+
+And later in your template:
+
+  [% gettys_facebook_profile.name %]
+  
+And you will get B<Torsten Raudssus>, which is the name of my Facebook Profile.
+The usage of B<include_metadata> adds some more information, also a longer
+description about every field that you are getting from the profile. You should
+not use this in production later, so that you spare resources on the request.
+
+For more informations what you can do with the Graph API, you could checkout
+L<Facebook::Graph> and the informations on the Facebook
+L<http://developers.facebook.com/docs/reference/api/|Graph API Documentation>.
+
+=head2 Integrating Facebook Javascript SDK for the advanced Social Plugins
+
+Now we also need to integrate the Facebook Javascript SDK, for having the
+possibility to bind the Facebook login to our application and also for the
+other more advanced Social Plugins, like comments and discussion boards.
+
+You need to integrate the following snippet on top inside the <body> tag of 
+your structure template:
 
   <div id="fb-root"></div>
   <script src="http://connect.facebook.net/en_US/all.js"></script>
   <script>
     FB.init({
-      appId  : 'YOUR APP ID',
+      appId  : '[% c.model('MyFacebook').app_id %]',
       status : true, // check login status
       cookie : true, // enable cookies to allow the server to access the session
       xfbml  : true  // parse XFBML
     });
+	FB.Event.subscribe('auth.login', function(response) {
+		window.location.reload();
+	});
   </script>
 
 Don't put the JavaScript include in the <head> of your HTML, you will get into
@@ -109,11 +162,47 @@ locales, if Facebook offers them. Just test it out with replacing B<en_US> with
 your language locales definition (or the one the user has choosen for use on
 your webpage).
 
-Later we will replace the I<hand written> App ID with something that comes out
-of the configuration we use for Catalyst, but this step is not reached so far
-;).
+The B<FB.Event.subscribe> will be used to reload the page when the user has
+logged in using Facebook. You can of course make other stuff here, but this is
+for the beginning the most easy solution. We will integrate the login in the
+next step.
+
+If you want to get more debugging informations out of the Javascript SDK, you
+can use B<http://static.ak.fbcdn.net/connect/en_US/core.debug.js> as the
+javascript include, but this one is only available in en_US locale.
+
+For more detailed information about the integration you can checkout the
+L<http://developers.facebook.com/docs/reference/javascript/|Javascript SDK Documentation>.
+
+=head2 Adding the login button to your page
+
+If you now want to go a step further, you can now make a login button for
+Facebook on your page. Beside that you actually know which Facebook user is on
+your page, you can also now make API requests on behalf of the user, which
+means that you are using the Facebook database depending on the rights the user
+gave you like the user would do it. This can also give you more information,
+cause you access the Facebook API with the rights of the user.
+
+But this depends on the rights you request. Generally its a good advice to try
+as much requests as possible on behalf of a user so that Facebook doesn't see
+your application as a kind of information leaker, if you do all requests to the
+Facebook APIs on your applications behalf.
 
 
+
+
+
+=head2 Testing your application in development stage
+
+So for testing your application without touching the live information, you need
+a bit more stress. I suggest to register 2 applications at Facebook and just
+use in the development environment the different application id and secret.
+This way you can make a development database, and use test accounts on Facebook
+without risking to make your live application dirty. Especially the management
+of the tokens you get from the Facebook users and the access rights they give
+to you, could make problems. Even tho i must say, I'm open for good suggestions
+and tricks for the development stage, just visit me on IRC, if you want to talk
+deeper about this.
 
 =head1 See also
 
