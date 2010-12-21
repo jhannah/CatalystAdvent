@@ -33,21 +33,17 @@ Confirmed ideas:
  - Opsview does i18n with Catalyst (Ton Voon) - ** DONE **
 
 Ideas looking for authors
-  - Catalyst::TraitFor::Model::DBIC::Schema::Caching / DBIx::Class::Cursor::Cached
+  - Catalyst::TraitFor::Model::DBIC::Schema::Caching / DBIx::Class::Cursor::Cached - ** DONE **
   - Catalyst::TraitFor::Model::DBIC::Schema::Replicated / DBIx::Class::Storage::DBI::Replicated 
   - anything not in "Confirmed Ideas"
 
-Authors:
- - Getty
- - dhoss
- - Ton Voon
- - edenc (tentative)
- - zamolxes (?)
- - frew (?)
- - hercynium
- - skaufman
- - steve@matsch.com
- - davewood
+Authors/Articles Authored (not comprehensive, and not useful at this point):
+ - Getty - .5
+ - dhoss - 4.5
+ - Ton Voon - 2
+ - skaufman - 1
+ - steve@matsch.com - 1 (and crew)
+ - davewood - 1
 
 Editors: 
  - jester
@@ -74,12 +70,12 @@ Dates needed:
  - 19: DONE (Catalyst + jQgrid and Catalyst::Controller::REST) - dhoss
  - 20: DONE (opsview part 2) - Ton Voon
  - 21: DONE (Form::Sensible::Reflector::DBIC + Cat) - dhoss
- - 22
- - 23
- - 24
+ - 22: DONE (multiaction) - lukast
+ - 23:
+ - 24: Catalyst year wrap up I hope?
 
 Plan of attack:
- - wing it
+ - anyone who can get an article in for the 23rd or 24th has the spot.  Otherwise, you can fill in an old spot.
 
 
 People to annoy: 
