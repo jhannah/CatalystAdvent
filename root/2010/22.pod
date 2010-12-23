@@ -348,7 +348,7 @@ To account for the tasks described above, edit root/src/books/list.tt2, and
 
 =item * add a checkbox for each displayed database-entry. Add, just before the </tr> tag inside the FOEARCH-loop:
 
- <td> <input type="checkbox" name="captures" value="[% book.id %]"/> </td>
+ <td> <input type="checkbox" name="selected" value="[% book.id %]"/> </td>
  <input type="hidden" name="captures_[% book.id %]" value="[% book.id %]"/>
  <input type="hidden" name="arguments_[% book.id %]" value="[% book.id %]"/>
 
@@ -377,7 +377,7 @@ after this, your list.tt2 should look like this:
        [% # Add a link to delete a book %]
        <a href="[% c.uri_for(c.controller.action_for('delete'), [book.id]) %]">Delete</a>
      </td>
-     <td> <input type="checkbox" name="captures" value="[% book.id %]"/> </td>
+     <td> <input type="checkbox" name="selected" value="[% book.id %]"/> </td>
      <input type="hidden" name="captures_[% book.id %]" value="[% book.id %]"/>
      <input type="hidden" name="arguments_[% book.id %]" value="[% book.id %]"/>
    </tr>
