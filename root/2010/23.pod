@@ -5,7 +5,6 @@
 L<Yesterdays article|http://www.catalystframework.org/calendar/2010/22> gave 
 a short introduction on how to create reusable actions with the help of 
 Moose::Role.
-
 Todays article will deepen this topic and demonstrate how to create reusable
 DBIx::Class based schemas.
 
@@ -42,14 +41,16 @@ after successfull implementation.
 L<here|http://public.thiemeier.net/download/CatalystAdvent_2010_22-01.tar.bz2>.
 
 =item * Unpack it by running 
+
  lukast@Mynx:~/src$ tar -xf CatalystAdvent_2010_22.tar.bz2
 
 =back
 
 =item * Install the dependecies:
+
  lukast@Mynx:~/src$ cpan XML::Simple MooseX::NonMoose Moose::Util
 
-=item * as in yesterdays example, the following credentials can be used to log in to the application:
+=item * the following credentials can be used to log in to the application:
 
 =over 
 
@@ -109,11 +110,13 @@ The models tasks is to
 =head3 Updating the View
 
 We will reuse our multiaction templates and just add a "export selected" button. Open "root/src/book/list.tt2" and add
+
  <input type="submit" name="multi_export", value="export selected"/>
+
 anywhere inside the multiaction form, but ouside the FOREACH loop. 
 (For example next to the delete-button, in the same table header field)
 
-We will have to adapt our multiactions behaviour to make this work. 
+Note: We will have to adapt our multiactions behaviour to make this work. 
 
 =head3 Implementing the Controller Role
 
@@ -139,7 +142,7 @@ If this attribute is not set, the filename defaults to "out.xml".
 
 =item * methods 
 
-=over
+=over 
 
 =item * createxml :Private
 
@@ -150,7 +153,7 @@ XML.
 
 =item * parameters
 
-=over
+=over 
 
 =item * $rootname
 
@@ -251,9 +254,11 @@ Create the file "MyApp/ControllerRole/XmlExport.pm" and add the following conten
  1;
 
 The line 
+
  ensure_all_roles($rs, qw/MyApp::SchemaRole::ResultSet::XmlExport/);
+
 applies the Role "MyApp::SchemaRole::ResultSet::XmlExport" to the resultset, if
-the resultset does not yet consume the role. 
+the resultset does not yet consume that role. 
 By using this feature of Moose::Util, 
 it is possible to add functionality to the resultset without the need to create
 or adapt a resultset. See "Updating the Schema" below for more information.
@@ -296,6 +301,10 @@ by adding
  export => {Chained => 'objectgroup', PathPart => 'export', Args => 0},
 
 to your __PACKAGE__->config(...) section at the bottom of the file.
+
+As you can see, the export method is chained to "objectgroup", which retrieves
+the selected dataset and stores the resultset to stash, where it can be found
+by the export method.
 
 =item * adapt the multiaction
 
@@ -474,7 +483,7 @@ content:
 =head3 Updating the Schema
 
 As already stated before, Moose::Util makes it possible to apply roles to
-classes or objects on demand. This makes it possible to consume our SchemaRoles
+classes or objects on demand. This bringds us in the position to consume our SchemaRoles
 without the need to change the model.
 
 If it is necessary to change the roles behaviour, it is possible to use
@@ -489,6 +498,7 @@ non-Moose classes.
 =over 
 
 =item * start the application:
+
  lukast@Mynx:~/src/MyApp_Chapter5/MyApp$ script/myapp_server.pl 
 
 =item * point your browser to "localhost:3000/books/list"
@@ -535,6 +545,7 @@ and the root-element "book listing". Do do so, add the following code to
   	rootname "book listing"
  </Controller::Books>
 
+Alternatively, you can configure the controller in "lib/MyApp.pm"
 
 =head3 Result modification
 
@@ -546,13 +557,15 @@ the exported data.
 
 =over
 
-=item * To use the around-pragme provided by Moose, it is necessary to consume
+=item * Prepare the Result class
+
+To use the around-pragme provided by Moose, it is necessary to consume
 the role in the schema-file itself. Relying on "Moose::Util" will result in a
 compile-time error, because the role is added at runtime. A statement like 
 "around xml_data => sub{...}" will fail, because the modified method (xml_data)
 is not present at compile time.
 
-Edit the head of lib/MyApp/Schema/Result/Book.pm and replace the line 
+Edit the head of "lib/MyApp/Schema/Result/Book.pm" and replace the line 
 "use base DBIx::Class::Core" with 
  
  use Moose;
@@ -561,7 +574,9 @@ Edit the head of lib/MyApp/Schema/Result/Book.pm and replace the line
  extends 'DBIx::Class::Core';
  with 'MyApp::SchemaRole::Result::XmlExport';
 
-=item * modify the method my adding the following code anywhere before "1;", at
+=item * modify the method 
+
+Add the following code anywhere before "1;", at
 the bottom of the file:
 
  around xml_data => sub {
