@@ -1,2 +1,613 @@
-=head1 will be finished at 23:00!!
-(lukast)
+=head1 Moose::Role, Moose::Util and DBIx::Class based Models (multiaction revisited)
+
+=head2 Overview
+
+L<Yesterdays article|http://www.catalystframework.org/calendar/2010/22> gave 
+a short introduction on how to create reusable actions with the help of 
+Moose::Role.
+
+Todays article will deepen this topic and demonstrate how to create reusable
+DBIx::Class based schemas.
+
+To illustrate the topic, the application created in yesterdays article
+will be extended. An example xml-export action will be added, where the actual
+xml creation is performed by the controller, whereas all data preparation is
+delegated to the model.
+
+All new functionality will be implemented in roles. Unlike yesterdays article,
+the methods will directly be implemented in roles and not be moved to roles 
+after successfull implementation.
+
+=head2 Dependencies
+
+=over
+
+=item * L<XML::Simple>
+
+=item * L<MooseX::NonMoose>
+
+=item * L<Moose::Util>
+
+=back
+
+=head2 Preparation
+
+=over
+
+=item * read L<yesterdays article|http://www.catalystframework.org/calendar/2010/22> 
+
+=over
+
+=item * A working copy of the example code can be found 
+L<here|http://public.thiemeier.net/download/CatalystAdvent_2010_22-01.tar.bz2>.
+
+=item * Unpack it by running 
+ lukast@Mynx:~/src$ tar -xf CatalystAdvent_2010_22.tar.bz2
+
+=back
+
+=item * Install the dependecies:
+ lukast@Mynx:~/src$ cpan XML::Simple MooseX::NonMoose Moose::Util
+
+=item * as in yesterdays example, the following credentials can be used to log in to the application:
+
+=over 
+
+=item * username: test01
+
+=item * password: mypass
+
+=back
+
+=back
+
+=head2 Tasks
+
+The presence of a list action is assumed, as in the previous article.
+
+=head3 the View
+
+The books listing should provide:
+
+=over 
+
+=item * checkboxes to select books from the list
+
+=item * a 'export selected' button
+
+=back
+
+=head3 the Controller
+
+The Books Controller has to
+
+=over 
+
+=item * retrieve the data from the model
+
+=item * transform the data to xml
+
+=item * create a file and offer it to the user
+
+=back
+
+=head3 the Model
+
+The models tasks is to
+
+=over
+
+=item * retrieve the selected data from the database
+
+=item * pass the data to the controller in an adequate form
+
+=back
+
+
+=head2 Implementation
+
+=head3 Updating the View
+
+We will reuse our multiaction templates and just add a "export selected" button. Open "root/src/book/list.tt2" and add
+ <input type="submit" name="multi_export", value="export selected"/>
+anywhere inside the multiaction form, but ouside the FOREACH loop. 
+(For example next to the delete-button, in the same table header field)
+
+We will have to adapt our multiactions behaviour to make this work. 
+
+=head3 Implementing the Controller Role
+
+=over
+
+=item * required methods: list
+
+=item * attributes
+
+=over
+
+=item * rootname => (isa => 'Str', is => 'rw', required => 0)
+
+If available, this attribute will override the XML root element name provided
+by the resultset.
+
+=item * filename => (isa => 'Str', is => 'rw', required => 0)
+
+This attribute defines the name of the file that should be offered to the user.
+If this attribute is not set, the filename defaults to "out.xml".
+
+=back
+
+=item * methods 
+
+=over
+
+=item * createxml :Private
+
+This method uses XML::Simple to transform the data provided by the resultset to
+XML.
+
+=over 
+
+=item * parameters
+
+=over
+
+=item * $rootname
+
+The XML root element name.
+
+=item * $data
+
+A HashRef or ArrayRef containting the data. In this example, the data is
+passed to XML::Simple without further modification, so we have to make sure that
+the parameter passed to "createxml" has an appopriate form.
+
+=back
+
+=item * returns the xml-presentation of the provided data
+
+=back
+
+=item * export :Action
+
+This method is the actual action, which can be called by the user. 
+For greater reusability, this method focuses on its original task, which is
+XML-creation. It does not parse any request params and does not perform 
+any database lookups. The controller has to provide the resultset in the stash,
+for example by chaining this method.
+
+=over
+
+=item * parameters: none
+
+=item * returns :nothing
+
+=item * conventions: The selected data can be found in the stash, the key name should be "export_rs".
+
+=back
+
+=back
+
+=back
+
+Create the file "MyApp/ControllerRole/XmlExport.pm" and add the following content:
+
+
+ package MyApp::ControllerRole::XmlExport;
+ 
+ use XML::Simple qw/XMLout/;
+ 
+ use MooseX::MethodAttributes::Role;
+ use namespace::autoclean;
+ use Moose::Util qw/apply_all_roles does_role ensure_all_roles/;
+ 
+ requires qw/list/;
+ 
+ # attributes
+ has rootname => (isa => 'Str', is => 'rw', required => 0);
+ has filename => (isa => 'Str', is => 'rw', required => 0);
+ 
+ 
+ sub export: Action{
+ 	my ($self, $c) =@_;
+ 	#set the filename
+ 	my $filename = $self->filename || "out.xml";
+ 
+ 	#retrieve the resultset
+ 	my $rs = $c->stash->{export_rs};
+ 	if( $rs ){
+ 		# apply the SchemaRole to the ResultSet if necessary
+ 		ensure_all_roles($rs, qw/MyApp::SchemaRole::ResultSet::XmlExport/);
+ 		 # retrieve xml-data from model
+ 		my $data = $rs->xml_data;
+ 
+ 		# transform data to xml
+  		my $xml = $c->forward($self->action_for("createxml"),[$rs->xml_collection_name, $data]);
+ 		 # offer the file to the user, if xml-creation was successfull
+ 		if($xml){
+ 			$c->res->content_type('text/plain');
+ 			$c->res->header('Content-Disposition', qq[attachment; filename="$filename"]);
+ 			$c->res->body($xml);
+  			return;
+ 		}else{
+ 			$c->flash(error_msg => "creating xml failed");
+ 	}
+ 	 }else{
+  		$c->flash(error_msg => "XmlExport: unable to find resultset");
+ 	}
+ 
+	#forward to list
+	$c->response->redirect($c->uri_for($self->action_for("list")));
+ }
+ 
+ sub createxml :Private{
+	my ($self, $c, $rootname, $data) = @_;
+	# set rootname 
+	$rootname = $self->rootname if($self->rootname);
+	#create and return xml
+	return XMLout($data, RootName => $rootname);
+ }
+
+ 1;
+
+The line 
+ ensure_all_roles($rs, qw/MyApp::SchemaRole::ResultSet::XmlExport/);
+applies the Role "MyApp::SchemaRole::ResultSet::XmlExport" to the resultset, if
+the resultset does not yet consume the role. 
+By using this feature of Moose::Util, 
+it is possible to add functionality to the resultset without the need to create
+or adapt a resultset. See "Updating the Schema" below for more information.
+ 
+
+=head3 Updating the Controller
+
+Edit "lib/MyApp/Controller/Books.pm:
+
+=over
+
+=item * Make the Controller consume the ControllerRole
+
+by adding 'MyApp::ControllerRole::XMLExport' to your "with" section at the top
+of the file. Afer that, your Books.pm's head should look similar to this:
+ package MyApp::Controller::Books;
+
+ use Moose;
+ use namespace::autoclean;
+
+ BEGIN {extends 'Catalyst::Controller'; }
+ with qw/MyApp::MultiAction MyApp::ControllerRole::XmlExport/;
+
+=item * provide an action that retrieves the selected entries and stores the resultset to the stash.
+
+Add the following code:
+ 
+ sub objectgroup :Chained("base") :PathPart("multi") :CaptureArgs(0) {
+	my ($self, $c) = @_;
+	my $selected = [$c->req->param("selected")];
+	my $rs = $c->model("DB::Book")->search_rs(id => [$selected]);
+	$c->stash(export_rs => $rs);
+ }
+
+
+=item * activate the export action:
+
+by adding 
+
+ export => {Chained => 'objectgroup', PathPart => 'export', Args => 0},
+
+to your __PACKAGE__->config(...) section at the bottom of the file.
+
+=item * adapt the multiaction
+
+Since we are using our multiactions form to select database entries, 
+"multiaction" will be called when the "export selected" button is pressed.
+Because "export" is not a multiaction, but an action that operates on a 
+resultset,
+we have to tell "multiaction" that it should forward to "export" directly, instead of calling the method for every selected id.
+
+This can be achieved by adding the following code:
+
+ around multiaction => sub{
+	my ($orig, $self, @args) = @_;
+	my $c = $args[0];
+
+	if($c->forward($self->action_for("get_multiaction")) eq "export"){
+		$c->go($self->action_for("export"));
+	}
+	else{
+		$self->$orig(@args);
+	}
+ } ;
+
+Note: Our controller already consumes the role "MyApp::MultiAction", 
+so we can use 
+the roles helper "get_multiaction" to find out the current multiactions name.
+
+=back
+
+=head3 Implementing the Schema Roles
+
+=head4 The ResultSet Role
+
+=over
+
+=item * required methods: all (provided by DBIx::Class::ResultSet)
+
+=item * attributes: none
+
+=item * methods:
+
+=over
+
+=item * xml_data
+
+This method uses the SchemaRoles "xml_data" method to create xml-data
+for the current resultset. Moose::Util is used to apply the roles to the
+relevant results, just as in the controller.
+
+=over
+
+=item * parameters: none
+
+=item * returns: A ArrayRef OR HashRef
+
+=back
+
+=item * xml_collectionname
+
+This method can be called by the controller to figure out the correct
+xml root element name, if it is not provided by the controller itself.
+
+=over
+
+=item * parameters: none
+
+=item * returns: a String
+
+=back
+
+=back
+
+=back
+
+Create the file "lib/MyApp/SchemaRole/ResultSet/XmlExport.pm" with the following
+content:
+ 
+ package MyApp::SchemaRole::ResultSet::XmlExport;
+
+ use namespace::autoclean;
+ use Moose::Util qw/ensure_all_roles/;
+ use Moose::Role;
+
+ requires qw/all/;
+
+ sub xml_data {
+	 my ($self) = @_;
+	 my $result = {};
+	 ensure_all_roles($self->first, "MyApp::SchemaRole::Result::XmlExport") if $self->first;
+	 foreach ($self->all){
+		 ensure_all_roles($_, "MyApp::SchemaRole::Result::XmlExport") ;
+
+		 push @{$result->{$_->xml_element_name}},  {$_->xml_data};
+	 }
+	 return $result;
+ }
+
+
+ sub xml_collection_name {
+	my ($self) = @_;
+	return "dataset";
+ }
+
+ 1;
+
+=head4 The Result Role
+
+=over
+
+=item * required methods: get_columns (provided by DBIx::Class::Core)
+
+=item * attributes: none
+
+=item * methods:
+
+=over
+
+=item * xml_data
+
+This method returns the results column data in a form that can easily be parsed
+by XML::Simple
+
+=over
+
+=item * parameters: none
+
+=item * returns: a ArrayRef OR HashRef
+
+=back
+
+=item * xml_collectionname
+
+This method can be called by the controller to figure out the correct
+xml root element name, if it is not provided by the controller itself.
+
+=over
+
+=item * parameters: none
+
+=item * returns: a String
+
+=back
+
+=back
+
+=back
+
+Create the file "lib/MyApp/SchemaRole/Result/XmlExport.pm" with the following
+content:
+
+ package MyApp::SchemaRole::Result::XmlExport;
+
+ use namespace::autoclean;
+ use Moose::Role;
+
+ requires qw/get_columns/;
+
+ sub xml_data {
+	my ($self) = @_;
+	my %cols = $self->get_columns;
+	my @data;
+	foreach (keys %cols ){
+		push @data ,  $_ => [ $cols{$_}];
+	}
+	return @data;
+ }
+
+ sub xml_element_name {
+	my ($self) = @_;
+	return "element";
+ } 
+ 1;
+
+
+
+=head3 Updating the Schema
+
+As already stated before, Moose::Util makes it possible to apply roles to
+classes or objects on demand. This makes it possible to consume our SchemaRoles
+without the need to change the model.
+
+If it is necessary to change the roles behaviour, it is possible to use
+Mooses methodmodifiers as described in yesterdays article.
+
+Keep in mind that DBIx::Class based schema files are no Moose classes.
+It is recommended to use MooseX::NonMoose to add Moose functionality to these
+non-Moose classes.
+
+=head2 Testing the application
+
+=over 
+
+=item * start the application:
+ lukast@Mynx:~/src/MyApp_Chapter5/MyApp$ script/myapp_server.pl 
+
+=item * point your browser to "localhost:3000/books/list"
+
+(use username: test01 and password: mypass to log in)
+
+You should be able to select several books and export them by clicking the
+"export selected" button. The resulting xml-file should be called "out.xml" and
+look similar to this:
+
+ <dataset>
+	 <element>
+		 <id>4</id>
+		 <created>2010-02-17 16:10:48</created>
+		 <rating>5</rating>
+		 <title>Perl Cookbook</title>
+		 <updated>2010-02-17 16:10:48</updated>
+	 </element>
+	 <element>
+		 <id>9</id>
+		 <created>2010-02-17 16:10:48</created>
+		 <rating>5</rating>
+		 <title>TCP/IP Illustrated, Vol 3</title>
+		 <updated>2010-02-17 16:10:48</updated>
+	 </element>
+ </dataset>
+
+=back
+
+=head2 Configuration / Modification
+
+=head3 Basic configuration
+
+Since we made sure that our controller has the attributes "filename" and
+"rootname", and a controllers attribute can be set in the applications 
+configuration, it is possible to do some basic configuration on a per controller basis, within the applications configuration.
+
+In this example, it is a good idea to call the resulting xml-file "books.xml"
+and the root-element "book listing". Do do so, add the following code to 
+"myapp.conf", just after the "name MyApp" line:
+
+ <Controller::Books>
+  	filename books.xml
+  	rootname "book listing"
+ </Controller::Books>
+
+
+=head3 Result modification
+
+To add additional data to our xml export, it is possible to modify the method
+"xml_data" in "lib/MyApp/Schema/Result/Book.pm"
+
+The following example will add some information about a books authors to
+the exported data.
+
+=over
+
+=item * To use the around-pragme provided by Moose, it is necessary to consume
+the role in the schema-file itself. Relying on "Moose::Util" will result in a
+compile-time error, because the role is added at runtime. A statement like 
+"around xml_data => sub{...}" will fail, because the modified method (xml_data)
+is not present at compile time.
+
+Edit the head of lib/MyApp/Schema/Result/Book.pm and replace the line 
+"use base DBIx::Class::Core" with 
+ 
+ use Moose;
+ use MooseX::NonMoose;
+ use namespace::autoclean;
+ extends 'DBIx::Class::Core';
+ with 'MyApp::SchemaRole::Result::XmlExport';
+
+=item * modify the method my adding the following code anywhere before "1;", at
+the bottom of the file:
+
+ around xml_data => sub {
+	my ($orig, $self) = @_;
+	my @data = $self->$orig();
+	my @authors;
+	foreach my $author ($self->authors->all){
+		push @authors, {firstname => [$author->first_name],
+			lastname => [$author->last_name]
+		};
+	}
+	push @data, Author => \@authors;
+	return @data;
+
+ };
+
+=back
+
+Both SchemaRoles fetch their xml-tag-names with helper methods. This makes it
+possible to create dynamic xml-tags my overriding "xml_element_name" or "xml_collection_name".
+
+To achieve a more reusable result modification, it can be usefull to implement
+the xml-export feature for Authors, and use the authors "get_xml" method within
+the modified "xml_data" method in other classes.
+
+=head2 Conclusion
+
+Delegating tasks to the applications model is always a good idea. Moose::Role 
+offers one possibility to do this in a reusable way.
+
+But: Moving code to the model has one disadvantage, especially if you try
+to make your actions reusabel: Anybody who wants to use your reusabel actions
+is FORCED to use your models aswell. This drawback can be bypassed with the
+help of Moose::Util, which lets you "plug" a roles methods and attributes to
+the applications model at runtime, if necessary.
+
+=head2 Notes
+
+This articles goal is to give an introduction to Moose Roles and 
+DBIx::Class based Catalyst Models, and not to create a perfect xml-exporter.
+There are, most likely,  better (and more MVC-conform)  ways to dump your data 
+to XML. The present code was choosen, because it is simple enough to be 
+an example, and complex enough illustrate how to use Moose Roles in Result-
+(and ResultSet) Classes.
+
+=head2 Author
+
+Lukas Thiemeier <lukas@thiemeier.net>
+L<public.thiemeier.net|http://public.thiemeier.net>
