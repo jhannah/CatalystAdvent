@@ -1,0 +1,181 @@
+=head1 Checking for leaks in MyApp.
+
+Wait a minute. Catalyst leaks? No, but our application might be 
+leaking.  
+
+The single most common leak cause in Catalyst, which we'll cover later,
+is stashing a closure which needs to use the Catalyst context (usually 
+C<$ctx> or C<$c>). But that's hardly the only cause.
+
+=head2 The Real Culprit(TM): circular references
+
+How do we end up with circular references? 
+
+Perl uses references for its complex data structures: L<perldsc> is all
+about references. Making a loop is easy:
+
+    sub foo : Global Args(0) {
+        my ($self, $c) = @_;
+
+        my %foo;
+        my $bar = \%foo;
+        $foo{bar} = $bar;  # A circular thingy!
+                           # It's still ok: if we go out of scope now
+                           # it'll be handled nicely but...
+
+        # by adding another ref that survives the scope, we're now leaking
+        $c->stash( foo_data => \%foo );
+    }
+
+But, what's so bad about circular references? Perl's garbage collector
+uses reference counting, and memory doesn't get freed until that count gets
+to zero.
+
+A looping reference happens to make it hard for the GC to know when the
+thing is ok be freed.
+
+This can happen with all Perl code, not just Catalyst, and it's the reason
+things like the L<Devel::Cycle> module and L<Scalar::Util>'s C<weaken> 
+exist.
+
+In the previous example, we can use L<Scalar::Util> to 'weaken' the
+reference and get rid of the problem the loop poses.
+
+    use Scalar::Util qw/weaken/;
+
+    sub foo : Global Args(0) {
+        # ... 
+
+        $bar = \%foo;
+        weaken($bar);
+        $foo{bar} = $bar;
+
+        # ...
+    }
+
+With this, we're saying that we're referencing C<\%foo> but "just don't 
+count it". Problem is, the example is very simple: the leaked and the
+leaker are five lines apart: hardly a realistic scenario.
+
+When there's models, several controllers, chained dispatch, stashed code
+references, that legacy module subclassed with L<MooseX::NonMoose>, and 
+whatnot involved, the task of spotting potential leaks becomes uphill. 
+
+Knowing where to weaken gets difficult and, to add more complexity,
+when weakened references are referenced, the new reference is B<*not*>
+weak.
+
+=head2 How to spot leaks, the perl^Wlazy way.
+
+L<CatalystX::LeakChecker> is a neat L<Moose> role to make our App's debug
+output tell us when our code is leaving circular references around. 
+
+To use it, all we have to do is to compose the role into our app class:
+    
+    extends 'Catalyst';
+    with 'CatalystX::LeakChecker';
+
+And the previous leak would have produced the following output:
+    
+    [debug] Circular reference detected:
+    .------------------------------------------------------------------------.
+    | $ctx->{stash}->{foo_data}->{bar}                                       |
+    '------------------------------------------------------------------------'
+
+While all nice and dandy, adding and removing the role to our app class 
+in the dev/test/prod cycle can be tedious, so here's what the author did:
+Instead of consuming the role directly, the author just applies the role if 
+certain conditions are met.
+
+    # right after __PACKAGE__->setup(); in MyApp.pm
+
+    if( __PACKAGE__->debug() && $ENV{MYAPP_LEAK_CHECK} ) {                                                                                                                 
+        Moose::Util::apply_all_roles( __PACKAGE__, 'CatalystX::LeakChecker');                                                                                            
+    }
+
+Now all we need to do to check for leaks is to run our app as follows.
+
+    spiceman@cynic ~/workspace/MyApp % MYAPP_LEAK_CHECK=1 script/myapp_server.pl -d
+
+And L<CatalystX::LeakChecker> will warn us when we're leaking.
+
+
+=head2 "Oh, I know! I'll just stash a sub ref"
+
+Stashing a sub reference is convenient. Particularly when we want to avoid
+adding logic to the view. 
+
+But it also is, in the author's experience, the Catalyst's most common leak.
+
+Just hiding the logic inside a sub reference makes our templates a lot 
+more readable, moves the code to where it probably belongs (the controller),
+and -lets B<face> it-, when the line between code and data starts blurring
+the coder gets some sort of high.
+
+    sub foo : Global Args(0) {
+        my( $self, $c ) = @_;
+
+        # wait! isn't this t0m example? yes, but since this is really about rafl and t0m's modules...
+        $c->stash( uri_for_secure => sub { my $uri = $c->uri_for(@_); $uri->scheme('https'); return $uri } );
+    }
+
+    [debug] Circular reference detected:
+    .------------------------------------------------------------------------.
+    | $a = $ctx->{stash}->{uri_for_secure};                                  |
+    | code reference $a deparses to: sub {                                   |
+    |     package MyApp::Controller::Root;                                   |
+    |     use warnings;                                                      |
+    |     use strict 'refs';                                                 |
+    |     my $uri = $c->uri_for(@_);                                         |
+    |     $uri->scheme('https');                                             |
+    |     return $uri;                                                       |
+    | };                                                                     |
+    | ${ $c }                                                                |
+    '------------------------------------------------------------------------'
+
+
+We could use C<weaken> like in the first example, but that means little
+reusability. Every time C<$c> gets in the stash we need to make a reference,
+weaken it, and use the weakened reference instead. 
+
+Fortunately, that's what L<Catalyst::Component::ContextClosure> does for us,
+and the resulting syntax screams Catalyst so much that it just feels natural.
+
+As with L<CatalystX::LeakChecker>, we need to compose the role to our class.
+In this case, our controller:
+
+    BEGIN {
+        extends 'Catalyst::Controller';
+        with 'Catalyst::Component::ContextClosure';
+    }
+
+    sub foo : Global Args(0) {
+        my( $self, $c ) = @_;
+
+        $c->stash( 
+            uri_for_secure => $self->make_context_closure(sub {
+                my $c = shift;
+                my $uri = $c->uri_for(@_);
+                $uri->scheme('https');
+                return $uri;
+            }, $c),
+        );
+    }
+
+Our closure no longer leaks. And it gets the Catalyst context as an
+argument, just like our components' methods!
+
+Truly catalyzed.
+
+There's a lot more involving leaks and, sometimes, debugging them is 
+not a task for the faint of heart. Hopefully, this article provided a 
+starting point.
+
+=head1 Author
+
+Marcel "SpiceMan" Montes <spiceman@cpan.org> was categorized as
+an "intermediate Perl programmer" by the Catalyst Book. He's working
+on it when C<$reallife> and C<@deadlines> allow, and he does not 
+talk about himself in third person over IRC.
+Join him at irc.perl.org #catalyst and irc.freenode.org #perl.
+
