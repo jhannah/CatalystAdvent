@@ -1,7 +1,7 @@
 =head1 Integrating Facebook into your Catalyst application
 
 In this article I want to try to give you a small overview of what is it about 
-L<http://www.facebook.com/|Facebook> in general, and also about how you can 
+L<Facebook|http://www.facebook.com/> in general, and also about how you can 
 easily make a real Facebook application, and some hints about how you 
 integrate Facebook into your website (for this part you dont actually need 
 Catalyst, but I want to cover it for the overview)
@@ -12,20 +12,20 @@ To understand what you want from Facebook, you must first see what Facebook
 offers you.
 
 Facebook themself give an overview of all this on the following 
-L<http://developers.facebook.com/|Facebook Developers> Page. For you as
+L<Facebook Developers|http://developers.facebook.com/> Page. For you as
 Catalyst developer, we can split them into 2 relevant parts: 
 
 The first is the pure website integration of Facebook elements, which is 
-covered by the L<http://developers.facebook.com/plugins/|Social Plugins> and
-the L<http://developers.facebook.com/docs/guides/web|Facebook for Webpages>
+covered by the L<Social Plugins|http://developers.facebook.com/plugins/> and
+the L<Facebook for Webpages|http://developers.facebook.com/docs/guides/web>
 guides on Facebook Developers.
 
 The second is the usage of the APIs of Facebook. Over this way you can read or
 modify the Facebook data. Facebook uses here three for us relevant access ways:
-L<http://developers.facebook.com/docs/reference/api/|Graph API>,
-L<http://developers.facebook.com/docs/reference/fql/|Facebook Query Language>
+L<Graph API|http://developers.facebook.com/docs/reference/api/>,
+L<Facebook Query Language|http://developers.facebook.com/docs/reference/fql/>
 and the soon hopefully outdated 
-L<http://developers.facebook.com/docs/reference/rest/|Old REST API>.
+L<Old REST API|http://developers.facebook.com/docs/reference/rest/>.
 
 =head1 Integration
 
@@ -35,7 +35,7 @@ happen.
 =head2 Adding a "Like" button
 
 For the like button and many others of the 
-L<http://developers.facebook.com/plugins/|Social Plugins>, you dont even need
+L<Social Plugins|http://developers.facebook.com/plugins/>, you dont even need
 an account or application registered on Facebook. The only thing, you need
 todo is adding the specific B<iframe>. In the past, you was also able todo
 this via FBML, but this is official deprecated and will be dropped by Facebook
@@ -54,19 +54,19 @@ pages where you want a like button with:
   [% INCLUDE facebook/like.tt %]
   
 You can finetune the values for it, see more details on the 
-L<http://developers.facebook.com/docs/reference/plugins/like|Like Button> Page.
+L<Like Button|http://developers.facebook.com/docs/reference/plugins/like> Page.
 
 =head2 Getting deeper, become an application
 
 Many social plugins require you to be a real Facebook application. This way
 provides you with an application id, and also gives you the way to manage the
 content produced by this plugins, for example if you like to integrate the
-L<http://developers.facebook.com/docs/reference/plugins/comments|Comments> of
+L<Comments|http://developers.facebook.com/docs/reference/plugins/comments> of
 Facebook.
 
 At first you must add an application to your Facebook acount, which you now
 need for the further integration. You can do this on your
-L<http://www.facebook.com/developers/apps.php|Applications page>. If you want
+L<Applications page|http://www.facebook.com/developers/apps.php>. If you want
 to add a new application you will be forced to authenticate yourself with your
 mobile number, or if this doesn't work, with your credit card number. Facebook
 will not charge you anything. Sadly on many mobile networks the short message
@@ -74,8 +74,8 @@ sent by Facebook isn't received, so it could be that it never works for you and
 you must validate with your credit card number.
 
 After you added your application with the
-L<http://www.facebook.com/developers/createapp.php|Set Up New Application>
-button on the L<http://www.facebook.com/developers/apps.php|Applications page>,
+L<Set Up New Application|http://www.facebook.com/developers/createapp.php>
+button on the L<Applications page|http://www.facebook.com/developers/apps.php>,
 you will be pushed to the setup of the application. You should go there to
 B<Web Site> and give a Site URL and a Site Domain. For example you would give
 B<www.example.com> as Site URL and B<example.com> as Site Domain. With this
@@ -140,7 +140,7 @@ not use this in production later, so that you spare resources on the request.
 
 For more informations what you can do with the Graph API, you could checkout
 L<Facebook::Graph> and the informations on the Facebook
-L<http://developers.facebook.com/docs/reference/api/|Graph API Documentation>.
+L<Graph API Documentation|http://developers.facebook.com/docs/reference/api/>.
 
 =head2 Integrating Facebook Javascript SDK for the advanced Social Plugins
 
@@ -180,7 +180,7 @@ can use B<http://static.ak.fbcdn.net/connect/en_US/core.debug.js> as the
 javascript include, but this one is only available in en_US locale.
 
 For more detailed information about the integration you can checkout the
-L<http://developers.facebook.com/docs/reference/javascript/|Javascript SDK Documentation>.
+L<Javascript SDK Documentation|http://developers.facebook.com/docs/reference/javascript/>.
 
 =head2 Adding the login button to your page
 
@@ -198,9 +198,9 @@ leaker.
 The implementation itself is now a bit of a problem in the current state of
 Facebook. Technical you only get official good documentation, which uses FBML,
 but on the other side on the FBML page you get the information that you should
-use the L<http://developers.facebook.com/docs/reference/javascript/|Javascript SDK>.
+use the L<Javascript SDK|http://developers.facebook.com/docs/reference/javascript/>.
 Interesting is also stuff like
-L<http://developers.facebook.com/docs/user_registration|Custom User Registration>,
+L<Custom User Registration|http://developers.facebook.com/docs/user_registration>,
 which allows you to let Facebook store extra fields the user most give on your
 registration process. It can be integrated over a simple B<iframe>.
 
