@@ -191,12 +191,12 @@ means that you are using the Facebook database depending on the rights the user
 gave you like the user would do it. This can also give you more information,
 cause you access the Facebook API with the rights of the user.
 
-But this depends on the rights you request. Generally its a good advice to try
-as much requests as possible on behalf of a user so that Facebook doesn't see
-your application as a kind of information leaker.
+Generally its a good advice to try as much requests as possible on behalf of a
+user so that Facebook doesn't see your application as a kind of information
+leaker.
 
 The implementation itself is now a bit of a problem in the current state of
-Facebook. Technical you only get official good documentation solved with FBML,
+Facebook. Technical you only get official good documentation, which uses FBML,
 but on the other side on the FBML page you get the information that you should
 use the L<http://developers.facebook.com/docs/reference/javascript/|Javascript SDK>.
 Interesting is also stuff like
