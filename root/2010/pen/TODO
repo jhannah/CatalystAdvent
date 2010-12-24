@@ -6,7 +6,7 @@ Organising:
   - Devin Austin (devin.austin at gmail com , dhoss on irc)
 
 Article ideas (2010 Calendar):
- - facebook general application development (Getty)
+ - facebook general application development (Getty) - **DONE**
  - Catalyst + Gearman (dhoss) - **DONE**
  - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss + davewood) - **DONE**
  - Catalyst + ElasticSearch (dhoss) - **DONE**
@@ -25,7 +25,7 @@ Article ideas (2010 Calendar):
  - Catalyst + jQuery theme roller - steve@matsch.com - ** DONE **
 
 Confirmed ideas: 
- - facebook general application development (Getty)
+ - facebook general application development (Getty) ** DONE **
  - Catalyst + Gearman (dhoss) ** DONE **
  - Catalyst + DBIx::Class::InflateColumn::FS + HTML files + X-sendfile for a simple CMS (dhoss + davewood) - ** DONE **
  - Catalyst + ElasticSearch (dhoss) ** DONE **
