@@ -98,7 +98,7 @@ steps.
 For making the Model in Catalyst you need to use the create command of your
 application, after installing L<Catalyst::Model::Facebook>:
 
-  script/myapp_create.pl model MyFacebook Facebook APPLICATION_ID_FROM_FACEBOOK APPLICATION_SECRET_FROM_FACEBOOK
+  script/myapp_create.pl model MyFacebook Facebook APPLICATION_ID_FROM_FACEBOOK API_KEY_FROM_FACEBOOK APPLICATION_SECRET_FROM_FACEBOOK
 
 Where B<MyFacebook> is the name of the Model you want to generate. If you
 want to use now the Facebook modules L<WWW::Facebook::API> or
@@ -107,6 +107,15 @@ to think about it deeper. Don't forget to also add them to your requirements
 of your application. The Facebook package itself doesnt require both of them,
 but throws an error if you try to use the method of them. I often forget that,
 cause both modules are normally installed in my environment :).
+
+B<Warning>: Please do not put the code of your application public if you create
+the model this way. Facebook don't want that you make your secret public, cause
+this makes it possible for others to make stuff on Facebook in behalf of your
+application, which in the long line comes down to your personal name. Best is
+to exclude the application ID and the application secret from outside, like
+environment and replace this in your MyFacebook model, like using
+$ENV{MYAPP_MYFACEBOOK_APP_ID} or in that direction and set them on the
+environment.
 
 =head2 Using Catalyst::Model::Facebook independent
 
@@ -144,17 +153,16 @@ your structure template:
 
   <div id="fb-root"></div>
   <script src="http://connect.facebook.net/en_US/all.js"></script>
-  <script>
+  <script>/* <![CDATA[ */
+  
     FB.init({
       appId  : '[% c.model('MyFacebook').app_id %]',
       status : true, // check login status
       cookie : true, // enable cookies to allow the server to access the session
       xfbml  : true  // parse XFBML
     });
-	FB.Event.subscribe('auth.login', function(response) {
-		window.location.reload();
-	});
-  </script>
+  
+  /* ]]> */</script>
 
 Don't put the JavaScript include in the <head> of your HTML, you will get into
 problems, just add it like Facebook suggests. Of course, you can use other
@@ -185,13 +193,59 @@ cause you access the Facebook API with the rights of the user.
 
 But this depends on the rights you request. Generally its a good advice to try
 as much requests as possible on behalf of a user so that Facebook doesn't see
-your application as a kind of information leaker, if you do all requests to the
-Facebook APIs on your applications behalf.
+your application as a kind of information leaker.
 
+The implementation itself is now a bit of a problem in the current state of
+Facebook. Technical you only get official good documentation solved with FBML,
+but on the other side on the FBML page you get the information that you should
+use the L<http://developers.facebook.com/docs/reference/javascript/|Javascript SDK>.
+Interesting is also stuff like
+L<http://developers.facebook.com/docs/user_registration|Custom User Registration>,
+which allows you to let Facebook store extra fields the user most give on your
+registration process. It can be integrated over a simple B<iframe>.
 
+So I made up a solution that works, and shows you a bit of the concept, and
+also gives you a good base to go on with your own way. You definitly should
+come up with something more clear for yourself :). I use the help of jQuery in
+this example, cause we need some click events, and the usage of onclick, would
+make me seriously sick. Lets make a very simple HTML structure for this:
 
+  <div class="header">
+    [% IF c.model('MyFacebook').uid %]
+      You are logged in with uid [% c.model('MyFacebook').uid %]
+    [% ELSE %]
+      You are not logged in, who the hell are you?
+    [% END %]
+  </div>
+  <div id="login">
+    [% IF c.model('MyFacebook').uid %]
+      LOGOUT
+    [% ELSE %]
+      LOGIN VIA FACEBOOK
+    [% END %]
+  </div>
 
+Also we extend our B<FB.init> JavaScript block with the following JavaScript
+code:
 
+  FB.Event.subscribe('auth.sessionChange', function(response) {
+    // do something when the user logs in or logs out
+    // for a start a page reload is the best solution ;)
+    window.location.reload();
+  });
+
+  $(function(){
+
+    $('#login').click(function(){
+      if (FB.getSession()) {
+        FB.logout();
+      } else {
+        FB.login();
+      }
+    });
+
+  });
+  
 =head2 Testing your application in development stage
 
 So for testing your application without touching the live information, you need
@@ -204,12 +258,29 @@ to you, could make problems. Even tho i must say, I'm open for good suggestions
 and tricks for the development stage, just visit me on IRC, if you want to talk
 deeper about this.
 
+=head2 And there is more...
+
+There are much more possibilities that you can do with Facebook in context of
+Catalyst. Soon I will make a HowTo for Canvas applications with Catalyst, you
+should follow the Facebook package development to see when its there. Its
+available on L<https://github.com/Getty/p5-facebook>. A sample Catalyst project
+where you just need to replace the Facebook application API key, App id and
+secret with your own, you can get from
+L<https://github.com/Getty/p5-catalystadvent-facebook>.
+
+Just join us on irc.perl.org in the channel #facebook or contact me on 
+Facebook L<http://www.facebook.com/raudssus> ;).
+
+Have fun and B<MERRY CHRISTMAS!> :).
+
 =head1 See also
 
 L<Facebook::Manual>
+L<Facebook::Graph>
+L<WWW::Facebook::API>
 L<Catalyst::Model::Facebook>
 
 =head1 Author
 
-Torsten Raudssus, <torsten@raudssus.de>. You can find me on irc.perl.org 
+Torsten Raudssus <torsten@raudssus.de> L<http://www.raudssus.de/>. You can find me on irc.perl.org 
 #facebook or #catalyst as C<Getty>.
