@@ -199,7 +199,7 @@ sub feed : Chained('base') Args() {
         close $fh;
         
         my $e = $feed->add_entry(
-            title    => { type => 'text', content => $parser->title },
+            title    => { type => 'text', content => ($parser->title || "") },
             content  => { type => 'html', content => $parser->asString },
             author   => { name => $parser->author||'Catalyst', 
 			  email => ($parser->email||
