@@ -58,7 +58,7 @@ sub seqL {
     $text = Pod::Xhtml::_htmlEscape($text);
     $targ = Pod::Xhtml::_htmlEscape($targ);
 
-    return qq{<a href="http://search.cpan.org/perldoc?$targ">$text</a>};
+    return qq{<a href="http://metacpan.org/module/$targ">$text</a>};
 }
 
 sub title   { $_[0]->{_title} }
