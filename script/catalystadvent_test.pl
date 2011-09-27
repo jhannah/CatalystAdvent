@@ -1,19 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
-use strict;
-use Getopt::Long;
-use Pod::Usage;
-use FindBin;
-use lib "$FindBin::Bin/../lib";
-use Catalyst::Test 'CatalystAdvent';
-
-my $help = 0;
-
-GetOptions( 'help|?' => \$help );
-
-pod2usage(1) if ( $help || !$ARGV[0] );
-
-print request($ARGV[0])->content . "\n";
+use Catalyst::ScriptRunner;
+Catalyst::ScriptRunner->run('CatalystAdvent', 'Test');
 
 1;
 
@@ -26,7 +14,7 @@ catalystadvent_test.pl - Catalyst Test
 catalystadvent_test.pl [options] uri
 
  Options:
-   -help    display this help and exits
+   --help    display this help and exits
 
  Examples:
    catalystadvent_test.pl http://localhost/some_action
@@ -40,15 +28,13 @@ catalystadvent_test.pl [options] uri
 
 Run a Catalyst action from the command line.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@oook.de>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-Copyright 2004 Sebastian Riedel. All rights reserved.
-
-This library is free software, you can redistribute it and/or modify
+This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut

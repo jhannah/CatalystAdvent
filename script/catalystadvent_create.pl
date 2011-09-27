@@ -1,23 +1,10 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 use strict;
-use Getopt::Long;
-use Pod::Usage;
-use Catalyst::Helper;
+use warnings;
 
-my $force = 0;
-my $help  = 0;
-
-GetOptions(
-    'nonew|force' => \$force,
-    'help|?'      => \$help
- );
-
-pod2usage(1) if ( $help || !$ARGV[0] );
-
-my $helper = Catalyst::Helper->new( { '.newfiles' => !$force } );
-
-pod2usage(1) unless $helper->mk_component( 'CatalystAdvent', @ARGV );
+use Catalyst::ScriptRunner;
+Catalyst::ScriptRunner->run('CatalystAdvent', 'Create');
 
 1;
 
@@ -30,21 +17,28 @@ catalystadvent_create.pl - Create a new Catalyst Component
 catalystadvent_create.pl [options] model|view|controller name [helper] [options]
 
  Options:
-   -force    don't create a .new file where a file to be created exists
-   -help     display this help and exits
+   --force        don't create a .new file where a file to be created exists
+   --mechanize    use Test::WWW::Mechanize::Catalyst for tests if available
+   --help         display this help and exits
 
  Examples:
    catalystadvent_create.pl controller My::Controller
+   catalystadvent_create.pl -mechanize controller My::Controller
    catalystadvent_create.pl view My::View
-   catalystadvent_create.pl view MyView TT
-   catalystadvent_create.pl view TT TT
+   catalystadvent_create.pl view HTML TT
    catalystadvent_create.pl model My::Model
-   catalystadvent_create.pl model SomeDB CDBI dbi:SQLite:/tmp/my.db
-   catalystadvent_create.pl model AnotherDB CDBI dbi:Pg:dbname=foo root 4321
+   catalystadvent_create.pl model SomeDB DBIC::Schema MyApp::Schema create=dynamic\
+   dbi:SQLite:/tmp/my.db
+   catalystadvent_create.pl model AnotherDB DBIC::Schema MyApp::Schema create=static\
+   [Loader opts like db_schema, naming] dbi:Pg:dbname=foo root 4321
+   [connect_info opts like quote_char, name_sep]
 
  See also:
    perldoc Catalyst::Manual
    perldoc Catalyst::Manual::Intro
+   perldoc Catalyst::Helper::Model::DBIC::Schema
+   perldoc Catalyst::Model::DBIC::Schema
+   perldoc Catalyst::View::TT
 
 =head1 DESCRIPTION
 
@@ -54,15 +48,13 @@ Existing component files are not overwritten.  If any of the component files
 to be created already exist the file will be written with a '.new' suffix.
 This behavior can be suppressed with the C<-force> option.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Sebastian Riedel, C<sri@oook.de>
+Catalyst Contributors, see Catalyst.pm
 
 =head1 COPYRIGHT
 
-Copyright 2004 Sebastian Riedel. All rights reserved.
-
-This library is free software, you can redistribute it and/or modify
+This library is free software. You can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
