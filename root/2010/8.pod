@@ -30,6 +30,7 @@ Data::SearchEngine has two simple goals:
 =item Provide a consistent API for I<using> search results.
 
 =back
+
 Accomplishing this goal requires some buy in on your part.  It's a bit more
 expensive up front but I can tell you from personal experience that your
 search backend will grow and change in any reasonably web application.  It's
