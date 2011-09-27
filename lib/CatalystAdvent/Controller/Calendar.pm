@@ -48,10 +48,10 @@ sub index : Chained('base') PathPart('') Args(0) {
     closedir DIR;
 
     my $year = pop @years || $c->stash->{now}->year;
-#    $c->go( $self->action_for('year'), [$year], []);
-    $c->stash->{year}     = $year;
-    $c->stash->{calendar} = calendar( 12, $year );
-    $c->stash->{template} = 'year.tt';
+    $c->go( $self->action_for('year'), [$year], []);
+#    $c->stash->{year}     = $year;
+#    $c->stash->{calendar} = calendar( 12, $year );
+#    $c->stash->{template} = 'year.tt';
 
 }
 
@@ -71,6 +71,35 @@ sub get_year : Chained('base') PathPart('') CaptureArgs(1) {
 
     $c->stash->{year}     = $year;
     $c->stash->{calendar} = calendar( 12, $year );
+
+    opendir my $DIR, $c->path_to('root', $year) or die "Error opening root: $!";
+    my @days = sort { $a <=> $b }
+               map  { m/(\d+)\.pod/ }
+               grep { /(\d+)\.pod/ && $1 <= $c->stash->{now}->day } 
+               readdir $DIR;
+    closedir $DIR;
+    
+    my @links;
+    foreach my $day (@days) {
+        my $file = $c->path_to( 'root', $year )->file( "$day.pod" );
+
+        my $mtime        = ( stat $file )->mtime;
+        my $cached_title = $c->cache->get("title $file $mtime");
+        if ( !$cached_title ) {
+            my $parser = CatalystAdvent::Pod->new();
+
+            open my $fh, '<:utf8', $file or die "Failed to open $file: $!";
+            $parser->parse_from_filehandle($fh);
+            close $fh;
+            
+            $cached_title = $parser->title || '(no title)';
+            $c->cache->set( "title $file $mtime", $cached_title, '12h' );
+        }
+
+        push @links, { day => $day, title => $cached_title };
+    }
+
+    $c->stash->{links} = \@links;
 }
 
 =head2 year

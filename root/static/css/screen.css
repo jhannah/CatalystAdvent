@@ -135,6 +135,16 @@ h2 {
     text-align: left;
 }
 
+#links {
+    border-top: 1px solid #ddd;
+    clear: both;
+}
+
+#links h2 {
+    margin-top: 0.5em;
+    text-align: left;
+}
+
 .rss {
     font-size: x-small;
     text-align: right;

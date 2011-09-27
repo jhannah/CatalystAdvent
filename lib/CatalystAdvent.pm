@@ -8,7 +8,7 @@ use Catalyst qw( Static::Simple
                  Unicode
               );
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 __PACKAGE__->config(
   name => 'CatalystAdvent',

@@ -36,6 +36,14 @@
 </tr>
 [% END %]
 </table>
+[% IF c.stash.links.size > 0 %]
+<div id="links">
+    <h2>Articles</h2>
+    [% FOREACH link IN c.stash.links %]
+    <p>Day [% link.day %]: <a href="[% c.uri_for('/', year, link.day) %]">[% link.title %]</a></p>
+    [% END %]
+</div>
+[% END %]
 [% TRY %]
 <div id="notes">
     [% INCLUDE "notes/${year}.tt" %]
