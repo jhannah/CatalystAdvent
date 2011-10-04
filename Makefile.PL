@@ -8,9 +8,8 @@ license('perl');
 
 include('ExtUtils::AutoInstall');
 
-requires Catalyst => '5.80';
-requires 'Catalyst::Plugin::DefaultEnd';
-requires 'Catalyst::Plugin::Unicode';
+requires Catalyst => '5.90';
+requires 'Catalyst::Plugin::Unicode::Encoding';
 requires 'Catalyst::Plugin::Cache' => '0.08';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'DateTime';
