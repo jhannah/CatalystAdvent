@@ -5,10 +5,10 @@ use warnings;
 
 use Catalyst qw( Static::Simple
                  Cache
-                 Unicode
+                 Unicode::Encoding
               );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 __PACKAGE__->config(
   name => 'CatalystAdvent',

@@ -1,5 +1,9 @@
 This file documents the revision history for Perl extension CatalystAdvent.
 
+0.05
+        - Resolve dependencies
+        - Fix displaying article list
+
 0.04
         - Display article list with names underneath the calendar on the
           per-year page 

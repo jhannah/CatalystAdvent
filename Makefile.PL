@@ -11,7 +11,9 @@ include('ExtUtils::AutoInstall');
 requires Catalyst => '5.90';
 requires 'Catalyst::Plugin::Unicode::Encoding';
 requires 'Catalyst::Plugin::Cache' => '0.08';
+requires 'Cache::FileCache';
 requires 'Catalyst::Plugin::Static::Simple';
+requires 'Catalyst::View::TT';
 requires 'DateTime';
 requires 'File::stat';
 requires 'Pod::Xhtml';
@@ -20,6 +22,8 @@ requires 'XML::Atom::SimpleFeed';
 requires 'HTTP::Date';
 requires 'List::Util';
 requires 'Template::Plugin::DateTime'; # EWWWWW
+requires 'Date::Calc';
+requires 'Catalyst::Action::RenderView';
 
 test_requires 'Test::More' => '0.88';
 

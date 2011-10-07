@@ -66,7 +66,7 @@ sub get_year : Chained('base') PathPart('') CaptureArgs(1) {
 
     $c->detach( '/calendar/index' ) unless $year =~ /^\d{4}$/;
 
-    $c->res->redirect( $c->uri_for('/') )
+    $c->res->redirect( $c->uri_for('/') ) && $c->detach
         unless ( -d $c->path_to( 'root', $year ) );
 
     $c->stash->{year}     = $year;
@@ -75,12 +75,15 @@ sub get_year : Chained('base') PathPart('') CaptureArgs(1) {
     opendir my $DIR, $c->path_to('root', $year) or die "Error opening root: $!";
     my @days = sort { $a <=> $b }
                map  { m/(\d+)\.pod/ }
-               grep { /(\d+)\.pod/ && $1 <= $c->stash->{now}->day } 
                readdir $DIR;
     closedir $DIR;
-    
+
     my @links;
-    foreach my $day (@days) {
+    DAY: foreach my $day (@days) {
+        # Don't show link to articles before the appropriate day, even if they're ready
+        my $date = DateTime->new( day => $day, month => 12, year => $year );
+        next DAY if $c->stash->{now} < $date;
+
         my $file = $c->path_to( 'root', $year )->file( "$day.pod" );
 
         my $mtime        = ( stat $file )->mtime;
