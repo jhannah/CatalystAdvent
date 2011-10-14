@@ -134,4 +134,4 @@ The configuration to do this on the frontend will vary.
 
 =head4 [1] 
 
-L<http://search.cpan.org/dist/Catalyst-Engine-Apache/lib/Catalyst/Engine/Apache/MP13.pm>
+L<https://metacpan.org/module/Catalyst::Engine::Apache::MP13>

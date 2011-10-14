@@ -178,7 +178,7 @@ L<http://www.catalystframework.org/calendar/2006/9>
 
 L<http://en.wikipedia.org/wiki/REST>
 
-L<http://search.cpan.org/perldoc?Catalyst::Controller::REST>
+L<https://metacpan.org/module/Catalyst::Controller::REST>
 
 =head1 Author
 

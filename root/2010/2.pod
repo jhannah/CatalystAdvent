@@ -28,7 +28,7 @@ Start your instances by typing C<bin/elasticsearch> in the root directory where 
 
 =head1 A Simple API Introduction
 
-L<ElasticSearch|http://search.cpan.org/~drtech/ElasticSearch-0.27/lib/ElasticSearch.pm> is the Perl binding to the ElasticSearch REST API, and is written (marvelously) by Clinton Gormley.  It has a few key methods we will be using in this article.
+L<ElasticSearch|https://metacpan.org/module/ElasticSearch> is the Perl binding to the ElasticSearch REST API, and is written (marvelously) by Clinton Gormley.  It has a few key methods we will be using in this article.
 
 =over 12
 

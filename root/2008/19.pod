@@ -16,7 +16,7 @@ applications just email the forgotten password in plain text.
 Both of these solutions are wrong.  (Now I'm just going to leave it at that.)
 
 This situation directly inspired the development of the Progressive Realm
-(L<http://search.cpan.org/~jayk/Catalyst-Plugin-Authentication-0.100091/lib/Catalyst/Authentication/Realm/Progressive.pm>).
+(L<https://metacpan.org/module/Catalyst::Authentication::Realm::Progressive>).
 We won't cover proper handling of temporary passwords, since that is a 
 more involved topic and much larger article (to be discussed at a later date,
 but I provide a brief note at the bottom of this article).

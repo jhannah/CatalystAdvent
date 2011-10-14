@@ -11,20 +11,20 @@ So what exciting things have happened with your (hopefully) favorite SQL de-hate
 The answer is - a lot!
 
 First the obligatory numbers: this year up until the latest official release
-L<0.08124|http://search.cpan.org/~frew/DBIx-Class-0.08124/> DBIC saw
+L<0.08124|https://metacpan.org/release/FREW/DBIx-Class-0.08124> DBIC saw
 code and documentation contributions from 42 (no joke!) people in over 1,000
 commits, touching over 400 files with a total of over 14,000 non-whitespace
 lines of changes! But what do these scary numbers give us?
 
 The killer feature remains
-L<resultset chaining|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#Chaining_resultsets>,
+L<resultset chaining|https://metacpan.org/module/DBIx::Class::ResultSet#Chaining_resultsets>,
 but what a facelift it got this year:
-L<searches|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#search>,
-L<relationship traversals|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#search_related>,
-L<set operations|http://search.cpan.org/dist/DBIx-Class-Helpers/lib/DBIx/Class/Helper/ResultSet/SetOperations.pm#DESCRIPTION>,
-L<subselects|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#as_subselect_rs>,
-L<limits|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#rows>,
-L<column slices|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/ResultSet.pm#get_column>
+L<searches|https://metacpan.org/module/DBIx::Class::ResultSet#search>,
+L<relationship traversals|https://metacpan.org/module/DBIx::Class::ResultSet#search_related>,
+L<set operations|https://metacpan.org/module/DBIx::Class::Helper::ResultSet::SetOperations#DESCRIPTION>,
+L<subselects|https://metacpan.org/module/DBIx::Class::ResultSet#as_subselect_rs>,
+L<limits|https://metacpan.org/module/DBIx::Class::ResultSet#rows>,
+L<column slices|https://metacpan.org/module/DBIx::Class::ResultSet#get_column>
 (and by the end of this week
 L<custom joins|http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/DBIx-Class.git;a=blob;f=lib/DBIx/Class/Relationship/Base.pm;h=8012dd8fcd9ab5f36f26d555f5303f0c826de328;hb=refs/heads/extended_rels#l128>
 ) - all work together in perfect harmony, producing mind-numbing but fully
@@ -39,9 +39,9 @@ L<SQL formatter|http://cpansearch.perl.org/src/RIBASUSHI/SQL-Abstract-1.71/scrip
 Just add C<DBIC_TRACE_PROFILE=console> to your environment and watch a rainbow
 of properly indented SQL dance on your otherwise dull console any time you
 request SQL traces with
-L<DBIC_TRACE|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage.pm#DBIC_TRACE>
+L<DBIC_TRACE|https://metacpan.org/module/DBIx::Class::Storage#DBIC_TRACE>
 or with
-L<< storage->debug|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage.pm#debug >>.
+L<< storage->debug|https://metacpan.org/module/DBIx::Class::Storage#debug >>.
 Catalyst/Plack users are not left out in the cold either, thanks to
 L<jnap|http://jjnapiorkowski.typepad.com/modern-perl/> and his
 L<Plack::Middleware::Debug::DBIC::QueryLog>, which leverages the same
@@ -56,12 +56,12 @@ nested searches with reckless abandon, and DBIC will do its best to remove
 unreferenced C<LEFT JOIN>'s before sending the coveted query to the RDBMS.
 
 So you have a DBA - you are most likely using some opinionated commercial
-RDBMS. Thanks to L<Caelum|http://search.cpan.org/~rkitover> DBIC now
+RDBMS. Thanks to L<Caelum|https://metacpan.org/author/RKITOVER> DBIC now
 supports oddballs like
-L<Informix|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage/DBI/Informix.pm>,
-L<Firebird and Interbase|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage/DBI/InterBase.pm>,
-L<Sybase ASE|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage/DBI/Sybase/ASE.pm> and
-L<Sybase SQL Anywhere|http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Storage/DBI/SQLAnywhere.pm>. Note that
+L<Informix|https://metacpan.org/module/DBIx::Class::Storage::DBI::Informix>,
+L<Firebird and Interbase|https://metacpan.org/module/DBIx::Class::Storage::DBI::InterBase>,
+L<Sybase ASE|https://metacpan.org/module/DBIx::Class::Storage::DBI::Sybase::ASE> and
+L<Sybase SQL Anywhere|https://metacpan.org/module/DBIx::Class::Storage::DBI::SQLAnywhere>. Note that
 "supports" means real support - with proper limit dialects, datetime
 formatters, transaction handlers, savepoints, and other fixups and workarounds
 for minor but irritating RDBMS-specific quirks.
@@ -79,13 +79,13 @@ easy), for example in-line data migration during schema upgrades.
 Finally in order to attract more followers of the sugar-club, he spilled some
 L<DBIx::Class::Candy> to make the life of DBIC newcomers sweeter^Weasier.
 
-L<Caelum|http://search.cpan.org/~rkitover> adopted
+L<Caelum|https://metacpan.org/author/RKITOVER> adopted
 L<DBIx::Class::Schema::Loader> and taught it neat tricks on all databases he
 could get his hands on. The new generation loaders are more precise, support
 more database metadata, and quite importantly choose saner names for
 Result Classes and Relationships.
 
-L<goraxe|http://search.cpan.org/~goraxe/> contributed a brand-new fully
+L<goraxe|https://metacpan.org/author/GORAXE> contributed a brand-new fully
 Moosified control module L<DBIx::Class::Admin>, making it dead simple to write
 CLI apps and other control interfaces against your DBIC schema.
 

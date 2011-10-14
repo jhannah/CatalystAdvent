@@ -119,10 +119,10 @@ still be automatically detected.
 See the documentation for each cache plugin for more details and other
 available configuration options.
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Cache-FastMmap/lib/Catalyst/Plugin/Cache/FastMmap.pm>
+L<https://metacpan.org/module/Catalyst::Plugin::Cache::FastMmap>
 L<http://search.cpan.org/dist/Catalyst-Plugin-Cache-FileCache/lib/Catalyst/Plugin/Cache/FileCache.pm>
-L<http://search.cpan.org/dist/Catalyst-Plugin-Cache-Memcached/lib/Catalyst/Plugin/Cache/Memcached.pm>
-L<http://search.cpan.org/dist/Catalyst-Plugin-PageCache/lib/Catalyst/Plugin/PageCache.pm>
-L<http://search.cpan.org/dist/Template-Toolkit/lib/Template/Manual/Config.pod#Caching_and_Compiling_Options>
+L<https://metacpan.org/module/Catalyst::Plugin::Cache::Memcached>
+L<https://metacpan.org/module/Catalyst::Plugin::PageCache>
+L<https://metacpan.org/module/Template::Manual::Config#Caching_and_Compiling_Options>
 
 -- Andy Grundman

@@ -14,10 +14,10 @@ L<Solr|http://lucene.apache.org/solr/> for work projects. Even with Solr in my
 toolbelt I occasionally find myself in need of a quick and dirty search that
 has no outside dependencies.  This means I'll have to roll something with SQL
 and maybe
-L<Search::QueryParser|http://search.cpan.org/perldoc?Search::QueryParser>.
+L<Search::QueryParser|https://metacpan.org/module/Search::QueryParser>.
 Regardless of how I choose to implement the search in my web application I
 know that I'll abstract it using
-L<Data::SearchEngine|http://search.cpan.org/perldoc?Data::SearchEngine>.
+L<Data::SearchEngine|https://metacpan.org/module/Data::SearchEngine>.
 
 =head2 Goals
 
@@ -39,7 +39,7 @@ a good investment to take some time to design yours well.
 =head2 Implementation
 
 We'll throw together a dead simple search using
-L<DBIx::Class|http://search.cpan.org/perldoc?DBIx::Class> to illustrate how
+L<DBIx::Class|https://metacpan.org/module/DBIx::Class> to illustrate how
 easy it is to build a new backend for Data::SearchEngine.  Then we'll
 demonstrate using it in a web application so you can see the advantages of
 using an abstraction layer atop your search implementation.
@@ -109,10 +109,10 @@ The big deal is that if you want to add a new search feature, backend
 implementation or refactor your code you don't have to change anything in your
 interface. As the author of a Data::SearchEngine implementation you can even
 implement common features such as
-L<faceting|http://search.cpan.org/perldoc?Data::SearchEngine::Results::Faceted>
-or L<spellchecking|http://search.cpan.org/perldoc?Data::SearchEngine::Results::Spellcheck>
+L<faceting|https://metacpan.org/module/Data::SearchEngine::Results::Faceted>
+or L<spellchecking|https://metacpan.org/module/Data::SearchEngine::Results::Spellcheck>
 and expose a common interface.  When your needs outgrow your homegrown DBIC
-implementation you can move up to L<Solr|http://search.cpan.org/perldoc?Data::SearchEngine::Solr>
+implementation you can move up to L<Solr|https://metacpan.org/module/Data::SearchEngine::Solr>
 and not have to change any code in your view!
 
 It should also be noted that – through the power of MooseX::Storage – the

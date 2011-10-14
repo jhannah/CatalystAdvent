@@ -75,7 +75,7 @@ an attribute C<verification_scope> that sets the scope. This can be overridden
 with Catalyst's configuration system, making it more general purpose and
 abstract.
 
-When combined with nested parameters (See L<Catalyst::Plugin::Params::Nested|http://search.cpan.org/dist/Catalyst-Plugin-Params-Nested/lib/Catalyst/Plugin/Params/Nested.pm> the user input (through forms) is formatted like C<name="ModelName.field"> and then verification happens easily:
+When combined with nested parameters (See L<Catalyst::Plugin::Params::Nested|https://metacpan.org/module/Catalyst::Plugin::Params::Nested> the user input (through forms) is formatted like C<name="ModelName.field"> and then verification happens easily:
 
  my $input = $c->req->params;
  # Though do verify this is what you expect

@@ -67,7 +67,7 @@ Now use B<pkg_info> to easily find all the packages having B<Catalyst> in their 
   p5-Test-WWW-Mechanize-Catalyst-0.42.tgz
   $
 
-We see L<p5-Catalyst-Devel|http://search.cpan.org/perldoc?Catalyst::Devel> in
+We see L<p5-Catalyst-Devel|https://metacpan.org/module/Catalyst::Devel> in
 the list and proceed to install it:
 
   $ sudo pkg_add p5-Catalyst-Devel
@@ -85,9 +85,9 @@ the list and proceed to install it:
 ... done, wasn't that easy?!  We have everything we need for the Catalyst base system.
 
 For session support we install 
-the L<session plugin|http://search.cpan.org/perldoc?Catalyst::Plugin::Session>,
-the L<file store|http://search.cpan.org/perldoc?Catalyst::Plugin::Session::Store::File>
-and L<cookie state|http://search.cpan.org/perldoc?Catalyst::Plugin::Session::State::Cookie> modules:
+the L<session plugin|https://metacpan.org/module/Catalyst::Plugin::Session>,
+the L<file store|https://metacpan.org/module/Catalyst::Plugin::Session::Store::File>
+and L<cookie state|https://metacpan.org/module/Catalyst::Plugin::Session::State::Cookie> modules:
 
   $ sudo pkg_add p5-Catalyst-Plugin-Session-Store-File p5-Catalyst-Plugin-Session-State-Cookie
   p5-Error-0.17009: complete
@@ -101,14 +101,14 @@ and L<cookie state|http://search.cpan.org/perldoc?Catalyst::Plugin::Session::Sta
   $
   
 Let's assume we want the application to also use the
-L<authentication plugin|http://search.cpan.org/perldoc?Catalyst::Plugin::Authentication> too:
+L<authentication plugin|https://metacpan.org/module/Catalyst::Plugin::Authentication> too:
 
   $ sudo pkg_add p5-Catalyst-Plugin-Authentication
   p5-Catalyst-Plugin-Authentication-0.10006: complete
   $
 
-... and L<DBIx::Class|http://search.cpan.org/perldoc?DBIx::Class> as the
-L<authentication store|http://search.cpan.org/perldoc?Catalyst::Plugin::Authentication::Store::DBIC>:
+... and L<DBIx::Class|https://metacpan.org/module/DBIx::Class> as the
+L<authentication store|https://metacpan.org/module/Catalyst::Plugin::Authentication::Store::DBIC>:
 
   $ sudo pkg_add p5-Catalyst-Plugin-Authentication-Store-DBIC
   p5-JSON-2.10: complete

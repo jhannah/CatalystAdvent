@@ -29,7 +29,7 @@ of them, but if you're reading this, all of them will make your life easier.
 
 The perl MVC framework
 
-=item HTML::FormHandler (L<http://search.cpan.org/~gshank/HTML-FormHandler-0.32005/lib/HTML/FormHandler.pm>)
+=item HTML::FormHandler (L<https://metacpan.org/module/HTML::FormHandler>)
 
 For creating, displaying, and validating forms
 

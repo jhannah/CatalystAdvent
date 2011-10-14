@@ -249,12 +249,12 @@ This is just a hint at what the Catalyst Authentication system is capable of.
 For more information, take a look at the Catalyst::Plugin::Authentication
 documentation:
 
-L<http://search.cpan.org/~jayk/Catalyst-Plugin-Authentication/>
+L<https://metacpan.org/module/Catalyst::Plugin::Authentication>
 
 And for more advanced DBIx::Class authentication options - check out the
 DBIx::Class store docs:
 
-L<http://search.cpan.org/~jayk/Catalyst-Authentication-Store-DBIx-Class/>
+L<https://metacpan.org/module/Catalyst::Authentication::Store::DBIx::Class>
 
 =head1 AUTHOR
 

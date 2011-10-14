@@ -240,7 +240,7 @@ L<http://www.infoq.com/articles/testing-ajax-selenium>
 
 L<http://www.infoq.com/news/2007/09/selenium-grid-parallel-testing>
 
-L<http://search.cpan.org/~lukec/Test-WWW-Selenium-1.13/lib/WWW/Selenium.pm>
+L<https://metacpan.org/module/WWW::Selenium>
 
 
 =head2 Comma Gotcha

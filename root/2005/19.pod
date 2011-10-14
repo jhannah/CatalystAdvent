@@ -119,67 +119,67 @@ test HTML, forms and links. A short example of usage:
 
 =item Catalyst::Test
 
-L<http://search.cpan.org/dist/Catalyst/lib/Catalyst/Test.pm>
+L<https://metacpan.org/module/Catalyst::Test>
 
 =item Test::WWW::Mechanize::Catalyst
 
-L<http://search.cpan.org/dist/Test-WWW-Mechanize-Catalyst/lib/Test/WWW/Mechanize/Catalyst.pm>
+L<https://metacpan.org/module/Test::WWW::Mechanize::Catalyst>
 
 =item Test::WWW::Mechanize
 
-L<http://search.cpan.org/dist/Test-WWW-Mechanize/Mechanize.pm>
+L<https://metacpan.org/module/Test::WWW::Mechanize>
 
 =item WWW::Mechanize
 
-L<http://search.cpan.org/dist/WWW-Mechanize/lib/WWW/Mechanize.pm>
+L<https://metacpan.org/module/WWW::Mechanize>
 
 =item LWP::UserAgent
 
-L<http://search.cpan.org/dist/libwww-perl/lib/LWP/UserAgent.pm>
+L<https://metacpan.org/module/LWP::UserAgent>
 
 =item HTML::Form
 
-L<http://search.cpan.org/dist/libwww-perl/lib/HTML/Form.pm>
+L<https://metacpan.org/module/HTML::Form>
 
 =item HTTP::Message
 
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Message.pm>
+L<https://metacpan.org/module/HTTP::Message>
 
 =item HTTP::Request
 
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Request.pm>
+L<https://metacpan.org/module/HTTP::Request>
 
 =item HTTP::Request::Common
 
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Request/Common.pm>
+L<https://metacpan.org/module/HTTP::Request::Common>
 
 =item HTTP::Response
 
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Response.pm>
+L<https://metacpan.org/module/HTTP::Response>
 
 =item HTTP::Status
 
-L<http://search.cpan.org/dist/libwww-perl/lib/HTTP/Status.pm>
+L<https://metacpan.org/module/HTTP::Status>
 
 =item URI
 
-L<http://search.cpan.org/dist/URI/URI.pm>
+L<https://metacpan.org/module/URI>
 
 =item Test::More
 
-L<http://search.cpan.org/dist/Test-Simple/lib/Test/More.pm>
+L<https://metacpan.org/module/Test::More>
 
 =item Test::Pod
 
-L<http://search.cpan.org/dist/Test-Pod/Pod.pm>
+L<https://metacpan.org/module/Test::Pod>
 
 =item Test::Pod::Coverage
 
-L<http://search.cpan.org/dist/Test-Pod-Coverage/Coverage.pm>
+L<https://metacpan.org/module/Test::Pod::Coverage>
 
 =item prove (Test::Harness)
 
-L<http://search.cpan.org/dist/Test-Harness/bin/prove>
+L<https://metacpan.org/release/Test-Harness>
 
 =back
 

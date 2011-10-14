@@ -139,10 +139,10 @@ Once again, this allows you to move your application around without having to wo
 
 Further Reading:
 
-L<http://search.cpan.org/perldoc?Catalyst>
+L<https://metacpan.org/module/Catalyst>
 
-L<http://search.cpan.org/perldoc?Catalyst%3A%3AView%3A%3ATT>
+L<https://metacpan.org/module/Catalyst::View::TT>
 
-L<http://search.cpan.org/perldoc?Template>
+L<https://metacpan.org/module/Template>
 
 --Adam Herzog

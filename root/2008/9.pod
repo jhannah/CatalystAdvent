@@ -5,14 +5,14 @@
 <p>
 Graphics::Primitive is a collection of objects that allow you build a 2d "scene".
 The building block of these scenes is a
-<a href="http://search.cpan.org/perldoc?Graphics::Primitive::Component">Component</a>.
+<a href="https://metacpan.org/module/Graphics::Primitive::Component">Component</a>.
 It has a width and height, colors (fore and back), borders, insets, and padding.
-A <a href="http://search.cpan.org/perldoc?Graphics::Primitive::Container">Container</a>
+A <a href="https://metacpan.org/module/Graphics::Primitive::Container">Container</a>
 builds on Component and yields a component that can contain other components.  To allow
 for more than plain ol' boxes, Graphics::Primitive provides
-<a href="http://search.cpan.org/perldoc?Graphics::Primitive::TextBox">TextBox</a>,
-<a href="http://search.cpan.org/perldoc?Graphics::Primitive::Canvas">Canvas</a> and
-<a href="http://search.cpan.org/perldoc?Graphics::Primitive::Image">Image</a>.  While
+<a href="https://metacpan.org/module/Graphics::Primitive::TextBox">TextBox</a>,
+<a href="https://metacpan.org/module/Graphics::Primitive::Canvas">Canvas</a> and
+<a href="https://metacpan.org/module/Graphics::Primitive::Image">Image</a>.  While
 these entities are all pretty simple, but you can create complex results by nesting them.
 </p>
 
@@ -25,12 +25,12 @@ our document in the Controller then let the view handle creating the actual impl
 
 <h2>Getting Started</h2>
 <p>
-The first step is to install the <a href="http://search.cpan.org/perldoc?Graphics::Primitive">Graphics::Primitive</a>
-and <a href="http://search.cpan.org/perldoc?Catalyst::View::Graphics::Primitive">Catalyst::View::Graphics::Primitive</a>
-modules.  You'll also want to install the <a href="http://search.cpan.org/perldoc?Graphics::Primitive::Driver::Cairo">Cairo driver</a>.
-There's an experimental <a href="http://search.cpan.org/perldoc?Graphics::Primitive::Driver::CairoPango">Cairo + Pango</a>
+The first step is to install the <a href="https://metacpan.org/module/Graphics::Primitive">Graphics::Primitive</a>
+and <a href="https://metacpan.org/module/Catalyst::View::Graphics::Primitive">Catalyst::View::Graphics::Primitive</a>
+modules.  You'll also want to install the <a href="https://metacpan.org/module/Graphics::Primitive::Driver::Cairo">Cairo driver</a>.
+There's an experimental <a href="https://metacpan.org/module/Graphics::Primitive::Driver::CairoPango">Cairo + Pango</a>
 driver available but it requires Gtk2 for now.  For this tutorial we'll also use
-<a href="http://search.cpan.org/perldoc?Paper::Specs">Paper::Specs</a> for our page sizes.
+<a href="https://metacpan.org/module/Paper::Specs">Paper::Specs</a> for our page sizes.
 </p>
 <p>
 With that out of the way, we can now add the Graphics::Primitive view to our application:
@@ -89,9 +89,9 @@ us our width and height.  We'll cover <tt>layout_manager</tt> later.
 
 <p>
 Graphics::Primitive is a color-agnostic library.  You might've noticed
-the <tt>use</tt> line above that included <a href="http://search.cpan.org/perldoc?Graphics::Color">Graphics::Color</a>,
+the <tt>use</tt> line above that included <a href="https://metacpan.org/module/Graphics::Color">Graphics::Color</a>,
 specifically, the RGB library.  To make the PDF interesting, we can
-add a <a href="http://search.cpan.org/perldoc?Graphics::Primitive::TextBox">TextBox</a> component.
+add a <a href="https://metacpan.org/module/Graphics::Primitive::TextBox">TextBox</a> component.
 </p>
 
 =end pod::xhtml
@@ -126,7 +126,7 @@ pretty that way.
 <p>
 Finally, we add the TextBox to the container.  Our previously glossed over
 <tt>layout_manager</tt> does the work now.  I chose to use the
-<a href="http://search.cpan.org/perldoc?Layout::Manager::Compass">Compass layout manager</a>.
+<a href="https://metacpan.org/module/Layout::Manager::Compass">Compass layout manager</a>.
 The <tt>add_component</tt> method takes a second argument that is
 passed on to the layout manager when the component is laid out.  We
 passed it "n" so that the TextBox will be positioned North.  You can

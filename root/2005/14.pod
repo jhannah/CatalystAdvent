@@ -120,7 +120,7 @@ the name of a role to check, and it returns true if the user is a member.
 
 =head1 More information
 
-L<http://search.cpan.org/perldoc?Catalyst::Plugin::Authentication> has a longer explanation.
+L<https://metacpan.org/module/Catalyst::Plugin::Authentication> has a longer explanation.
 
 
  --castaway

@@ -127,7 +127,7 @@ you print this out, this "character" (which is really an octet
 representing different character) will be encoded into UTF-8 octets
 representing the character.  This is called double-encoding, and is
 unfortunately the most frequently occurring Unicode bug that I've seen
-(even L<http://search.cpan.org/~jrockway/> has this problem).  
+(even L<https://metacpan.org/author/JROCKWAY> has this problem).  
 
 Perl will do the right thing, but only if you know what the right
 thing is :)

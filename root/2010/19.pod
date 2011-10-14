@@ -1,6 +1,6 @@
 =head1 Catalyst::Controller::REST, jQgrid, and You.
 
-Datagrids are a pretty big thing nowadays.  Every reasonable JavaScript framework has a solution for creating them, and for good reason.  You can get a really simple, data-agnostic CRUD interface up and running that has quick sorting features, pagination, bulk create/delete/update, and easy search features.  These are all extremely useful for situations in which you have large datasets you have to deal with in big chunks at a time.  Tangible scenarios include admin interfaces, store product inventory lists, email listings, etc.  This is all good and gravy, given we have a JavaScript UI solution to *displaying* the data, but how do we get data *into* it, reasonbly, and extensibly? We use my good friend L<Catalyst::Controller::REST|http://search.cpan.org/~bobtfish/Catalyst-Action-REST-0.87/lib/Catalyst/Controller/REST.pm>.  Folks have talked about this fella before, but not exactly in this capacity. See, things like flexigrid from jQuery also give you a nice grid interface, but the CRUD factor isn't quite as easy as with jQgrid.  So I'd like to take some time and explain how to use jQgrid for your datagrid instances, and show you why it's a bit easier.
+Datagrids are a pretty big thing nowadays.  Every reasonable JavaScript framework has a solution for creating them, and for good reason.  You can get a really simple, data-agnostic CRUD interface up and running that has quick sorting features, pagination, bulk create/delete/update, and easy search features.  These are all extremely useful for situations in which you have large datasets you have to deal with in big chunks at a time.  Tangible scenarios include admin interfaces, store product inventory lists, email listings, etc.  This is all good and gravy, given we have a JavaScript UI solution to *displaying* the data, but how do we get data *into* it, reasonbly, and extensibly? We use my good friend L<Catalyst::Controller::REST|https://metacpan.org/module/Catalyst::Controller::REST>.  Folks have talked about this fella before, but not exactly in this capacity. See, things like flexigrid from jQuery also give you a nice grid interface, but the CRUD factor isn't quite as easy as with jQgrid.  So I'd like to take some time and explain how to use jQgrid for your datagrid instances, and show you why it's a bit easier.
 
 =head2 PACKING LIST
 
@@ -14,7 +14,7 @@ Voila.  One down, a few more to go!
 
 =item A Data Source.
 
-Ours will be a database, hooked up via L<DBIx::Class|http://search.cpan.org/dist/DBIx-Class/>.  Yours can be anything, as long as it can be coerced into the data structure we'll be talking about here shortly.
+Ours will be a database, hooked up via L<DBIx::Class|https://metacpan.org/release/DBIx-Class>.  Yours can be anything, as long as it can be coerced into the data structure we'll be talking about here shortly.
 
 =item jQgrid
 

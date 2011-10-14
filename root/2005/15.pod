@@ -70,17 +70,17 @@ $c->session >>, and can be writen to and read from as a simple hash reference.
 
 =head1 More information
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session>
+L<https://metacpan.org/release/Catalyst-Plugin-Session>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-State-Cookie>
+L<https://metacpan.org/release/Catalyst-Plugin-Session-State-Cookie>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-State-URI>
+L<https://metacpan.org/release/Catalyst-Plugin-Session-State-URI>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-Store-FastMmap>
+L<https://metacpan.org/release/Catalyst-Plugin-Session-Store-FastMmap>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-Store-File>
+L<https://metacpan.org/release/Catalyst-Plugin-Session-Store-File>
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Session-Store-DBI>
+L<https://metacpan.org/release/Catalyst-Plugin-Session-Store-DBI>
 
 
   --castaway

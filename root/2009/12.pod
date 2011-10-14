@@ -136,7 +136,7 @@ MyApp::Schema::ResultSet::*.
 
 If you're not using load_namespaces, you can still make it work. Have a
 look at this:
-http://search.cpan.org/~frew/DBIx-Class-0.08114/lib/DBIx/Class/ResultSource.pm#resultset_class
+https://metacpan.org/module/DBIx::Class::ResultSource#resultset_class
 
 And a super simple resultset class might look like this:
 

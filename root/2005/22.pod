@@ -12,7 +12,7 @@ actions, and decides which URLs they map to.
 =head2 Type attributes
 
 Each action is a normal method in your controller, except that it has an
-L<attribute|http://search.cpan.org/~nwclark/perl-5.8.7/lib/attributes.pm>
+L<attribute|https://metacpan.org/module/NWCLARK/perl-5.8.7/lib/attributes.pm>
 attached. These can be one of several types.
 
 Assume our Controller module starts with the following package declaration:
@@ -202,7 +202,7 @@ in a Controller module.
 
 =head2 More Information
 
-L<http://search.cpan.org/author/SRI/Catalyst-5.61/lib/Catalyst/Manual/Intro.pod>
+L<https://metacpan.org/module/Catalyst::Manual::Intro>
 
 L<http://dev.catalyst.perl.org/wiki/FlowChart>
 

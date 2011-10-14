@@ -133,8 +133,8 @@ root of your app (but not in any other controller).
 
 =head2 More Information
 
-L<http://search.cpan.org/perldoc?Catalyst::Plugin::Authorization::Roles>
-L<http://search.cpan.org/perldoc?Catalyst::Plugin::Authorization::ACL>
+L<https://metacpan.org/module/Catalyst::Plugin::Authorization::Roles>
+L<https://metacpan.org/module/Catalyst::Plugin::Authorization::ACL>
 
   --nothingmuch
 

@@ -141,9 +141,9 @@ C< extjs_local.pl >, so the
 local configuration file settings override the default ones in extjs.pl.
 
 You can read more details about ConfigLoader::Multi here
-L<http://search.cpan.org/author/TOMYHERO/Catalyst-Plugin-ConfigLoader-Multi-0.03/lib/Catalyst/Plugin/ConfigLoader/Multi.pm>.
+L<https://metacpan.org/module/Catalyst::Plugin::ConfigLoader::Multi>.
 It's a nice piece of work.
-Also see L< http://search.cpan.org/~bricas/Catalyst-Plugin-ConfigLoader-0.19/lib/Catalyst/Plugin/ConfigLoader/Manual.pod >.
+Also see L<https://metacpan.org/module/Catalyst::Plugin::ConfigLoader::Manual>.
 
 
 =head2 Set Up Configuration Files

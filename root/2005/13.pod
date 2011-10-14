@@ -102,13 +102,13 @@ Search and retrieve from the database:
 You can find the documentation of C<Catalyst::Model::DBIC> and its helper
 at
 
-L<http://search.cpan.org/dist/Catalyst-Model-DBIC/>
+L<https://metacpan.org/release/Catalyst-Model-DBIC>
 
 For information concerning DBIx::Class please visit the documentation and
 Intro on CPAN:
 
-L<http://search.cpan.org/dist/DBIx-Class/>
-L<http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual/Intro.pod>
+L<https://metacpan.org/release/DBIx-Class>
+L<https://metacpan.org/release/DBIx-Classlib/DBIx/Class/Manual/Intro.pod>
 
 or its own Wiki
 

@@ -50,7 +50,7 @@ And that's precisely what we did :-)
 
 =head2 Enter Padre::Plugin::Catalyst
 
-L<Padre::Plugin::Catalyst|http://search.cpan.org/perldoc?Padre::Plugin::Catalyst>
+L<Padre::Plugin::Catalyst|https://metacpan.org/module/Padre::Plugin::Catalyst>
 integrates Catalyst development and Padre, (hopefully) improving the
 programmer's experience.
 
@@ -69,8 +69,8 @@ not to try it.
 
    cpan> install Padre::Plugin::Catalyst
 
-If you already have L<Padre|http://search.cpan.org/perldoc?Padre> and
-L<Catalyst::Devel|http://search.cpan.org/perldoc?Catalyst::Devel>
+If you already have L<Padre|https://metacpan.org/module/Padre> and
+L<Catalyst::Devel|https://metacpan.org/module/Catalyst::Devel>
 installed, this should go really smoothly. Otherwise, you might want to
 check your system's L<installation instructions for
 Padre|http://padre.perlide.org/download.html>, as it can occasionally be

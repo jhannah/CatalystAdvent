@@ -64,6 +64,6 @@ relative to the include_path dirs will also be ignored:
 
 =head2 More information
 
-L<http://search.cpan.org/dist/Catalyst-Plugin-Static-Simple/>
+L<https://metacpan.org/release/Catalyst-Plugin-Static-Simple>
 
  --castaway

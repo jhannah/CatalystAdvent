@@ -9,7 +9,7 @@ The complete tarball for this example is
 L<here|http://dev.catalyst.perl.org/repos/Catalyst/trunk/examples/Tutorial/MyApp_Chapter9_flexigrid.tar.gz>.
 
 We'll use
-L<this module|http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel>
+L<this module|https://metacpan.org/module/Catalyst::Action::Serialize::SimpleExcel>
 to create the Excel spreadsheets.
 
 =head1 The Button
@@ -34,7 +34,7 @@ Add the button in the C<buttons> section of the flexigrid:
     {name: 'Excel', bclass: 'excel', onpress : export_to_excel},
 
 Now we'll write the JavaScript, as specified in the
-L<synopsis|http://search.cpan.org/perldoc?Catalyst::Action::Serialize::SimpleExcel#SYNOPSIS>.
+L<synopsis|https://metacpan.org/module/Catalyst::Action::Serialize::SimpleExcel#SYNOPSIS>.
 
     function export_to_excel(button, grid) {
         $('<iframe '                                                  

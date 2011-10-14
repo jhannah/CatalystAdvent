@@ -38,13 +38,13 @@ of many books on data visualization.
 <h2>Preparation</h2>
 
 <p>
-First, you'll need to install L<Chart::Clicker|http://search.cpan.org/perldoc?Chart::Clicker>.
+First, you'll need to install L<Chart::Clicker|https://metacpan.org/module/Chart::Clicker>.
 Clicker is a great-looking L<charting package|http://www.onemogin.com/clicker/>
-that uses L<Graphics::Primitive|http://search.cpan.org/perldoc?Graphics::Primitive>.
+that uses L<Graphics::Primitive|https://metacpan.org/module/Graphics::Primitive>.
 </p>
 
 <p>
-You'll also need the L<Catalyst view|http://search.cpan.org/perldoc?Catalyst::View::Graphics::Primitive>.
+You'll also need the L<Catalyst view|https://metacpan.org/module/Catalyst::View::Graphics::Primitive>.
 </p>
 
 <p>
@@ -307,7 +307,7 @@ will render it for us.
 =begin pod::xhtml
 
 <p>
-The Graphics::Primitive view defaults to using the L<Cairo driver|http://search.cpan.org/perldoc?Graphics::Primitive::Driver::Cairo>.
+The Graphics::Primitive view defaults to using the L<Cairo driver|https://metacpan.org/module/Graphics::Primitive::Driver::Cairo>.
 The driver args and content type in our example instruct Graphics::Primitive
 to render our scene as a PNG.  Changein the format and the content type to
 SVF, PDF or PostScript would yield the same chart in those formats.

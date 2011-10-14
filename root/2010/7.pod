@@ -2,21 +2,21 @@
 
 =head2 SYNOPSIS
 
-L<Gearman|http://search.cpan.org/~dormando/Gearman-1.11/> is a distributed job queue system that excels in doing things quickly, and asynchronously run job processes for things that need batch processesing, or those which you don't want your web application having to deal with.  It's quick, and good for things like thumbnailing, which we will be talking about today.
+L<Gearman|https://metacpan.org/release/DORMANDO/Gearman-1.11> is a distributed job queue system that excels in doing things quickly, and asynchronously run job processes for things that need batch processesing, or those which you don't want your web application having to deal with.  It's quick, and good for things like thumbnailing, which we will be talking about today.
 
 =head2 REQUIREMENTS
 
 =over 12
 
-=item L<Gearman::Server|http://search.cpan.org/~dormando/Gearman-Server-1.11/lib/Gearman/Server.pm> 
+=item L<Gearman::Server|https://metacpan.org/module/Gearman::Server>
 
 This is the actual job server that keeps track of jobs, and what the worker processes connect to. Initialized with C<gearmand>.
 
-=item L<Gearman::Worker|http://search.cpan.org/~dormando/Gearman-1.11/lib/Gearman/Worker.pm>
+=item L<Gearman::Worker|https://metacpan.org/module/Gearman::Worker>
 
 This is your worker instance, which actually does the job you want done.  HINT:  We want to do thumbnailing, so this will contain the code for creating thumbnails from images.
 
-=item L<Gearman::Client|http://search.cpan.org/~dormando/Gearman-1.11/lib/Gearman/Client.pm>
+=item L<Gearman::Client|https://metacpan.org/module/Gearman::Client>
 
 This connects to the server(s) and communicates what jobs to execute etc.
 
@@ -307,7 +307,7 @@ And that's that.  You now have the ability to create thumbnails cleanly and smoo
 
 =head2 Final Notes
 
-Note that some of you may have done this with L<TheSchwartz|http://search.cpan.org/~sixapart/TheSchwartz-1.10/lib/TheSchwartz.pm>.  Which is all good and fine.  However, it's concerned more about reliability than speed.  Gearman doesn't check to make sure jobs got done successfully, but it is much more suited for creating thumbnails because of speed.  Thumbnails can also be trivially recreated if something fails.
+Note that some of you may have done this with L<TheSchwartz|https://metacpan.org/module/TheSchwartz>.  Which is all good and fine.  However, it's concerned more about reliability than speed.  Gearman doesn't check to make sure jobs got done successfully, but it is much more suited for creating thumbnails because of speed.  Thumbnails can also be trivially recreated if something fails.
 
 =head2 Author
 

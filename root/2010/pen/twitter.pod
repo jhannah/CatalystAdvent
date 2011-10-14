@@ -11,9 +11,9 @@ length, called "tweets", to your friends, or "followers."
 =head2 What we need to know before start using the L<Twitter API|http://apiwiki.twitter.com>?
 
 The good news is is that there is already a Perl interface to the Twitter API
-(L<Net::Twitter|http://search.cpan.org/~mmims/Net-Twitter-3.14002/lib/Net/Twitter.pod>)
+(L<Net::Twitter|https://metacpan.org/module/Net::Twitter>)
 which is based on
-L<Moose|http://search.cpan.org/~drolsky/Moose-1.21/lib/Moose.pm>. Also,
+L<Moose|https://metacpan.org/module/Moose>. Also,
 Net::Twitter::Lite is alternative, which does not depends on Net::Twitter or
 Moose, however in our article we are going to use Net::Twitter.
 
@@ -43,13 +43,13 @@ not sure for that part
 
 =over
 
-=item * L<Net::Twitter|http://search.cpan.org/dist/Net-Twitter/lib/Net/Twitter.pod>
+=item * L<Net::Twitter|https://metacpan.org/module/Net::Twitter>
 
-=item * L<Session|http://search.cpan.org/~bobtfish/Catalyst-Plugin-Session-0.31/lib/Catalyst/Plugin/Session.pm>
+=item * L<Session|https://metacpan.org/module/Catalyst::Plugin::Session>
 
-=item * L<Session::State::Cookie|http://search.cpan.org/~mstrout/Catalyst-Plugin-Session-State-Cookie-0.17/lib/Catalyst/Plugin/Session/State/Cookie.pm>
+=item * L<Session::State::Cookie|https://metacpan.org/module/Catalyst::Plugin::Session::State::Cookie>
 
-=item * L<Session::Store::FastMmap|http://search.cpan.org/~sscaffidi/Catalyst-Plugin-Session-Store-FastMmap-0.14/lib/Catalyst/Plugin/Session/Store/FastMmap.pm>
+=item * L<Session::Store::FastMmap|https://metacpan.org/module/Catalyst::Plugin::Session::Store::FastMmap>
 
 =back
 
