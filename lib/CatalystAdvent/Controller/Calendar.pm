@@ -43,6 +43,12 @@ sub base : Chained('/base') PathPart('') CaptureArgs(0) {}
 
 sub index : Chained('base') PathPart('') Args(0) {
     my ( $self, $c ) = @_;
+    my $now = $c->stash->{now};
+    my $start_date = $now->clone->set( month => 12, day => 1 );
+    my $until = $start_date - $now;
+    $c->stash(
+      days_until => $until->delta_days
+    );
     opendir DIR, $c->path_to('root') or die "Error opening root: $!";
     my @years = sort grep { /\d{4}/ } readdir DIR;
     closedir DIR;

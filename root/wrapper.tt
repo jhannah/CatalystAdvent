@@ -16,7 +16,10 @@
 	<p id="note">25 days of Catalyst tips!</p>
 [% END %]
         <div id="content">
+[%- IF days_until > 0; days_until %] days until the calendar starts!
+[% ELSE %]
 [% content %]
+[% END %]
         </div>
     </div>
 </body>
