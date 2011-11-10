@@ -17,7 +17,7 @@
 [% END %]
         <div id="content">
 [%- IF days_until > 0 %]
-<h1>[% days_until %] days until the calendar starts! </h2>
+<h1>[% days_until %] days until the calendar starts!</h2>
 [% ELSE %]
 [% content %]
 [% END %]
