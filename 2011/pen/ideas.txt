@@ -1,0 +1,10 @@
+Ideas:
+ - Catalyst::Plugin::MessageStack + Data::Manager model
+   show how to have seamless integration with your validation model's messages
+   simple message display plugin
+
+ - Catalyst::View::TT::Bootstrap
+   skinnable UI
+ 
+ - CatalystX::BREAD
+   simple BREAD layer with JSON api (much like a simple C::C::DBIC::API class)
