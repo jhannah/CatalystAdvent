@@ -18,6 +18,12 @@
         <div id="content">
 [%- IF days_until > 0 %]
 <h1>[% days_until %] days until the calendar starts!</h2>
+<p class="center">In the mean time, you might want to check our archives.</p>
+<p class="center">
+[% FOREACH previous_year IN previous_years %]
+    <a href="[% c.uri_for('/', previous_year) %]">[% previous_year %]</a>[% UNLESS loop.last %] - [% END %]
+[% END %]
+</p>
 [% ELSE %]
 [% content %]
 [% END %]

@@ -180,6 +180,10 @@ a img {
     width: 33%;
 }
 
+.center {
+    text-align: center;
+}
+
 @media print {
     a {
         color: black !important;

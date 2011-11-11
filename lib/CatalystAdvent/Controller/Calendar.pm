@@ -54,6 +54,7 @@ sub index : Chained('base') PathPart('') Args(0) {
     closedir DIR;
 
     my $year = pop @years || $c->stash->{now}->year;
+    $c->stash( previous_years =>\@years );
     $c->go( $self->action_for('year'), [$year], []);
 #    $c->stash->{year}     = $year;
 #    $c->stash->{calendar} = calendar( 12, $year );
