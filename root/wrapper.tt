@@ -15,15 +15,10 @@
 [% UNLESS pod %]
 	<p id="note">25 days of Catalyst tips!</p>
 [% END %]
-[% 
-USE date=DateTime(today = 1);
-USE start_date=DateTime(year = date.year, month=12, day=1);
-days_until = start_date-date
-%]
 
         <div id="content">
-[%- IF days_until.days > 0 %]
-<h1>[% days_until.days %] days until the calendar starts!</h2>
+[%- IF days_until > 0 %]
+<h1>[% days_until %] days until the calendar starts!</h2>
 <p class="center">In the mean time, you might want to check our archives.</p>
 <p class="center">
 [% FOREACH previous_year IN previous_years %]
