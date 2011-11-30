@@ -14,3 +14,4 @@ Ideas:
  - Bread::Board stuff
  - Facebook graph API stuff
  - twitter API stuff (I think I still have some code for this somewhere - dhoss)
+ - new PSGI features (what they afford us in 5.9, etc)
