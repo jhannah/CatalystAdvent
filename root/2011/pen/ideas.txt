@@ -8,3 +8,9 @@ Ideas:
  
  - CatalystX::BREAD
    simple BREAD layer with JSON api (much like a simple C::C::DBIC::API class)
+
+ - sensible scaling and architectural choices (HI t0m :-))
+ - start bugging people via email about writing articles
+ - Bread::Board stuff
+ - Facebook graph API stuff
+ - twitter API stuff (I think I still have some code for this somewhere - dhoss)
