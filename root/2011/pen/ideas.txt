@@ -15,3 +15,6 @@ Ideas:
  - Facebook graph API stuff
  - twitter API stuff (I think I still have some code for this somewhere - dhoss)
  - new PSGI features (what they afford us in 5.9, etc)
+
+ - AutoCRUD (thanks oliver)
+ - mo: the interesting thing about metacpan-web is how we do concurrent requests to the api to build the page
