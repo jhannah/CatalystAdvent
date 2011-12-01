@@ -1,4 +1,4 @@
-=head1 2011 Reflections - 
+=head1 2011 Reflections - 5.90 and beyond.
 
 Uh-oh, December 1st - time does indeed fly, and it's time to recap what
 has happened in our-favourite-web-framework-land.
