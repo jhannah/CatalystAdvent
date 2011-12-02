@@ -18,3 +18,16 @@ Ideas:
 
  - AutoCRUD (thanks oliver)
  - mo: the interesting thing about metacpan-web is how we do concurrent requests to the api to build the page
+ - dotcloud deployment (miyagawa?)
+   other such cloud deployment
+ - puppet psgi deployment
+ - chef deployment
+ - carton + catalyst
+ - starman/server_starter sane web app process service management
+
+Done:
+ - "State of the Cat" -> t0m
+ - "Checking for leaks in MyApp" - SpiceMan
+
+Enqueued:
+ - 
