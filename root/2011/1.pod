@@ -50,7 +50,7 @@ your static files to get concatenated automatically, to mounting entire sub-appl
 within or alongside your app.
 
 It also means that a much greater choice of web server engines is possible than ever
-before, as any Plack server can be used. See L<Catalyst::PSGI for further details.
+before, as any Plack server can be used. See L<Catalyst::PSGI> for further details.
 
 This includes asynchronous servers, and brings us to the present:
 
