@@ -92,6 +92,8 @@ With this model in my Catalyst app I can now access my main app from wherever I 
 
 Now I can use Catalyst for all the wonderful things it makes so easy while keeping my main app nicely separated from it. Oh, and just quietly.. if the sky turned green and I needed to set up a quick Dancer or Mojolicious app I could do that quite easily too..
 
+have a great Christmas and an excellent New Year.. then we'll start all over agin..
+
 cheers,
 
 -- J
