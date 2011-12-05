@@ -25,6 +25,18 @@ Ideas:
  - carton + catalyst
  - starman/server_starter sane web app process service management
 
+ - multiple chains ending in one action
+     t0m : the canonical example case being
+            /cd/barcode/<ID>/track/<id> and
+            /cd/by_number_from_the_left_on_my_self/<INDEX>/track/<id>
+     t0m :  everything from /track can all be implemented by shared code, that
+            just chains to ../find_cd (or whatever)
+     rafl:  oh, right. and you get to compose actions chained like that into
+            multiple controllers, getting "
+     rafl: "multiple chains ending in one action", which is often requested
+            but its support not very obvious
+
+
 Done:
  - "State of the Cat" -> t0m
  - "Checking for leaks in MyApp" - SpiceMan
