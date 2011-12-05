@@ -1,0 +1,86 @@
+=head1 Keep your libraries organized
+
+In this article we'll discuss how to organize your libraries and following the
+best practices these days to avoid installing new cpan modules as root. This
+way you can always test your applications and experiment with the latest
+versions of some modules without being afraid that you can screw something.
+
+=head2 Installing cpanminus and local::lib
+
+Before we start, we should say a few words about cpanminus and local::lib.
+L<cpanminus|App::cpanminus> is a script to get, unpack, build and install
+modules from CPAN and L<local::lib> is a greet tool to create and use local lib/
+for perl modules.
+
+Installing modules locally has never been easier. 
+First we need to install App::cpanminus and local::lib locally:
+
+  curl -L http://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
+
+this will install either cpanminus and local::lib (and all other required
+modules) locally into $HOME/perl5 directory.
+
+All we need to do is now to specify the appropriate environment variables to
+tell Perl where to look for installed modules.
+
+  eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib=~/perl5`
+  echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> ~/.bashrc
+
+It's time to install Catalyst locally:
+
+ dpetrov@vaio:~$ cpanm Catalyst Catalyst::Devel
+
+=head2 perlbrew
+
+L<perlbrew|App::perlbrew> is incredible easy to use Perl Environment manager
+which lets you to manage different Perl installations in your $HOME. This
+could be useful if you don't want to upgrade your system Perl or you would
+like to test your code behavior under different Perl versions.
+
+Assuming that you've already installed cpanminus let's brew some of the latest
+Perl versions.
+
+First we need to insall App::perlbrew:
+  
+  dpetrov@vaio:~$ cpanm App::perlbrew
+  --> Working on App::perlbrew
+  ...
+  Successfully installed App-perlbrew-0.33
+  28 distributions installed
+ 
+Than we need to init perlbrew:
+  
+  dpetrov@vaio:~$ perlbrew init
+  ...
+  Enjoy perlbrew at $HOME!!
+
+We can take a look to all available Perl versions:
+
+  dpetrov@vaio:~$ perlbrew available
+  perl-5.15.5
+  perl-5.14.2
+  ...
+
+And finally we can brew the latest available Perl version.
+
+  dpetrov@vaio:~$ perlbrew install 5.14.2
+  ...
+
+Since that could take a while you can probably go and grab a cup of coffee :)
+Once the new Perl version is installed we can switch and verify that:
+
+  dpetrov@vaio:~$ perlbrew use perl-5.14.2
+  A sub-shell is launched with perl-5.14.2 as the activated perl. Run 'exit'
+  to finish it.
+
+  dpetrov@vaio:~$ perl -v
+  This is perl 5, version 14, subversion 2 (v5.14.2) built for x86_64-linux
+
+Now you can enjoy using perl 5.14.2 and you can switch back to the system Perl
+version simply by turning C<perlbrew off>.
+
+=head2 Summary
+
+=head1 AUTHOR
+
+Dimitar Petrov <mitakaa@gmail.com>
