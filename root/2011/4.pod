@@ -90,6 +90,17 @@ that is locally).
 
 =head2 Summary
 
+Perlbrew, local::lib and cpanminus are some awesome tools which can be really
+helpful during your development. They are extremely helpful if you don't have
+root access or you don't want to deal with all your modules locally. In
+addition you can always use something like L<App::cpanoutdated> and test your
+codebase against latest modules releases simple like that:
+
+  cpanm App::cpanoutdated
+  cpan-outdated | cpanm
+
+and if something goes wrong you can always start from scratch: C<rm -r ~/perl5>
+
 =head1 AUTHOR
 
 Dimitar Petrov <mitakaa@gmail.com>
