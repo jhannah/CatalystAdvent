@@ -13,7 +13,7 @@ install modules from CPAN and L<local::lib> is a greet tool to create and use
 local lib/ for perl modules.
 
 Installing modules locally has never been easier. 
-First we need to install App::cpanminus and local::lib locally:
+First we need to install L<App::cpanminus> and L<local::lib> locally:
 
   curl -L http://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
 
