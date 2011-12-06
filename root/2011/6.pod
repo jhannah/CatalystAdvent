@@ -1,3 +1,7 @@
+=head1 Title
+
+Using Plack Middleware for Better Database Debugging
+
 =head1 Overview
 
 This is a short article that shows how one can use the new L<Plack> based
