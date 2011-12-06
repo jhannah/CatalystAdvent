@@ -85,7 +85,7 @@ of that class you can set via C<querylog_args>:
     };
 
 C<passthrough> is one of the more useful options, since it makes sure that the
-querylog allows any database events it intercepts pass through done to whatever
+querylog allows any database events it intercepts pass through down to whatever
 logging you might be doing at your L<Catalyst> application level.  In many
 cases when you are developing you might use the C<DBIC_TRACE> environment
 variable to help you understand what L<DBIx::Class> is doing (in addition to
