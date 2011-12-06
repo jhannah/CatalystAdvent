@@ -1,0 +1,5 @@
+=head1 Multiple chains ending in ONE action
+
+=head1 AUTHOR
+
+Dimitar Petrov <mitakaa@gmail.com>
