@@ -165,7 +165,7 @@ get a debug console similar to this one:
 
 =begin xhtml
 
-<img src="/static/images/2011/querylog.png" alt="" />
+<img src="../../static/images/2011/querylog.png" alt="DBIC::QueryLog - Querylog Report" />
 
 =end xhtml
 
