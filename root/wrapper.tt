@@ -17,7 +17,7 @@
 [% END %]
 
         <div id="content">
-[%- IF days_until > 0 %]
+[%- IF days_until AND days_until > 0 %]
 <h1>[% days_until %] [% IF days_until == 1 %]day[% ELSE %]days[% END %] until the calendar starts!</h2>
 <p class="center">In the mean time, you might want to check our archives.</p>
 <p class="center">
@@ -30,5 +30,19 @@
 [% END %]
         </div>
     </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" type="text/javascript"></script>
+    <script src="[% c.uri_for('/static/js/shCore.js') %]" type="text/javascript"></script>
+    <script src="[% c.uri_for('/static/js/shBrushPerl.js') %]" type="text/javascript"></script>
+    <link href="[% c.uri_for('/static/css/shCore.css') %]" rel="stylesheet" type="text/css" />
+    <link href="[% c.uri_for('/static/css/shThemeDefault.css') %]" rel="stylesheet" type="text/css" />
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('pre').addClass('brush: perl');
+            SyntaxHighlighter.defaults['toolbar'] = false;
+            SyntaxHighlighter.defaults['auto-links'] = false;
+            SyntaxHighlighter.all();
+        });
+    </script>
 </body>
 </html>
