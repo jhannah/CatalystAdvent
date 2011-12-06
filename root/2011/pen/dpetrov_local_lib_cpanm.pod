@@ -8,20 +8,20 @@ versions of some modules without being afraid that you can screw something.
 =head2 Installing cpanminus and local::lib
 
 Before we start, we should say a few words about cpanminus and local::lib.
-L<cpanminus|App::cpanminus> is a script to get, unpack, build and install
-modules from CPAN and L<local::lib> is a greet tool to create and use local lib/
-for perl modules.
+L<cpanminus|App::cpanminus> is a great script to get, unpack, build and
+install modules from CPAN and L<local::lib> is a greet tool to create and use
+local lib/ for perl modules.
 
 Installing modules locally has never been easier. 
 First we need to install App::cpanminus and local::lib locally:
 
   curl -L http://cpanmin.us | perl - -l ~/perl5 App::cpanminus local::lib
 
-this will install either cpanminus and local::lib (and all other required
+This will install either cpanminus and local::lib (and all other required
 modules) locally into $HOME/perl5 directory.
 
-All we need to do is now to specify the appropriate environment variables to
-tell Perl where to look for installed modules.
+Now all we need to do is now to specify the appropriate environment variables
+to tell Perl where to look for installed modules.
 
   eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib=~/perl5`
   echo 'eval $(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib)' >> ~/.bashrc
@@ -61,7 +61,7 @@ We can take a look to all available Perl versions:
   perl-5.14.2
   ...
 
-And finally we can brew the latest available Perl version.
+And finally we can brew the some of the latest available Perl versions.
 
   dpetrov@vaio:~$ perlbrew install 5.14.2
   ...
@@ -78,6 +78,15 @@ Once the new Perl version is installed we can switch and verify that:
 
 Now you can enjoy using perl 5.14.2 and you can switch back to the system Perl
 version simply by turning C<perlbrew off>.
+
+=head2 NOTE
+
+We should mention that L<local::lib> was not designed to work with multiple
+Perl versions. That's so because usually XS modules are not compatible
+across major Perl releases. That's usually not such a big issue, because
+using L<perlbrew|App::perlbrew> you have your own Perl, which allows you to
+install different module versions across different Perl versions (and all
+that is locally).
 
 =head2 Summary
 
