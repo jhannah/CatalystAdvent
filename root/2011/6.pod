@@ -1,6 +1,4 @@
-=head1 Title
-
-Using Plack Middleware for Better Database Debugging
+=head1 Using Plack Middleware for Better Database Debugging
 
 =head1 Overview
 
