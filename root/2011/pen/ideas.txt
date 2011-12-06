@@ -40,9 +40,10 @@ Ideas:
 Done:
  - "State of the Cat" -> t0m
  - "Checking for leaks in MyApp" - SpiceMan
+ - "Fat Models" - lecster
+ - "Keep your libraries organized" - dpetrov
 
 Enqueued:
- - "Fat Models"
  
 
 In Progress:
