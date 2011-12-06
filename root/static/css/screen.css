@@ -16,6 +16,10 @@ body {
     -moz-border-radius: 10px;
 }
 
+#contentwrapper .pod img {
+    width: 100%;
+} 
+
 h1 {
     margin-top: 10px;
     margin-bottom: 10px;
