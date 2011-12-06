@@ -214,4 +214,11 @@ you should consider how that functionality could be brought down to the L<Plack>
 level.  The code written to expose L<DBIx::Class::QueryLog> via L<Plack>
 middleware can serve as a decent example of how to do this.
 
+=head1 Author
+
+John Napiorkowski <jjnapiork@cpan.org> or jnap on IRC.
+
+Thanks to Shutterstock (http://www.shutterstock.com/jobs.mhtml) for giving me
+a bit of time to review and craft this advent article.
+
 =cut
