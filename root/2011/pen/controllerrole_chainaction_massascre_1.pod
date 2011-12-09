@@ -176,7 +176,7 @@ This allows you to implement complete Catalyst actions, including "Path", "Args"
 
 To make the "get_item" action more reusable, move it to a role as shown in the following example:
 
-	package CatalystX::ControllerRole::MyGetItem;
+	package CatalystX::TraitFor::Controller::MyGetItem;
 
 	use MooseX::MethodAttributes::Role;
 
@@ -211,7 +211,7 @@ The resulting roles for "foo" and "bar" will look like this:
 
 For Foo:
 
-	package CatalystX::ControllerRole::MyFoo;
+	package CatalystX::TraitFor::Controller::MyFoo;
 
 	use MooseX::MethodAttributes::Role;
 
@@ -229,7 +229,7 @@ For Foo:
 
 and for Bar:
 
-	package CatalystX::ControllerRole::MyBar;
+	package CatalystX::TraitFor::Controller::MyBar;
 
 	use MooseX::MethodAttributes::Role;
 
@@ -254,8 +254,8 @@ path in all controllers:
 	use Moose;
 	extends "Catalyst::Controller";
 	with qw/
-		CatalystX::ControllerRole::MyGetItem 
-		CatalystX::ControllerRole::MyFoo
+		CatalystX::TraitFor::Controller::MyGetItem 
+		CatalystX::TraitFor::Controller::MyFoo
 	/;
 
 	__PACKAGE__->config(
@@ -275,7 +275,7 @@ Or, if you want to provide your own "foo" method:
 	use Moose;
 	extends "Catalyst::Controller";
 	with qw/
-		CatalystX::ControllerRole::MyGetItem 
+		CatalystX::TraitFor::Controller::MyGetItem 
 	/;
 
 	sub foo :Chained('get_item') :Args(0){
@@ -299,8 +299,8 @@ It is possible to modify the chains for each controller. If you want to do somet
 	use Moose;
 	extends "Catalyst::Controller";
 	with qw/
-		CatalystX::ControllerRole::MyGetItem 
-		CatalystX::ControllerRole::MyFoo
+		CatalystX::TraitFor::Controller::MyGetItem 
+		CatalystX::TraitFor::Controller::MyFoo
 	/;
 	
 	sub prepare :Chained('/') :PathPart("") :CaptureArgs(0){
@@ -325,8 +325,8 @@ And if your table has more than one primary key:
 	use Moose;
 	extends "Catalyst::Controller";
 	with qw/
-		CatalystX::ControllerRole::MyGetItem 
-		CatalystX::ControllerRole::MyFoo
+		CatalystX::TraitFor::Controller::MyGetItem 
+		CatalystX::TraitFor::Controller::MyFoo
 	/;
 	
 	__PACKAGE__->config(
@@ -358,7 +358,7 @@ Code-reusability in the first chapter is very limited. This chapter will tell yo
 One problem in the previous example is that the "get_item" action does more than getting one item. It can only be used by actions which 
 require exactly one item in the stash. By splitting "get_item" into three atomic parts, the code gets even more reusable:
 
-	package CatalystX::ControllerRole::MyGetItem;
+	package CatalystX::TraitFor::Controller::MyGetItem;
 
 	use MooseX::MethodAttributes::Role;
 
@@ -411,13 +411,13 @@ the "get_model" action in your controller. If you often need all actions in the 
 
 The "reunion-role":
 
-	package CatalystX::ControllerRole::ModelActions;
+	package CatalystX::TraitFor::Controller::ModelActions;
 
 	use Moose::Role;
 	with qw/
-		CatalystX::ControllerRole::MyGetModel
-		CatalystX::ControllerRole::MyGetRS
-		CatalystX::ControllerRole::MyGetItem
+		CatalystX::TraitFor::Controller::MyGetModel
+		CatalystX::TraitFor::Controller::MyGetRS
+		CatalystX::TraitFor::Controller::MyGetItem
 	/;
 
 	no Moose::Role;
@@ -429,7 +429,7 @@ A controller which uses all three action would look like this:
 
 	use Moose;
 	extends "Catalyst::Controller";
-	with "CatalystX::ControllerRole::ModelActions";
+	with "CatalystX::TraitFor::Controller::ModelActions";
 
 	__PACKAGE__->meta->make_immutable;
 
@@ -443,8 +443,8 @@ A controller with a custom "get_model" action would look like this:
 	use Moose;
 	extends "Catalyst::Controller";
 	with qw/
-		CatalystX::ControllerRole::MyGetRS
-		CatalystX::ControllerRole::MyGetItem
+		CatalystX::TraitFor::Controller::MyGetRS
+		CatalystX::TraitFor::Controller::MyGetItem
 	/;
 
 	sub get_model :Chained("/") :CaptureArgs(0) :PathPart(""){ ... }
@@ -466,7 +466,7 @@ model name and table name as your role.
 Using attributes to store these information makes your roles configurable and much more
 reusable:
 
-	package CatalystX::ControllerRole::MyGetModel;
+	package CatalystX::TraitFor::Controller::MyGetModel;
 
 	use MooseX::MethodAttributes::Role;
 
@@ -499,7 +499,7 @@ With this modification, you can configure the model name for each controller:
 
 	use Moose;
 	extends "Catalyst::Controller";
-	with "CatalystX::ControllerRole::ModelActions";
+	with "CatalystX::TraitFor::Controller::ModelActions";
 
 	...
 	
@@ -518,7 +518,7 @@ The next problem is related to the previous one. The stash-keys of model, result
 This may result in conflicting names, overwritten values in the stash and a lot of trouble. Avoid this by making the 
 stash-keys configurable aswell. The default values can even be created dynamically:
 
-	package CatalystX::ControllerRole::MyGetModel;
+	package CatalystX::TraitFor::Controller::MyGetModel;
 
 	use MooseX::MethodAttributes::Role;
 
@@ -553,7 +553,7 @@ stash-keys configurable aswell. The default values can even be created dynamical
 
 You will have to modify your "get_resultset" action aswell:
 
-	package CatalystX::ControllerRole::MyGetResultSet;
+	package CatalystX::TraitFor::Controller::MyGetResultSet;
 
 	use MooseX::MethodAttributes::Role;
 
@@ -597,7 +597,7 @@ Here is an Example: Try to guess the purpose of the following controllers:
 
 	use Moose;
 	extends "Catalyst::Controller";
-	with "CatalystX::ControllerRole::MyRole";
+	with "CatalystX::TraitFor::Controller::MyRole";
 
 	__PACKAGE__->meta->make_immutable;
 	no Moose;
@@ -611,7 +611,7 @@ No chance!
 
 	use Moose;
 	extends "Catalyst::Controller";
-	with "CatalystX::ControllerRole::ChainedCRUD";
+	with "CatalystX::TraitFor::Controller::ChainedCRUD";
 
 	__PACKAGE__->meta->make_immutable;
 	no Moose;
