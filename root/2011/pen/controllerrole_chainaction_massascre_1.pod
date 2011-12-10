@@ -640,18 +640,18 @@ You should include some extra information about your chained actions:
 
 When you add all these information, everybody (including yourself) will be able to 
 understand the purpose of your roles, and how to use them. Well, not everybody will 
-be able to understand your code. Maybe not even you. But the chance that youself and others
-understand und use your code increases.
+be able to understand your code. Maybe not even you. But the chance that yourself and others
+understand and use your code increases.
 
 =head2 Conclusion
 
 =over
 
-=item * Chaining actions can make your code more reusabel
+=item * Chaining actions can make your code more reusable
 
 =item * Making your actions as atomic as possible increases flexibility and reusability
 
-=item * It is possible to write reuseabe, chained actions in Moose::Role's
+=item * It is possible to write reuseable, chained actions in Moose::Role's
 
 =item * Making your roles as configurable as possible dramatically increases the chance that you (and others) find it usefull in other projects
 
