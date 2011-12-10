@@ -73,7 +73,7 @@ Thats one reason why I love Catalyst.
 
 One possible solution to this problem is "chaining actions". This is neither new
 nor surprising, since the Catalyst Tutorial directly 
-L<points to it|Catalyst::Manual::Tutorial::04BasicCRUD/CONVERT_TO_A_CHAINED_ACTION>.
+L<points to it|https://metacpan.org/module/Catalyst::Manual::Tutorial::04_BasicCRUD#CONVERT-TO-A-CHAINED-ACTION>
 
 =head4 Converting a regular action into a chained one can be done in two steps:
 
@@ -156,7 +156,7 @@ to
 
 which is more beautiful in my opinion. Take care that the paths stay unique!
 
-=item * L<uri_for_action|Catalyst/uri_for_action> knows how to handle CaptureArgs. See the Catalyst documentation for details.
+=item * L<uri_for_action|https://metacpan.org/module/Catalyst#c-uri_for_action-path-captures_and_args-args-query_values-> knows how to handle CaptureArgs. See the Catalyst documentation for details.
 
 =back
 
@@ -205,7 +205,7 @@ To make the "get_item" action more reusable, move it to a role as shown in the f
 	1;
 
 If you feel like using the actions "foo" and "bar" in several controllers, you can move their code to roles aswell.
-You can ensure that the actions you are chaining to are present in your controller by using Moose's L<require|Moose::Role/require>
+You can ensure that the actions you are chaining to are present in your controller by using Moose's L<require|Moose::Role>
 keyword. Keep in mind that this ensures that the required subroutine is present, but it does not require it to be a Catalyst action.
 The resulting roles for "foo" and "bar" will look like this:
 
