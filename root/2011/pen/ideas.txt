@@ -36,6 +36,8 @@ Ideas:
      rafl: "multiple chains ending in one action", which is often requested
             but its support not very obvious
 
+ - Internationalization and https://metacpan.org/module/MENDEL/Catalyst-Plugin-I18N-PathPrefix-0.07/lib/Catalyst/Plugin/I18N/PathPrefix.pm
+   for localizing the path for example: /en/hello /de/hallo
 
 Done:
  - "State of the Cat" -> t0m
