@@ -1,0 +1,239 @@
+=head1 Easy CRUD for your Catalyst App
+
+CRUD is a rapid application development tool which produces Create, Search,
+Update and Delete methods for your back-end data. If you worked through the
+L<Catalyst Tutorial|Catalyst::Manual::Tutorial> then CRUD should be a familiar
+term, but it can be implemented in different ways.
+
+Some helper scripts which accompany L<Catalyst> modules will generate CRUD
+code, subroutine stubs, package templates, and so on. You can use these as a
+starting point from which to grow your application, and the term for this is
+scaffolding.
+
+In the Python world there's a plugin for their Django web framework which is a
+bit like scaffold helper scripts on steroids.  It generates a fully working
+web interface for manipulating back-end data.
+
+Catalyst's L<AutoCRUD|Catalyst::Plugin::AutoCRUD> plugin does something
+similar. After installing the plugin you have a new URL path at C</autocrud>
+from which you can access and edit any data accessible through the app Models.
+However unlike L<Django's plugin|https://docs.djangoproject.com/en/dev/ref/contrib/admin/>,
+this is all done on the fly, there are no scaffolding files written to disk.
+To give you an idea of what's generated, head over to the demo site at
+L<http://demo.autocrud.pl>.
+
+That doesn't mean you can't control what AutoCRUD produces. This article will
+look at a few ways to tailor the appearance of the Catalyst::Plugin::AutoCRUD
+products.
+
+=head1 The mini Synopsis
+
+Once AutoCRUD is installed, update your main application module to have:
+
+ use Catalyst qw(ConfigLoader AutoCRUD); # <-- add the plugin name here in MyApp.pm
+
+You need a database, and ideally also the L<Catalyst Models|Catalyst::Model::DBIC::Schema>
+to access it. No Models? No problem - this is AutoCRUD after all! Add the
+following to myapp.conf:
+
+ <Model::AutoCRUD::DBIC>
+     connect_info   dbi:<engine>:dbname=<db>;host=<hostname>;
+     connect_info   <username>
+     connect_info   <password>
+ </Model::AutoCRUD::DBIC>
+
+Season the above to taste, changing your database engine, database name, host,
+username and password as needed. AutoCRUD will do the rest.
+
+You'll now have the C</autocrud> path enabled. Where can you go from here...?
+
+=head1 Dedicated AutoCRUD App
+
+One common scenario is an app dedicated to AutoCRUD - a cheap way to spin up a
+web user interface for a database. Set the following in your app config file
+(something like C<myapp.conf>):
+
+ <Plugin::AutoCRUD>
+     basepath ""
+ </Plugin::AutoCRUD>
+
+Instead of running AutoCRUD at the C</autocrud> path, this makes it run from the
+root path, C</>.
+
+=head1 Read-only Interface
+
+If you want to present some data to users but not have them change any of it,
+there are three config options:
+
+ <Plugin::AutoCRUD>
+    <sites>
+        <default>
+            update_allowed no
+            create_allowed no
+            delete_allowed no
+        </default>
+    </sites>
+ </Plugin::AutoCRUD>
+
+Each of these options can be left out (it defaults to "yes"), or included, and
+you can pick any combination of the three.
+
+=head1 Without JavaScript
+
+Hopefully you've seen by now that the default user interface is a fancy
+dynamic web application. If this isn't to your taste, then an alternative
+simple HTML interface is available, but it's read-only. Add the following to
+your app's configuration:
+
+ <Plugin::AutoCRUD>
+    <sites>
+        <default>
+            frontend skinny
+        </default>
+    </sites>
+ </Plugin::AutoCRUD>
+
+Beware that this doesn't prevent users from changing data, just because the
+web front-end has no editing facility! If you really want a simple HTML,
+read-only interface, then combine this setting with the three "allowed"
+options, above.
+
+=head1 Columns and Names
+
+Perhaps your tables have a large number of columns, and the columns don't have
+very human-friendly names. AutoCRUD config can also control the displayed
+columns and their names!
+
+For this you need to know the database name and table name, which are easily
+found in the URL path when you browse to the table in the normal AutoCRUD
+interface.
+
+ <Plugin::AutoCRUD>
+    <sites>
+        <default>
+            <mydb>
+                <thetable>
+                    columns  id
+                    columns  title
+                    columns  length
+                    <headings>
+                        id      Key
+                        title   Name
+                        length  "Time Taken"
+                    </headings>
+                </thetable>
+            </mydb>
+        </default>
+    </sites>
+ </Plugin::AutoCRUD>
+
+Let's walk through this configuration. Below the C<< <default> >> key (which
+is something you don't need to worry about right now) you can see the database
+name, and table name, as C<< <mydb> >> and C<< <thetable> >>. This allows you
+to have different column configurations for different tables - simply add new
+sections to the config.
+
+Within the table's configuration the list of C<column> values are, guess
+what... the columns AutoCRUD will display in the table. And inside the C<<
+<headings> >> key we can tell AutoCRUD what to put in the user interface as
+their names.
+
+As you might guess, AutoCRUD does its best to work things like the headings
+out automatically, so these settings are all optional. If you don't include
+config for a table, you get all the columns shown and AutoCRUD's choice of
+heading.
+
+=head1 DBIx::Class Tricks
+
+This is something it can take a while for new users to grasp... AutoCRUD is
+only as smart as your L<DBIx::Class> result set classes. What does this mean?
+Well, assuming you have existing Catalyst Models, AutoCRUD never asks your
+database what its columns are. It asks the Model.
+
+So you can use the Model to "hide" columns from AutoCRUD quite easily.
+Sometimes this is easier to maintain than the app config we saw just above.
+Remember you can also have two DBIx::Class result sets for the same table,
+only with different names and column configs (perhaps a full config for your
+app, and a limited one for AutoCRUD).
+
+One other trick you can do with DBIx::Class is to put a sub into your result
+set class called C<display_name>. AutoCRUD will use this to "stringify" a row
+from the table. For example:
+
+ sub display_name {
+     my $self = shift;
+     return $self->forename .' '. $self->surname;
+ }
+
+=head1 Hiding a Database or Table
+
+Let's say you use the above trick of having two DBIx::Class result sets for
+the same table, so you want to hide one from AutoCRUD. There's a simple config
+key for this:
+
+ <Plugin::AutoCRUD>
+    <sites>
+        <default>
+            <mydb>
+                <secrettable>
+                    hidden yes
+                </secrettable>
+            </mydb>
+        </default>
+    </sites>
+ </Plugin::AutoCRUD>
+
+=head1 Overriding Templates
+
+The final thing we'll cover in this article is messing around with AutoCRUD's
+templates. The app is built using our old friend L<Template::Toolkit>, and you
+have the option to override any of the templates used.
+
+This can be handy for many reasons. Perhaps you want to add something to the
+footer, like the L<demo site|http://demo.autocrud.pl> does for its hosting
+provider logo. Or you can do something altogether more serious and embed the
+app in a page in your own site, by changing the wrapper template.
+
+First, set up a path on your filesystem from which AutoCRUD can pick up
+template overrides. This can be set multiple times if you want a set of paths
+to be searched:
+
+ <Plugin::AutoCRUD>
+    tt_path /path/to/my/local/templates
+ </Plugin::AutoCRUD>
+
+Then within that path, copy the built-in AutoCRUD template and season to
+taste. You need to keep the same path structure as the files in AutoCRUD's
+distribution package. So for the footer example mentioned above, for both
+JavaScript and HTML-only versions of the app, we have two files:
+
+ extjs2/wrapper/footer.tt
+ skinny/wrapper/footer.tt
+
+=head1 Conclusion
+
+We started with a simple idea - producing a simple user interface allowing
+Create, Search, Update and Delete on your back-end data. You can start with
+scaffolding files produced by helper scripts, or with a plugin like AutoCRUD
+very quickly have an app which does the same, all on the fly.
+
+Which way you go is your choice. There's a trade-off between effort, and
+flexibility and power. AutoCRUD requires little effort and delivers a lot, and
+is even configurable to some degree, as we saw above. But maybe there comes a
+point when your app grows and you need more.
+
+Like all of Perl, there are few rules, and the journey is always as much fun
+as the end result!
+
+=head1 Further Information
+
+The L<AutoCRUD|Catalyst::Plugin::AutoCRUD> manual page is fairly
+comprehensive, with many hints and tips for other areas such as successful
+handling of Unicode. Don't forget there's also the demo site at
+L<http://demo.autocrud.pl>.
+
+=head1 Author
+
+Oliver Gorwits <oliver@cpan.org> or C<oliver> on IRC.
+
+=cut
