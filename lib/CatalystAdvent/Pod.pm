@@ -54,11 +54,16 @@ sub seqL {
 	return $self->SUPER::seqL($link);
     }
 
-    $targ ||= $text;
+    $page ||= $text;
     $text = Pod::Xhtml::_htmlEscape($text);
+    $page = Pod::Xhtml::_htmlEscape($page);
     $targ = Pod::Xhtml::_htmlEscape($targ);
 
-    return qq{<a href="http://metacpan.org/module/$targ">$text</a>};
+    if ($targ) {
+        return qq{<a href="http://metacpan.org/module/$page#$targ">$text</a>};
+    }
+
+    return qq{<a href="http://metacpan.org/module/$page">$text</a>};
 }
 
 sub title   { $_[0]->{_title} }
