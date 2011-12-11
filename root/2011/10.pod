@@ -3,9 +3,9 @@
 =head2 Overview
 
 This article describes one way to create reusable code
-by writing L<roles|Moose::Role> for 
-L<Catalyst Controllers|Catalyst::Controller> with a massive use of 
-L<Chained Actions|Catalyst::DispatchType::Chained>.
+by writing L<roles|https://metacpan.org/module/Moose::Role> for 
+L<Catalyst Controllers|https://metacpan.org/module/Catalyst::Controller> with a massive use of 
+L<Chained Actions|https://metacpan.org/module/Catalyst::DispatchType::Chained>.
 
 =head3 About this Article
 
@@ -164,7 +164,7 @@ which is more beautiful in my opinion. Take care that the paths stay unique!
 
 At this point, we know that Catalyst makes it easy to reuse code by creating chained actions. But we still have to make our code available in our controller.
 
-Using L<roles|Moose::Role> makes reusing your code easy. Roles allow you to specify subroutines and attributes. They will be 
+Using L<roles|https://metacpan.org/module/Moose::Role> makes reusing your code easy. Roles allow you to specify subroutines and attributes. They will be 
 present in any class which has the role applied to it. Since Catalyst Controllers are Moose objects, applying a role to it is as easy as 
 adding 
  
@@ -205,7 +205,7 @@ To make the "get_item" action more reusable, move it to a role as shown in the f
 	1;
 
 If you feel like using the actions "foo" and "bar" in several controllers, you can move their code to roles aswell.
-You can ensure that the actions you are chaining to are present in your controller by using Moose's L<require|Moose::Role>
+You can ensure that the actions you are chaining to are present in your controller by using Moose's L<require|https://metacpan.org/module/Moose::Role#EXPORTED-FUNCTIONS>
 keyword. Keep in mind that this ensures that the required subroutine is present, but it does not require it to be a Catalyst action.
 The resulting roles for "foo" and "bar" will look like this:
 
