@@ -360,9 +360,9 @@ Connect from your workstation to http://advent:3000 in your favorite browser.
 Create a psgi file as in the example. Because modules are installed in local
 libraries, you'll need 3 use lib statements:
 
-  use lib '/home/catalyst/perl5/lib/perl5/i486-linux-gnu-thread-multi '
-  use lib '/home/catalyst/perl5/lib/perl5 '
-  use lib '/var/www/TestApp/lib' ;
+  use lib '/home/catalyst/perl5/lib/perl5/i486-linux-gnu-thread-multi';
+  use lib '/home/catalyst/perl5/lib/perl5';
+  use lib '/var/www/TestApp/lib';
 
 To do things that need to be root type su -. Type exit when you are done.
 
