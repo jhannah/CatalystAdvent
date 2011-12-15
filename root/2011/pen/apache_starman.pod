@@ -1,0 +1,383 @@
+=head1 Deploy Catalyst Applications with Starman and Apache
+
+=head2 Overview
+
+Applies to L<Catalyst 5.90|https://metacpan.org/module/BOBTFISH/Catalyst-Runtime-5.9000/lib/Catalyst.pm> and later
+Applies to Apache 2.x
+
+One of the cool features of L<Catalyst> 5.90 is the switch to L<Plack>. With
+Plack comes several new ways to deploy your application. There is a better
+built in Development Server, and a choice of several Plack process servers.
+This article is about deploying one of these, L<Starman>, behind Apache 2.2 or
+2.4 (versions 1.4 and 2.0 should also work, but I'm not promising anything) on
+a Unixlike OS.
+
+Even though L<Starman> can be a standalone webserver, it has so few options that
+it really isn't suitable as one. What it excels at is being a Perl process
+server. Unlike older mod_perl and fastcgi deployments it does not require any
+special modules.
+
+We're going to configure an Apache 2.2 Server, serving 2 instances of an
+application. The first instance will be devapp, which will run from the
+developer's workstation (for simplicity presumed to be on the same LAN as the
+Apache Server) using the Catalyst Development Server. The second instance will
+be prodapp, the real instance, running locally on Server. Both instances of
+the application will have a publicly viewable page and a password protected
+page, additionally access to devapp will be ip restricted.
+
+Apache Server. If you compiled it from source the default configuration would
+be a monothlic C<httpd.conf> located in C</usr/local/apache2/conf>. Most
+distributions relocate this to C</etc/apache2>. Most distributions break the
+apache configuration into multiple smaller parts, and allow the loading of
+Virtual Hosts and Modules by creating symbolic links to them. Debian/Ubuntu
+rename the main configuration file apache2.conf
+
+For my examples I use two computers but you can do this with one. You will need to edit your hosts files on all relevant computers or create entries in DNS. You will need an entry for both the developer's workstation (devwork) and the apache server (advent) as well as a cname to create a second virtual host (testapp).
+
+=head2 Install TestApp and Create a PSGI File.
+
+Install your application on both the workstation and the server. Bring both up with the development server. For my example I am using TestApp, The source for the only controller in it is on github. 
+https://brainbuz@github.com/brainbuz/Catalyst-Debugging-Controller.git. The page /brief will tell us who is logged in and /spew will spew a whole bunch of information back.
+
+On the Server, in the TestApp Directory create a file testapp.psgi. 
+
+  use strict; use warnings; 
+  use lib '/var/www/TestApp/lib' ; 
+  use TestApp; 
+  my $app = TestApp->apply_default_middlewares(TestApp->psgi_app); 
+  $app; 
+
+Then execute this command
+
+  starman --l :5000 /var/www/TestApp/testapp.psgi 
+
+Then browse your server:5000. You should see the default page.
+Terminate the application. 
+
+B<Important things to remember:>
+The use lib statement is there so that Perl can locate your Application.
+If you have multiple Perls installed, use the full path to to starman to make sure that the correct starman/Perl is invoked.
+
+=head2 Make starman into a System Service
+
+Since we want our webserver to bring up our application whenever it restarts, we need to make an initialization task out of it. There are three different ways of doing this in widespread use. 
+
+As of the end of 2011, Debian, Gentoo and most older distributions use SystemV Init scripts. Ubuntu and derivatives all use upstart. OpenSUSE and Fedora have chosen systemd, with their Enterprise counterparts in some state of switching to systemd.
+
+try this:
+  
+  sudo starman --l :5000 /Path_To/TestApp/testapp.psgi --daemonize --pid /var/run/testapp.pid 
+
+check that your app is running
+  
+  cat  /var/run/testapp.pid
+
+Stop it: 
+
+  cat  /var/run/testapp.pid | sudo xargs kill
+
+Add this line to your TestApp configuration to inform Catalyst that it is behind a proxy. 
+
+  using_frontend_proxy  1
+
+I'm also going to change the --l switch to specify localhost:5000, because this way the raw starman process will only be accessible from the web-server itself. 
+
+=head2 Upstart:
+
+Create a file C</etc/init/starman_testapp.conf> and change the permissions to be world readable.
+
+  description "Starman Upstart Job"
+  author      "Based on a script by Steve Langasek <steve.langasek@ubuntu.com>" 
+  # Copy this script with the name of the actual script to run embedded 
+  # place your copy at /etc/init/jobname.conf 
+  start on filesystem or runlevel [2345] 
+  stop on runlevel [!2345] 
+  respawn limit 10 5 
+  umask 022 
+  expect fork 
+  exec /perlbrew/perls/perl-5.14.1/bin/starman --daemonize  --l localhost:5000 /var/www/TestApp/testapp.psgi 
+
+Most of the scripts in /etc/init.d are symbolic links to something like:
+/lib/init/upstart-job. Make another link to it: /etc/init.d/starman_testapp.
+When you type service starman_testapp status you should be told that the
+service isn't running. Restart your server and check the status of the service
+in the same manner. If you want to disable your job you'll just delete the
+symlink you made to the system upstart script.
+
+With upstart you do not specify the pid file.
+
+=head2 Systemd:
+
+You'll create a single file C</etc/systemd/system/starman_testapp.service>.
+Change the permissions to 755.
+
+  [Unit] 
+  Description=Starman TestApp 
+  After=syslog.target 
+  
+  [Service] 
+  Type=forking 
+  ExecStart=/usr/bin/starman --daemonize -l :5000 --pid /var/run/starman_testapp.pid /Path_To/TestApp/testapp.psgi 
+  Restart=always 
+  
+  [Install] 
+  WantedBy=multi-user.target
+  
+  sudo systemctl enable starman_testapp.service
+
+reboot and you should be able to see the testapp from a browser, only on the localhost.
+
+=head2 System V initialization. 
+
+A typical SystemV Init script is 100 or more lines. Due to my time and space
+in this article, I will omit a working script of this type and recommend that
+you instead use the rc.local method.
+
+=head2 rc.local
+
+Most distributions have a file like rc.local in ubuntu and debian or
+/etc/init.d/boot.local or /etc/rc.d/rc.local in SUSE and RedHat. You can add
+the command you need to execute to the end of the file. The advantage is that
+this is very easy to do, the disadvantage is that you don't get to control the
+process as a system service, if you need to restart it you need to kill the
+pid and then start the job again. You could create a shell script to manage
+this.
+
+=head2 Troubleshooting Starman
+
+Starman recently added an --errorlog /path_to_log_file switch. You need to
+make sure that the process owner is able to write to the file you specify.
+When the daemonize switch is used there is no output if Starman fails to start
+and this switch is how you can capture it. It will capture any errors it would
+normally write to STDERR plus all of the debugging output your Catalyst app
+produces.
+
+We've used a couple of starman switches -l to specify which address to listen
+on and the port. You can have any number of Starmen running by sending them to
+a different port (and pid). --daemonize --pid let us start the process as a
+daemon and specify an arbitrary pid (although upstart does not use --pid).
+
+=head2 Now configure Apache!
+
+All configuration is going to be performed in a vhost file, because this is
+relatively independent of the variations in Apache configuration between
+vendors, and is also a portable configuration, easy to move to a different
+server. You'll want to make sure a couple of mods are enabled: mod_proxy,
+mod_proxy_http, mod_rewrite, mod_auth_digest. If you are going to be using
+named virtual hosts (multiple sites on a single ip address) you need to enable
+it, if you are using all addresses port 80 add this line to your main apache
+config file if it is not already there NameVirtualHosts *:80.
+
+create a vhost file. On Debian/Ubuntu you would place this in
+/etc/apache2/sites-available, and then use a2ensite to enable it. In opensuse
+it would go into /etc/apache2/vhosts.d and be automatically picked up on the
+next start. In OpenSUSE and some other distributions the file needs a .conf
+extension, in debian/ubuntu it does not. Test your configuration with
+apache2ctl configtest.  If your system uses upstart: service apache2 restart,
+or systemd: systemctl restart apache2, even though debian uses SystemV Inits
+you can use the service command, finally if none of these are applicable
+apachectl restart or apache2ctl restart.
+
+  <VirtualHost *:80> 
+    ServerAdmin webmaster@dummy-host.example.com 
+    ServerName advent 
+
+    # if not specified, the global error log is used 
+    ErrorLog /var/log/apache2/advent-error_log 
+    CustomLog /var/log/apache2/advent-access_log combined 
+
+    # don't loose time with IP address lookups 
+    HostnameLookups Off 
+    # helpful for named virtual hosts 
+    UseCanonicalName Off 
+
+    DocumentRoot /srv/www/vhosts/advent/ 
+    # This should be changed to whatever you set DocumentRoot to. 
+    <Directory "/srv/www/vhosts/advent/"> 
+	Options FollowSymLinks 
+	AllowOverride None 
+	Order allow,deny 
+	Allow from all 
+    </Directory> 
+
+    # Boilerplate you generally need above, the important stuff below.
+
+    RewriteEngine On 
+    <Location /prodapp> 
+          ProxyPass http://localhost:5000/ 
+          ProxyPassReverse http://localhost:5000/
+    </Location> 
+    RewriteRule ^/devapp(.*) http://dev:3000$1 [P] 
+    ProxyPassReverse /devapp http://dev:3000
+  </VirtualHost> 
+
+The important directives are I<Location>, I<ProxyPass>, and I<RewriteRule>. 
+
+Location designates a location in the virtualhosts' namespace (url), that in
+this case is proxied from starman.
+
+ProxyPass tells apache to proxy this location. 
+
+The RewriteRule in this case is doing the exact same thing as the Proxy
+command, except that it is not wrapped in a location. The rewrite rule follows
+a regular expression pattern ^/devapp(.*), capturing everything after the
+initial bit, and then proxies it to the developer's workstation (running the
+development server), appending the capture to the url. The [P] tells the
+rewrite engine that this rule is a Proxy. ProxyPass /A /B could also be used
+here, but it is less powerful in pattern matching. A word of warning about
+RewriteEngine On, if the rewrite module is loaded the server still defaults to
+off globally and to turning it off in each vhosts file, you always have to
+remember to turn it on, configtest will ignore this error.
+
+Finally, you may have noticed the ProxyPassReverse directives. In this case
+they are superfluous, because by having set  using_frontend_proxy Catalyst's
+Plack powered engine should be taking care of dealing with the fact that it is
+running behind a proxy. Including ProxyPassReverse doesn't hurt, and if your
+application wasn't Proxy Aware, they would instruct Apache to try to
+compensate for some of the problems.
+
+=head2 Authentication
+
+Using Server Authentication has several advantages. If you have a heterogenous
+group of assets (Catalyst and non-Catalyst) that your users access, the server
+can provide a single signon. You can realize a performance advantage by only
+serving dynamic content from your application and using the webserver to
+protect and serve all of your static content. Finally, it simplifies your
+application by removing the need for any modules or code to perform
+authentication.
+
+Secure your server. In this example you'll restrict access to devapp to two
+workstations. To do so you'll specify a <location>, even though our rewrite
+rule will remain outside of it. Replace everything from RewriteEngine to the
+Virtual Host tag at the end of the file as below. In the restriction clause
+the order deny allow causes apache to first apply our deny all rule and then
+apply the specific exceptions we are granting.
+
+  RewriteEngine On 
+  <Location /prodapp/brief>   
+    AuthType Digest   
+    AuthDigestDomain / 
+    AuthName "advent" 
+    AuthDigestProvider file 
+    AuthUserFile /etc/apache2/advent.pw 
+    Require valid-user 
+  </Location> 
+  <Location /prodapp> 
+    ProxyPass http://localhost:5000/ 
+    Order allow,deny 
+    Allow from all 
+  </Location> 
+  RewriteEngine On 
+  <Location /devapp/brief>   
+    AuthType Digest   
+    AuthDigestDomain / 
+    AuthName "advent" 
+    AuthDigestProvider file 
+    AuthUserFile /etc/apache2/advent.pw 
+    Require valid-user 
+  </Location> 
+  <Location /devapp> 
+  	order deny,allow 
+  	Allow from 192.168.1.30 192.168.1.33 
+  	deny from all 
+  </Location> 
+  RewriteRule ^/devapp(.*) http://dev:3000$1 [P] 
+  
+  </VirtualHost> 
+
+Restart your server. Everything works as before, except that only the two
+workstations specified can reach the dev instance, and when we try view brief
+Apache demands credentials. Overlapping locations are permitted.
+
+Finally for a major project you probably will want your application to run
+from the uri root. Copy your configuration as testapp (.conf if required).
+Change the ServerName to testapp. Delete the DocumentRoot and it's related
+Directory Block. Delete the existing Location entries. Put this in their
+place:
+
+  RewriteEngine On 
+  <Location />  
+  	Order allow,deny 
+         Allow from all 
+  </Location> 
+  RewriteRule ^/(.*) http://localhost:5000/$1 [P]
+
+If you need to restrict areas of the site, just put in a location with
+authentication block as in the earlier example.
+
+Next we'll have to create the digest passwords file so we can access the
+private area. There are two reasons why you should use Digest. The more widely
+accepted reason is that it is more secure than Apache Basic Authentication
+(which is in plaintext), in our context there is an even more urgent reason,
+Apache won't pass the remote_user variable to the proxied service, but it will
+pass the digest authenticated user string HTTP_AUTHORIZATION which includes
+the user's name.
+
+  htdigest -c /etc/apache2/advent.pw advent billy 
+  Adding password for billy in realm advent.
+  New password: 
+  Re-type new password: 
+
+Of course you'll want to know how to encode a digest password in perl –
+
+  use Digest::MD5 qw(md5 md5_hex md5_base64); 
+  my $authname = 'advent' ; 
+  my $user = 'billy' ; 
+  my $password = 'themountain' ; 
+  my $result = md5_hex( "$user:$authname:$password" ) ; 
+  say "$user:$authname:$result" ;
+
+This regexp will extract the username from the string:
+
+  my ($username) = $http_authorization_string =~ m/username="(.*)", realm/ ;
+
+It is beyond the scope of this article, mod_auth_form, introduced in Apache
+httpd 2.4 will allow you to redirect logins to a form instead of the password
+dialog box that just leaps out, and integrates nicely with a whole bunch of
+authorization and session tools.
+
+=head2 Quick Steps for The Catalyst Tutorial Virtual Machine on ShadowCat
+
+The Virtual Machine is running Debian 6.0 (Squeeze), Modules are installed in
+the user's home directory.
+
+As soon as you are started up and know the ip address of the VM, edit the
+hosts file on your workstation.
+
+  Linux: sudo nano /etc/hosts
+  Windows 7: Right click 'All Prorams'->'Accessories'->'CMD' . choose 'Run as Administrator'.
+  	Then type: notepad c:\windows\system32\drivers\etc\hosts.
+  	It does not matter if it is x64 or x32.
+
+add to the file:
+
+	ip.ad.dr.es advent
+
+In the catalyst home directory type catalyst.pl TestApp. Replace
+lib/TestApp/Controller/Root.pm with the testapp.A
+Start the Development Server. 
+Connect from your workstation to http://advent:3000 in your favorite browser.
+Create a psgi file as in the example. Because modules are installed in local
+libraries, you'll need 3 use lib statements:
+
+  use lib '/home/catalyst/perl5/lib/perl5/i486-linux-gnu-thread-multi '
+  use lib '/home/catalyst/perl5/lib/perl5 '
+  use lib '/var/www/TestApp/lib' ;
+
+To do things that need to be root type su -. Type exit when you are done.
+
+=head2 Test Starman.
+
+Because Debian still uses SysVInit, add your Starman command line to /etc/rc.local before exit 0. 
+
+  apt-get install apache2.
+
+use your browser to test that it works. 
+The default debian configuration provides a sane set of defaults that meet our
+immediate need, and you can immediately get to work on creating your first
+vhost. which will be as the above except that you will be running both the
+prod (starman :5000) and dev (development server :3000) on localhost.
+
+=head1 AUTHOR
+
+John Karr <brainbuz@brainbuz.org>
