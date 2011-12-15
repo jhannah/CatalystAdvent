@@ -354,8 +354,8 @@ add to the file:
 	ip.ad.dr.es advent
 
 In the catalyst home directory type catalyst.pl TestApp. Replace
-lib/TestApp/Controller/Root.pm with the testapp.A
-Start the Development Server. 
+lib/TestApp/Controller/Root.pm with the testapp. And
+Start the Development Server.
 Connect from your workstation to http://advent:3000 in your favorite browser.
 Create a psgi file as in the example. Because modules are installed in local
 libraries, you'll need 3 use lib statements:
