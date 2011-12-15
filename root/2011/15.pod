@@ -660,7 +660,7 @@ Then add the action:
 
         return unless $form->process(
             schema  => $c->model('DB')->schema,
-            item_id => $c->user->users_id,
+            item_id => $c->user->id,
             params  => $c->req->body_parameters,
         );
 
