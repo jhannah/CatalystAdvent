@@ -1,0 +1,31 @@
+=pod
+
+=head1 Turbocharge your SQLite App with WAL
+
+In current SQLite versions, there is a feature called Write Ahead Logging or
+L<WAL|http://www.sqlite.org/draft/wal.html>.
+
+In a multi-process application such as a L<Catalyst> FastCGI instance, this
+feature greatly improves average write performance, at the cost of occasional
+writes taking slightly longer. See previously linked document for details.
+
+To turn it on, add C<on_connect_do "PRAGMA journal_mode=WAL;"> to your
+L<Catalyst::Model::DBIC::Schema> configuration, a typical configuration might
+be:
+
+    <Model::DB>
+        schema_class MyApp::Schema
+        traits Caching
+        <connect_info>
+            dsn dbi:SQLite:dbname=__path_to(db/myapp.db)__
+            quote_names 1
+            auto_savepoint 1
+            on_connect_do "PRAGMA journal_mode=WAL;"
+        </connect_info>
+    </Model::DB>
+
+=head2 AUTHOR
+
+Caelum: Rafael Kitover <rkitover@cpan.org>
+
+=cut
