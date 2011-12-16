@@ -6,8 +6,8 @@ In current SQLite versions, there is a feature called Write Ahead Logging or
 L<WAL|http://www.sqlite.org/draft/wal.html>.
 
 In a multi-process application such as a L<Catalyst> FastCGI instance, this
-feature greatly improves average write performance, at the cost of occasional
-writes taking slightly longer. See previously linked document for details.
+feature greatly improves performance, at the cost of occasional writes taking
+slightly longer. See previously linked document for details.
 
 To turn it on, add C<on_connect_do "PRAGMA journal_mode=WAL;"> to your
 L<Catalyst::Model::DBIC::Schema> configuration, a typical configuration might
@@ -23,6 +23,9 @@ be:
             on_connect_do "PRAGMA journal_mode=WAL;"
         </connect_info>
     </Model::DB>
+
+Make sure that all clients that use this database are version C<3.7.0> of SQLite
+or above, and preferrably, that they execute this C<PRAGMA> when connecting.
 
 =head2 AUTHOR
 
