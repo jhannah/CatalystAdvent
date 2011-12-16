@@ -3,7 +3,7 @@
 =head2 Introduction
 
 Do you remember L<The ControllerRole ChainAction Massacre (Part 1)|http://www.catalystframework.org/calendar/2011/10>?
-We were innocent. Sitting on the floor, playing Lego and cuddeling with some tiny little actions.
+We were innocent. Sitting on the floor, playing Lego and cuddling with some tiny little actions.
 It was fun! 
 
 But as Roland Deschain of Gilead, the Gunslinger, once stated: "The world has moved on!"
