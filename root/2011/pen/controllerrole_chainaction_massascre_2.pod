@@ -206,7 +206,7 @@ and parameters passed to the constructor are material.
 Catalyst controllers are suits.
 You can order clothes by creating dot.pm order sheets.
 
-What we are doing above is a little bit like ordering a red suite with knobs, 
+What we are doing above is a little bit like ordering a red suit with knobs, 
 and 
 adding a note to the sheet which says "please use red knobs aswell".
 We have to remind the taylor of doing that, otherwise he would use
@@ -216,7 +216,7 @@ This is not very clever. Let's create a smarter sewing pattern.
 The default pattern
 lets the customer choose all material (by setting __PACKAGE__->config).
 We should keep this behaviour, but the default colour should be the same
-as the suite itself. 
+as the suit itself. 
 
 Here we go: (yes, GetRS is the knob-role)
 	
@@ -450,7 +450,7 @@ Using it can have unforseen consequences.
 
 No matter which way you prefere, you should alwas add a comment to your
 roles documentation if you use a BUILD method. This makes it possible
-to find out why things are going wrong if thei are going wrong.
+to find out why things are going wrong if they are going wrong.
 If your documentation does not include such a hint, a developer using
 your role will most likely not be able to figure out the problem
 in case of conflicts.
@@ -517,7 +517,7 @@ by creating method-modifiers for methods supplied by my roles. I will edit my co
 Adding a few "with"-lines does not hurt me. But this is 
 just my personal opinion. There is more than one way to do it! I am NOT interested
 in a flame-war! L<CatalystX::Component::Traits> is great. I have used it in the past, and 
-I will use it i the future. It has 
+I will use it in the future. It has 
 usefull features, like "trait searching" and "trait merging". And, of course:
 There are these little differences...
 
@@ -703,7 +703,7 @@ behave different if the current request is done by an authenticated user.
 =item * Carefully designing a role, and providing reasonable
 defaults can safe a lot of time when using it.
 
-=item * Moose offers two different ways to influence your controllers
+=item * Moose offers two different ways to influence your controller's
 build process.
 
 =item * BUILDARGS allows you to modify parameters before the object is created
