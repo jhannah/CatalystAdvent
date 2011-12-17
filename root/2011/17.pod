@@ -33,7 +33,7 @@ You can require attributes by requiring their accessors.
 
 =head3 But:
 
-Attributes, including their accessors, are created at runtime by calling L<has|Moose/has>. 
+Attributes, including their accessors, are created at runtime by calling L<has|https://metacpan.org/module/Moose#EXPORTED-FUNCTIONS>. 
 Ok. Why not. Or: Why is this interesting?
 Depending on how you write your roles, the "order" in which they are applied to a class matters.
 
@@ -86,7 +86,7 @@ Moose will complain about missing the "stash_item_as" method which is required
 by MyFoo, even though it would be present 
 in the object after creation. This is not a bug. Moose complains because it has to. 
 
-Simply speaking: Roles are added by a call to L<Moose/with>.
+Simply speaking: Roles are added by a call to L<with in Moose|http://metacpan.org/module/Moose#EXPORTED-FUNCTIONS>.
 All roles are added  with the same call. The contained attributes would satisfy
 all requirements,
 but the requirements are checked before the attributes are created. MyFoo is not satisfied. Moose complains.
@@ -173,7 +173,7 @@ does not matter anymore, and circular requirements are resolved.
 
 The price we pay is obvious: We have to write more code.
 Additionally,
-accessor manipulation inherited from L<Class::MOP|Class::MOP::Attribute/Creation>
+accessor manipulation inherited from L<Class::MOP|https://metacpan.org/module/Class::MOP::Attribute#Creation>
 does not work anymore. 
 
 =head2 A stitch in time saves nine
@@ -190,6 +190,10 @@ At the moment, we are doing something like this in our roles:
 And something like this in the consuming controller:
 
 	package MyApp::Controller::Foo;
+
+	use Moose;
+	extends "Catalyst::Controller";
+	with "CatalystX::TraitFor::Controller::GetRS";
 
 	...
 
@@ -304,7 +308,7 @@ The L<BUILD|https://metacpan.org/module/Moose::Manual::Construction#BUILD> metho
 It is called as object method and receives the parameter hash passed to new, after
 eventually updating it with BUILDARGS.
 
-It is is often use to perform complex verifcation, like this:
+It is is often used to perform complex verifcation, like this:
 
 	sub BUILD{
 		my $self = shift;
@@ -338,7 +342,7 @@ always matches the currently authenticated user, unless the user is a superuser:
 			}
 			else{
 				die ref($self) . "does not implement $_. Check your configuration";
-				# the first dead body so far. This seems to be a peaceful massacre...
+				# the second dead body so far. This seems to be a peaceful massacre...
 			}
 		}
 		return $self;
@@ -370,14 +374,14 @@ And this is how the role is used:
 
 It is assumed that L<Catalyst::Plugin::Authentication> and L<Catalyst::Plugin::Authorization::Roles> are in use.
 Class::MOP's
-L<add_before_method_modifier|Class::MOP::Class/Method-Modifiers> is used to add the method modifiers.
+L<add_before_method_modifier|https://metacpan.org/module/Class::MOP::Class#Method-Modifiers> is used to add the method modifiers.
 If you need access to the roles configuration within your controller, you can add an attribute for it.
-To make this role more reusable, the name of the overwritten parameter, and the superuser-role should
+To make this role more reusable, the name of the overwritten parameter and the superuser-role should
 be configurable aswell...
 
 Specifying a BUILD method within a role results in the same problems as specifying a BUILDARGS method.
 Unfortunately, the BUILD method is special. It is kind of bitchy, a real drama queen. 
-Moose relies on  BUILD methods of superclasses beeing executed in the right order. The BUILD method of a 
+Moose relies on BUILD methods of superclasses beeing executed in the right order. The BUILD method of a 
 superclass always has to be called before the extending classes BUILD method, otherwise it is not guaranteed
 that the base object is complete and valid.
 According to the L<Moose Manual|https://metacpan.org/module/Moose::Manual::Construction#BUILD-and-parent-classes>, 
@@ -385,7 +389,7 @@ applying method modifiers to BUILD is not supported.
 
 =head3 The "do-it-anyway-approach"
 
-Nevertheless, the L<Moose Cookbook| Moose::Cookbook::Extending::Recipe2> suggests to
+Nevertheless, the L<Moose Cookbook|https://metacpan.org/module/Moose::Cookbook::Extending::Recipe2> suggests to
 use after-modifiers for BUILD, like this:
 
 	sub BUILD{}
@@ -459,7 +463,7 @@ in case of conflicts.
 =head2 Trait me well
 
 The CPAN is huge. It contains so many modules. 
-And most of them are realy usefull!
+And most of them are realy useful!
 L<CatalystX::Component::Traits> for example. It is a Moose::Role for Catalyst 
 Components, which adds support for traits. 
 Traits are roles which are applied to an instance, and not to
@@ -518,7 +522,7 @@ Adding a few "with"-lines does not hurt me. But this is
 just my personal opinion. There is more than one way to do it! I am NOT interested
 in a flame-war! L<CatalystX::Component::Traits> is great. I have used it in the past, and 
 I will use it in the future. It has 
-usefull features, like "trait searching" and "trait merging". And, of course:
+useful features, like "trait searching" and "trait merging". And, of course:
 There are these little differences...
 
 The fact that traits are applied to objects instead of classes matters in 
@@ -602,7 +606,7 @@ like this:
 
  Moose::Meta::Class::__ANON__::SERIAL::33
 
-With our "old" code, the resulting key for my foo-controller would be
+With our "old" code, the resulting key for our foo-controller would be
 
  33_model
 
@@ -613,10 +617,10 @@ and not
 This might work if you always use the "stash_model_as" attribute, but it is 
 ugly and risky. 
 And think of our BUILDARGS method. It will result in the pathpart
-beeing "33" insted of "foo", which is realy bad.
+beeing "33" instead of "foo", which is realy bad.
 
 We can use some Moose internals to bypass this. 
-Since we all like reuable code,
+Since we all like reusable code,
 lets create a subroutine which extracts the "Foo" from 
 "MyApp::Controller::Foo", no matter if it is anonymous or not:
 
@@ -678,7 +682,7 @@ Notes:
 
 =back
 
-Thanks to the people in #moose for usefull tips.
+Thanks to the people in #moose for many useful tips.
 
 =head3 The main difference
 
@@ -704,9 +708,9 @@ behave different if the current request is done by an authenticated user.
 defaults can safe a lot of time when using it.
 
 =item * Moose offers two different ways to influence your controller's
-build process.
+build process:
 
-=item * BUILDARGS allows you to modify parameters before the object is created
+=item * BUILDARGS allows you to modify parameters before the object is created.
 
 =item * BUILD allows you to modify the object after creation, but before it
 is returned to the calling context.
@@ -729,7 +733,7 @@ Lukas Thiemeier <lukast@cpan.org>
 
 Thank you for reading my article. I hope you had at least as much fun reading it as I had  writing it for you.
 
-Hints, criticism, bugfixes and everything which helps me making my articles better are very welcome!
+Hints, criticism, bugfixes and everything which helps me making my articles better is very welcome!
 Just send a message to lukast@cpan.org.
 
-=head2 I wish you a merry cristmas. Yes, I do!
+=head2 I wish you a merry christmas. Yes, I do!
