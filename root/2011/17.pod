@@ -17,8 +17,8 @@ implemented with Moose::Role. It includes some examples to explain the problems,
 hints how to solve them.
 It introduces Moose's BUILD and BUILDARGS methods, and shows an alternative way to
 add roles to Catalyst controllers, including some information about how this 
-can influence your controllers and controllerroles.
-It starts to look behind the scenes and somehow pushes controllerroles to the next level.
+can influence your controllers and controller roles.
+It starts to look behind the scenes and somehow pushes controller roles to the next level.
 
 The section about performance is postponed. The author himself seems to have some performance issues and could not finish it in time...
 
@@ -130,7 +130,7 @@ in the consuming class.
 If MyFoo requires an attribute which is included in MyBar, and MyBar
 requires an attribute which is included in MyFoo, both roles can not be used in
 the same controller without resolving the
-requirements manualy. Yes, you are right. Circular requirements are evil and 
+requirements manually. Yes, you are right. Circular requirements are evil and 
 should be avoided. But it happens from time to time,
 and you never
 know how your roles will be used in the future.
@@ -164,7 +164,7 @@ Another approach is not to wait for Moose to create your accessors:
 
 Now, "stash_model_as" is not created at runtime anymore. It is an ordinary 
 subroutine and therefore recognized by every
-role that requires it. The attribute itself did not change much. We can still use typeconstraints,
+role that requires it. The attribute itself did not change much. We can still use type constraints,
 coercion, delegation and all that candy. 
 By setting the "init_arg", even the attributes key in the config hash
 stays the same. The role can be consumed by every controller again. 
@@ -212,14 +212,14 @@ You can order clothes by creating dot.pm order sheets.
 
 What we are doing above is a little bit like ordering a red suit with knobs, 
 and 
-adding a note to the sheet which says "please use red knobs aswell".
-We have to remind the taylor of doing that, otherwise he would use
+adding a note to the sheet which says "please use red knobs as well".
+We have to remind the tailor of doing that, otherwise he would use
 transparent default-knobs.
 
 This is not very clever. Let's create a smarter sewing pattern. 
 The default pattern
 lets the customer choose all material (by setting __PACKAGE__->config).
-We should keep this behaviour, but the default colour should be the same
+We should keep this behavior, but the default color should be the same
 as the suit itself. 
 
 Here we go: (yes, GetRS is the knob-role)
@@ -236,7 +236,7 @@ Here we go: (yes, GetRS is the knob-role)
 			&& $params{action}->{get_resultset}
 			&& $params{action}->{get_resultset}->{PathPart}
 		){
-			# create a new pathpart, based on the classname
+			# create a new pathpart, based on the class name
 			my @split = split /::/, $class;
 			my $pathpart = $split[-1];
 			$pathpart =~ tr/[A-Z]/[a-z]/;
@@ -285,7 +285,7 @@ Using the "around" modifier works fine:
 	};
 
 You should always specify your BUILDARGS method like that, even in the class 
-itself. All other implementations of BUILDARS (up to L<Moose::Object>, and 
+itself. All other implementations of BUILDARGS (up to L<Moose::Object>, and 
 including roles) will be called.  
 As long as your role does not change any parameters except 
 its own, you don't have to worry about conflicts.
@@ -295,10 +295,10 @@ consuming controller...
 
 Yes! If your role is used just 16 times, you are a winner. But that's not the point.
 The point is: Reasonable defaults make using your roles more intuitive.
-Additonaly, the chance of creating bugs by misspelling or forgetting pathpart
+Additionally, the chance of creating bugs by misspelling or forgetting pathpart
 definitions decreases. 
 
-Do I have to mention that BUILDARGS is quite powerfull, and not limited 
+Do I have to mention that BUILDARGS is quite powerful, and not limited 
 to pathpart-manipulation? I don't think so.
 
 =head2 Under construction
@@ -308,13 +308,13 @@ The L<BUILD|https://metacpan.org/module/Moose::Manual::Construction#BUILD> metho
 It is called as object method and receives the parameter hash passed to new, after
 eventually updating it with BUILDARGS.
 
-It is is often used to perform complex verifcation, like this:
+It is is often used to perform complex verification, like this:
 
 	sub BUILD{
 		my $self = shift;
 
 		die "very complex verification failed"
-			unless $self->do_very_complex_verifivation;
+			unless $self->do_very_complex_verification;
 	}
 
 But it can do more. It can even add method modifiers based on construction
@@ -377,11 +377,11 @@ Class::MOP's
 L<add_before_method_modifier|https://metacpan.org/module/Class::MOP::Class#Method-Modifiers> is used to add the method modifiers.
 If you need access to the roles configuration within your controller, you can add an attribute for it.
 To make this role more reusable, the name of the overwritten parameter and the superuser-role should
-be configurable aswell...
+be configurable as well...
 
 Specifying a BUILD method within a role results in the same problems as specifying a BUILDARGS method.
 Unfortunately, the BUILD method is special. It is kind of bitchy, a real drama queen. 
-Moose relies on BUILD methods of superclasses beeing executed in the right order. The BUILD method of a 
+Moose relies on BUILD methods of superclasses being executed in the right order. The BUILD method of a 
 superclass always has to be called before the extending classes BUILD method, otherwise it is not guaranteed
 that the base object is complete and valid.
 According to the L<Moose Manual|https://metacpan.org/module/Moose::Manual::Construction#BUILD-and-parent-classes>, 
@@ -411,9 +411,9 @@ as expected. (Since I still do not know the exact reason, it is possible that it
 
 It is possible to solve this problem by yourself, within the consuming controller.
 Moose lets us exclude and alias role methods. If our controller does not implement 
-its own BUILD method, and only one role includes a custom BUILD, we do't have to 
+its own BUILD method, and only one role includes a custom BUILD, we don't have to 
 do anything. It will just work. If several BUILD methods are in charge, 
-we can rename them and call them manualy inside the classes BUILD:
+we can rename them and call them manually inside the classes BUILD:
 
 	package MyApp::Controller::WithBuild;
 
@@ -430,7 +430,7 @@ we can rename them and call them manualy inside the classes BUILD:
 		$self = $self->_first_roles_BUILD(%params);
 		$self = $self->_second_roles_BUILD(%params);
 
-		# your controllers BUILD code here
+		# your controller's BUILD code here
 
 		return $self;
 	}
@@ -438,7 +438,7 @@ we can rename them and call them manualy inside the classes BUILD:
 	no Moose;
 	1;
 
-BUILD is not modified anymore. The controllers BUILD is an ordinary method and
+BUILD is not modified anymore. The controller's BUILD is an ordinary method and
 can be handled by Moose. The roles BUILD methods are renamed (in fact, they are 
 excluded and re-added with a different name). They do not conflict with 
 any other BUILD implementation anymore, and can therefor be called by BUILD without 
@@ -450,9 +450,9 @@ The good thing about this approach is that it will always work, as long as
 the developer remembers to implement it.
 
 The first approach is much more elegant, but not officially supported.
-Using it can have unforseen consequences.
+Using it can have unforeseen consequences.
 
-No matter which way you prefere, you should alwas add a comment to your
+No matter which way you prefer, you should always add a comment to your
 roles documentation if you use a BUILD method. This makes it possible
 to find out why things are going wrong if they are going wrong.
 If your documentation does not include such a hint, a developer using
@@ -463,7 +463,7 @@ in case of conflicts.
 =head2 Trait me well
 
 The CPAN is huge. It contains so many modules. 
-And most of them are realy useful!
+And most of them are really useful!
 L<CatalystX::Component::Traits> for example. It is a Moose::Role for Catalyst 
 Components, which adds support for traits. 
 Traits are roles which are applied to an instance, and not to
@@ -513,7 +513,7 @@ This is (almost) equivalent to specifying the roles in your class:
 	no Moose;
 	1;
 
-I prefere the "classic" approach, without CatalystX::Component::Traits. 
+I prefer the "classic" approach, without CatalystX::Component::Traits. 
 It feels right to 
 specify all the functionality and actions within the controller class, and use the
 config hash for configuration only. This also makes it easy to modify my controller
@@ -560,7 +560,7 @@ true when traits are in use. If you specify your traits within the applications
 config (as shown above), they are not part of the controller. Bar will
 inherit everything from Foo, but not the traits, and nothing specified in any of the traits.
 
-It is also possible to specify the traits within the controllers config:
+It is also possible to specify the traits within the controller's config:
 
 	package MyApp::Controller::Foo;
 
@@ -589,8 +589,8 @@ Using traits instead of roles also influences you when you are writing
 reusable code with Moose::Role.
 
 Do you remember the dynamically created "stash_model_as" attributes from L<The ControllerRole ChainAction Massacre (Part 1)|http://www.catalystframework.org/calendar/2011/10>
-? The controllers
-classname was used to dynamically create the key which is used to store the model in the stash. 
+? The controller's
+class name was used to dynamically create the key which is used to store the model in the stash. 
 The key was created like this:
 
 	sub{
@@ -601,7 +601,7 @@ The key was created like this:
 	}
 
 CatalystX::Component::Traits uses L<MooseX::Traits::Pluggable> to create
-a new anonymious class with all traits applied to it. This results in a classname
+a new anonymous class with all traits applied to it. This results in a class name
 like this:
 
  Moose::Meta::Class::__ANON__::SERIAL::33
@@ -617,7 +617,7 @@ and not
 This might work if you always use the "stash_model_as" attribute, but it is 
 ugly and risky. 
 And think of our BUILDARGS method. It will result in the pathpart
-beeing "33" instead of "foo", which is realy bad.
+being "33" instead of "foo", which is really bad.
 
 We can use some Moose internals to bypass this. 
 Since we all like reusable code,
@@ -666,7 +666,7 @@ Now we can create our default stash-key for the model like this:
 	sub{ shift->_get_base_name =~ tr/[A-Z]/[a-z]/r . "_model" }
 
 Since our helper can be called as a class- and as a object-method, we can 
-use it in our BUILDARGS method aswell.
+use it in our BUILDARGS method as well.
 
 Notes:
 
@@ -716,7 +716,7 @@ build process:
 is returned to the calling context.
 
 It is the princess in the Moose empire. The princess is beautiful, mighty but special. If you treat her right, she will be thankful
-and give you unforseen power. But if she gets mad, she will throw her golden ball into
+and give you unforeseen power. But if she gets mad, she will throw her golden ball into
 the sewers and blame you, the innocent frog.
 
 =item * There is more than one way to do it!
@@ -733,7 +733,7 @@ Lukas Thiemeier <lukast@cpan.org>
 
 Thank you for reading my article. I hope you had at least as much fun reading it as I had  writing it for you.
 
-Hints, criticism, bugfixes and everything which helps me making my articles better is very welcome!
+Hints, criticism, bug fixes and everything which helps me making my articles better is very welcome!
 Just send a message to lukast@cpan.org.
 
-=head2 I wish you a merry christmas. Yes, I do!
+=head2 I wish you a merry Christmas. Yes, I do!
