@@ -1,0 +1,194 @@
+=head1 Using CatalystX::Syntax::Action for More Concise Controllers
+
+=head1 Overview
+
+This article discusses how to use L<CatalystX::Syntax::Action> to make shorter
+controllers with less method block boilerplate.  You may find it also helps
+cleanly separate your L<Catalyst::Controller> actions from regular methods.
+
+=head1 Classic Controllers
+
+One of the things about L<Catalyst> that is both powerful and yet somewhat
+perplexing to newcomers is how your actions are just regular methods on a
+class that inherits from L<Catalyst::Controller>:
+
+    package TestApp::Controller::User;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub root : Chained('/') PathPrefix CaptureArgs(0) {
+      my ($self, $c) = @_;
+      $c->stash(user_rs=>$c->model('Schema::User'));
+    }
+
+      sub all_users : Chained('root') PathPart('') Args(0) {
+        my ($self, $c) = @_;
+        $c->stash(all_users => (delete $c->stash->{user_rs})->all_users);
+      }
+
+      sub one_user : Chained('root') PathPart('') Args(1) {
+        my ($self, $c, $id) = @_;
+        $c->stash(user => (delete $c->stash->{user_rs})->find($id));
+      }
+
+    sub regular_method {
+      my ($self, @args) = @_;
+      ## Some controller specific work
+    }
+
+    __PACKAGE__->meta->make_immutable;
+
+If you are familiar with L<Catalyst> the above probably doesn't seem so
+surprising to you.  If we assume the example controller is lifted from a
+'classic' style application (with a ::Root controller that has a C<base> action
+from which everything chains off, and an C<end> action which inherits from
+L<Catalyst::Action::RenderView>) we can see that the following
+HTTP requests would be handled:
+
+    http://localhost/user  => maps to ->all_users
+    http://localhost/user/1 => maps to ->one_user and sets $id to 1
+
+However for people new to the framework, there is often a lot of confusion
+regarding the difference between an action and a regular controller method,
+and when to use which.  Also, it is not always immediately evident what is
+what when opening a L<Catalyst::Controller> based class for the first time.
+And compared to some of the newer web frameworks floating around CPAN, it
+might seem like the syntax for L<Catalyst::Controllers> is a bit, "over the
+hill".
+
+=head1 More Modern Controllers?
+
+L<Catalyst> developers, in our quest to come with a more modern syntax that
+retains the overall power and flexibility, and hopefully solves some of the
+bigger problems with classic contollers, have experimented broadly.  You can
+review CPAN and spot ideas like L<CatalystX::Declare> or
+L<CatalystX::Controller::Sugar>.  In these cases, the authors have tried
+replacing the 'Plain old class' syntax with a type of domain specific language
+that is designed to better express the type of logic one needs to build good
+controllers.
+
+Although the syntax is certainly shiny, the downside is that we no longer
+can leverage all our existing knowledge about how to properly model straight
+forward classes using standard practices (Like inheritance, roles and so
+forth.)  We have to work within the DSL.  Additionally those experiments are
+internally documented but are not part of the broader documentation ecosystem.
+
+Mentioning these possible downsides, I am not intending to disparge the author's
+efforts, but merely to point out upsides and downsides.  Each project should
+seriously consider the value and demerits of all the possible approachs and
+choose something that makes sense for the team and business need.
+
+In order to split the difference between trying to introduce shiny new syntax
+and yet keep things similar enough to the vast amounts of Catalyst documentation
+as to be immediately recognizable and understandable, I've introduced
+L<CatalystX::Syntax::Action> on CPAN.
+
+L<CatalystX::Syntax::Action> sticks with the idea that a Controller is just
+a specialized class, so it doesn't really add a new domain specific language.
+What it does is add a bit of L<Devel::Declare> based magic to create a new Perl
+keyword C<action> which just encapsulates some of the basic boilerplate that
+goes into your Catalyst Controllers.  It also plays nice with the L<syntax>
+namespace and can be a good part of that ecosystem as well.  Hopefully someone
+that did the Catalyst tutorial and read the book would be able to immediately
+understand this syntax, and would not require much additional study.  Let's
+rewrite the above controller using L<CatalystX::Syntax::Action> and some other
+members of the L<syntax> ecosystem:
+
+   package TestApp::Controller::User;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+    use syntax 'method', 'catalyst_action';
+
+    extends 'Catalyst::Controller';
+
+    action root : Chained('/') PathPrefix CaptureArgs(0) {
+      $ctx->stash(user_rs=>$ctx->model('Schema::User'));
+    }
+
+      action all_users : Chained('root') PathPart('') Args(0) {
+        $ctx->stash(all_users => (delete $ctx->stash->{user_rs})->all_users);
+      }
+
+      action one_user($id) : Chained('root') PathPart('') Args(1) {
+        $ctx->stash(user => (delete $ctx->stash->{user_rs})->find($id));
+      }
+
+    method regular_method(@args) {
+      ## Some controller specific work
+    }
+
+    __PACKAGE__->meta->make_immutable;
+
+There's not a big difference here, hopefully if you understood the 'classic'
+controller, this change would not confuse you.  Let's review the changes:
+
+    use syntax 'method', 'catalyst_action';
+
+When you installed L<CatalystX::Syntax::Action> (via your C<Makefile.PL>
+hopefully) we added support for the C<catalyst_action> argument to the
+C<syntax> pragma.  This is a pragma for managing adding syntax features to
+Perl.  In this case we also are using L<Syntax::Feature::Method>, which adds a
+C<method> argument as well.  You can review the C<Syntax::Feature> namespace on
+CPAN for more examples of pluggable syntax you can leverage in your code.
+
+    action one_user($id) : Chained('root') PathPart('') Args(1) {
+      $ctx->stash(user => (delete $ctx->stash->{user_rs})->find($id));
+    }
+
+    method regular_method(@args) {
+      ## Some controller specific work
+    }
+
+The C<action> and C<method> keywords basically wrap the C<sub> keyword, adding
+two features.  First of all C<action> will automatically expose two lexically
+scoped variables to your method block, C<$self> and C<$ctx>.  These exactly map
+to C<my ($self, $c) = @_> in the classic controller.  We use C<$ctx> over C<$c>
+in order to reduce confusion and to canonicalize evolving practices within the
+Catalyst community.
+
+Secondly, it lets you specify arguments in the method prototype, which may seem
+nicer to programmers coming to Perl and L<Catalyst> from other languages.  It
+also leads to a bit less boilerplate code since you don't have to C<shift> or
+map from C<@_> to get lexical variable into your method scope.
+
+In all other cases methods that are declared with the C<action> keyword function
+identically to those declare with a C<sub>.
+
+For how the C<method> keyword works, you should look at  L<Syntax::Feature::Method>
+but the one sentence summary is that it is just like C<action> but of course
+we don't create a lexically scoped C<$ctx> since you are not expecting one.
+
+So that is all there is, basically just like classic controllers, but a bit
+less boilerplate in the method blocks, and some support for method prototypes
+that hopefully will be attractive to programmers used to having those in other
+programming languges.  I also find that the keywork C<action> really jumps out
+at me in my source code, and makes it easier to immediate distinguish actions
+from regular methods.
+
+=head1 Summary
+
+Authors in the L<Catalyst> ecosystem continue to experiment with possible
+approaches for advanced, new techniques for building concise Controllers that
+are both easy to understand, do what programmers need with a minimum of
+boilerplate code.  Additionally, we want to consider how we can keep well
+synchronized with the broader ecosystem of code on CPAN and with evolving
+best practices for modeling objects.  One of the great things about L<Catalyst>
+is how well it lives in the larger Perl world.  It tries hard to not introduce
+too much new syntax or practices, but instead wishes to say, "This is how one
+builds great Perl software, and we are going to be a good member of that
+community."
+
+That is certainly something we'd wish to keep!  Happy Holidays to all!
+
+=head1 Author
+
+John Napiorkowski <jjnapiork@cpan.org> or jnap on IRC.
+
+Thanks to Shutterstock (http://www.shutterstock.com/jobs.mhtml) for giving me
+a bit of time to review and craft this advent article.
+
+=cut
