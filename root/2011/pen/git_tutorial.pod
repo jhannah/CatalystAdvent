@@ -1,0 +1,287 @@
+=pod
+
+=head1 A Git Tutorial
+
+Git has taken the open source world by storm. Both L<Catalyst-Runtime|Catalyst>
+and L<DBIx::Class> have switched to git for the main repositories. There are
+still a few repositories in subversion, but they will be converted in due time.
+
+If you still are unfamiliar with git, this tutorial will show you the common
+idioms that we use for L<Catalyst> and L<DBIx::Class> development, so that you
+can jump right in.
+
+=head2 What is Git?
+
+Git is a decentralized revision control software suite. Decentralized means
+that, unlike in subversion for example, you can operate on a git repository
+without the central server, by using your local filesystem or another server.
+
+Git is very powerful, much more so than tools like subversion, it's a whole new
+way of working with revision control software.
+
+=head2 Where can I host a repository?
+
+You need no server to start working with git. You can even clone a repository
+you started on your workstation to another machine via ssh, although you may
+want to set up gitosis or gitolite on a server to manage your git repositories
+for work or personal needs.
+
+Starting a new git project is simply a matter of:
+
+    mkdir project
+    cd project
+    git init
+    touch README
+    git add README
+    git commit -a -m'first commit'
+
+For open source projects, L<github.com> is a popular choice. Once you register,
+create a repository and the website will guide you through setting it up and
+pushing it to the github servers. You may also find yourself needing to fork a
+repository on github on occasion, pull requests have become a very popular way
+to submit patches to projects.
+
+For L<Catalyst> or L<DBIx::Class> related CPAN modules, we will be happy to host
+your repository on the project servers, provided by Shadowcat. Join
+#catalyst-dev or #dbix-class on irc.perl.org and ask to be set up, and someone
+will help get you started.
+
+=head2 Cloning a Repository
+
+Making a local copy of a repository to work with is called cloning in git, it is
+different from checking out in subversion in that you get the B<whole>
+repository with all of its history, not just the latest revision, so you can do
+all possible operations on your local copy. Cloning is very fast, unlike tools
+such as SVK where the initial import could take many hours, cloning usually only
+takes a few seconds or a minute.
+
+To clone L<Catalyst-Runtime|Catalyst> you would do this:
+
+    git clone git://git.shadowcat.co.uk/catagits/Catalyst-Runtime.git cat-runtime
+
+Usually you will access your projects via ssh, if you have commit access to
+them, e.g.:
+
+    git clone catagits@git.shadowcat.co.uk:Catalyst-Runtime.git cat-runtime
+
+If you started a git project on another computer and want to clone it on this
+one, the command would be something like this:
+
+    git clone rkitover@hlagh:src/catalyst/runtime cat-runtime
+
+if the project is in C<src/catalyst/runtime> under the home directory on the
+remote host. You can then push via ssh to that machine to sync your changes.
+
+=head2 Editing and Committing
+
+Now that you've created or cloned a repository, how do you make changes to it? To
+make changes to C<master>, which is known as the C<trunk> in subversion, the
+central branch that all projects have, it is simply a matter of committing your
+changes and pushing your changes up to the server (if you're using one.) I will
+discuss branches in a later section.
+
+Git gives you a view onto a commit as the files in your project directory, the
+files represent that commit. All git metadata files are in the subdirectory
+C<.git> under the project directory. There is only one C<.git> directory, not
+one in every subdirectory like in tools such as subversion. All other files are
+part of your project.
+
+The current checked out commit is called C<HEAD>. You do not generally make a
+new directory to view another commit or branch, you simply use commands to
+switch between them.
+
+Files that you want to be part of your project need to be added with C<< git add
+<file> >> and they will be added on the next commit. You can see which files you
+haven't added yet with C<git status>.
+
+Most people also like adding a C<.gitignore> file to their project, the format
+of the file is one entry per line, comments starting with C<#>, in shell glob
+format, for example:
+
+    *.o
+    Thumbs.db
+    Icon?
+
+This file should be committed to the project.
+
+To see a diff of your edits so far, use the very handy command C<git diff HEAD>.
+
+Once you are ready to make a commit, the command:
+
+    git commit -a -m'commit message'
+
+will commit all of your changes. C<git push> will push your changes up to the
+server, if you're using one.
+
+=head2 Surgical Commits
+
+By default, git does not commit all of your changes, only the changes that are
+C<staged>. The C<-a> flag to C<git commit> will instead commit all changes to
+C<HEAD>, which is what most new users use.
+
+Git pros use C<< git add <file> >> to stage changes for commits to have more
+control over what content will go into which commit, often with the C<-p>
+option. C<< git add -p <file> >> will ask you whether you want to stage each
+diff hunk in the changes for C<< <file> >> for the next commit.
+
+Once you've staged all the changes you want to go into the commit, the command:
+
+    git commit -m'commit message'
+
+will commit them.
+
+=head2 On Commit Messages
+
+See this excellent article on the proper etiquette regarding the writing of git
+commit messages:
+L<http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>.
+
+When you use the command C<git commit>, it will take you into your editor,
+usually vim, to write your commit message.
+
+The first line is the summary line, and should be no more than 50 characters.
+Then there is a blank line, and the following is the long description of the
+commit (with more blank lines as appropriate.) The long description should be
+wrapped at 72 characters. You may omit the long description for simple commits
+where the summary line is sufficient.
+
+If you are using vim, I highly recommend making the file
+C<~/.vim/ftplugin/gitcommit.vim> with the contents:
+
+    setlocal tw=72
+
+so that you get the wrapping automatically. On the summary line, vim will
+highlight the first 50 characters, so you will see if you go over.
+
+The language of the commit message should be in the B<imperative mood>, this
+means "change", not "changes" or "changed." For example:
+
+    run coffeemaker at 5am not 6am
+
+    Change the cronjob that runs the coffeemaker to brew coffee to run at
+    5am instead of 6am because many of the ops people come in earlier these
+    days.
+
+=head2 Working with a Remote Repository
+
+To pull in changes from a remote, use the command C<git fetch --prune>. Then
+fast forward your master to include the new changes with C<git rebase
+origin/master>.
+
+To push your changes to the remote, use C<git push> or C<git push origin HEAD>.
+
+If the server rejects your push, it means somewhat has pushed new changes to the
+remote since your last fetch, and you need to rebase your commits on top of
+theirs. To do this run:
+
+    git fetch --prune
+    git rebase origin/master
+
+then your push should be successful.
+
+=head2 The Git Log
+
+The C<git log> command will show you the log of commits to your current branch
+and their SHA hashes. To see the diff for a specific commit use C<< git show
+<SHA> >>, to see the diff between a certain commit and HEAD do C<< git diff
+<SHA> >>, between two commits C<< git diff <SHA1> <SHA2> >>. To see just your
+last commit, do C<git diff HEAD~1> and so on.
+
+=head2 Tagging
+
+To make a tag, use the command C<git tag -a -m'release 0.01' v0.01> most people
+use the C<v> on tags, I don't personally like it so I omit it. To push your new
+tag to the remote, use C<git push --tags>.
+
+To see all the tags, use the command C<git tag>, to see the tag messages use
+C<git tag -n1>. To fetch the most up to date list of tags from the remote, use
+C<git fetch --tags>, this is done automatically for you if you use C<git fetch
+--prune>.
+
+=head2 Branching
+
+With the exception of trivial changes, exploratory work for new features or bug
+fixes should be done in a branch. Unlike other revision control software,
+branches in git are very fast, inexpensive and powerful.
+
+To make a new branch, use the command C<< git checkout -b <branch-name> >>.
+Branch names can have slashes in them. Many projects like to name branches
+C<topic/foo>. L<DBIx::Class> uses the form C<people/nick/branch-name>.
+
+Once you have some commits in a branch, your first push should be with the
+command C<git push origin HEAD -u>. Subsequent pushes can be with C<git push>.
+
+C<git fetch --prune> will show you what is happening with remote branches, which
+ones have been deleted and which ones have been rebased (these will show
+C<forced update>.)
+
+To update your branch if it hasn't been rebased upstream, do a C<git fetch
+--prune> and a C<git rebase origin/branch-name>.
+
+If the branch B<HAS> been rebased upstream (as indicated by a C<forced update>
+in C<git fetch --prune>) then you need to find your first commit in C<git log>
+and then do a C<< git rebase --onto origin/<branch-name>
+<sha-of-your-first-commit> >>. If you have no commits and just want to update
+your local branch with the upstream rebased branch, just do a C<< git reset --hard
+origin/<branch-name> >>.
+
+=head2 Merging Changes from master
+
+To update your branch to the current master, do C<git rebase --root --onto
+origin/master>. You may need to resolve conflicts (see below.)
+
+After your branch has been updated thus, you need to push it to the server with
+C<git push -f origin HEAD> (but check C<git fetch --prune> to make sure no one
+has pushed to it.)
+
+=head2 Resolving Conflicts
+
+With C<git rebase> you will often have to resolve conflicts. This is similar to
+how you resolve conflicts in subversion and other version control systems; git
+will tell you that there is a conflict and which files you have to edit. After
+you have edited the files, C<git add> them and then issue the command C<git
+rebase --continue>.
+
+Sometimes you may wish to entirely skip one of your commits during conflict
+resolution, to do this use the command C<git rebase --skip>, B<BE VERY VERY
+CAREFUL> with this command. If you accidentally delete a commit this way that
+you later decide you needed, you can use C<git reflog> and C<git checkout> to
+recover it.
+
+If in the middle of a rebase you decide the whole thing was a bad idea, you can
+back out with C<git rebase --abort>.
+
+=head2 Rewriting History, the Interactive Rebase
+
+Often you will want to clean up your branch history into a set of logical
+commits, or just one commit, before merging it to master. To do this, use the
+command C<git rebase -i --root --onto origin/master>. Your editor will come up
+with the list of commits, instructions are at the bottom of the file. Place the
+commands you want to invoke on a specific commit by changing the word C<pick> to
+the command. Here you can squash commits into the previous ones with C<f>,
+reword commit messages with C<r> and move commits around. When you're done, save
+the file and exit. You may have to resolve conflicts.
+
+=head2 Merging your Branch
+
+Once you are happy with the work you (and possibly others) have done on a
+branch, you will want to merge it into master. To do this, issue the command:
+
+    git merge --ff-only <branch-name>
+
+then do a C<git push> to push the new master to the remote.
+
+Delete your local branch with C<< git branch -D <branch-name> >>. To delete the
+remote branch, do C<< git push origin :refs/heads/<branch-name> >>.
+
+=head2 There is Much More
+
+I have merely scratched the surface of the capabilities of git, and I am by no
+means an expert. Hopefully however, I have provided all the information you need
+to get started with git, and to contribute to our projects!
+
+=head2 AUTHOR
+
+Caelum: Rafael Kitover <rkitover@cpan.org>
+
+=cut
