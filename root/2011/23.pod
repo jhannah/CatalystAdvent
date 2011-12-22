@@ -1,12 +1,14 @@
+=pod
+
 =head1 Using CatalystX::Syntax::Action for More Concise Controllers
 
-=head1 Overview
+=head2 Overview
 
 This article discusses how to use L<CatalystX::Syntax::Action> to make shorter
 controllers with less method block boilerplate.  You may find it also helps
 cleanly separate your L<Catalyst::Controller> actions from regular methods.
 
-=head1 Classic Controllers
+=head2 Classic Controllers
 
 One of the things about L<Catalyst> that is both powerful and yet somewhat
 perplexing to newcomers is how your actions are just regular methods on a
@@ -24,15 +26,15 @@ class that inherits from L<Catalyst::Controller>:
       $c->stash(user_rs=>$c->model('Schema::User'));
     }
 
-      sub all_users : Chained('root') PathPart('') Args(0) {
-        my ($self, $c) = @_;
-        $c->stash(all_users => (delete $c->stash->{user_rs})->all_users);
-      }
+    sub all_users : Chained('root') PathPart('') Args(0) {
+      my ($self, $c) = @_;
+      $c->stash(all_users => (delete $c->stash->{user_rs})->all_users);
+    }
 
-      sub one_user : Chained('root') PathPart('') Args(1) {
-        my ($self, $c, $id) = @_;
-        $c->stash(user => (delete $c->stash->{user_rs})->find($id));
-      }
+    sub one_user : Chained('root') PathPart('') Args(1) {
+      my ($self, $c, $id) = @_;
+      $c->stash(user => (delete $c->stash->{user_rs})->find($id));
+    }
 
     sub regular_method {
       my ($self, @args) = @_;
@@ -59,7 +61,7 @@ And compared to some of the newer web frameworks floating around CPAN, it
 might seem like the syntax for L<Catalyst::Controllers> is a bit, "over the
 hill".
 
-=head1 More Modern Controllers?
+=head2 More Modern Controllers?
 
 L<Catalyst> developers, in our quest to come with a more modern syntax that
 retains the overall power and flexibility, and hopefully solves some of the
@@ -76,9 +78,9 @@ forward classes using standard practices (Like inheritance, roles and so
 forth.)  We have to work within the DSL.  Additionally those experiments are
 internally documented but are not part of the broader documentation ecosystem.
 
-Mentioning these possible downsides, I am not intending to disparge the author's
+Mentioning these possible downsides, I am not intending to disparge the authors'
 efforts, but merely to point out upsides and downsides.  Each project should
-seriously consider the value and demerits of all the possible approachs and
+seriously consider the value and demerits of all the possible approaches and
 choose something that makes sense for the team and business need.
 
 In order to split the difference between trying to introduce shiny new syntax
@@ -97,7 +99,7 @@ understand this syntax, and would not require much additional study.  Let's
 rewrite the above controller using L<CatalystX::Syntax::Action> and some other
 members of the L<syntax> ecosystem:
 
-   package TestApp::Controller::User;
+    package TestApp::Controller::User;
 
     use Moose;
     use MooseX::MethodAttributes;
@@ -109,13 +111,13 @@ members of the L<syntax> ecosystem:
       $ctx->stash(user_rs=>$ctx->model('Schema::User'));
     }
 
-      action all_users : Chained('root') PathPart('') Args(0) {
-        $ctx->stash(all_users => (delete $ctx->stash->{user_rs})->all_users);
-      }
+    action all_users : Chained('root') PathPart('') Args(0) {
+      $ctx->stash(all_users => (delete $ctx->stash->{user_rs})->all_users);
+    }
 
-      action one_user($id) : Chained('root') PathPart('') Args(1) {
-        $ctx->stash(user => (delete $ctx->stash->{user_rs})->find($id));
-      }
+    action one_user($id) : Chained('root') PathPart('') Args(1) {
+      $ctx->stash(user => (delete $ctx->stash->{user_rs})->find($id));
+    }
 
     method regular_method(@args) {
       ## Some controller specific work
@@ -169,11 +171,11 @@ programming languges.  I also find that the keywork C<action> really jumps out
 at me in my source code, and makes it easier to immediate distinguish actions
 from regular methods.
 
-=head1 Summary
+=head2 Summary
 
 Authors in the L<Catalyst> ecosystem continue to experiment with possible
 approaches for advanced, new techniques for building concise Controllers that
-are both easy to understand, do what programmers need with a minimum of
+are both easy to understand and do what programmers need with a minimum of
 boilerplate code.  Additionally, we want to consider how we can keep well
 synchronized with the broader ecosystem of code on CPAN and with evolving
 best practices for modeling objects.  One of the great things about L<Catalyst>
@@ -184,7 +186,7 @@ community."
 
 That is certainly something we'd wish to keep!  Happy Holidays to all!
 
-=head1 Author
+=head2 AUTHOR
 
 John Napiorkowski <jjnapiork@cpan.org> or jnap on IRC.
 
