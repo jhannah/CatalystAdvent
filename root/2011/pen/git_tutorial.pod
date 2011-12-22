@@ -35,10 +35,10 @@ Starting a new git project is simply a matter of:
     git add README
     git commit -a -m'first commit'
 
-For open source projects, L<github.com> is a popular choice. Once you register,
-create a repository and the website will guide you through setting it up and
+For open source projects, L<github.com> is a popular choice. Once you register
+and create a repository, the website will guide you through setting it up and
 pushing it to the github servers. You may also find yourself needing to fork a
-repository on github on occasion, pull requests have become a very popular way
+repository on github on occasion; pull requests have become a very popular way
 to submit patches to projects.
 
 For L<Catalyst> or L<DBIx::Class> related CPAN modules, we will be happy to host
@@ -102,7 +102,8 @@ format, for example:
     Thumbs.db
     Icon?
 
-This file should be committed to the project.
+This file should be committed to the project. If you don't want to commit a
+C<.gitignore> to your project, you can use C<.git/info/exclude>.
 
 To see a diff of your edits so far, use the very handy command C<git diff HEAD>.
 
@@ -170,7 +171,7 @@ origin/master>.
 
 To push your changes to the remote, use C<git push> or C<git push origin HEAD>.
 
-If the server rejects your push, it means somewhat has pushed new changes to the
+If the server rejects your push, it means someone has pushed new changes to the
 remote since your last fetch, and you need to rebase your commits on top of
 theirs. To do this run:
 
@@ -206,10 +207,18 @@ branches in git are very fast, inexpensive and powerful.
 
 To make a new branch, use the command C<< git checkout -b <branch-name> >>.
 Branch names can have slashes in them. Many projects like to name branches
-C<topic/foo>. L<DBIx::Class> uses the form C<people/nick/branch-name>.
+C<topic/foo>.
+
+To switch branches, including to the C<master> branch, use C<< git checkout
+<branch-name> >>. You cannot switch branches if you have uncommitted changes.
+
+To move uncommitted changes between branches, use the C<git stash> command to
+save them, switch branches, then the C<git stash pop> command load them back
+into your working copy.
 
 Once you have some commits in a branch, your first push should be with the
-command C<git push origin HEAD -u>. Subsequent pushes can be with C<git push>.
+command C<git push origin HEAD -u>, this is so that C<git pull> will work.
+Subsequent pushes can be with C<git push>.
 
 C<git fetch --prune> will show you what is happening with remote branches, which
 ones have been deleted and which ones have been rebased (these will show
@@ -219,16 +228,14 @@ To update your branch if it hasn't been rebased upstream, do a C<git fetch
 --prune> and a C<git rebase origin/branch-name>.
 
 If the branch B<HAS> been rebased upstream (as indicated by a C<forced update>
-in C<git fetch --prune>) then you need to find your first commit in C<git log>
-and then do a C<< git rebase --onto origin/<branch-name>
-<sha-of-your-first-commit> >>. If you have no commits and just want to update
-your local branch with the upstream rebased branch, just do a C<< git reset --hard
-origin/<branch-name> >>.
+in C<git fetch --prune>) then you need to do a C<git pull --rebase>. If you have
+no commits and just want to update your local branch with the upstream rebased
+branch, just do a C<< git reset --hard origin/<branch-name> >>.
 
 =head2 Merging Changes from master
 
-To update your branch to the current master, do C<git rebase --root --onto
-origin/master>. You may need to resolve conflicts (see below.)
+To update your branch to the current master, do C<git rebase origin/master>. You
+may need to resolve conflicts (see below.)
 
 After your branch has been updated thus, you need to push it to the server with
 C<git push -f origin HEAD> (but check C<git fetch --prune> to make sure no one
@@ -255,12 +262,15 @@ back out with C<git rebase --abort>.
 
 Often you will want to clean up your branch history into a set of logical
 commits, or just one commit, before merging it to master. To do this, use the
-command C<git rebase -i --root --onto origin/master>. Your editor will come up
-with the list of commits, instructions are at the bottom of the file. Place the
-commands you want to invoke on a specific commit by changing the word C<pick> to
-the command. Here you can squash commits into the previous ones with C<f>,
-reword commit messages with C<r> and move commits around. When you're done, save
-the file and exit. You may have to resolve conflicts.
+command C<git rebase -i origin/master>. Your editor will come up with the list
+of commits, instructions are at the bottom of the file. Place the commands you
+want to invoke on a specific commit by changing the word C<pick> to the command.
+Here you can squash commits into the previous ones with C<f>, reword commit
+messages with C<r> and move commits around. When you're done, save the file and
+exit. You may have to resolve conflicts.
+
+B<NEVER> rewrite history for master. This is why working in branches is so
+important, so that once you merge a branch to master you really mean it.
 
 =head2 Merging your Branch
 
