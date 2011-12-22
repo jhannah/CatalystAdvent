@@ -87,8 +87,8 @@ one in every subdirectory like in tools such as subversion. All other files are
 part of your project.
 
 The current checked out commit is called C<HEAD>. You do not generally make a
-new directory to view another commit or branch, you simply use commands to
-switch between them.
+new directory to view another commit or branch, you simply use commands such as
+C<git checkout> to switch between them.
 
 Files that you want to be part of your project need to be added with C<< git add
 <file> >> and they will be added on the next commit. You can see which files you
@@ -208,6 +208,9 @@ branches in git are very fast, inexpensive and powerful.
 To make a new branch, use the command C<< git checkout -b <branch-name> >>.
 Branch names can have slashes in them. Many projects like to name branches
 C<topic/foo>.
+
+To see a list of your local branches, use the command C<git branch>, to see all
+branches including remote branches, use C<git branch -a>.
 
 To switch branches, including to the C<master> branch, use C<< git checkout
 <branch-name> >>. You cannot switch branches if you have uncommitted changes.
