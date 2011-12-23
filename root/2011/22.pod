@@ -35,7 +35,7 @@ Starting a new git project is simply a matter of:
     git add README
     git commit -a -m'first commit'
 
-For open source projects, L<github.com> is a popular choice. Once you register
+For open source projects, L<github.com|http://github.com> is a popular choice. Once you register
 and create a repository, the website will guide you through setting it up and
 pushing it to the github servers. You may also find yourself needing to fork a
 repository on github on occasion; pull requests have become a very popular way
