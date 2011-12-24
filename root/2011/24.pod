@@ -29,8 +29,7 @@ of your business into a web application while ignoring the web for as long
 as possible.
 
 What if your business is a government department focused on collecting
-data, with hundreds of years of legacy procedures.  Well, Catalyst can do
-that for you.
+data, with hundreds of years of legacy procedures?  Well, Catalyst can help you cope with that requirement.
 
 What if your business is a transportation company, responsible for booking,
 scheduling and delivering millions of people from, and to their
@@ -44,7 +43,7 @@ integrate existing hardware and software infrastructure into a web
 application?  Let's make life more interesting - let's say that some of the
 hardware is physical and some of the hardware is virtual.  Catalyst stays
 out of your way so that the experts can concentrate on their expertise, and
-can treat the web programming side of the requirements as almost an
+can treat the web programming side of the requirements almost as an
 afterthought.
 
 Content distribution networks (think big)?  Archival systems (with optional
