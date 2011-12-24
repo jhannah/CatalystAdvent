@@ -1,0 +1,98 @@
+=head1  The Catalyst Advent Calendar
+
+You may have noticed that the Advent Calendar has more holes in it than
+previous years.  That's because we're too busy running the Internet to
+write extra documentation.  But Catalyst's documentation is stable,
+excellent and like the rest of Catalyst, mostly keeps out of your way until
+you need it.
+
+In 2005 SRI, Catalyst's originator edited the Catalyst advent
+calendar. From 2006, I (ZARQUON on CPAN or kd on IRC) took over the reins.
+In 2010 DHOSS took over from me.  That's 6 years, with 24 articles each
+December, and volunteers writing each article.  That's 144 articles (less
+the few we missed) all nicely planned in advance and edited.  As you can
+see, that's a lot of work. There's no longer time, or enough stuff to write
+about for that to be able to continue.  As a result we're retiring the
+Catalyst Advent Calendar from today.  The Catalyst Advent Calendar was
+inspired by the Perl advent calendar, and both of these together have gone
+on to inspire other documentation sprints in the Perl community, and
+elsewhere.  Documentation sprints are a great idea, and we encourage
+them. However, Catalyst no longer needs one.
+
+=head2 Case studies
+
+If Catalyst was a web framework that enforced its developer's decisions on
+it's end users, that would be fine, we could write about the latest way
+that our framework forces you to do things I<ad infinitum>.  But that's not
+the way we work.  What Catalyst excels at is allowing you to bolt the logic
+of your business into a web application while ignoring the web for as long
+as possible.
+
+What if your business is a government department focused on collecting
+data, with hundreds of years of legacy procedures.  Well, Catalyst can do
+that for you.
+
+What if your business is a transportation company, responsible for booking,
+scheduling and delivering millions of people from, and to their
+destinations, reliably, with as close to zero downtime as possible.  Let's
+make it interesting, let's add freight into the mix.  How can we integrate
+our legacy systems into a modern web interface?  Well one of the quickest,
+easiest and most reliable ways of doing that is with Catalyst.
+
+What if your business is a telecoms and networking company who need to
+integrate existing hardware and software infrastructure into a web
+application?  Let's make life more interesting - let's say that some of the
+hardware is physical and some of the hardware is virtual.  Catalyst stays
+out of your way so that the experts can concentrate on their expertise, and
+can treat the web programming side of the requirements as almost an
+afterthought.
+
+Content distribution networks (think big)?  Archival systems (with optional
+legacy technical debt)?  Internet security?  Academic research at both the
+big end of town (i.e. bioinformatics), and the small (e.g. the weird data
+models required for social science research)?  Yes indeed, no problems.
+Catalyst will help you to accomplish all of this easily, as it stays out of
+your way until you need web functionality.
+
+Why is this section short on technical detail?  Three words: Non Disclosure
+Agreements: an unfortunately common piece of security theatre in the IT
+industry.  Please email the author if you need more details (to the best of
+their ability etc. etc.).
+
+=head2 How does Catalyst accomplish such incredible feats?
+
+Perl was built from the ground up to help computers to deal with the
+horrible combination of technological and social complexity.  And, thanks
+to Larry Wall and his collaborators, this was accomplished to the extent
+that Perl facilitated the initial Internet explosion (both Web and
+networking infrastructure) in the mid to late 1990s.  CPAN (the largest,
+best tested, open source repository of programmers libraries in existence)
+is the vehicle that accomplishes this.  Catalyst is stable, backwards
+compatible, mature well documented and designed to integrate with CPAN at
+the most fundamental level.
+
+=head2 So why are we retiring the Advent Calendar again?
+
+Catalyst is designed to integrate with CPAN at the most fundamental level.
+Another way of putting this is that if you know CPAN, and you have read
+L<Catalyst::Manual::Tutorial>, and you know how to integrate your own
+expertise into something that looks like a CPAN module (or you know someone
+who can reliably do that for you), then you're ready to make the business
+decision to use Catalyst.
+
+If you've been paying attention, you know that for almost all of this
+decision making process you can ignore the World Wide Web, and Catalyst
+will make it easy to integrate your business logic into a web application
+at the last minute.
+
+=head2 What now?
+
+Well we're retiring the Catalyst Advent Calendar after 2011, and instead of
+trying to write one article on Catalyst per day in December in 2012, we (as
+in the community) are going to try to write one article per month on
+Catalyst through 2012 and beyond.  This doesn't mean that Catalyst is dying
+- This means that Catalyst is running the show.
+
+=head1 AUTHOR
+
+Kieren Diment <zarquon@cpan.org>
