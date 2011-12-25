@@ -14,29 +14,30 @@ the few we missed) all nicely planned in advance and edited.  As you can
 see, that's a lot of work. There's no longer time, or enough stuff to write
 about for that to be able to continue.  As a result we're retiring the
 Catalyst Advent Calendar from today.  The Catalyst Advent Calendar was
-inspired by the Perl advent calendar, and both of these together have gone
-on to inspire other documentation sprints in the Perl community, and
-elsewhere.  Documentation sprints are a great idea, and we encourage
-them. However, Catalyst no longer needs one.
+inspired by the L<Perl Advent Calendar|http://perladvent.org>, and both of
+these together have gone on to inspire other documentation sprints in the
+Perl community, and elsewhere.  Documentation sprints are a great idea, and
+we encourage them. However, Catalyst no longer needs one.
 
 =head2 Case studies
 
-If Catalyst was a web framework that enforced its developer's decisions on
-it's end users, that would be fine, we could write about the latest way
+If Catalyst were a web framework that enforced its developer's decisions on
+its end users, that would be fine, we could write about the latest way
 that our framework forces you to do things I<ad infinitum>.  But that's not
 the way we work.  What Catalyst excels at is allowing you to bolt the logic
 of your business into a web application while ignoring the web for as long
 as possible.
 
 What if your business is a government department focused on collecting
-data, with hundreds of years of legacy procedures?  Well, Catalyst can help you cope with that requirement.
+data, with hundreds of years of legacy procedures?  Well, Catalyst can help
+you cope with that requirement.
 
 What if your business is a transportation company, responsible for booking,
 scheduling and delivering millions of people from, and to their
-destinations, reliably, with as close to zero downtime as possible.  Let's
+destinations, reliably, with as close to zero downtime as possible?  Let's
 make it interesting, let's add freight into the mix.  How can we integrate
 our legacy systems into a modern web interface?  Well one of the quickest,
-easiest and most reliable ways of doing that is with Catalyst.
+easiest, and most reliable ways of doing that is with Catalyst.
 
 What if your business is a telecoms and networking company who need to
 integrate existing hardware and software infrastructure into a web
@@ -67,13 +68,14 @@ that Perl facilitated the initial Internet explosion (both Web and
 networking infrastructure) in the mid to late 1990s.  CPAN (the largest,
 best tested, open source repository of programmers libraries in existence)
 is the vehicle that accomplishes this.  Catalyst is stable, backwards
-compatible, mature well documented and designed to integrate with CPAN at
+compatible, mature, well documented and designed to integrate with CPAN at
 the most fundamental level.
 
 =head2 So why are we retiring the Advent Calendar again?
 
-Catalyst is designed to integrate with CPAN at the most fundamental level.
-Another way of putting this is that if you know CPAN, and you have read
+Because Catalyst stays out of your way until you nead it, almost all of the
+serious problems you will face are business logic problems.  Another way of
+putting this is that if you know CPAN, and you have read
 L<Catalyst::Manual::Tutorial>, and you know how to integrate your own
 expertise into something that looks like a CPAN module (or you know someone
 who can reliably do that for you), then you're ready to make the business
