@@ -158,7 +158,12 @@ Above the C<< __PACKAGE__->setup() >> call, put the following configuration:
              }
           },
        },
-       'Controller::Login' => { traits => ['-RenderAsTTTemplate'], },
+       'Controller::Login' => {
+           traits => ['-RenderAsTTTemplate'],
+           login_form_args => {
+               authenticate_args => { active => 'Y' },
+           },
+       },
     );
 
 Now we need a login template:
@@ -570,16 +575,6 @@ the following:
     sub base : Chained('/login/required') PathPart('') CaptureArgs(0) {
         my ($self, $c) = @_;
 
-        if ($c->user_exists && $c->user->active ne 'Y') {
-            $c->res->redirect($c->uri_for('/login', {
-                status_msg => 'User has been Deactivated',
-                username => $c->user->username,
-                password => 'xxx',
-            }));
-            $c->logout;
-            $c->detach;
-        }
-
         if ($c->action ne $c->controller('User')->action_for('change_password')
             && $c->user_exists
             && $c->user->password_expires
@@ -590,6 +585,8 @@ the following:
             }));
             $c->detach;
         }
+
+        return 1;
     }
 
 We are also checking that the user is active.
