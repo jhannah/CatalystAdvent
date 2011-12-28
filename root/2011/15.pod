@@ -587,8 +587,6 @@ the following:
         }
     }
 
-We are also checking that the user is active.
-
 Now restart the server and open the site in your web browser, you will be asked
 to change your password then taken to the book list.
 
