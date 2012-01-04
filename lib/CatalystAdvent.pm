@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Catalyst qw( Static::Simple
+                 ConfigLoader
                  Cache
                  Unicode::Encoding
               );
