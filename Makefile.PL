@@ -9,8 +9,11 @@ license('perl');
 include('ExtUtils::AutoInstall');
 
 requires Catalyst => '5.90';
+requires 'Moose';
+requires 'namespace::autoclean';
 requires 'Catalyst::Plugin::Unicode::Encoding';
 requires 'Catalyst::Plugin::Cache' => '0.08';
+requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Cache::FileCache';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::View::TT';

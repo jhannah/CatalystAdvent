@@ -1,9 +1,8 @@
 package CatalystAdvent::Controller::Calendar;
 
-use strict;
-use warnings;
-
-use base qw( Catalyst::Controller );
+use base 'Catalyst::Controller';
+use Moose;
+use namespace::autoclean;
 
 use DateTime;
 use Calendar::Simple;
@@ -39,6 +38,8 @@ Detaches to the "year" display for the current year.
 
 =cut
 
+has retired => (is => 'ro');
+
 sub base : Chained('/base') PathPart('') CaptureArgs(0) {}
 
 sub index : Chained('base') PathPart('') Args(0) {
@@ -53,11 +54,14 @@ sub index : Chained('base') PathPart('') Args(0) {
 
     my $days_until = $start_date->delta_days($now)->delta_days;
 
-    if (not $c->config->{retired}) {
+    if (not $self->retired) {
         if (not ($now->month == 12 || ($now->month == 1 || $now->month == 2))) {
             $c->stash(days_until => $days_until);
             pop @years if @years && $years[-1] == $now->year;
         }
+    }
+    else {
+        $c->stash(retired => $self->retired);
     }
 
     $c->stash(previous_years => \@years) if @years;
@@ -288,6 +292,8 @@ This library is free software, you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
+__PACKAGE__->meta->make_immutable;
 
 1;
 

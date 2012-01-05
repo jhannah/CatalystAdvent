@@ -17,19 +17,18 @@
 [% END %]
 
         <div id="content">
-[%- IF c.config.retired OR (days_until AND days_until > 0) %]
-    [%- IF !c.config.retired %]
+[%- IF retired OR (days_until AND days_until > 0) %]
+    [%- IF !retired %]
 <h2>[% days_until %] [% IF days_until == 1 %]day[% ELSE %]days[% END %] until the calendar starts!</h2>
         [%- IF previous_years %]
 <p class="center">In the mean time, you might want to check our archives.</p>
-        [% END %]
+        [%- END %]
     [%- ELSE %]
-<h2>The calendar has been retired, stay tuned for the Catalyst monthly
-    blog!</h2>
+<h2>[% retired %]</h2>
         [%- IF previous_years %]
 <p class="center">Please check out the archive of awesome articles from previous
 years.</p>
-        [% END %]
+        [%- END %]
     [%- END %]
 <p class="center">
 [% FOREACH previous_year IN previous_years %]
