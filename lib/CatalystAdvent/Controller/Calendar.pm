@@ -43,20 +43,20 @@ has retired => (is => 'ro');
 sub base : Chained('/base') PathPart('') CaptureArgs(0) {}
 
 sub index : Chained('base') PathPart('') Args(0) {
-    my ( $self, $c ) = @_;
+    my ($self, $c) = @_;
 
-    my $now = $c->stash->{now};
-    my $start_date = $now->clone->set(month => 12, day => 1);
-
-    opendir DIR, $c->path_to('root') or die "Error opening root: $!";
-    my @years = sort grep { /\d{4}/ } readdir DIR;
-    closedir DIR;
-
-    my $days_until = $start_date->delta_days($now)->delta_days;
+    my @years = $self->_years($c);
 
     if (not $self->retired) {
+        my $now = $c->stash->{now};
+
         if (not ($now->month == 12 || ($now->month == 1 || $now->month == 2))) {
+            my $start_date = $now->clone->set(month => 12, day => 1);
+
+            my $days_until = $start_date->delta_days($now)->delta_days;
+
             $c->stash(days_until => $days_until);
+
             pop @years if @years && $years[-1] == $now->year;
         }
     }
@@ -67,10 +67,14 @@ sub index : Chained('base') PathPart('') Args(0) {
     $c->stash(previous_years => \@years) if @years;
 
     $c->go($self->action_for('year'), [$years[-1]], []) if @years;
+}
 
-#    $c->stash->{year}     = $year;
-#    $c->stash->{calendar} = calendar( 12, $year );
-#    $c->stash->{template} = 'year.tt';
+sub _years {
+    my ($self, $c) = @_;
+
+    opendir my $dir, $c->path_to('root') or die "Error opening root: $!";
+
+    return sort { $a <=> $b } grep { /^\d{4}\z/ } readdir $dir;
 }
 
 =head2 get_year

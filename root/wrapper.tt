@@ -24,9 +24,9 @@
 <p class="center">In the mean time, you might want to check our archives.</p>
         [%- END %]
     [%- ELSE %]
-<h2>[% retired %]</h2>
+        [%- PROCESS retired.tt -%]
         [%- IF previous_years %]
-<p class="center">Please check out the archive of awesome articles from previous
+<p class="center">Please check out the archive of articles from previous
 years.</p>
         [%- END %]
     [%- END %]
