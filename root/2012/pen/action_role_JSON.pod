@@ -1,0 +1,129 @@
+
+=head1 Action Roles for cleaner less stashy Catalyst Actions
+
+=head2 Overview
+
+How to Serialize return values from Catalyst Actions
+
+=head3 About this Article
+
+Please note that this article leverages behavior that used to only exist in L<Catalyst::Controller::ActionRole> 
+but has been merged into Catalyst proper in Catalyst v5.90013 .
+To take advantage of ActionRoles with an older Catalyst see the docs for L<Catalyst::Controller::ActionRole>.
+
+=head2 { hello => 'world' }
+
+
+Write a function that given a name, returns a user readable greeting along with a hashref of the data used.
+Simple.
+
+    sub hello {
+        my($name) = @_;
+        return {
+            message => "howdy $name",
+            metadata => {
+                name => $name,
+            },
+        };
+    }
+
+It's readable and extensible.
+Write a Catalyst action that does the same.
+
+    sub hello {
+        my ( $self, $ctx ) = @_;
+        my $name = $ctx->req->params->{name};
+        $ctx->res->headers->{ContentType} = "text/javascript";
+        $ctx->res->body(
+            $self->json->encode(
+                {
+                    message  => "hello $name!",
+                    metadata => { name => $name },
+                }
+            )
+        );
+    }
+
+This is now pretty awful. A method that is supposed to take a string and transform it into a hashref is now:
+
+=over 2
+
+=item reading from the global "params"
+
+=item doing the transformation
+
+=item JSON encoding the response
+
+=back
+When that goes from being ugly to being a pain is when you decide you want to use L<Catalyst::Controller::REST>.
+
+The method becomes:
+
+    sub hello {
+        my ( $self, $ctx ) = @_;
+        my $name = $ctx->req->params->{name};
+        return $ctx->stash->{rest} = 
+            {
+                message  => "hello $name!",
+                metadata => { name => $name },
+            };
+    }
+
+And you now have to modify every action that used to use the first method.
+
+Let's clean this up a bit.
+
+In your controller:
+
+    __PACKAGE__->config( 
+        action => {
+            hello => {
+                Does => "JSONEncode"
+            }
+        }
+    );
+
+....meanwhile, in lib/WebApp/ActionRole/JSONEncode.pm
+
+    package WebApp::ActionRole::JSONEncode;
+    use strictures 1;
+    use Moose::Role;
+    use JSON;
+    has json => (
+        is => 'ro',
+        default => sub { JSON->new }
+    );
+
+    around execute => sub {
+        # $self is the $c->action being 'executed'
+        my ( $orig, $self ) = ( shift, shift );         
+        # execute is called on an action in a controller context
+        my ( $controller, $ctx ) = @_;                  
+        # wrap the original method
+        my $ret = $self->$orig(@_);                     
+        $ctx->res->headers->{ContentType} = "text/javascript";
+        $ctx->res->body( $self->json->encode( $ret ) );   
+        return $ret;
+    };
+
+    no Moose::Role;
+    1;
+
+The method now becomes:
+
+    sub hello {
+        my ( $self, $ctx ) = @_;
+        my $name = $ctx->req->params->{name};
+        return {
+                message  => "hello $name!",
+                metadata => { name => $name },
+            };
+        )
+    }
+
+So while the 'name' param is still being grabbed from a global (we'll leave fixing that for another time and place), the method is returning the intended hash without worrying about the encoding.
+
+
+=head1 AUTHOR
+
+Samuel Kaufman <skaufman@cpan.org>
