@@ -3,7 +3,7 @@
 =head1 OVERVIEW
 
 A bit about the contents of the Advent Calendar and some general thoughts on 
-the l<Catalyst> project.
+the L<Catalyst> project.
 
 =head1 Didn't Advent Start already?
 
