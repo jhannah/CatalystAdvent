@@ -1,0 +1,337 @@
+=head1 Catalyst in 9 steps - step 8: SQLite DB accessed with DBIC in the controller, CLI scripts
+
+Note: You can download the archive with the application created in this eighth step from:
+
+=begin xhtml
+
+<a href="/calendar/static/2012/WebApp-0.08.tar.gz">WebApp-0.08.tar.gz</a>
+
+=end xhtml
+
+We now have an application that can use a relational database. It uses a standalone library which can be also used easily in other programs and we have also made some CLI scripts that can use it. It does the HTML formatting in a view which uses Template-Toolkit templates.
+
+This application is very simple though, and it doesn't have too many SQL queries and the SQL code it uses is very basic. As we said, if we would change the DSN to make it use a MySQL database instead of SQLite, this application would work fine.
+
+But in other applications we might have much more complex queries and we might need to do a lot of string joining to compose the SQL code, which will lead to ugly source code which would be harder to maintain.
+The simple SQL queries we used are compatible with more database management systems and we are able to change the database types very easy. But if we will need to use complex queries, some of them will work with just a single database type, so that application would be much less flexible.
+
+For example, if we'd want to use a pretty simple SQL query like "select * from person limit 10", it will work with SQLite and MySQL databases, but it won't work with Oracle or MS SQL.
+
+The solution that would make our source code much elegant and easier to maintain and which would make the application compatible with more database types, is to use an L<ORM|http://en.wikipedia.org/wiki/Object-relational_mapping> (Object Relational Mapping).
+An ORM used in a Perl application is a Perl package of modules that can access a relational database using Perl objects, methods and data structures, and not simple SQL strings.
+
+The most used ORM in Perl which is also the preferred ORM in Catalyst applications is L<DBIx::Class|https://metacpan.org/module/DBIx::Class>, also known as DBIC.
+
+DBIC is a pretty complex package and it takes some time to learn it, but it increases the productivity very much. In this article we will improve our application to make it access the SQLite database using it. We won't give too many details about this ORM, but we will show how it can be used in a Catalyst app.
+
+You can read more about DBIC by reading the POD documentation of the following modules:
+
+    L<DBIx::Class|https://metacpan.org/module/DBIx::Class>
+    L<DBIx::Class::Manual::Intro|https://metacpan.org/module/DBIx::Class::Manual::Intro>
+    L<DBIx::Class::Manual::Example|https://metacpan.org/module/DBIx::Class::Manual::Example>
+    L<DBIx::Class::Manual::Cookbook|https://metacpan.org/module/DBIx::Class::Manual::Cookbook>
+    L<DBIx::Class::Manual::FAQ|https://metacpan.org/module/DBIx::Class::Manual::FAQ>
+    L<DBIx::Class::Manual::Joining|https://metacpan.org/module/DBIx::Class::Manual::Joining>
+
+Because our application is very simple and so are the SQL queries we used, it won't be very clear what's the advantage of using DBIC, but in more complex apps, the productivity improvement will be huge.
+
+In order to use DBIC, we will need to create a so called Result class for each table in the database. A Result class is a Perl module that contains information about the table, like the name of the table, the names of the columns, the primary key and other information.
+
+If we need to use DBIC to access a database that has many tables, it is very time consuming and error prone to create all those Perl modules manually, but fortunately there are methods to run a command that studies the internal structure of the database and create those modules automaticly. We can also use that method if we made some structural changes in the database and need to re-generate those Perl modules and it will work even after we already made some manual changes in them.
+
+To access a database using DBIC, in Catalyst apps we can create a model using a command line similar to the ones presented at the end of step 6, but this time we will create a model which inherits from Catalyst::Model::DBIC::Schema. Because this model will require more details, the command line will be pretty long, and because we might need it to use it again after we made some structural changes in the database, we can store it in a batch file.
+
+We will first delete the existing model DB.pm and then we will create a new model named DB.pm using the following command in the main directory of the application:
+
+    perl script/webapp_create.pl model DB DBIC::Schema StandaloneApp3 \
+    create=static dbi:SQLite:data/database_file2.db
+
+Here it is what means each component of this command:
+
+    perl script/webapp_create.pl model
+
+This means that we will create a model (and not a controller or view).
+
+    DB
+
+This is the name of the model we will create.
+
+    DBIC::Schema
+
+This is the type of the model, or with other words it means that this model will inherit from Catalyst::Model::DBIC::Schema
+
+    StandaloneApp3
+
+This will be the name of the standalone module that will be accessed with the model DB.pm. As we said, it is usually recommended to place these modules not directly under the lib directory, but under the directory with the name of the Catalyst application, in our case under lib/WebApp, so by recommendation this standalone module should have been named WebApp::StandaloneApp3. We named it just StandaloneApp3 in order to be created automaticly in the lib directory, because we also created there the previous standalone libraries StandaloneApp1 and StandaloneApp2.
+
+    create=static
+
+We need to use this command line parameter always in order to have the Result class modules generated and saved on the disk.
+
+    dbi:SQLite:data/database_file2.db
+
+This last parameter contains the DSN we need to access the database.
+
+After these parameters we can also add the username and the password as 2 distinct parameters in case the database we use needs them.
+
+This command will create the following files on the disk:
+
+    lib/StandaloneApp3.pm - the schema module of the standalone library
+    lib/StandaloneApp3/Result/Person.pm - the Result class for the table person
+    lib/WebApp/Model/DB.pm - the model that will access the standalone library
+    t/model_DB.t - the base of the test file for the model DB
+
+The model DB.pm will have the following content (plus some POD documentation):
+
+    package WebApp::Model::DB;
+    use strict;
+    use base 'Catalyst::Model::DBIC::Schema';
+    1;
+
+The Catalyst helper command we just used to create this model also added in it the configuration data we provided at command line, but we will delete this code from the DB.pm model and we will add it in the configuration file webapp.conf, because we might need this configuration data in other applications that might need to access our database using the DBIC schema StandaloneApp3.pm.
+
+In the configuration file this will appear as:
+
+    <Model::DB>
+        schema_class StandaloneApp3
+        <connect_info>
+            dsn dbi:SQLite:__path_to(data,database_file2.db)__
+        </connect_info>
+    </Model::DB>
+
+After we created the model and generated the DBIC classes and after we added the configuration to the config file, we will modify the controller Manage to access the database using DBIC. The controller will have the following content:
+
+    package WebApp::Controller::Manage;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Controller';
+
+    sub add : Local {
+        my ( $self, $c ) = @_;
+
+        if ( delete $c->request->params->{submit} ) {
+            $c->model( 'DB::Person' )->create( $c->request->params );
+            $c->res->redirect( "/manage" );
+        }
+    }
+
+    sub edit : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+
+        if ( delete $c->request->params->{submit} ) {
+            $c->model( 'DB::Person' )->find( $wanted_id )->update( $c->request->params );
+            $c->res->redirect( "/manage" );
+        }
+        else {
+            my $members = $c->model( 'DB::Person' )->find( $wanted_id );
+
+            $c->stash(
+                wanted_id => $wanted_id,
+                first_name => $members->first_name,
+                last_name => $members->last_name,
+                email => $members->email,
+            );
+        }
+    }
+
+    sub delete : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+        $c->model( 'DB::Person' )->find( $wanted_id )->delete;
+        $c->res->redirect( "/manage" );
+    }
+
+    sub index :Path :Args(0) {
+        my ( $self, $c ) = @_;
+        my @members = $c->model( 'DB::Person' )->search( undef, { order_by => 'id' } )->all;
+        $c->stash( members => \@members );
+    }
+
+    1;
+
+
+In the add() subroutine only the following 2 lines were modified:
+
+        if ( delete $c->request->params->{submit} ) {
+            $c->model( 'DB::Person' )->create( $c->request->params );
+
+In the first line we added the delete function. The hashref $c->request->params contains the keys first_name, last_name, email and commit.
+We will send the whole hashref as a parameter to the DBIC method create() to create a new record in the database with the values that correspond to these keys.
+But in the database table there is no column named "commit", and if we would be sending it, we would receive an error, so we should delete it. The delete() function returns true if the hashref contained a key named "submit" so it has the same effect as when we just checked if there is a key named "submit" in that hash. With other words, if the form was submitted, the hashref contains a "commit" key, so the delete returns true.
+
+The second line is the way used by DBIC to create a new record with the values from the hashref sent as a parameter.
+The keys from this hash should correspond to the column names of the database table.
+
+This line is a shortened version of the longer line:
+
+            $c->model( 'DB' )->resultset( 'Person' )->create( $c->request->params );
+
+DB is the name of the model and Person is the Result class that corresponds to the "persons" table. DBIC by default singularizes the names of the tables when it generates the corresponding Result classes.
+
+In the edit() subroutine there are a few more lines which were modified:
+
+        if ( delete $c->request->params->{submit} ) {
+            $c->model( 'DB::Person' )->find( $wanted_id )->update( $c->request->params );
+
+The second line uses the model DB and the Result class Person. It first searches for the record with the primary key $wanted_id and then updates that record with the values from $c->request->params hashref.
+
+            my $members = $c->model( 'DB::Person' )->find( $wanted_id );
+
+The line above also used the model DB and the Result class Person and searched for the record with the primary key $wanted_id.
+
+                first_name => $members->first_name,
+                last_name => $members->last_name,
+                email => $members->email,
+
+These lines add the variables above to the stash in order to be then used for rendering the template edit.tt.
+You can see that the names of the columns are accessors of the object $members.
+
+In the delete() subroutine there is only a single line modified:
+
+        $c->model( 'DB::Person' )->find( $wanted_id )->delete;
+
+This line also uses the model DB and the Result class Person. It searches for the record with the primary key $wanted_id and it deletes that record.
+
+In the subroutine index() both lines of code were modified:
+
+        my @members = $c->model( 'DB::Person' )->search( undef, { order_by => 'id' } )->all;
+        $c->stash( members => \@members );
+
+The first line gets all the records from the database, so it doesn't use the find() method that gets only a single record, but the search() method which is more complex.
+This time we don't need to specify any search criteria in the first parameter of the method, so it is undef, but in the second parameter we specify that we want the found records to be ordered by their ID.
+
+The search() method returns a ResultSet object that can be iterate using the next() iterator with a syntax like:
+
+    while ( my $m = $members->next ) {
+        print $m->first_name;        #and also $m->last_name, $m->email
+    }
+
+In the index.tt template we don't use WHILE but FOREACH, so we need to add an arrayref in the stash as we did until now. In order to return an array of records from the ResultSet given by search() we needed to use the all() method.
+In the second line we added to the stash a reference to the @members array.
+
+And that's all. This time we don't need to create a standalone module manually as we did before, because that standalone module is now a DBIC schema and it was created automaticly together with the Result classes and the Catalyst model DB when we used that long command.
+
+For using DBIC in our application we just needed to run the Catalyst helper script (that long command) and change the Manage controller. (We have also moved the configuration code from the model DB to the config file, but the application can also work at this stage without that movement.)
+
+So we moved from an application that uses SQL queries to access the database to an application that uses DBIC without too much effort, and the new application will work with the same database, the same view, same template files as before.
+
+As we are going to do on each step, we will test the application using the same actions:
+
+Run again the development server:
+
+    perl script/webapp_server.pl
+
+And then access it at the following URL:
+
+    http://localhost:3000/manage
+
+Click on the "Add new member". It will open the page with the add form.
+Add some data in the form and submit it. It will add that record in the database and it will redirect to the page with the persons.
+Click on the name of the person. It will open the edit form. Change some values and submit that form. It will make the change in the database and it will redirect to the page with the list of persons.
+Click on "Delete member" link for the person you want. It will delete that record from the database and it will redirect to the page with the list of persons.
+
+
+Note: Even though the standalone library StandaloneApp3.pm is a different library than StandaloneApp2.pm, both libraries access the same database file data/database_file2.db, one using SQL and the other using DBIC.
+
+The Catalyst helper command created a standalone library for us without writing any code, and we can also use it in other programs to access the database of our application.
+
+We will create the scripts add.pl, edit.pl, delete.pl and retrieve.pl and we will place them in the directory standalone_app3_script. These scripts will be very similar to the scripts from the directory standalone_app2_script, so we will explain only the lines which are different.
+
+    # add.pl
+
+    use StandaloneApp3;
+
+    my $dsn = $config->{'Model::DB'}{connect_info}{dsn};
+
+This line is similar but the Catalyst helper created a configuration with a different structure, so we use "connect_info" key instead of "args".
+
+    my $app = StandaloneApp3->connect( $dsn );
+
+This line initializes the DBIC schema object using a similar syntax with the one used by the module DBI.
+
+    $app->resultset( 'Person' )->create( { first_name => $first_name,
+      last_name => $last_name, email => $email } );
+
+This line uses the Result class Person and creates a new record in the database with the values from the hashref given as a parameter to the create() method.
+The keys should be the names of the columns of the table persons.
+
+    # edit.pm
+
+    $app->resultset( 'Person' )->find( $id )->update( { first_name => $first_name,
+      last_name => $last_name, email => $email } );
+
+This line uses the Person Result class, gets the record with the primary key $id and updates it in the database with the new values given.
+The other changed lines that appear in this script were explained above for the script add.pl.
+
+    # delete.pl
+
+    $app->resultset( 'Person' )->find( $id )->delete;
+
+This line uses the Person Result class, gets the record with the primary key $id and deletes it.
+
+    #retrieve.pl
+
+    my $members = $app->resultset( 'Person' )->search( undef, { order_by => 'id' } );
+
+This line gets all the records from the table persons and orders them by the column "id".
+
+    $members = $members->search( { id => $id } ) if $id;
+
+If the command line parameter --id was used, so if the $id variable is true, this line refines the search by adding a new condition that the ID of the record should be the given ID. At this point, no search in the database is made yet, so other conditions and options can be added.
+
+    my @members = $members->all;
+
+This line executes the method all() which returns an array with all the records from the ResultSet $members.
+
+    for my $m ( @members ) {
+        print $m->id, ', ', $m->first_name, ', ', $m->last_name, ', ', $m->email, "\n";
+    }
+
+This code get each record from the @members array as an object. For returning the values of some columns of the record we can use the column names as methods of this object.
+
+We can also use these scripts as a test of the standalone library (the DBIC schema) using commands like:
+
+    perl add.pl --first-name John --last-name Smith --email john@smith.com
+
+    perl edit.pl --id 1 --first-name George --last-name Smith --email j@smith.com
+
+    perl retrieve.pl --id 1
+
+    perl delete.pl --id 1
+
+In order to be also able to use the old CLI scripts from the directory standalone_app2_script that use the old library StandaloneApp2.pm (which accesses the database using plain SQL), we changed the line that gets the DSN from the configuration file, because we modified that file.
+
+That line in the old CLI scripts was:
+
+    my $dsn = $config->{'Model::DB'}{args}{dsn};
+
+and now it is:
+
+    my $dsn = $config->{'Model::DB'}{connect_info}{dsn};
+
+We've seen that in previous steps when we were using a plain text database or when we were accessing the current SQLite database with plain SQL queries we needed to manually create the subroutines add(), edit(), delete() and retrieve() in the standalone library. Now that we use DBIC, it was pretty simple to skip creating those subroutines and use directly the methods offered by this ORM. In our example we have used the methods find() to find a record with a certain primary key, search() to search for one or more records with certain conditions and options, update() to update the found record with new data, delete() to delete the found record or records, next() to iterate the list of results from a ResultSet object and get each record, all() to create an array with records, but DBIC offer other methods for doing more complex things in an easier way.
+
+We have also created a test file t/05standalone_app3.t which tests if the DBIC schema works fine.
+
+In order to access the database, these test files, as well as the CLI scripts get the DSN from the configuration file made under the key Module::DB. Now that we changed this configuration, we should also change it in the old test file 04standalone_app2.t which tests if the database can be accessed using plain SQL because otherwise it won't be able to find the database.
+
+So in that test file we must changed the line:
+
+    my $dsn = "$config->{'Model::DB'}{args}{dsn}_test";
+
+with:
+
+    my $dsn = "$config->{'Model::DB'}{connect_info}{dsn}_test";
+
+And then we can run all the tests with:
+
+    prove -l t
+
+And it should finish with the results:
+
+    All tests successful.
+    Files=6, Tests=88,  4 wallclock secs ( 0.05 usr +  0.01 sys =  0.06 CPU)
+    Result: PASS 
+
+=head2 Author:
+
+Octavian Rasnita <orasnita@gmail.com>

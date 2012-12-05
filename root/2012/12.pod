@@ -1,0 +1,161 @@
+=head1 Catalyst in 9 steps - step 6: A light controller, a fat model with an SQLite DB and a TT view 
+
+Note: You can download the archive with the application created in this sixth step from:
+
+=begin xhtml
+
+<a href="/calendar/static/2012/WebApp-0.06.tar.gz">WebApp-0.06.tar.gz</a>
+
+=end xhtml
+
+We managed to change the database type of the application from a simple text file to a more reliable and scalable relational database, but now we have business code in the controller again and if we will need to use a part of it in other controllers, we would need to duplicate that code, which is bad.
+
+The previous controller Manage.pm that we made on step 4 is much better because it contains just web logic code and not business code. It cleanly calls the model DB and its methods add(), edit(), delete() and retrieve(), and those subroutines from the model do the business logic.
+
+So we will continue with the application we made in the previous step, but we will abandon the controller Manage.pm that we made in that step and we will get and use the controller Manage.pm we made at step 4 because it is much better.
+
+We will add the subroutines add/edit/delete/retrieve in the model DB.pm that we created in the previous step, and in the Manage controller we will just execute those subroutines.
+
+We will see that these subroutines will be very similar to the code we added in the controller Manage.
+
+After adding these subroutines to the model DB, it will become a fat model, (like the model we used in the step 2), and it will have the following content:
+
+    package WebApp::Model::DB;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Model::DBI';
+
+    sub add {
+        my ( $self, $params ) = @_;
+
+        my $first_name = $params->{first_name};
+        my $last_name = $params->{last_name};
+        my $email = $params->{email};
+
+        my $dbh = $self->dbh;
+
+        my $p = $dbh->prepare( "insert into persons(first_name, last_name, email) values(?,?,?)" );
+
+            $p->execute( $first_name, $last_name, $email );
+    }
+
+    sub edit {
+        my ( $self, $wanted_id, $params ) = @_;
+
+        my $first_name = $params->{first_name};
+        my $last_name = $params->{last_name};
+        my $email = $params->{email};
+
+        my $dbh = $self->dbh;
+
+        my $p = $dbh->prepare( "update persons set first_name=?, last_name=?, email=? where id=?" );
+
+        $p->execute( $first_name, $last_name, $email, $wanted_id );
+    }
+
+    sub delete {
+        my ( $self, $wanted_id ) = @_;
+
+        my $dbh = $self->dbh;
+
+        my $p = $dbh->prepare( "delete from persons where id=?" );
+        $p->execute( $wanted_id );
+    }
+
+    sub retrieve {
+        my ( $self, $wanted_id ) = @_;
+
+        my $dbh = $self->dbh;
+
+        my $members;
+
+        if ( $wanted_id ) {
+            $members = $dbh->selectall_arrayref( "select * from persons where id=? order by id",
+              { Slice => {} }, $wanted_id );
+        }
+        else {
+            $members = $dbh->selectall_arrayref( "select * from persons order by id",
+              { Slice => {} } );
+        }
+
+        return $members;
+    }
+
+    1;
+
+
+The subroutines will receive the same parameters like the subroutines from the fat model which we used on step 2.
+The difference between the current model and the model from step 2 is that now the business logic use a relational database and not a text file for storing data.
+Another difference between these 2 models is that the current model doesn't inherit from Catalyst::Model, but from Catalyst::Model::DBI, which offers in addition a few more subroutines, one of them beeing dbh() that returns the handle to the database.
+
+The add() subroutine will be called with a parameter $params which is a hashref and from this hashref we are getting the variables $first_name, $last_name and $email.
+
+        my $dbh = $self->dbh;
+
+This line calls the method dbh() of the current model which returns the database handle.
+
+Then the next lines add the new record in the database, using the identical code we used in the controller Manage.
+
+The subroutines edit() and delete() do similar things, but they don't add a new record but update or delete an existing record.
+
+The subroutine retrieve() does 2 things: If it is called without parameters, it selects and returns an arrayref with all the records from the database, and if it is called with a parameter - the ID of the record we want, it selects and returns an arrayref that contain just the wanted record.
+
+So, what do we have now?
+
+On this step we just moved the business logic from the controller Manage to the model DB.
+We are now using the old controller Manage that we created on step 4 without any change. We use the same SQLite database as in the previous step, the same configuration for the model, the same view and templates.
+The advantage of moving the business logic to the model is that now we are able to call it in more controllers if we need it, without needing to have duplicated code.
+
+Because the controller Manage just calls the methods from the model, it is still working fine even though it was made to work when we were using a text file database.
+And because the new model returns the same type of data to the controller which then forwards it to the view, the view and the templates are also working without any change.
+
+This is the advantage of separation of code in controllers, models and views. We can use the same controller, view and templates with a totally changed business logic.
+And if the web designers would want to add design elements in the templates, they will work with existing views, controllers and models if the new design doesn't need additional data from database.
+
+As we are going to do on each step, we will test the application using the same actions:
+
+Run again the development server:
+
+    perl script/webapp_server.pl
+
+And then access it at the following URL:
+
+    http://localhost:3000/manage
+
+Click on the "Add new member". It will open the page with the add form.
+Add some data in the form and submit it. It will add that record in the database and it will redirect to the page with the persons.
+Click on the name of the person. It will open the edit form. Change some values and submit that form. It will make the change in the database and it will redirect to the page with the list of persons.
+Click on "Delete member" link for the person you want. It will delete that record from the database and it will redirect to the page with the list of persons.
+
+Each time we created a Catalyst component (controller, model or view) we created the file and its content manually, but Catalyst offers more helper scripts that can be used to create these components with a command line.
+
+Here are a few examples of such commands:
+
+Create a Manage controller which inherits from Catalyst::Controller:
+
+    perl script/webapp_create.pl controller Manage
+
+Create a DB model which inherits from Catalyst::Model:
+
+    perl script/webapp_create.pl model DB
+
+Create a DB model which inherits from Catalyst::Model::DBI:
+
+    perl script/webapp_create.pl model DB DBI
+
+Create a DB model which inherits from Catalyst::Model::Adaptor:
+
+    perl script/webapp_create.pl model DB Adaptor
+
+Create a TTView view which inherits from Catalyst::View::TT:
+
+    perl script/webapp_create.pl view TTView TT
+
+We haven't used these commands in our application because some of the helper scripts use Moose, some of them don't use it but instead use "use base" or "use parent" and it might have been a little unclear for those who don't know Moose yet why is this difference.
+We also wanted to show that the components we need to create in a Catalyst application can work without Moose.
+
+Moose is great, but it may be a stopper for those who don't know it but want to use Catalyst, not because Catalyst cannot be used without it, but because most Catalyst tutorials include it.
+
+=head2 Author:
+
+Octavian Rasnita <orasnita@gmail.com>

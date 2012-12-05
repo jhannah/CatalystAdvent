@@ -1,0 +1,266 @@
+=head1 Catalyst in 9 steps - step 2: A Controller and a fat model with a text DB
+
+Note: You can download the archive with the application created in this second step from:
+
+=begin xhtml
+
+<a href="/calendar/static/2012/WebApp-0.02.tar.gz">WebApp-0.02.tar.gz</a>
+
+=end xhtml
+
+L<Catalyst|https://metacpan.org/module/Catalyst> is an L<MVC|http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller> framework (model/view/controller). The model is the interface to the business logic, the view is the part of the app that provides the results in different formats (html, JSON, XML, PDF, CSS...). The controller is the part of the app which... as its name says, controls the web logic.
+
+The recommendation is to use fat models and light controllers. This means that the business logic, the biggest part of the application should be in the models and not in the controllers. The controllers should just get the data from web requests and send it to the appropriate models and get the results from models and send them back to browsers.
+
+Why does it matter this separation?
+
+For code reuse, for an easier testing.
+
+If a Catalyst app wrongly executes the business logic in a controller and then it needs to use a part of that business logic in other controllers, the same code may need to be copied in more places and it would need to be maintained in more places.
+
+If a model does the business logic as it should, that model can be called in more controllers and the business logic code need to be maintained in a single place.
+
+If the parts of the application are separated and independent, they can be easier plugged with each other in much more combinations and they can be easier reused even in other applications.
+
+Even though the recommendation is to use fat models and light controllers in Catalyst apps, many Catalyst tutorials don't do that, but show how to do some things by adding code to the controllers and not to the models, because it is much easier to understand that way.
+
+Ideally, the controllers should not include any business logic code because this is the job of models. Also ideally, they should not include any code used for formatting data, because this is the job of the views.
+
+In our application in its first step we included both business logic and HTML formatting in the controller because it was easier to understand how Catalyst works this way, but now we will need to separate the business logic and add it in a fat Catalyst model.
+
+Ok, but if it works... why should we change it?
+
+You have seen that in our application we have created 2 controllers that do the same thing. We needed to duplicate the entire business logic in both controllers, and if we want to change something in that business logic, to correct an error, or to add some features, we would need to do it in both controllers.
+In real world application probably we wouldn't have 2 controllers that do the same thing, but we will probably have more different controllers that would require the same parts of the business logic.
+
+So the next step would be to create a fat Catalyst model, which is nothing more than a module that inherits from Catalyst::Model which contains all the subroutines we need to add, edit, delete and retrieve the data from our database.
+
+So will create a file named DB.pm in the directory lib/WebApp/Model that will have the following content:
+
+
+    package WebApp::Model::DB;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Model';
+    use File::Slurp ':all';
+
+    __PACKAGE__->config(
+        database_file => 'd:/web/step2/WebApp/data/database_file.txt',
+    );
+
+    sub add {
+        my ( $self, $params ) = @_;
+
+        my $database_file = $self->{database_file};
+
+        my ( @lines, $id );
+        @lines = read_file( $database_file ) if -f $database_file;
+        ( $id ) = $lines[-1] =~ /^(\d+)\|/ if $lines[-1];
+        $id = $id ? $id + 1 : 1;
+
+        write_file $database_file, { append => 1 },
+          "$id|$params->{first_name}|$params->{last_name}|$params->{email}\n";
+    }
+
+    sub edit {
+        my ( $self, $id, $params ) = @_;
+
+        my $database_file = $self->{database_file};
+
+        my $first_name = $params->{first_name};
+        my $last_name = $params->{last_name};
+        my $email = $params->{email};
+
+        edit_file_lines { s/^$id\|.*$/$id|$first_name|$last_name|$email/ } $database_file;
+    }
+
+    sub delete {
+        my ( $self, $wanted_id ) = @_;
+
+        my $database_file = $self->{database_file};
+
+        edit_file_lines { $_ = '' if /^$wanted_id\|/ } $database_file;
+    }
+
+    sub retrieve {
+        my ( $self, $wanted_id ) = @_;
+
+        my $database_file = $self->{database_file};
+
+        my @raw_lines;
+        @raw_lines = read_file $database_file if -f $database_file;
+        chomp @raw_lines;
+
+        my ( @lines, $id, $first_name, $last_name, $email );
+
+        for my $raw_line ( @raw_lines ) {
+            my ( $test_id ) = split( /\|/, $raw_line );
+            next if $wanted_id && $wanted_id != $test_id;
+            ( $id, $first_name, $last_name, $email ) = split( /\|/, $raw_line );
+
+            push( @lines, {
+                id => $id,
+                first_name => $first_name,
+                last_name => $last_name,
+                email => $email,
+            } );
+        }
+
+        return \@lines;
+    }
+
+    1;
+
+
+You've seen that the code of this model is similar to the one in the controller Manage2 that we made in the first step, but it is more simple because it doesn't contain any HTML generation code in it. It doesn't contain any web logic either, because we don't need to test here if a form was submitted or not, or to redirect to a certain URL.
+
+This model also simplifies something else...
+In the edit() subroutine of the controller Manage.pm we needed to retrieve the lines from the database in order to get the record we wanted to edit. In the retrieve() subroutine of the same controller we needed to retrieve all the records for printing them in the page with the list of persons. So we needed to use a similar code in 2 places.
+
+In the model DB.pm we shortened the code  a little because we created a retrieve() subroutine which accepts the optional parameter $wanted_id. If this subroutine is called without parameters, it returns an array with all the records from the database, as we need in the retrieve() subroutine of the controller. If it is called with one parameter - the ID of the record we need, it will return an array with a single element - the record with that ID, as we need in the edit() subroutine of the controller. So we will be able to call the same subroutine in both edit() and retrieve() subroutines of the Manage controller.
+
+After we created this model, we need to simplify the controller Manage.pm, which will have the content below.
+
+Note: We will change the controller Manage.pm and not the improved controller Manage2.pm, because that improvement was to just add the database file path to the controller's configuration, but if we moved the business logic to the DB.pm model, we won't need to access at all the database file name in the controller. And you've probably noticed that the model uses exactly the same code for adding the database file name to its configuration.
+We don't need the controller Manage2.pm anymore so we deleted it.
+
+
+    package WebApp::Controller::Manage;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Controller';
+
+    sub add : Local {
+        my ( $self, $c ) = @_;
+
+        if ( $c->request->params->{submit} ) {
+            $c->model( 'DB' )->add( $c->request->params );
+            $c->res->redirect( "/manage" );
+        }
+        else {
+            my $body = qq~<html><head><title>Add person</title></head><body>
+                <form action="/manage/add" method="post">
+                First name: <input type="text" name="first_name" /><br />
+                Last name: <input type="text" name="last_name" /><br />
+                Email: <input type="text" name="email" /><br />
+                <input type="submit" name="submit" value="Save" />
+                </form></body></html>~;
+
+            $c->response->body( $body );
+        }
+
+    }
+
+    sub edit : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+
+        if ( $c->request->params->{submit} ) {
+            $c->model( 'DB' )->edit( $wanted_id, $c->request->params );
+            $c->res->redirect( "/manage" );
+        }
+        else {
+            my $members = $c->model( 'DB' )->retrieve( $wanted_id );
+            my $first_name = $members->[0]{first_name};
+            my $last_name = $members->[0]{last_name};
+            my $email = $members->[0]{email};
+
+            my $body = qq~<html><head><title>Edit person</title></head><body>
+                <form action="/manage/edit/$wanted_id" method="post">
+                First name: <input type="text" name="first_name" value="$first_name" /><br />
+                Last name: <input type="text" name="last_name" value="$last_name" /><br />
+                Email: <input type="text" name="email" value="$email" /><br />
+                <input type="submit" name="submit" value="Save" />
+                </form></body></html>~;
+
+            $c->response->body( $body );
+        }
+
+    }
+
+    sub delete : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+        $c->model( 'DB' )->delete( $wanted_id );
+        $c->res->redirect( "/manage" );
+    }
+
+    sub index :Path :Args(0) {
+        my ( $self, $c ) = @_;
+
+        my $members = $c->model( 'DB' )->retrieve;
+
+        my $body = qq~<html><head><title>Persons list</title></head><body>
+            <a href="/manage/add">Add new person</a><br /><table>~;
+
+        for my $m ( @$members ) {
+            $body .= qq~<tr>
+                <th>$m->{id}</th>
+                <td><a href="/manage/edit/$m->{id}">$m->{last_name}, $m->{first_name}</a></td>
+                <td>$m->{email}</td>
+                <td><a href="/manage/delete/$m->{id}">delete member</a></td>
+            </tr>\n~;
+        }
+
+        $body .= "</table></body></html>";
+
+        $c->response->body( $body );
+    }
+
+    1;
+
+
+Because the business logic has been moved to the fat model, we don't need to read/write/edit the database file directly in the controller, so we don't need the module File::Slurp anymore in the controller.
+
+In the add() subroutine we replaced a big part of the code with a single line:
+
+            $c->model( 'DB' )->add( $c->request->params );
+
+This line calls the subroutine add() from the model DB with the parameter $c->request->params. This parameter is a hashref with the request parameters.
+
+In the subroutine edit() from this controller we also changed a bigger piece of code with a single line:
+
+            $c->model( 'DB' )->edit( $wanted_id, $c->request->params );
+
+This line calls the edit() subroutine from the model DB with the parameters $wanted_id and $c->request->params.
+
+In the same edit() subroutine from the controller another piece of code is replaced with the following lines:
+
+            my $members = $c->model( 'DB' )->retrieve( $wanted_id );
+            my $first_name = $members->[0]{first_name};
+            my $last_name = $members->[0]{last_name};
+            my $email = $members->[0]{email};
+
+The first line of this code calls the subroutine retrieve() from the model DB with the parameter $wanted_idd and stores the result in the arrayref $members. This arrayref will contain just a single element, the record with the wanted ID.
+The other 3 lines just store the first name, last name and email from this arrayref in scalar variables.
+
+In the subroutine delete() from the controller a part of the code was replaced with the line:
+
+        $c->model( 'DB' )->delete( $wanted_id );
+
+This line calls the delete() subroutine from the DB model with the $wanted_id parameter.
+
+In the subroutine index() from the controller a part of the code was replaced with the line:
+
+        my $members = $c->model( 'DB' )->retrieve;
+
+This line calls the subroutine retrieve() from the DB model just like it did in the edit() subroutine, but this time it calls it without any parameter. The result will be an arrayref that will contain all the records in the database.
+
+In this second step we created a fat Catalyst model that holds the business logic, and we deleted the business logic code from the controller. Now if we need to create other controllers in which we need to add/edit/delete/retrieve records from the database, we will be able to do it each time by using just a single line of code which will look the same in all those controllers without needing to copy a lot of code. We won't need to add the database file path in the configuration of all those controllers either, because we added it to the configuration of the model.
+
+As we are going to do on each step, we will test the application using the same actions:
+
+Run again the development server:
+
+    perl script/webapp_server.pl
+
+And then access it at the following URL:
+
+    http://localhost:3000/manage
+
+Click on the "Add new member". It will open the page with the add form.
+Add some data in the form and submit it. It will add that record in the database and it will redirect to the page with the persons.
+Click on the name of the person. It will open the edit form. Change some values and submit that form. It will make the change in the database and it will redirect to the page with the list of persons.
+Click on "Delete member" link for the person you want. It will delete that record from the database and it will redirect to the page with the list of persons.
+
+=head2 Author:
+
+Octavian Rasnita <orasnita@gmail.com>

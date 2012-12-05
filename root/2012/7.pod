@@ -1,0 +1,439 @@
+=head1 Catalyst in 9 steps - step 1: Just a controller using a plain text file database
+
+Note: You can download the archive with the application created in this first step from:
+
+=begin xhtml
+
+<a href="/calendar/static/2012/WebApp-0.01.tar.gz">WebApp-0.01.tar.gz</a>
+
+=end xhtml
+
+Probably everybody remembers the first steps made in the childhood and the falls on belly that followed them, right? Oh, nobody remembers? Well, me neither, but there were surely many falls and they were very normal. The same thing happens when starting to learn a complex enough piece of software like Catalyst.
+
+We learn to walk by continuously improving our skills and knowledge because this is the easiest way. It would be much harder or impossible if an adult would teach us a lot of theory about the process of walking, without letting us to walk and fall.
+Why? Because at that age is easier to try to walk and fall than to understand what the adults tell us.
+
+Most L<Catalyst|https://metacpan.org/module/Catalyst> tutorials try to teach the beginners the "right way" directly, try to teach the best practices which usually involve other high-level Perl modules like templating systems, ORMs, form processors etc.
+The result is that there are many Perl programmers that consider Catalyst a web framework which is hard to use and which involves a lot of time for learning it even for doing a simple test web app.
+
+In this article I will try a different approach. I will try to create a simple Catalyst app which doesn't use the best practices and recommendations at the beginning, and then when the app is working and everything is clear we will move on by improving it step by step.
+This way should make clear that Catalyst framework is very simple to use and it should also make clear that a Catalyst app doesn't require using DBIx::Class, Template-Toolkit, HTML::FormFu or other similar modules.
+
+Note: This article is not a substitute for Catalyst docs. It just tries to cover the child steps which might be missing from Catalyst docs, but it is necessary to read Catalyst POD documentation in order to understand how URL dispatching works, or what is the stash, or how to redirect to a certain URL and so on.
+
+OK, let's begin. We will make a very simple application which doesn't really matter what it does, because we need it only to show how Catalyst works, not how to create such an application professionally.
+This application will be able to display a table with persons and it will also allow adding, editting and deleting the records in the database that holds these records.
+The database will hold 4 fields for each record saved: id, first name, last name and email.
+Not only that we won't use an ORM like DBIx::Class to access the database, but we won't even use a relational database (at the beginning). We will use a single text file as a database. Nothing more. Each row in the text file will be a record, and the fields of the same record will be separated by vertical bars (|). It won't be a strong database, it won't allow adding text that contain a vertical bar or end of line chars, and it will surely have other problems, but as I said, it is not important what it does, but how we can make Catalyst to use it and later how to improve it.
+
+We will begin by creating the base Catalyst project named WebApp, using the following command:
+
+    catalyst.pl WebApp
+
+(Or catalyst WebApp if you do it under Windows.)
+
+Then we change the current directory to the newly created "WebApp" directory using:
+
+    cd WebApp
+
+Then we run the application using the development web server provided by Catalyst just as a test, to see if it works:
+
+    perl script/webapp_server.pl
+
+And then we access it in the browser at the following URL:
+
+    http://localhost:3000/
+
+Yep, the welcome page of this app shows as it should.
+
+After this step, the application contains more files and folders, but for the moment we will be interested just in a few of them.
+In the main directory of the application there are the directories lib, root, script, t, and a few files.
+In this directory we will create another directory named "data" in which the application will store its database. This directory can be put anywhere, not necessarily under the WebApp directory.
+
+The "lib" directory contains all the modules used by this application.
+In this directory, the module WebApp.pm is the main module of the application.
+
+Alongside the module WebApp.pm there is a directory named WebApp which contains the directories Controller, Model and View.
+In the Controller directory there is a single controller module created by default, named Root.pm.
+
+We can add our code in that controller, or we can create another one. It would be a little easier to use the existing Root controller, but because in most applications you will need to create separate controllers for different parts of the application, we will also create another controller for doing what we want, especially that it is very simple to do it.
+
+In the Controller directory We will create a new module named Manage.pm that will have the content below.
+This controller will contain 4 subroutines:
+
+    - add() will be executed when we access the URL /manage/add
+    - edit() will be executed when we access the URL /manage/edit
+    - delete() will be executed when we access the URL /manage/delete
+    - index() will be executed when we access the URL /manage
+
+
+    package WebApp::Controller::Manage;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Controller';
+    use File::Slurp ':all';
+
+    sub add : Local {
+        my ( $self, $c ) = @_;
+
+        if ( $c->request->params->{submit} ) {
+            my $first_name = $c->request->params->{first_name};
+            my $last_name = $c->request->params->{last_name};
+            my $email = $c->request->params->{email};
+
+            my ( @lines, $id );
+
+            my $database_file = 'd:/web/step1/WebApp/data/database_file.txt';
+            @lines = read_file( $database_file ) if -f $database_file;
+            ( $id ) = $lines[-1] =~ /^(\d+)\|/ if $lines[-1];
+            $id = $id ? $id + 1 : 1;
+
+            write_file $database_file, { append => 1 },
+              "$id|$first_name|$last_name|$email\n";
+
+            $c->res->redirect( "/manage" );
+        }
+        else {
+            my $body = qq~<html><head><title>Add person</title></head><body>
+                <form action="/manage/add" method="post">
+                First name: <input type="text" name="first_name" /><br />
+                Last name: <input type="text" name="last_name" /><br />
+                Email: <input type="text" name="email" /><br />
+                <input type="submit" name="submit" value="Save" />
+                </form></body></html>~;
+
+            $c->response->body( $body );
+        }
+
+    }
+
+    sub edit : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+
+        my $database_file = 'd:/web/step1/WebApp/data/database_file.txt';
+
+        if ( $c->request->params->{submit} ) {
+            my $first_name = $c->request->params->{first_name};
+            my $last_name = $c->request->params->{last_name};
+            my $email = $c->request->params->{email};
+
+            edit_file_lines { s/^$wanted_id\|.*$/$wanted_id|$first_name|$last_name|$email/ } $database_file;
+            $c->res->redirect( "/manage" );
+        }
+        else {
+            my @raw_lines = read_file $database_file;
+            chomp @raw_lines;
+
+            my ( $id, $first_name, $last_name, $email );
+
+            for my $raw_line ( @raw_lines ) {
+                my ( $test_id ) = split( /\|/, $raw_line );
+                next if $wanted_id && $wanted_id != $test_id;
+                ( $id, $first_name, $last_name, $email ) = split( /\|/, $raw_line );
+            }
+
+            my $body = qq~<html><head><title>Edit person</title></head><body>
+                <form action="/manage/edit/$id" method="post">
+                First name: <input type="text" name="first_name" value="$first_name" /><br />
+                Last name: <input type="text" name="last_name" value="$last_name" /><br />
+                Email: <input type="text" name="email" value="$email" /><br />
+                <input type="submit" name="submit" value="Save" />
+                </form></body></html>~;
+
+            $c->response->body( $body );
+        }
+
+    }
+
+    sub delete : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+
+        my $database_file = 'd:/web/step1/WebApp/data/database_file.txt';
+        edit_file_lines { $_ = '' if /^$wanted_id\|/ } $database_file;
+        $c->res->redirect( "/manage" );
+    }
+
+    sub index :Path :Args(0) {
+        my ( $self, $c ) = @_;
+
+        my $body = qq~<html><head><title>Persons list</title></head><body>
+            <a href="/manage/add">Add new person</a><br /><table>~;
+
+        my $database_file = 'd:/web/step1/WebApp/data/database_file.txt';
+        my @raw_lines;
+        @raw_lines = read_file $database_file if -f $database_file;
+        chomp @raw_lines;
+
+        for my $raw_line ( @raw_lines ) {
+                my ( $id, $first_name, $last_name, $email ) = split( /\|/, $raw_line );
+
+            $body .= qq~<tr>
+                <th>$id</th>
+                <td><a href="/manage/edit/$id">$last_name, $first_name</a></td>
+                <td>$email</td>
+                <td><a href="/manage/delete/$id">delete person</a></td>
+            </tr>\n~;
+        }
+
+        $body .= "</table></body></html>";
+
+        $c->response->body( $body );
+    }
+
+    1;
+
+
+Here are some comments for the content of the Manage.pm module:
+
+    use base 'Catalyst::Controller';
+
+All the controller modules under the Controller directory inherit the class L<Catalyst::Controller|https://metacpan.org/module/Catalyst::Controller> so we are using it as a base.
+
+    use File::Slurp ':all';
+
+This line will load the module L<File::Slurp|https://metacpan.org/module/File::Slurp> and it will export all its subroutines, not only those subroutines exported by default, because we will need the subroutine edit_file_lines() which is not exported by default.
+
+    sub add : Local {
+        my ( $self, $c ) = @_;
+
+This code starts the add() subroutine, the one that will be executed when the URL /manage/add will be accessed.
+
+This subroutine will do 2 things:
+
+    1. It will display the form which will be used for adding a new person in the database.
+    2. It will add the data posted by the user if the form was submitted and then it will redirect to the page which displays the list of persons.
+
+        if ( $c->request->params->{submit} ) {
+
+This line will check if the page was requested with a parameter named "submit" (which is the name of the submit button in the add form), and if it is a true value, it will add the submitted data in the database.
+
+You can read more about $c->request method in the POD documentation of L<Catalyst::Request|https://metacpan.org/module/Catalyst::Request>.
+
+            my $first_name = $c->request->params->{first_name};
+            my $last_name = $c->request->params->{last_name};
+            my $email = $c->request->params->{email};
+
+These lines of code get the first name, last name and email variables from the posted data.
+
+            my $database_file = 'd:/web/step1/WebApp/data/database_file.txt';
+
+This line of code gets the full path to the database file. You need to change this line to match the full path to the database file on your computer. You can store it wherever you want.
+Because in all the subroutines from this controller module we need to access the same database file, we will see that this line appears in all the subroutines and we won't talk about it anymore.
+
+            @lines = read_file( $database_file ) if -f $database_file;
+
+This code uses the subroutine read_file() which is exported by the module File::Slurp. It reads the database file if it exists and it stores all the lines of that file in the array @lines.
+We need to read the database file because we need to get the last ID in it. The current ID will be the last stored ID + 1.
+
+            ( $id ) = $lines[-1] =~ /^(\d+)\|/ if $lines[-1];
+
+This line gets the ID from the last line of the file.
+From the last line of the file ($lines[-1]), it gets the first number (\d+ which is found between the beginning of the line (^) and the first vertical bar (|).
+
+            $id = $id ? $id + 1 : 1;
+
+If an ID was found so there is something in the database, the new ID is incremented with 1, otherwise the new id is the number 1.
+
+            write_file $database_file, { append => 1 },
+              "$id|$first_name|$last_name|$email\n";
+
+This code uses the subroutine write_file() which is exported by the module File::Slurp. It adds the new line at the end of the file.
+
+            $c->res->redirect( "/manage" );
+
+After the new person was added to the database file, this line redirects the browser to the url /manage which displays the page with the list of persons in the database.
+
+        else {
+            my $body = qq~<html><head><title>Add member</title></head><body>
+                <form action="/manage/add" method="post">
+                First name: <input type="text" name="first_name" /><br />
+                Last name: <input type="text" name="last_name" /><br />
+                Email: <input type="text" name="email" /><br />
+                <input type="submit" name="submit" value="Save" />
+                </form></body></html>~;
+
+            $c->response->body( $body );
+        }
+
+If the variable $c->request->params->{submit} is false, it means that the form was not submitted, so this alternative code is executed.
+It just generates the body of the page which contains the form which will be used for adding a new person in the database.
+
+The last line from this block tells Catalyst that the body of the current page that should be returned to the browser is the $body variable.
+
+You can read more about the $c->response method in the POD documentation of L<Catalyst::Response|https://metacpan.org/module/Catalyst::Response>.
+
+So, in a fewer words, this subroutines checks if the form was submitted, and if this is true it adds the new person in the database, otherwise it displays the form.
+
+    sub edit : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+
+This code starts the edit() subroutine which will be used for editting the record with $wanted_id ID in the database.
+This subroutine will be accessed at the URLs like /manage/edit/1 where 1 is the ID of the record we want to modify.
+
+        if ( $c->request->params->{submit} ) {
+            my $first_name = $c->request->params->{first_name};
+            my $last_name = $c->request->params->{last_name};
+            my $email = $c->request->params->{email};
+
+            edit_file_lines { s/^$wanted_id\|.*$/$wanted_id|$first_name|$last_name|$email/ }    $database_file;
+            $c->res->redirect( "/manage" );
+        }
+
+This code is similar to the one in the add() subroutine, but it is more simple, because we don't need to get the latest ID stored in the database.
+Instead of adding a new line to the database file, this code modifies the line which starts with the wanted ID, using the subroutine edit_file_lines() which is exported by File::Slurp.
+
+        else {
+            my @raw_lines = read_file $database_file;
+            chomp @raw_lines;
+
+            my ( $id, $first_name, $last_name, $email );
+
+            for my $raw_line ( @raw_lines ) {
+                my ( $test_id ) = split( /\|/, $raw_line );
+                next if $wanted_id && $wanted_id != $test_id;
+                ( $id, $first_name, $last_name, $email ) = split( /\|/, $raw_line );
+            }
+
+            my $body = qq~<html><head><title>Edit member</title></head><body>
+                <form action="/manage/edit/$id" method="post">
+                First name: <input type="text" name="first_name" value="$first_name" /><br />
+                Last name: <input type="text" name="last_name" value="$last_name" /><br />
+                Email: <input type="text" name="email" value="$email" /><br />
+                <input type="submit" name="submit" value="Save" />
+                </form></body></html>~;
+
+            $c->response->body( $body );
+        }
+
+The code above is similar with the one in the add() subroutine, but this time it is not just printing a static empty form. It reads the lines from the database file, skips all the lines that don't start with the wanted ID, and from the line which starts with the wanted ID it gets the values which will be displayed in the form.
+
+So, with fewer words, this subroutine checks if the form was submitted, and if this is true, it replaces the line in the database that starts with the wanted ID with newer values posted. If the form was not submitted, it gets the existing values from the database for the record with the wanted ID and display a form filled with those values.
+
+    sub delete : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+
+This code starts the subroutine delete() which will be used for deleting the record in the database which has the wanted ID.
+It will be executed when the URLs like /manage/delete/1 will be accessed (where 1 is the ID of the record we want to delete).
+
+        my $database_file = $c->config->{database_file};
+        edit_file_lines { $_ = '' if /^$wanted_id\|/ } $database_file;
+        $c->res->redirect( "/manage" );
+    }
+
+This code deletes from the database file the line which starts with the wanted ID, using the subroutine edit_file_lines() which is exported by File::Slurp.
+
+    sub index :Path :Args(0) {
+        my ( $self, $c ) = @_;
+
+This code starts the index() subroutine, the subroutine which will display the list of persons in our database.
+The attributes :Path :Args(0) makes Catalyst to execute this subroutine when the URL /manage is accessed.
+
+        my $body = qq~<html><head><title>Members list</title></head><body>
+            <a href="/manage/add">Add new member</a><br /><table>~;
+
+This code adds to the $body variable the start of the HTML document, a link and the start of a table.
+The link points to /manage/add, the page with the form which will be used for adding new persons in the database.
+The table will display the list of persons in our database.
+
+        my @raw_lines;
+        @raw_lines = read_file $database_file if -f $database_file;
+        chomp @raw_lines;
+
+This code reads the database file if it exists and it stores all the lines of that file in the array @raw_lines. The second line deletes the end of line char from all the elements of this array.
+
+        for my $raw_line ( @raw_lines ) {
+            my ( $id, $first_name, $last_name, $email ) = split( /\|/, $raw_line );
+
+            $body .= qq~<tr>
+                <th>$id</th>
+                <td><a href="/manage/edit/$id">$last_name, $first_name</a></td>
+                <td>$email</td>
+                <td><a href="/manage/delete/$id">delete member</a></td>
+            </tr>\n~;
+        }
+
+This code splits every element of the array using the "|" char as separator and gets the fields id, first_name, last_name and email for every line of the database file. Then it creates an HTML table row with these values and it adds it to the $body variable which holds the content of the current page.
+
+        $body .= "</table></body></html>";
+        $c->response->body( $body );
+
+This code just adds to the content of the page the end of the table and the end of the HTML document. The last line tells Catalyst that the body of the current page that should be returned to the browser is the $body variable.
+
+In this Catalyst application you needed to create just a single module manually and the directory "data" which will hold the database file.
+
+This Catalyst app doesn't use any L<relational database|http://en.wikipedia.org/wiki/Relational_database>, any L<ORM|http://en.wikipedia.org/wiki/Object-relational_mapping>, L<form processor|http://en.wikipedia.org/wiki/Forms_processing>, L<templating system|http://en.wikipedia.org/wiki/Web_template_system> and the module above doesn't even use <Moose|https://metacpan.org/module/Moose>.
+
+As we are going to do on each step, we will test the application using the same actions:
+
+Run again the development server:
+
+    perl script/webapp_server.pl
+
+And then access it at the following URL:
+
+    http://localhost:3000/manage
+
+Click on the "Add new member". It will open the page with the add form.
+Add some data in the form and submit it. It will add that record in the database and it will redirect to the page with the persons.
+Click on the name of the person. It will open the edit form. Change some values and submit that form. It will make the change in the database and it will redirect to the page with the list of persons.
+Click on "Delete member" link for the person you want. It will delete that record from the database and it will redirect to the page with the list of persons.
+
+Before passing to the next step we could improve our application a little.
+You've seen that in all the subroutines of this controller we needed to hard code the path to the database file, which is not nice, especially that this path could be different on different computers. We can solve this problem by adding this path to the controller's configuration, in a single place, and then use that configuration value everywhere we need it in this controller.
+
+In order to let the controller Manage.pm unmodified for you to see it, we will copy it and create an identic controller named Manage2.pm and then we're make a few changes in it.
+
+As the first change, add the "2" in the name of the module:
+
+    package WebApp::Controller::Manage2;
+
+Change all the links to point to /manage2:
+
+    <a href="/manage/add"> will become <a href="/manage2/add">.
+    <a href="/manage/edit/$id"> will become <a href="/manage2/edit/$id">.
+    <a href="/manage/delete/$id"> will become <a href="/manage2/delete/$id">.
+
+Change all the form actions to point to /manage2:
+
+    <form action="/manage/add" will become <form action="/manage2/add".
+    <form action="/manage/edit/$id" will become <form action="/manage2/edit/$id".
+
+Change the redirection to /manage2 in all 3 places:
+
+    $c->res->redirect( "/manage2" );
+
+Now the controller Manage2.pm will work exactly like the controller Managed. To improve it, we will do the following 2 changes in it:
+
+Before the first subroutine, add the following code:
+
+    __PACKAGE__->config(
+        database_file => 'd:/web/step2/WebApp/data/database_file.txt',
+    );
+
+And then in all the subroutines change the line that initializes the variable $database_file with the following line:
+
+        my $database_file = $self->{database_file};
+
+The values of the configuration become keys in the $self hash and you can access directly using the line above.
+
+Now if you'll need the path to the database file in other places in this controller you will be able to access it without typing that full path again, and if you'll want to change that path you will need to change it just in a single place.
+
+As we are going to do on each step, we will test the application using the same actions:
+
+Run again the development server:
+
+    perl script/webapp_server.pl
+
+And then access it at the following URL:
+(note that the URL ends with manage2, not manage as in our first test.)
+
+    http://localhost:3000/manage2
+
+Click on the "Add new member". It will open the page with the add form.
+Add some data in the form and submit it. It will add that record in the database and it will redirect to the page with the persons.
+Click on the name of the person. It will open the edit form. Change some values and submit that form. It will make the change in the database and it will redirect to the page with the list of persons.
+Click on "Delete member" link for the person you want. It will delete that record from the database and it will redirect to the page with the list of persons.
+
+=head2 Author:
+
+Octavian Rasnita <orasnita@gmail.com>

@@ -1,0 +1,381 @@
+=head1 Catalyst in 9 steps - step 3: A light model, standalone lib with a text DB, CLI scripts
+
+Note: You can download the archive with the application created in this third step from:
+
+=begin xhtml
+
+<a href="/calendar/static/2012/WebApp-0.03.tar.gz">WebApp-0.03.tar.gz</a>
+
+=end xhtml
+
+Let's say that we received a .xls file with data for 100 persons we need to add in our database. What can we do?
+
+We can copy/paste all the fields from all those records manually in the add form using the web application we just created. But this doesn't sound like a nice solution.
+Our application is a simple one with only one table of records and with a single web form for adding data, so another solution would be to either save the .xls file as .csv then replace the commas with vertical bars to create the database file directly, or create a short program that parses the .xls file and submits the data by web. But in real applications there are usually more tables of data involved, with much more data, and there are usually more forms to add it in the database, so in those cases it would be very hard to work this way with such an application because it would require too much manual work.
+
+The perfect solution would be to have a standalone library that would handle the business logic, with subroutines/methods for adding, editting, deleting and retrieving data, because we could use them to add data in the database directly.
+Of course, we can create that library, but it would be very good if it would be possible to use it in Catalyst application also, not only as a standalone application, because in that case we would have the business logic code in a single place.
+
+Fortunately, this is possible.
+
+Catalyst offers the possibility of using light models and light controllers. The Catalyst light models will be just a glue to a totally independent Perl application organized as a library.
+
+If we will create a totally separated library that does the business work, the Catalyst application will be just a web interface, nothing more. Alongside that web interface we could create a command line interface also, and even a desktop GUI interface with WxPerl. We could even create another web interface for our application using other web frameworks and use the business logic from that library just as we use any other package of modules from CPAN.
+
+In order to create that light model we need to install a Catalyst component named L<Catalyst::Model::Adaptor|https://metacpan.org/module/Catalyst::Model::Adaptor>, using one of the following commands:
+
+    cpan Catalyst::Model::Adaptor
+    cpanm Catalyst::Model::Adaptor
+    ppm install Catalyst::Model::Adaptor
+
+Then we need to create the independent application library and a light Catalyst model which makes it available in our Catalyst app.
+
+Let's create the independent library that will hold the business logic for our application.
+
+Because our application is small, we will need to create just a single module. We will name it StandaloneApp1.pm.
+
+If the name of a Catalyst app is for example MyApp, the recommendation is to put any other modules you create in this app under the directory lib/MyApp/, so all the modules of this application will have a name starting with "MyApp::". If you do that and if you'll create say a module named Foo.pm, it will be named MyApp::Foo.
+
+The advantage of doing this is that there won't be name conflicts with other modules you might install from CPAN. If you'll put the module Foo.pm under the lib directory you will access it with the name "Foo", but maybe someday it will appear a module named "Foo" on CPAN and you might want to use it, but then you'll see that you won't be able to access it in your Catalyst app because you have another module with the same name in the lib directory of your app.
+
+If you think that you can give a name that it won't be used by somebody else and you don't fear to pollute with a new name, you can put it directly under the lib directory.
+In our example we will put the standalone application module StandaloneApp1.pm directly under the lib directory, for showing that it is a totally independent application that doesn't have any relation with the Catalyst app.
+
+We will include here just the beginning of this standalone application because after this code, all the rest, all the subroutines are absolutely identical with the subroutines from the fat model Persons.pm we made in our previous step, as you may see by downloading the entire source code of the application at this step.
+
+
+    # lib/StandaloneApp1.pm
+
+    package StandaloneApp1;
+
+    use strict;
+    use warnings;
+    use File::Slurp ':all';
+
+    sub new {
+        my ( $class, $params ) = @_;
+        my $self = $params;
+        return bless $self, $class;
+    }
+
+The standalone library will start with the code above and then it will continue with the subroutines from the model DB that we made in the previous step.
+
+As you may see, this module doesn't inherit from L<Catalyst::Model|https://metacpan.org/module/Catalyst::Model> nor from L<Catalyst::Controller|https://metacpan.org/module/Catalyst::Controller> or from another Catalyst module, so it is a totally independent module which can be copied and used in other applications that doesn't even use Catalyst.
+
+This module has a constructor new() that receives a parameter $params which is a hashref with the arguments sent to this constructor.
+
+Now we will create a light Catalyst model which will be placed at WebApp/Model/DB.pm which will have the following content:
+
+    package WebApp::Model::DB;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Model::Adaptor';
+    1;
+
+That's all the necessary code. If you'll have more such models which inherit from Catalyst::Model::Adaptor, their content will be very similar.
+
+OK, but how does this model know what standalone module it needs to access? And how does it send the necessary parameters, like the database file path in our case to that module?
+
+We can specify the configuration for this model in the main module of this Catalyst app, lib/WebApp.pm, by adding the following code in the config hash:
+
+    'Model::DB' => {
+        class => 'StandaloneApp1',
+        args => {
+            database_file => 'D:/web/step3/WebApp/data/database.txt',
+        },
+    },
+
+The first line of this code associate this block of settings with the model DB.pm.
+The second line specifies that this model is an interface to the class named StandaloneApp1 (in the module lib/StandaloneApp1.pm).
+The hashref associated with the key "args" is sent as parameter to the new() constructor of the StandaloneApp1 class.
+
+Note: The value for the key database_file should be modified to match the full path to the database file on your computer!
+
+The configuration hash from the main module will look like:
+
+    __PACKAGE__->config(
+        name => 'WebApp',
+        # Disable deprecated behavior needed by old applications
+        disable_component_resolution_regex_fallback => 1,
+        enable_catalyst_header => 1, # Send X-Catalyst header
+        'Model::DB' => {
+            class => 'StandaloneApp1',
+            args => {
+                database_file => 'D:/web/step3/WebApp/data/database.txt',
+            },
+        },
+    );
+
+So we created the module lib/StandaloneApp1.pm, the light model DB.pm, and we added those few lines in the configuration hash of the application main module.
+
+Our application may appear to be more complex now, since we don't have just a single controller that does everything, or a controller and a model, but we have a controller, a model and a standalone module and it might not be clear how it works.
+
+The process is very simple though:
+
+When the application starts, the model DB.pm will get its config from the configuration hash of the application based on its name, and from that config it will know which is the standalone class it needs to call and which are the arguments it needs to send to the constructor of that class. It will then construct that class by calling the new() constructor creating an object.
+
+When a request comes from a browser, the Catalyst dispatcher will call the appropriate subroutine in the appropriate controller.
+When in a subroutine from a controller will appear a code like $c->model( 'DB' )->retrieve, the model DB will be called and it will return the created object which will use the retrieve() method.
+
+As we are going to do on each step, we will test the application using the same actions:
+
+Run again the development server:
+
+    perl script/webapp_server.pl
+
+And then access it at the following URL:
+
+    http://localhost:3000/manage
+
+Click on the "Add new member". It will open the page with the add form.
+Add some data in the form and submit it. It will add that record in the database and it will redirect to the page with the persons.
+Click on the name of the person. It will open the edit form. Change some values and submit that form. It will make the change in the database and it will redirect to the page with the list of persons.
+Click on "Delete member" link for the person you want. It will delete that record from the database and it will redirect to the page with the list of persons.
+
+We are able now to create CLI or GUI scripts that can add/edit/delete/retrieve records to/from our database and we will be able to create very easy that script that parse that .xls file and add all its records in the database.
+
+As a test we will create CLI scripts that can access the database of this Catalyst application.
+These scripts will construct the StandaloneApp1 object by calling the new() constructor and give it the path to the database file and then that object will use the add/edit/delete/retrieve methods, calling these methods with the parameters we get from command line.
+
+The problem is that the CLI scripts can't read very easy the path to the database file from the module lib/WebApp.pm module, and it wouldn't be nice to hard code it in those scripts also, because if we will need to change it, we will need to change it in more places.
+
+But there is a better way of adding the settings for a Catalyst app than the one we did above.
+
+Instead of adding the configuration in the main module of the Catalyst app lib/WebApp.pm, we can add those settings in the configuration file webapp.conf. The settings from the configuration file overrides the configuration from the main module of the Catalyst app, so they'll be used by the Catalyst app, and the configuration file can be read much easier by other programs, for example by those CLI scripts we want to create.
+
+For doing this, we will need to delete the code we just added in the main module of the application, and add the following lines in the file webapp.conf, after the configuration which is already present in it:
+
+    <Model::DB>
+        class StandaloneApp1
+        <args>
+            database_file D:/web/step1/WebApp/data/database.txt
+        </args>
+    </Model::DB>
+
+This configuration format is by default the Apache style configuration used in httpd.conf, but if you want, after changing the file extension of this configuration file you will be able to use any other format supported by the module Config::Any, like JSON, YAML, XML, INI or even a Plain data structure.
+
+So let's start creating the command line interface!
+
+This interface will be nothing more than 4 scripts, named add.pl, edit.pl, delete.pl and retrieve.pl which we will place in a directory named standalone_app1_script which we created it in the main directory of the Catalyst app.
+
+We know that the configuration file for this Catalyst application is named webapp.conf and that it is placed in the parent directory of the directory standalone_app1_script, so we could access it using the path ../webapp.conf and read the path of the database file from it. But we also know that the Catalyst application might also have a second configuration file named webapp_local.conff, which will override the configurations in the first config file, so it won't be a nice solution to read and merge these 2 configuration files if both of them exist.
+
+Fortunately, there is the module L<Config::JFDI|https://metacpan.org/module/Config::JFDI> that can be used for reading both configuration files of a Catalyst app, with a very simple interface. The advantage it offers is that we don't need to hard code the path to the database file and we also don't need to hard code the path to the configuration files of the Catalyst app.
+
+Note: There is also the module L<Config::ZOMG|https://metacpan.org/module/Config::ZOMG> that does the same thing as Config::JFDI and its POD documentation says that it works faster, but for the moment it has a small bug, so we will use Config::JFDI.
+
+We will use the module L<Getopt::Long|https://metacpan.org/module/Getopt::Long> for reading the parameters which we will use in the command line when we will run these CLI scripts.
+
+We will also use the module L<FindBin|https://metacpan.org/module/FindBin> in order to get the full path to the current directory and of course, we will use the module StandaloneApp1 which will offer the methods for adding/editting/deleting/retrieving records.
+
+If some of the modules mentioned above are not installed, they need to be installed using one of the commands cpan, cpanm or ppm. If we would need to make a quick and dirty script just for adding a big number of records in the database once and then we won't need that script anymore, the modules mentioned above wouldn't be necessary because we could hard code the path to the database and we wouldn't need to read command line parameters.
+
+Here is the content of these CLI scripts:
+
+    # add.pl:
+
+    use strict;
+    use warnings;
+    use Config::JFDI;
+    use Getopt::Long;
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    use StandaloneApp1;
+
+    my ( $first_name, $last_name, $email );
+
+    GetOptions(
+        'first-name=s' => \$first_name,
+        'last-name=s' => \$last_name,
+        'email=s' => \$email,
+    );
+
+    die "Please use --first-name, --last-name and --email parameters\n"
+      unless $first_name and $last_name and $email;
+
+    my $config = Config::JFDI->new( name => 'WebApp', path => "$FindBin::Bin/.." )->get;
+    my $database_file = $config->{'Model::DB'}{args}{database_file};
+
+    my $app = StandaloneApp1->new( { database_file => $database_file } );
+
+    $app->add( { first_name => $first_name, last_name => $last_name, email => $email } );
+
+
+Here are a few explanations for some parts of the script above:
+
+    GetOptions(
+        'first-name=s' => \$first_name,
+        'last-name=s' => \$last_name,
+        'email=s' => \$email,
+    );
+
+This code is used by Getopt::Long and assigns the command line parameters to Perl variables. The script add.pl will be ran with a command like:
+
+    perl add.pl --first-name John --last-name Smith --email j@smith.com
+
+The command above will add the person John Smith in the database of our application. If you get the names and the email address of the persons from another source than the command line, you don't need this code and you also don't need the module Getopt::Long.
+
+    die "Please use --first-name, --last-name and --email parameters\n"
+      unless $first_name and $last_name and $email;
+
+The command above will interrupt the program if those variables are not all defined.
+
+    my $config = Config::JFDI->new( name => 'WebApp', path => "$FindBin::Bin/.." )->get;
+
+This line uses the module Config::JFDI and reads the configuration file of the Catalyst application (or both configuration files if there are 2) and stores this configuration in the hashref $config;
+In our case we need it just for reading the path to the database file from it.
+
+    my $database_file = $config->{'Model::DB'}{args}{database_file};
+
+The line above reads the path to the database file from the $config hashref. If we hard code the path to the database file, we don't need the last 2 explained lines and we don't need the module Config::JFDI.
+
+    my $app = StandaloneApp1->new( { database_file => $database_file } );
+
+This is the constructor of our standalone module.
+
+    $app->add( { first_name => $first_name, last_name => $last_name, email => $email } );
+
+And this line executed the add() method of the standalone module.
+
+A quick and dirty script that will do the same thing would look like:
+
+    use lib '../lib';
+    use StandaloneApp1;
+
+    my $database_file = 'D:/web/step3/WebApp/data/database.txt';
+    my $app = StandaloneApp1->new( { database_file => $database_file } );
+    $app->add( { first_name => 'John', last_name => 'Smith', email => 'j@smith.com' } );
+
+
+    # edit.pl:
+
+    use strict;
+    use warnings;
+    use Config::JFDI;
+    use Getopt::Long;
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    use StandaloneApp1;
+
+    my ( $id, $first_name, $last_name, $email );
+
+    GetOptions(
+        'id=i' => \$id,
+        'first-name=s' => \$first_name,
+        'last-name=s' => \$last_name,
+        'email=s' => \$email,
+    );
+
+    die "Please use --id, --first-name, --last-name and --email parameters\n"
+      unless $id and $first_name and $last_name and $email;
+
+    my $config = Config::JFDI->new( name => 'WebApp', path => "$FindBin::Bin/.." )->get;
+    my $database_file = $config->{'Model::DB'}{args}{database_file};
+
+    my $app = StandaloneApp1->new( { database_file => $database_file } );
+
+    $app->edit( $id, { first_name => $first_name, last_name => $last_name, email => $email } );
+
+As you can see, this script is very similar to the add.pl, but in addition it gets the ID of the record it needs to modify, and sends 2 parameters to the edit() subroutine of the module StandaloneApp1.pm, the $id and the hashref with the first name, last name and email.
+
+
+    # delete.pl:
+
+    use strict;
+    use warnings;
+    use Config::JFDI;
+    use Getopt::Long;
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    use StandaloneApp1;
+
+    my $id;
+
+    GetOptions(
+        'id=i' => \$id,
+    );
+
+    die "Please use --id parameter\n" unless $id;
+
+    my $config = Config::JFDI->new( name => 'WebApp', path => "$FindBin::Bin/.." )->get;
+    my $database_file = $config->{'Model::DB'}{args}{database_file};
+
+    my $app = StandaloneApp1->new( { database_file => $database_file } );
+
+    $app->delete( $id );
+
+This script gets only the ID parameter of the record we want to delete and sends it to the delete() method.
+
+
+    # retrieve.pl:
+
+    use strict;
+    use warnings;
+    use Config::JFDI;
+    use Getopt::Long;
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    use StandaloneApp1;
+
+    my $id;
+
+    GetOptions(
+        'id=i' => \$id,
+    );
+
+    my $config = Config::JFDI->new( name => 'WebApp', path => "$FindBin::Bin/.." )->get;
+    my $database_file = $config->{'Model::DB'}{args}{database_file};
+
+    my $app = StandaloneApp1->new( { database_file => $database_file } );
+
+    my $members = $app->retrieve( $id );
+
+    for my $m ( @$members ) {
+        print "$m->{id}, $m->{first_name}, $m->{last_name}, $m->{email}\n";
+    }
+
+This script gets the optional ID command line parameter. If no parameters are used, the script will retrieve and print all the persons in the database. If an --id command line parameter is used, only the values of the record with that ID are printed.
+
+So with these command line parameters we can do everything we can do by using the web interface, and sometimes this they might be helpful because we can use them in batch scripts or cron/scheduler jobs.
+Anyway, we made them just to show how helpful can be to have a standalone library that can be used in any program, not only in the web application.
+
+We can also use these scripts as a test of the standalone application using commands like:
+
+    perl add.pl --first-name John --last-name Smith --email john@smith.com
+
+    perl edit.pl --id 1 --first-name George --last-name Smith --email j@smith.com
+
+    perl retrieve.pl --id 1
+
+    perl delete.pl --id 1
+
+We also created a test file named t/04standalone_app1.t which tests if the module StandaloneApp1.pm works fine. It is much easier to test if the business logic, the add/edit/delete/retrieve methods work well in a standalone application than in a web app.
+
+You can run all the tests using the following command in the main directory of the web application:
+
+    prove -l t
+
+The results should be:
+
+    All tests successful.
+    Files=4, Tests=44,  3 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
+    Result: PASS 
+
+
+Before passing to the next step we can improve this application a little.
+
+Until now, everywhere we configured the path to the database file, in the controller subroutines, controller's configuration, model's configuration, main module of the application, configuration file of the application, we specified the full path to the database file literally. This is not very nice because this path may be different on different computers.
+Catalyst offers a macro that can be used to provide a path relative to the main directory of the application using a line like the following in the configuration hash of the main module WebApp.pm:
+
+    database_file => "__path_to(data,database_file.txt)__",
+
+or the following line in the webapp.conf config file:
+
+    database_file "__path_to(data,database_file.txt)__"
+
+The macro __path_to()__ will get the path to the main directory of the application and between its ( and ) we can add the list of directories under it, until the wanted directory or file, separated by commas.
+You can read more about the macros that can be used in the POD documentation of L<Catalyst::Plugin::ConfigLoader|https://metacpan.org/module/Catalyst::Plugin::ConfigLoader>.
+
+=head2 Author:
+
+Octavian Rasnita <orasnita@gmail.com>

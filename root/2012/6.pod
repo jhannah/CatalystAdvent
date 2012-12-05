@@ -1,0 +1,181 @@
+=head1 Catalyst Advent 2012 Introduction
+
+=head1 OVERVIEW
+
+A bit about the contents of the Advent Calendar and some general thoughts on 
+the l<Catalyst> project.
+
+=head1 Didn't Advent Start already?
+
+Yes, we are getting a bit of a late start (although since Advent officially
+started on December 2nd, perhaps a bit less late).
+
+=head1 Didn't we way we'd retire Catalyst Advent?
+
+Well, in my mind that was more of a kick in the pants to get more people
+involved, since last year the burden of work was carried by far too few people.
+
+=head1 So, what's the 'Year End Review' of Catalyst
+
+So here's my thoughts on the state of Catalyst.  Catalyst continues to be one
+of the more popular choices for Modern Perl programmers who are building web
+sites / applications.  The code base is pretty mature and we have quite a bit
+(probably not enough, but a lot for a Perl project) documentation and examples
+floating around.
+
+The community has a number of pretty enthusiastic members, and the number of
+people hanging out on the various Catalyst IRC channels continues to be much
+higher than any other modern web framework.  So that is the good stuff.
+
+On the other hand Catalyst is facing significant challenges if we want it to
+continue to be fresh and relevent as time goes on.  I can see both internal
+and external challenges for the project.  Internally, we have an aging codebase
+with a lot of backward compatibility hacks, and probably some things in core
+that don't belong in core (and some things outside core that should be core).
+Although the codebase was converted to L<Moose> a number of years ago, many
+of the more important parts of the Catalyst ecosystem have not made the switch
+and in addition although Catalyst core uses Moose a lot of the code could be 
+significantly cleaned up to make better use of existing Moose features.  Same
+thing for the L<Plack> integration work that was completed more than a year ago.
+There's a lot of overlap between some of the popular Catalyst plugins and
+features that come with L<Plack> and there is no clarity as to how to address
+this.
+
+In addition our attempts to replace Catalyst's service lookup features with
+the better supported and more featureful L<Bread::Board> has stalled due to
+the tremendous difficult in managing this transition without breaking so much
+of Catalyst as to render the project without merit.
+
+Again, although many people hang out on the various Catalyst IRC channels,
+it seems there's a very small number of people that can actually contribute
+to the project. There's a number of reasons for this, part of it is how the
+project is currently managed, and part of it is probably the complexity of the
+codebase, and part of it is likely the complexity of the various design patterns
+that Catalyst uses (Model - View - Controller and Chain of Command plus a bit
+of Mediator and some others).
+
+Externally there's a lot of challenge to the idea that a theoretically heavy (
+what I mean by this is that the design patterns that Catalyst is build on all
+have many papers and academic discussions around them) and full stack solution
+is relevent today.  There's a lot of cutting edge web development that is taking
+place exclusively on clients (such as in Javascript on the web browser, or in
+C# and Java for various smart phone clients) and one could make the argument
+that back end applications will focus more on providing well structured web
+services, probably in JSON or similar popular standards, and following a REST
+paradigm.  Many of the popular mini/micro web frameworks cater to this idea,
+and they tend to focus on minimal code / maximum feature delivery.
+
+In such a world, can Catalyst continue to be a good choice for the Modern
+Perl programmer?
+
+I personally believe so, although it is clear the use cases for server side
+development is going to change and expand.  The fundemental design patterns
+that Catalyst strives to deliver are in my mind still very relevent, and I
+think they lead you to delivering better code that is easier to test, deploy
+and change as requirements change.  It is not clear to me that some of the
+popular micro-frameworks achieve this, although I do think that Catalyst could
+take a page from the micro-framework book and lose some of the bulk and boiler
+plate needed to get started with a meaningful application.
+
+In additional to Catalyst growing and changing with these evolved needs, I
+think our community needs to mature as well.  I think we need to have more
+hands on engagement with the various intellectual ideas upon which Catalyst
+is built, for example.  As people use Catalyst and grapple with issues
+around MVC and other topics, it would be great for us to talk about that stuff
+and not just code cookbooks.  Perl programmers have always been practical, but
+we should always remember that Larry Wall make Perl practical but also in
+line with a consistent philisophy about language and how people use languages
+to communicate and achieve goals.
+
+=head1 Wait, you aren't going to actually show us some code?
+
+Ok, here's my 'stupid pet trick' so that you didn't read all this in vain.
+Quite often when you are first working on a Catalyst application using
+DBIx::Class you are messing around a lot with the Schema and it is a big
+pain to keep rebuilding a fresh database.  Sometimes I use L<Test::DBIx::Class>
+to automatically create and deploy a schema on each application restart.
+
+    package MyApp::Web::Model::DBIC;
+
+    use Moose;
+    use Test::DBIx::Class
+      -schema_class => 'MyApp::Schema';
+
+    extends 'Catalyst::Model::DBIC::Schema';
+ 
+    __PACKAGE__->config(
+      schema_class => 'MyApp::Schema',
+      connect_info => [
+        sub {Schema()->storage->dbh},
+        { on_connect_call => sub { Schema()->install_fixtures } },
+      ]);
+
+Please note with the above you will lose all your data for each restart of the
+application, unless you save or dump it in some manner.  Also, note that
+L<Test::DBIx::Class> imports C<Schema> as well as a few other things into your
+namespace, so you might want to review the documentation on that to know what
+you are getting into.
+
+You'll need to create the method C<install_fixtures> in C<MyApp::Schema> if you
+want to install some seed or development data.
+
+Another useful variation of this trick is to move this connect information into
+a stand alone configuration file (such as C<myapp_web_test.pl>) for when you are
+running automated tests against your application.  For example:
+
+    ## share/etc/myapp_web_test.pl
+
+    use Test::DBIx::Class
+      -schema_class=>'MusicBase::Schema',
+      -traits=>['Testmysqld'];
+
+  {
+    'Model::DBIC' => {
+      schema_class => 'MyApp::Schema',
+      connect_info => [
+        sub {Schema()->storage->dbh},
+        { on_connect_call => sub { Schema()->install_fixtures } },
+      ],
+    },
+  };
+
+Then if you start your Catalyst application pointing to this testing configuration
+file, you'll get a fresh schema and data for each set of tests that get run.
+
+In this example I am also using the C<Testmysqld> trait so that we run our
+automated tests against MySQL instead of the default SQLite.  This is a good
+idea to be running your tests against the same database type as your intended
+production database, and the Testmysqld trait for L<Test::DBIx::Clas> makes it
+pretty easy to use MySQL (it only needs to be installed (not running) and
+find-able in $PATH).  You can even use the mysql replication testing trait to
+make sure your code runs well in a replicated cluster.
+
+=head1 So What is Next?
+
+This year we are going to kick off Advent with a nine (NINE!!!) article series
+by Octavian who is going to walk us through one approach to building up an 
+application over time.  Although not all the code is the most modern in approach
+(not everyone can use the most recent version of Catalyst on the job, so I think
+it is great to have such an extended example that would work well across many
+Catalyst versions) there is a clear thinking pattern that runs through it all
+and there is a lot of very interesting discussion of some of the design patterns
+I mentioned above.  So be sure to read all the words and not just skip right to
+the code!
+
+Following we will have our standard grab bags of cookbooks articles and various
+musings on Catalyst.
+
+=head1 Summary
+
+Catalyst is a project in transition, and I think the 2012 Advent calendar will
+reflect that.  We will have some old and new voices mixing both legacy and
+modern approaches to using the framework.  My hope is that it will provoke us
+to think more deeply about the future evolution of Catalyst such that it will
+continue to be the first, best choice for Modern Perl programmers building the
+next generation of web applications.
+
+=head1 Author
+
+John Napiorkowski <jjnapiork@cpan.com> jnap on IRC
+
+=cut

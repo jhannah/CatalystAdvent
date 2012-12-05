@@ -1,0 +1,222 @@
+=head1 Catalyst in 9 steps - step 7: Light model, standalone lib, SQLite DB, TT view, CLI scripts
+
+Note: You can download the archive with the application created in this seventh step from:
+
+=begin xhtml
+
+<a href="/calendar/static/2012/WebApp-0.07.tar.gz">WebApp-0.07.tar.gz</a>
+
+=end xhtml
+
+The application we created on the previous step is good if we don't need to access its database using other applications.
+
+If we need to create CLI scripts or other external applications to do the same business logic, than using a fat model that inherits from L<Catalyst::Model::DBI|https://metacpan.org/module/Catalyst::Model::DBI> is not a good solution.
+
+Just like when we were using a text file as a database, the solution is to create a standalone library which provides the methods for accessing the relational database.
+As on step 3, we will do this in the same way, by creating a light model which inherits from L<Catalyst::Model::Adaptor|https://metacpan.org/module/Catalyst::Model::Adaptor> and a standalone library that provides the business logic.
+
+The model DB.pm will have the following content:
+
+    package WebApp::Model::DB;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Model::Adaptor';
+    1;
+
+This model has the same content as it had on step 3 but only its configuration will be different because this time the standalone library doesn't need to know the path to a text file database but the DSN to a relational database.
+
+Here is the new configuration for the model DB.pm:
+
+    <Model::DB>
+        class StandaloneApp2
+        <args>
+            dsn dbi:SQLite:__path_to(data,database_file2.db)__
+        </args>
+    </Model::DB>
+
+This configuration is similar to the one we used on step 3, because both of them use "class" and "args" keys. This is because the models that inherit from Catalyst::Model::Adaptor use them.
+
+The standalone library will be named StandaloneApp2.pm and it will have the same interface as the old StandaloneApp1.pm, so it will also contain the subroutines add/edit/delete/retrieve, but instead of working with a text database, these subroutines will access a relational database.
+
+Usually when we access a relational database we use the Perl module L<DBI|https://metacpan.org/module/DBI>, but if we will use DBI only, we wouldn't have a safe database connection because if the connection to the database drops, DBI won't make the reconnection so we would need to write code that checks if the connection is working, and reconnect if the connection died.
+
+Fortunately, there is a better option. We can use the module L<DBIx::Connector|https://metacpan.org/module/DBIx::Connector> which offers a secure database connection, because it reconnects automaticly if the connection has dropped.
+
+In our previous step we used the module Catalyst::Model::DBI as a base for our model, but this module also uses DBIx::Connector transparently. Now that we need to create our standalone library we would need to explicitly use the module DBIx::Connector, but fortunately its interface is very simple.
+
+So here it is the content of the new standalone library lib/StandaloneApp2.pm:
+
+    package StandaloneApp2;
+
+    use strict;
+    use warnings;
+    use DBIx::Connector;
+
+    sub new {
+        my ( $class, $params ) = @_;
+        my $self = $params;
+
+        my $dsn = $self->{dsn};
+        my $user = $self->{user};
+        my $password = $self->{password};
+
+        my $conn = DBIx::Connector->new( $dsn, $user, $password );
+        $self->{conn} = $conn;
+
+        return bless $self, $class;
+    }
+
+    sub dbh {
+        my ( $self ) = @_;
+        return $self->{conn}->dbh;
+    }
+
+    sub add {
+        my ( $self, $params ) = @_;
+
+        my $first_name = $params->{first_name};
+        my $last_name = $params->{last_name};
+        my $email = $params->{email};
+
+        my $dbh = $self->dbh;
+
+        my $p = $dbh->prepare( "insert into persons(first_name, last_name, email) values(?,?,?)" );
+
+            $p->execute( $first_name, $last_name, $email );
+    }
+
+    sub edit {
+        my ( $self, $wanted_id, $params ) = @_;
+
+        my $first_name = $params->{first_name};
+        my $last_name = $params->{last_name};
+        my $email = $params->{email};
+
+        my $dbh = $self->dbh;
+
+        my $p = $dbh->prepare( "update persons set first_name=?, last_name=?, email=? where id=?" );
+
+        $p->execute( $first_name, $last_name, $email, $wanted_id );
+    }
+
+    sub delete {
+        my ( $self, $wanted_id ) = @_;
+
+        my $dbh = $self->dbh;
+
+        my $p = $dbh->prepare( "delete from persons where id=?" );
+        $p->execute( $wanted_id );
+    }
+
+    sub retrieve {
+        my ( $self, $wanted_id ) = @_;
+
+        my $dbh = $self->dbh;
+
+        my $members;
+
+        if ( $wanted_id ) {
+            $members = $dbh->selectall_arrayref( "select * from persons where id=? order by id",
+              { Slice => {} }, $wanted_id );
+        }
+        else {
+            $members = $dbh->selectall_arrayref( "select * from persons order by id",
+              { Slice => {} } );
+        }
+
+        return $members;
+    }
+
+    1;
+
+
+As you might have seen, the subroutines add/edit/delete/retrieve were moved here from the model DB.pm without any change.
+And now the model DB doesn't inherit from Catalyst::Model::DBI but from Catalyst::Model::Adaptor.
+
+So the new things are in the new() constructor and dbh() method of StandaloneApp2.pm.
+
+        my $dsn = $self->{dsn};
+
+The line above gets the DSN which is needed for database connection. It is configured in the config file.
+
+        my $user = $self->{user};
+        my $password = $self->{password};
+
+The lines above get the username and password needed to connect to the database if the database accept a user and a password. In our case the SQLite database doesn't need a username and password so we could have skipped using these variables, but it is better to write a more complete standalone library that could also work with other databases like MySQL, PostgreSQL or others.
+
+If we do this, we can use this standalone library to access a MySQL database by changing the DSN in the configuration file with something like:
+
+    dsn dbi:mysql:test
+    user the_username
+    password the_password
+
+We would just need to have a MySQL database named "test" and the table "persons" with the same columns created as in the SQLite database and our application will work using MySQL.
+
+        my $conn = DBIx::Connector->new( $dsn, $user, $password );
+
+This line creates the DBIx::Connector object which maintains the connection to the database.
+
+        $self->{conn} = $conn;
+
+This line stores the DBIx::Connector object in the $self hashref in order to be accessed later in all the methods of this standalone library.
+
+The dbh() method is just an accessor for the database handle. Without this method we need to access the database handle using $self->{conn}->dbh. This is not a problem, but the add/edit/delete/retrieve subroutines we moved from previous model already use $self->dbh because that model inherits from Catalyst::Model::DBI which offers the dbh() accessor. So it is more easy to offer this accessor in our standalone library too and let all the other subroutines unmodified.
+
+So, in this step we created the new standalone library StandaloneApp2.pm, moved all the subroutines from the model DB.pm in it, change the model DB.pm to inherit from Catalyst::Model::Adaptor, and changed the settings for this model in the configuration file.
+
+Our application does the same thing as before, but it has an important advantage, the fact that it has a standalone library which can be used in other applications and because now it is easier to test it.
+
+As we are going to do on each step, we will test the application using the same actions:
+
+Run again the development server:
+
+    perl script/webapp_server.pl
+
+And then access it at the following URL:
+
+    http://localhost:3000/manage
+
+Click on the "Add new member". It will open the page with the add form.
+Add some data in the form and submit it. It will add that record in the database and it will redirect to the page with the persons.
+Click on the name of the person. It will open the edit form. Change some values and submit that form. It will make the change in the database and it will redirect to the page with the list of persons.
+Click on "Delete member" link for the person you want. It will delete that record from the database and it will redirect to the page with the list of persons.
+
+Now that we have a working application which uses a relational database which is accessed with a standalone library that can be used in other applications, we will create again those command line scripts that can add/edit/delete/retrieve the records to/from the database. This time we will store these scripts in the directory standalone_app2_script.
+
+These scripts will be very similar with the scripts we created on step 3. They are not perfectly identical because now the standalone module is named StandaloneApp2 and not StandaloneApp1 as before, and because the constructor of this module doesn't receive a path to a text file database but a DSN to connect to a relational database.
+
+So in all these scripts there will be only 3 lines that differ:
+
+    use StandaloneApp2;
+
+    my $dsn = $config->{'Model::DB'}{args}{dsn};
+
+    my $app = StandaloneApp2->new( { dsn => $dsn } );
+
+The rest of the code in all these scripts is the same as it was on the step 3.
+
+We can also use these scripts as a test of the standalone application using commands like:
+
+    perl add.pl --first-name John --last-name Smith --email john@smith.com
+
+    perl edit.pl --id 1 --first-name George --last-name Smith --email j@smith.com
+
+    perl retrieve.pl --id 1
+
+    perl delete.pl --id 1
+
+We also created a test file named t/04standalone_app2.t which tests if the module StandaloneApp2.pm works fine.
+
+You can run all the tests using the following command in the main directory of the web application:
+
+    prove -l t
+
+The results should be:
+
+    All tests successful.
+    Files=4, Tests=44,  3 wallclock secs ( 0.01 usr +  0.00 sys =  0.01 CPU)
+    Result: PASS 
+
+=head2 Author:
+
+Octavian Rasnita <orasnita@gmail.com>

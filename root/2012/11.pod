@@ -1,0 +1,190 @@
+=head1 Catalyst in 9 steps - step 5: A controller with a new SQLite DB, a light model and a TT view
+
+Note: You can download the archive with the application created in this fifth step from:
+
+=begin xhtml
+
+<a href="/calendar/static/2012/WebApp-0.05.tar.gz">WebApp-0.05.tar.gz</a>
+
+=end xhtml
+
+Our application has now a better structure, but a big problem is still the fact that the core of the application, the standalone library that does the business logic is pretty poor. As we said at the beginning, it can't accept values that contain vertical bars (|) because that character is used as a field separator. It also can't accept values with end of line chars. It is not scalable and it would not work well if we need to add a very large number of records in it. So a good idea would be to use a relational database instead.
+
+We will use an L<SQLite|http://www.sqlite.org/> database because it is easier to use than other relational databases which require a server like MySQL, PostgreSQL or oracle, but the application will be very similar if we would be using one of those databases.
+
+We could use directly the module L<DBI|https://metacpan.org/module/DBI> to connect to the relational databases, but in order to have a secure database connection which gets reconnected if it drops, we need to use a model which inherits from L<Catalyst::Model::DBI|https://metacpan.org/module/Catalyst::Model::DBI>. This model uses L<DBIx::Connector|https://metacpan.org/module/DBIx::Connector> which automaticly re-makes the connection to the database if it drops.
+
+So we will need to have the modules L<DBD::SQLite|https://metacpan.org/module/DBD::SQLite> and Catalyst::Model::DBI installed.
+
+We will be able to use the database handle offered by this model in our controller, so with other words we will be doing the business logic in the controller.
+If we don't need to have a standalone application that can run outside of the Catalyst app we can use this method because it is more simple.
+
+Here is what we need to do to change our application to use a relational database instead of that text file:
+
+First we will need to delete some things that won't be necessary from now:
+
+    - the directory standalone_app1_script which contains the CLI scripts that can access the text file database;
+    - the module lib/StandaloneApp1.pm;
+    - the test script t/04standalone_app1.t
+    - the configuration data for the model Standalone from the file webapp.conf.
+
+Then we will need to create our database, using L<sqlite3|http://www.sqlite.org/download.html> application.
+
+We will name the new SQLite database file database_file2.db and we will place it in the same "data" directory.
+So, in order to create this database, we will change the current directory to the "data" directory and we will give the command:
+
+    sqlite3 database_file2.db
+
+This command will create the empty database and it will change the prompt to "sqlite>".
+At this prompt we can give any SQL commands we want, or the command .help for more help or .exit for exitting to the shell prompt.
+
+We will type the following SQL code, which can be found in the file named database2.sql in the main directory of the application:
+
+    create table if not exists persons(
+        id integer primary key autoincrement,
+        first_name text,
+        last_name text,
+        email text
+    );
+
+Now we need to modify the model DB.pm which inherits from Catalyst::Model::Adaptor and make it inherit from Catalyst::Model::DBI. Its content will become:
+
+    package WebApp::Model::DB;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Model::DBI';
+    1;
+
+And just as the old model, it also needs some settings which we will add in the configuration file of the application.
+
+The configuration for this model will look like:
+
+    <Model::DB>
+        dsn dbi:SQLite:__path_to(data,database_file2.db)__
+    </Model::DB>
+
+In this configuration appears the tipical DSN we use when connecting to a database with DBI.
+In the path to the SQLite database file we used again the macro __path_to()__ for specifying the file name data/database_file2.db.
+
+If you'll want to use another database like MySQL for example, the configuration could accept other needed options like:
+
+    <Model::DB>
+        dsn dbi:mysql:database_name
+        user the_user_name
+        password the_password
+    </Model::DB>
+
+After we created the table in the database and the model and added its configuration to the config file, we just need to change the code in the controller Manage.pm to work with the new database type.
+
+After this change it will have the following content:
+
+    package WebApp::Controller::Manage;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Controller';
+
+    sub add : Local {
+        my ( $self, $c ) = @_;
+
+        if ( $c->request->params->{submit} ) {
+            my $first_name = $c->request->params->{first_name};
+            my $last_name = $c->request->params->{last_name};
+            my $email = $c->request->params->{email};
+
+            my $dbh = $c->model( 'DB' )->dbh;
+
+            my $p = $dbh->prepare( "insert into persons(first_name, last_name, email) values(?,?,?)" );
+
+            $p->execute( $first_name, $last_name, $email );
+
+            $c->res->redirect( "/manage" );
+        }
+    }
+
+    sub edit : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+
+        my $dbh = $c->model( 'DB' )->dbh;
+
+        if ( $c->request->params->{submit} ) {
+            my $first_name = $c->request->params->{first_name};
+            my $last_name = $c->request->params->{last_name};
+            my $email = $c->request->params->{email};
+
+            my $p = $dbh->prepare( "update persons set first_name=?, last_name=?, email=? where id=?" );
+
+            $p->execute( $first_name, $last_name, $email, $wanted_id );
+
+            $c->res->redirect( "/manage" );
+        }
+        else {
+            my $p = $dbh->prepare( "select first_name, last_name, email from persons where id=?" );
+            $p->execute( $wanted_id );
+            my ( $first_name, $last_name, $email ) = $p->fetchrow_array;
+
+            $c->stash(
+                wanted_id => $wanted_id,
+                first_name => $first_name,
+                last_name => $last_name,
+                email => $email,
+            );
+        }
+    }
+
+    sub delete : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+
+        my $dbh = $c->model( 'DB' )->dbh;
+        my $p = $dbh->prepare( "delete from persons where id=?" );
+        $p->execute( $wanted_id );
+
+        $c->res->redirect( "/manage" );
+    }
+
+    sub index :Path :Args(0) {
+        my ( $self, $c ) = @_;
+
+        my $dbh = $c->model( 'DB' )->dbh;
+        my $members = $dbh->selectall_arrayref( "select * from persons order by id", { Slice => {} } );
+
+        $c->stash( members => $members );
+    }
+
+    1;
+
+
+The code specific to the relational database we use in the add() subroutine is:
+
+    my $dbh = $c->model( 'DB' )->dbh;
+
+    my $p = $dbh->prepare(
+        "insert into persons(first_name, last_name, email) values(?,?,?)" );
+
+    $p->execute( $first_name, $last_name, $email );
+
+The first line of this code calls the model DB and the method dbh() that returns the database handle.
+This line of code appears in all the subroutines of this controller.
+
+The last 2 lines is common code for adding a record in a relational database.
+All the subroutines of this controller do a similar thing: Gets the $dbh database handle, then add/edit/delete/select the records to/from the database, so there is anything special.
+
+So in this step, after we created the database, we created the light model DB.pm and added its configuration and then changed the controller Manage.pm to work with this database.
+
+As we are going to do on each step, we will test the application using the same actions:
+
+Run again the development server:
+
+    perl script/webapp_server.pl
+
+And then access it at the following URL:
+
+    http://localhost:3000/manage
+
+Click on the "Add new member". It will open the page with the add form.
+Add some data in the form and submit it. It will add that record in the database and it will redirect to the page with the persons.
+Click on the name of the person. It will open the edit form. Change some values and submit that form. It will make the change in the database and it will redirect to the page with the list of persons.
+Click on "Delete member" link for the person you want. It will delete that record from the database and it will redirect to the page with the list of persons.
+
+=head1 Author:
+
+Octavian Rasnita <orasnita@gmail.com>

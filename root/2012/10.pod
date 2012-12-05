@@ -1,0 +1,248 @@
+=head1 Catalyst in 9 steps - step 4: A light controller, light model, standalone lib and a TT view
+
+Note: You can download the archive with the application created in this fourth step from:
+
+=begin xhtml
+
+<a href="/calendar/static/2012/WebApp-0.04.tar.gz">WebApp-0.04.tar.gz</a>
+
+=end xhtml
+
+We now have an independent library that does the business logic, some CLI apps and a Catalyst web app that can access it. There is a light model that makes the independent library available in the web app and a controller that does the web logic and the HTML formatting of the results.
+
+Our app is better than it was after the first step, but it still has a problem. If the app will grow and we would need to collaborate with a professional web designer, it would be very hard to her to understand the whole Perl code mixed with the HTML code, especially if she doesn't know Perl.
+It would be better if we would let the controller do only web logic which is the job of the controllers and let the views format the results in the format we want (as HTML, css, xls, JSON or others).
+
+The controller should just get the data structure from the model and then forward it to the view that will format it as we want. If a certain view should format that data structure to a simple format like css or JSON, that view should only receive the data structure and possible a few configuration data, but nothing more.
+On the other hand, if that view should format the data structure as HTML, then it is not enough if it receives only that data structure and possible some configuration data, because an HTML document might be much more complex than a css or JSON one, so it should have an HTML template and embed that data structure in it.
+
+In order to use templates we must use a templating system like L<Template-Toolkit|https://metacpan.org/module/Template>, L<HTML::Template|https://metacpan.org/module/HTML::Template>, L<Mason|https://metacpan.org/module/Mason> or others.
+
+There are many templating systems that can be used in a Catalyst app, but the most used templating system is Template-Toolkit and it is also the one used by default in most Catalyst tutorials, so we will use it in our app also.
+
+In order to be able to use Template-Toolkit templates in the application, we need to install the modules Template-Toolkit and L<Catalyst::View::TT|https://metacpan.org/module/Catalyst::View::TT> using either cpan, cpanm or ppm.
+
+After doing this, the first thing is to create a view which inherits from the module Catalyst::View::TT. We will create a view named TT.pm in the directory lib/WebApp/View. The content of this module will be:
+
+    package WebApp::View::TT;
+    use strict;
+    use warnings;
+    use base 'Catalyst::View::TT';
+    1;
+
+That's all. You've seen that the view is also very light and very similar to the light model we created, but it inherits from Catalyst::View::TT and not from Catalyst::Model::Adaptor.
+
+Just as the model needed some configuration data that let it know what's the standalone class it needs to instantiate and what's the path to the database file, the view also needs some configuration that lets it know where it can find the template files and other few things.
+
+We will add the configuration directly in the config file now. This configuration will look like:
+
+    <View::TT>
+        INCLUDE_PATH "__path_to(root,templates)__"
+        TEMPLATE_EXTENSION .tt
+        render_die 1
+    </View::TT>
+
+Here are the short explanations for these lines:
+
+        INCLUDE_PATH "__path_to(root,templates)__"
+
+By default, the view will look for the templates directly in the "root" directory where we also have other items. If we like to have a distinct directory just for templates, we will create a directory named "templates" under the "root" directory, but in this case we need to specify the path to this directory using the key INCLUDE_PATH in the configuration file.
+
+        TEMPLATE_EXTENSION .tt
+
+By default, the path to the template that will be used by a controller action (subroutine) will be composed from the name of the controller and the name of that action. For example, the subroutine add() from the controller WebApp::Controller::Manage will be in our case:
+
+    root/templates/manage/add
+
+But if we want that all the template files to have the .tt extension, we must specify that extension using the key TEMPLATE_EXTENSION in the config file.
+If we do that, the template file for the add() subroutine will be:
+
+    root/templates/manage/add.tt
+
+        render_die 1
+
+This key should be set to on for new applications to throw an error in case of errors in the templates.
+
+We now need to delete the HTML code from the controller and put into templates.
+
+After deleting the HTML code from the controller, it will look like:
+
+    package WebApp::Controller::Manage;
+    use strict;
+    use warnings;
+    use base 'Catalyst::Controller';
+
+    sub add : Local {
+        my ( $self, $c ) = @_;
+
+        if ( $c->request->params->{submit} ) {
+            $c->model( 'DB' )->add( $c->request->params );
+            $c->res->redirect( "/manage" );
+        }
+    }
+
+    sub edit : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+
+        if ( $c->request->params->{submit} ) {
+            $c->model( 'DB' )->edit( $wanted_id, $c->request->params );
+            $c->res->redirect( "/manage" );
+        }
+        else {
+            my $members = $c->model( 'DB' )->retrieve( $wanted_id );
+
+            $c->stash(
+                wanted_id => $wanted_id,
+                first_name => $members->[0]{first_name},
+                last_name => $members->[0]{last_name},
+                email => $members->[0]{email},
+            );
+        }
+    }
+
+    sub delete : Local {
+        my ( $self, $c, $wanted_id ) = @_;
+        $c->model( 'DB' )->delete( $wanted_id );
+        $c->res->redirect( "/manage" );
+    }
+
+    sub index :Path :Args(0) {
+        my ( $self, $c ) = @_;
+        my $members = $c->model( 'DB' )->retrieve;
+        $c->stash( members => $members );
+    }
+
+    1;
+
+
+In the add() subroutine remained just the code which verifies if the form was submitted until now, and the code that was printing the HTML code has been deleted.
+
+It might look strange that the application works as it should even though there is no code nowhere to tell it what to do in case that the form was not submitted.
+
+Simplified, the flow is something like:
+
+At the end of a controller action (subroutine), $c->response->body should not be null. It should contain something to be printed on the browser.
+
+If $c->response->body is null, that subroutine must forward to one of the views which were created in the application, and that view will generate that content and it will store it in $c->response->body.
+
+The forward to a view could be done with a line like:
+
+    $c->forward( 'View::TT' );
+
+If this line is used, Catalyst forwards to the view WebApp::View::TT.
+If at the end of the subroutine there is no such a line, like in the case of our add() subroutine, Catalyst will forward to the default view.
+
+In case there is just a single view defined in the application, like in our case, that view will be the default view, so no need to forward to it, because Catalyst will forward automaticly if there is no content in $c->response->body.
+
+If there are more views defined in the application, but we want to forward to the default view without explicit use of $c->forward, we need to specify in the configuration file which of them is the default one, using a code like:
+
+    default_view TT
+
+So in case the add form was not submitted, the add() subroutine finishes, Catalyst sees that there is no explicit forward to any view, so it forwards to the default view, which is the TT view because it is the single one we have.
+
+TT view gets the parameters we stored in $c->stash (there are no such parameters defined now in add() subroutine), reads the template root/templates/manage/add.tt, generate the final HTML content from that template and store the results in $c->response->body which is then sent to the browser.
+
+In the edit() subroutine we deleted the HTML code and we added a code which puts in the stash the variables we need to embed in the template in the specified places:
+
+            $c->stash(
+                wanted_id => $wanted_id,
+                first_name => $members->[0]{first_name},
+                last_name => $members->[0]{last_name},
+                email => $members->[0]{email},
+            );
+
+The values of this hash will replace in the template the special places which contain variables with the same name as the keys of this hash.
+For example, in the template we will have a place noted as [% wanted_id %]. It will be replaced with the value of the variable $wanted_id because we added "wanted_id => $wanted_id" in the stash.
+
+At the end of the edit() subroutine Catalyst will also do an implicit forward to the default view which will render the template root/templates/manage/edit.tt.
+
+Because the delete subroutine doesn't print anything but just deletes the record from the database and redirects to the page with the list of persons, we don't have HTML in it, so we don't change anything in it.
+
+In the index() subroutine we delete the HTML code and the loop that generates the table rows and we move that logic to the index.tt template.
+
+In place of that code we just added a line which adds the arrayref $members to the stash for making it available in the template using:
+
+        $c->stash( members => $members );
+
+And at the end of the subroutine Catalyst also forwards to the default view that renders the template and generate the table with persons.
+
+We will now see how the templates we created look like.
+
+The add.tt template contains exactly the same HTML code it was in the add() subroutine of the controller, because it is just a static HTML content, with no variables to embed inside. We just arranged it a little.
+
+In the edit.tt template the HTML code outside the form is exactly the same as it was in the controller, but the code inside the form look a little bit different:
+
+        <form action="/manage/edit/[% wanted_id %]" method="post">
+          First name: <input type="text" name="first_name" value="[% first_name %]" /><br />
+          Last name: <input type="text" name="last_name" value="[% last_name %]" /><br />
+          Email: <input type="text" name="email" value="[% email %]" /><br />
+          <input type="submit" name="submit" value="Save" />
+        </form>
+
+So instead of including the name of the Perl variables in the template we included markers that will be replaced with the values of their corresponding variables from the stash.
+
+The biggest changes were made in the template index.tt which should generate the table with all the persons from the database.
+
+The code outside the table is not changed but only arranged a little. Here is the content of the template that generates the table:
+
+        <table>
+        [% FOREACH m IN members %]
+          <tr>
+            <th>[% m.id %]</th>
+            <td><a href="/manage/edit/[% m.id %]">[% m.last_name %], [% m.first_name %]</a></td>
+            <td>[% m.email %]</td>
+            <td><a href="/manage/delete/[% m.id %]">delete member</a></td>
+          </tr>
+        [% END %]
+        </table>
+
+The following directive:
+
+        [% FOREACH m IN members %]
+
+is similar with the following line in Perl:
+
+    foreach $m ( @$members ) {
+
+The following directive:
+
+    [% m.id %]
+
+is similar with the following one in Perl:
+
+    $m->{id}
+
+The FOREACH directive is ended with the [% END %].
+
+Of course, these are just a few of the features offered by Template-Toolkit, but the other features it offers are not more complicated than them.
+
+It is recommended to read the POD docs of:
+    L<Template::Manual::Intro|https://metacpan.org/module/Template::Manual::Intro>
+    L<Template::Manual::Directives|https://metacpan.org/module/Template::Manual::Directives>
+    L<Template::Manual::Syntax|https://metacpan.org/module/Template::Manual::Syntax>
+    L<Template::Manual::Variables|https://metacpan.org/module/Template::Manual::Variables>
+    L<Template::Manual::VMethods|https://metacpan.org/module/Template::Manual::VMethods>
+    L<Template::Manual::Filters|https://metacpan.org/module/Template::Manual::Filters>
+    L<Template::Manual::Config|https://metacpan.org/module/Template::Manual::Config>
+
+
+We have now a standalone library that we can access with CLI scripts and with a web interface offered by a Catalyst app. The Catalyst app uses a light model that access the standalone library, a controller that does only the web logic as it should, and a light view that uses Template-Toolkit to render the templates as HTML. These templates are stored in distinct files which are much easier to understand by a web designer.
+
+As we are going to do on each step, we will test the application using the same actions:
+
+Run again the development server:
+
+    perl script/webapp_server.pl
+
+And then access it at the following URL:
+
+    http://localhost:3000/manage
+
+Click on the "Add new member". It will open the page with the add form.
+Add some data in the form and submit it. It will add that record in the database and it will redirect to the page with the persons.
+Click on the name of the person. It will open the edit form. Change some values and submit that form. It will make the change in the database and it will redirect to the page with the list of persons.
+Click on "Delete member" link for the person you want. It will delete that record from the database and it will redirect to the page with the list of persons.
+
+=head2 Author:
+
+Octavian Rasnita <orasnita@gmail.com>
