@@ -1,0 +1,26 @@
+=head1 Create more sensible defaults
+
+=head1 OVERVIEW
+
+=head1 
+
+=head1 Dist::Zilla and "minting profiles"
+
+As many sections as neeed to complete the article!
+
+=head1 Dist::Zilla::MintingProfile::Catalyst::Easy
+
+=head1 For More Information
+
+Where to go to learn more, for example links to CPAN distributions or source code on Github
+For more information please check:
+L<Dist::Zilla Tutorial|http://dzil.org/tutorial/minting-profile.html> and
+L<Dist::Zilla::MintingProfile::Catalyst>
+
+=head1 Summary
+
+=head1 Author
+
+Dimitar Petrov <dcpetrov@cpan.org> dpetrov
+
+=cut
