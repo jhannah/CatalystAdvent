@@ -17,8 +17,7 @@ Pie and StackedColumn) and allows customization of almost every parameter.
 
 C<Imager::Graph> depends on L<Imager|https://metacpan.org/release/Imager>, so
 the same prerequisites apply here. Please see 
-### FIXME: Link must be adjusted! ###
-L<Scaling images on demand|http://www.catalystframework.org/calendar/2012/99>
+L<Scaling images on demand|http://www.catalystframework.org/calendar/2012/20>
 for a list of C-libraries required for installing C<Imager::Graph>.
 
 =head1 How to talk to the view
