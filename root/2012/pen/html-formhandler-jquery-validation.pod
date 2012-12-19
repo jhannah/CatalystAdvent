@@ -4,19 +4,30 @@
 
 =head2 HTML::FormHandler
 
-L<HTML::FormHandler> is a form handling package that generates, validates
-HTML form data and saves it to the database once the validation passes. 
+L<HTML::FormHandler> maintains a clean separation between form construction
+and form rendering. It allows you to define your forms and fields in a number
+of flexible ways. Although it provides renderers for HTML, you can define
+custom renderers for any kind of presentation. HTML::FormHandler allows you to
+define form fields and validators. It can be used for both database and
+non-database forms, and will automatically update or create rows in a
+database. It can be used to process structured data that doesn't come from an
+HTML form.
 
 =head2 HTML::FormHandlerX::Form::JQueryValidator
 
-The L<HTML::FormHandlerX::Form::JQueryValidator> is a simple trait which
+The L<HTML::FormHandlerX::Form::JQueryValidator> is a simple role which
 provides convinient mechanism to create a simple jQuery validation profile
 from our form definition.
 
 =head2 jQuery Validator
 
 L<jQuery Validator|https://github.com/jzaefferer/jquery-validation> makes
-clientside form validation easy.
+clientside form validation easy and at the same time provides a lot of options
+to customize the validation plugin to your specific needs. The plugin comes
+with useful commonly used set of validation methods such as validation URL,
+email addresses, zip codes, phone numbers, credit card numbers and etc. All
+these methods come with default error messages which are available in
+more than 30 different languages.
 
 =head2 Simple Order Form
 
