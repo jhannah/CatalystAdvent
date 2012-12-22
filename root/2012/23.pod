@@ -228,7 +228,13 @@ And that is all! We have nice looking form, both validated front-end and
 server-side and automatically integrated with DBIx::Class using the
 L<HTML::FormHandler::TraitFor::Model::DBIC> trait.
 
-And here is the final example: <img src="/calendar/static/images/2012/formhandler-jquery-validator.png" />
+And here is the final example: 
+
+=begin xhtml
+
+<img src="/calendar/static/images/2012/formhandler-jquery-validator.png" />
+
+=end xhtml
 
 =head1 Demo
 
