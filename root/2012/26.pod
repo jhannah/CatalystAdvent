@@ -1,0 +1,128 @@
+=head1 STEADY AS SHE GOES
+
+Catalyst has been established as the leading Perl MVC framework for at least five years now. It's installed base runs to hundreds of sites. 
+It is proven. It has a large and active community both on IRC and on the mailing lists. There are even books.
+
+It has also proved to be more suited to larger projects than to very small ones. It is a serious product for serious companies with serious 
+projects which will have serious consequences if they are late or buggy.
+
+The Catalyst community ran an advent calendar for six years, from 2005 to 2010 inclusive. However, this has had a downside. It is difficult 
+to be proven and to come up with new and trendy ideas the whole time. Much of what needs to be said has already been said. It isn't
+possible to make as much noise as the new kids on the block for whom everything is novel and exciting.
+
+This has led to a mood of introspection. There have been musings about how to introduce inversion of control in a way which is backwards
+compatible. At times it sounds as if the installed base is a handicap and the important thing is to have something new to say in
+the advent calendar.
+
+Catalyst is the mainstream Perl MVC framework. It's large installed based, large community, quality support and suitability for 
+large projects are strengths. Let's use the remaining slots in the advent calendar to demonstrate that it is widely used on 
+serious projects.
+
+=head1 BACKGROUND
+
+Motortrak began using Catalyst in early 2010 when we were looking to re-write a prototype system so that
+it could be rolled out nationally and possibly internationally. We have invested approximately 5 man-years into the project. That
+makes it a serious project. That makes it a Catalyst project.
+
+The system provides an online service booking facility for owners of a particular brand of up-market motor vehicles. Our client
+is the chain of official retailers (garages) for this manufacturer. The users are in one of two categories: the first
+are the owners of the vehicles, the second are the staff of the chain at local, retailer and national level.
+
+The prototype catered for a single UK-based retailer. The project plan called for the system to be re-written to incorporate
+the lessons learned from the prototype and to be expandable so retailers could be added singly or in groups until all 200
+retailers in the UK network were included.
+
+The was also the real possibility that the system could be sold into the USA, mainland Europe and/or Australia. This meant
+that the system had to be sufficiently modular to allow it to be skinned for these markets or for large chunks of it to be
+re-used in sibling products.
+
+The project also had a disproportionate level of political sensitivity. The head of the chain of retailers had gone public in
+the industry press stating that an online service booking facility was the key objective of 2011. There would be severe consequences
+if the system was late or buggy. The components we chose had to be mainstream, not experimental.
+
+The system has been live for nearly two years and phase 5b will be released shortly. Numerous other development phases are
+scheduled for 2013. Most of the UK retailers are now included, 
+the rest will be included in early 2013.It is perceived as a success and is attracting interest from abroad.
+
+=head1 WHY CATALYST?
+
+As explained previously, we wanted a mainstream MVC framework well-suited to a medium-sized project. This immediately took us
+three-quarters of the way to choosing Catalyst. There was a lot of noise about Dancer and Mojolicious at the time, so we had a 
+look at those as well.
+
+Both products were very immature in early 2010. Dancer later released version two under the banner "Why I re-wrote everthing"
+which appeared to confirm our fears. It has since developed a good reputation for small projects, but ours isn't a small 
+project.
+
+We dismissed Mojolicious because it was very new and because it had been criticized at LPW. It has developed quite a good
+reputation since then. Catalyst's philosophy of fully utilising CPAN has much more intellectual appeal then Mojo's approach
+of re-writing everything. There remains a suspicision that once the enthusiasm born of having a new product as faded, Mojo
+will have created both a straight-jacket and a maintenance headache for itself. That said, we would certainly take Mojo
+more seriously if we were starting from scratch today.
+
+=head1 COMPANION PRODUCTS
+
+We tend to refer to the system as a Catalyst system but, of course, it isn't. It utilises Catalyst as its MVC framework 
+but it uses numerous other Perl and non-Perl components.
+
+We needed a mainstream templating system. There are numerous Perl templating systems, but there is only one which can
+reasonably be described as mainstream. We chose Template::Toolkit.
+
+All Motortrak's products are Oracle-based, so that decision had been made for us. However, we did need a way of accessing it.
+We decided to use DBIx::Class, which is regarded as Perl's mainstream ORM (object-relational mapper) for the basic CRUD. We
+stayed with straight DBI for more complex SQL operations such as tree-walking.
+
+Catalyst was at version 5.8 at the time and we have since upgraded to 5.9. This has automatically given us Moose and Plack.
+We were initially cautious about using Moose's features such as Roles. We have used them more as the project has progressed
+and we have become more aware of their usefulness.
+
+The other Perl modules were deliberately chosen to be conservative. We used Params::Validate for checking method parameters
+and Data::FormValidator for validating request parameters.
+
+We also implemented several project-wide QA policies. Our tests check that all modules have been run through perltidy. All
+methods must at least be mentioned in the POD. All modules must have been run through Perl::Critic on level three. (We had
+to disable the rule which doesn't recognise Params::Validate as a valid way of unpacking parameters.)
+
+The front end is a mixture of HTML, CSS, Javascript anf Jquery.
+
+=head1 WHAT WE DID LEARN?
+
+The system has been a huge success, so we obviously got most of it right. 
+
+Fat controllers. We read the POD, we read the book, we chuckled at the diagram of the fat controller. We had a team
+of experienced programmers, we wouldn't make a mistake like that.
+
+We did. When the pressure is on, the obvious place for the logic is the controller. It's the wrong place. The analogy
+with an eating disorder is a good one. Once the controllers get fat, it is difficult to slim them down. More logic creeps
+back in and they put on weight.
+
+Logic in a controller is difficult to unit test because there is an assumption that it has been compiled into a Catalyst process.
+This means the unit tests start to look more like end-to-end tests involving firing up LWP or Selenium and firing requests
+into the webserver.
+
+We found that with fat controllers came a lot of tightly-coupled interaction between the controllers. This was clumsy and
+made testing even harder.
+
+Code within a controller cannot be re-used outside Catalyst. You can't use it in a cron job or a cgi script.
+
+I know what I've said there has been said many times before, but it's worth saying again. We thought we were too experienced to make
+that mistake.
+
+A more subtle issue concerns fat models. It is important to have thin controllers and fat models. However, this does not mean the Catalyst
+model modules should be fat. They should be thin as well. They should be wrappers with allow standard Catalyst-independent Perl modules to 
+be plugged into Catalyst. These standard modules should do most of the work. They can then be easily unit tested and easily re-used outside
+of Catalyst.
+
+We didn't make the mistake of building fat Catalyst model modules.
+
+Template::Toolkit was powerful and easy to use. No problems there.
+
+DBIx::Class was brilliant for the simple CRUD operations and operations involving two or three tables. Far easier than using SQL directly.
+We did build one custom DBIx::Class module to run a complex SQL query. The documentation on how to do this was clear enough and the module worked. However,
+it was hard work and we stuck to SQL for the complex stuff after that.
+
+One of our tasks if we ever get a quiet moment will be to go back and audit where we used DBIx::Class and where we used SQL. We will 
+probably conclude that we should have used DBIx::Class more.
+
+The decisions to use Params::Validate and Data::FormValidator were rock-solid. However, they are ageing modules and we would evaluate
+Module inline declarations and HTML::FormBuilder if we were starting from scratch now.
