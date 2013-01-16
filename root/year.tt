@@ -50,4 +50,10 @@
 </div>
 [% CATCH %]
 [% END %]
+<h4>All Years</h4>
+<div class='center'>
+    [% FOREACH year IN years %]
+        <span>[ <a href='[% c.uri_for('/', year) %]'>[% year %]</a> ]</span>
+    [% END %]
+</div>
 <p class="rss">[<a href="[% c.uri_for('/feed', year) %]">XML Feed</a>]</p>

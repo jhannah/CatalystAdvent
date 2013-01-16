@@ -75,6 +75,11 @@ h2 {
     color: #b00;
 }
 
+h4 {
+    text-align: center;
+    color: #b00;
+}
+
 #content .calendar {
     margin-left: auto;
     margin-right: auto;

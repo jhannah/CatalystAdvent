@@ -125,6 +125,9 @@ sub get_year : Chained('base') PathPart('') CaptureArgs(1) {
     }
 
     $c->stash->{links} = \@links;
+
+    # for years links
+    $c->stash(years => [ $self->_years($c) ]);
 }
 
 =head2 year
