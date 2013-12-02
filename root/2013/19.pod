@@ -1,0 +1,277 @@
+=head1 A LINUX WEEK IN THE LIFE OF A WINDOWS GUY!
+
+A step by step guide in setting up a complete web-server application development environment utilising GNU/Linux, NGINX, MySQL, PhpMyAdmin, PostGreSQL, pgAdmin III (including php-fpm & Catalyst application Daemon), perlbrew, Perl 5.16.0, CPAN Minus and of course the Catalyst MVC framework.
+
+=head1 OVERVIEW
+
+Having spent a few months getting to grips with Catalyst in an Windows environment and having developed with Perl using Active-State on Windows for many years, I was keen to learn how to develop Catalyst MVC application utilising the power of modern software technologies and best practises, as well as having a chance to expose myself to the latest offerings of Linux. 
+
+I hope this guide enables others to quickly and easily set up a powerful development environment with as little effort and knowledge as possible, so new developers (especially Windows users), can quickly get the benefits of a powerful Perl environment without the daunting task of having to work out how to do it all themselves.
+
+This is part two of a three part series.
+
+=head1 How to install Servers and Manage Perl Dependencies
+
+Before we move on to installing and setting up the other applications such as NGINX web-server and databases, we need to install the Catalyst dependencies required for the Daemon service as we will be running NGINX using FastCGI and unix sockets.
+
+=over 3
+
+=item *
+
+cpanm FCGI
+
+=item *
+
+cpanm FCGI::ProcManager
+
+=item *
+
+cpanm Daemon::Control
+
+=back
+
+At this point I should remind you that each time you add a new dependency to your application (as we just did with the two FCGI modules and Daemon Control), you need to edit your Makefile.PL file and add the new dependencies to it.
+
+	requires 'FCGI';  
+	requires 'FCGI::ProcManager';
+	requires 'Daemon::Control';
+
+It should be obvious where to put these lines of code, just stick them with the other 'requires' dependencies already declared in the script.
+
+B<Note> If you want to be sure that you C<Makefile.PL> tracks required dependencies, you may wish to add the dependency to the C<Makefile.PL> first, and then install directly from that via:
+
+    cpanm --installdeps .
+
+As long as '.' is the directory where your C<Makefile.PL> is located, C<cpanm> will inspect it and install any and all missing dependencies.
+
+=head1 INSTALLING NGINX
+
+OK, now we can move on to installing NGINX web-server.
+
+=over 3
+
+=item *
+
+sudo apt-get install nginx-light
+
+=back
+
+You will need to provide your root password. I have chosen to install the light version of NGINX as this is information I gleaned from another web source (see credits), and it works, so if it ain't broke! 
+
+We now need to configure the website for NGINX to run. Some installations such as NGINX and MySQL are installed as root, unlike Catalyst and Perl, perhaps there is a way to install some of the applications without root, but that is a discussion for another advent, once someone has told me how!
+
+Create a new file in the following location... 
+
+=over 3
+
+=item *
+
+/etc/nginx/sites-available/dance-music.org
+
+=back
+
+...choosing a name that represents your site name, for me I chose my hobby site dance-music.org, simply replace it with your domain choice. I will show you how to edit your hosts file at the end so you don't have to have a DNS server or a purchased domain pointing to a public IP, this way you can run the development environment as if the website was live on the Internet.
+
+(You will need root privileges - I do this by creating a new application menu item that uses the command 'kdesudo kate', which opens my text editor (KATE) with a root permissions password request, and then simply pin it to my panel (task bar).
+
+Your file should look something like this...
+
+      server {
+
+	      listen   80; ## listen for ipv4; this line is default and implied
+
+	      # Make site accessible from http://localhost/
+	      server_name dance-music.org;
+
+	      location / {
+		      include fastcgi_params; 
+		      fastcgi_pass unix:/home/your_user_name/Websites/DMO/DMO.socket;
+	      }
+
+	      location /static {
+		  root /home/your_user_name/Websites/DMO/root;
+	      }
+
+      }
+
+Remember to change 'your_user_name' for your user-name and of course the server_name 'dance-music.org' to your domain. The first location passes the URL to your Catalyst application, the second ensures that all files requested from your 'static' folder are served super-fast by NGINX.
+
+You can prove this is working by removing Static::Simple from the Catalyst application module (in this instance it would be ~/Websites/DMO/lib/DMO.pm). However, we still have a little more to do before we have your Catalyst app running with NGINX.
+
+The next thing you need to do is activate this website NGINX configuration file. The way this is done is by creating a symbolic link from the 'sites-available' folder to the 'sites-enabled' folder...
+
+=over 3
+
+=item *
+
+sudo ln -s /etc/nginx/sites-available/dance-music.org /etc/nginx/sites-enabled/dance-music.org
+
+=back
+
+You should now be able to restart NGINX and check it is running without error.
+
+=over 3
+
+=item *
+
+sudo service nginx restart
+
+=item *
+
+sudo service nginx status
+
+=back
+
+You should get a successful message and if you check the log file (/var/log/nginx/error.log), it should be empty!
+
+Now we will create your Daemon service script for the Catalyst application to listen on.
+
+=head1 CREATING A DAEMON SERVICE FOR CATALYST
+
+Firstly you need to create a file for the Daemon script, I called mine 'cat-dmo' - which will be the Daemon file-name you use for managing the service, create it in the following directory...
+
+=over 3
+
+=item *
+
+/etc/init.d/
+
+=back
+
+The file (cat-dmo) should look like something like this...
+
+      #!/usr/bin/env perl
+      use warnings;
+      use strict;
+      use Daemon::Control;
+
+      my $app_home = '/home/your_user_name/Websites/DMO';
+      my $perl     = '/home/your_user_name/perl5/perlbrew/perls/perl-5.16.0/bin/perl';
+      my $program  = $app_home . '/script/dmo_fastcgi.pl';
+      my $name     = 'DMO';
+      my $workers  = 1;
+      my $pid_file = $app_home . '/DMO.pid';
+
+      my $socket   = $app_home . '/DMO.socket';
+
+      Daemon::Control->new({
+	  name        => $name,
+	  lsb_start   => '$nginx',
+	  lsb_stop    => '$nginx',
+	  lsb_sdesc   => $name,
+	  lsb_desc    => $name,
+	  path        => $app_home . '/dmo.fastcgi.initd',
+
+	  user        => 'www-data',
+	  group       => 'www-data',
+	  directory   => $app_home,
+	  program     => "$perl $program --nproc $workers --listen $socket",
+
+	  pid_file    => $pid_file,
+	  stderr_file => $app_home . '/dmo.out',
+	  stdout_file => $app_home . '/dmo.out',
+
+	  fork        => 2,
+      })->run;
+
+Ensure you carefully check each scalar setting at the top and amend accordingly. I took this code from another source (credits below), So I'm sure it could do with some refinement as Perl is currently hard-coded!
+
+It is also important that you chmod this file as executable (755), or as I do it, use Dolphin and the right click 'properties' context-menu option and the 'permissions' tab.
+
+Now let's start the service, create a hosts file entry and check everything is working.
+
+=over 3
+
+=item *
+
+/etc/init.d/cat-dmo start
+/etc/init.d/cat-dmo status
+
+=back
+
+Your Catalyst Daemon should now be running.
+
+=head1 ADDING A HOSTS FILE ENTRY FOR YOUR DOMAIN
+
+Open up the following file with root permissions...
+
+=over 3
+
+=item *
+
+/etc/hosts
+
+=back
+
+Your file should look something like this after adding your website domain entry...
+
+      127.0.0.1		localhost
+      127.0.1.1		dmo # This will be your computer name
+      127.0.0.1		dance-music.org # Add your domain here for the IP 127.0.0.1
+
+Now open up a web-browser and try to navigate to your website.
+
+=over 3
+
+=item *
+
+http://dance-music.org
+
+=back
+
+Your Catalyst welcome page should be displayed.
+
+
+=head1 SUMMARY
+
+You now have your L<Catalyst> application running under FastCGI and Nginx!
+
+This ends part one of a three part series.  Stay tuned in tomorrow for the next installment!
+
+=head1 DISCLAIMER!
+
+This guide comes without any warranty! It is simply something I have put together over a week trying to get to grips with setting up a new Linux development environment. I apologise if there are errors, and please do not think this guide is adequate to be used in a live production, public facing web-server environment! This is simply meant to be a rough introduction into creating a local development environment using the latest software technologies for Catalyst application development on a GNU/Linux Debian Ubuntu Mint OS.
+
+I welcome all feedback with corrections, omissions or suggestions to any areas covered.
+
+=head1 CREDITS AND ACKNOWLEDGEMENTS
+
+Here are the main sources I used to crib this article together, to whom I am very grateful.
+
+=over 3
+
+=item *
+
+NGINX / MYSQL / PHP5-FPM : http://michael.lustfield.net/nginx/dummies-guide-to-setting-up-nginx
+
+=item *
+
+NGINX / DAEMON : http://blogs.perl.org/users/davewood/2013/01/nginx-fastcgi-vs-starman-erratum.html
+
+=item *
+
+PERLBREW : http://www.perlbrew.pl
+
+=item *
+
+CPANM / CATALYST : irc.perl.org#catalyst
+
+=item *
+
+POSTGRESQL : http://scratching.psybermonkey.net/2009/06/postgresql-how-to-reset-user-name.html
+
+=item *
+
+THE REST : http://www.bing.com - http://www.stackoverflow.com - various other forums, threads, blogs and how-to's.
+
+=back
+
+=head1 SPECIAL ACKNOWLEDGEMENT
+
+I would like to give a special thank-you to the Catalyst community, for without their help none of this would have been possible.
+
+=head1 AUTHOR
+
+Craig Chant <sspl@stepnstomp.co.uk> | IRC : SSPL
+
+=cut

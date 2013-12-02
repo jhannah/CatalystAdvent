@@ -191,12 +191,66 @@ hooked up to the 'ws' action.  Lets look at that.
 Since websocket support is new in L<Catalyst> there's not a lot of pretty helpers
 and shortcut methods.  So we need to call L<Protocol::WebSocket> to initiate the
 websocket, and then we create a 'on_read' handler to listen on the socket, and the
-we add to the write queue whatver shows up.
+we add to the write queue whatver shows up.  Lets break it down a bit:
+
+      my ($self, $c) = @_;
+      my $io = $c->req->io_fh;
+      my $hs = Protocol::WebSocket::Handshake::Server
+        ->new_from_psgi($c->req->env);
+
 
 The key to the magic is the L<Catalyst::Request> method C<io_fh>.  This gives you
 low level access to the underlying C<psgix.io> socket, and is also a flag to
 L<Catalyst> so that it never tries to finalize the body (since you are never really
-closing the connection).
+closing the connection).  We then create a handshake server object via
+L<Protocol::WebSocket::Handshake::Server>.  Now, this isnt' a running server, but
+rather the server's side of the Websocket protocol.  Since we are the server, that's
+the one we need (and there's a client side protocol as well, go check out the full
+docs of L<Protocol::WebSocket> for more).  this C<$hs> object parses the information
+coming across the websocket and presents it in a manner that is easy to use in Perl
+code, and it also does the opposite, it takes some Perl data and preps it to send
+across the open websocket.
+
+     $hs->parse($io);
+
+This the the handshake server parsing the start of the socket, which if you looked
+at it would like a lot of HTTP but with a few extra bits to say we'd like to
+upgrade the connection to a websocket (it does this using the documented HTTP/1.1
+Upgrade header, so yes the people that did HTTP 1.1 all those years ago were really
+thinking ahead!)
+
+      my $hd = AnyEvent::Handle->new(fh => $io);
+      $hd->push_write($hs->to_string);
+      $hd->push_write($hs->build_frame(buffer => "Echo Initiated")->to_bytes);
+
+This converts the raw C<$io> socket to socket resembling a bidirection filehandle
+with a clear API we can use to attache read and write events.  We then initiate 
+ther websocket protocol upgrade and send out first frew frames of data.  If you 
+go back to look at the Javascript end of things:
+
+    // Display messages received from the server
+    socket.addEventListener("message", function(event) {
+      message.textContent = "Server Says: " + event.data;
+    });
+
+Here's the message event that happens when those frames are sent across.
+
+The next bit is the code that listens to the read event, which happens when frames
+are pushed across the websocket from the browser to the server:
+
+      $hd->on_read(sub {
+        (my $frame = $hs->build_frame)->append($_[0]->rbuf);
+        while (my $message = $frame->next) {
+          $message = $hs->build_frame(buffer => $message)->to_bytes;
+          $hd->push_write($message);
+        }
+      });
+
+The on_read associates a callback to handle any incoming messages.  We use the
+handshake server to decode the frames and then we turn around and take that
+decoded message and put it right back on the write queue.  So when someone
+sends a message from the browser, we decode it, and send it back across the same
+websocket up the the browser.  Thus completing the echo!
 
 So, that's really it!
 

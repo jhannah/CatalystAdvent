@@ -1,0 +1,346 @@
+=head1 A LINUX WEEK IN THE LIFE OF A WINDOWS GUY!
+
+A step by step guide in setting up a complete web-server application development environment utilising GNU/Linux, NGINX, MySQL, PhpMyAdmin, PostGreSQL, pgAdmin III (including php-fpm & Catalyst application Daemon), perlbrew, Perl 5.16.0, CPAN Minus and of course the Catalyst MVC framework.
+
+=head1 OVERVIEW
+
+Having spent a few months getting to grips with Catalyst in an Windows environment and having developed with Perl using Active-State on Windows for many years, I was keen to learn how to develop Catalyst MVC application utilising the power of modern software technologies and best practises, as well as having a chance to expose myself to the latest offerings of Linux. 
+
+I hope this guide enables others to quickly and easily set up a powerful development environment with as little effort and knowledge as possible, so new developers (especially Windows users), can quickly get the benefits of a powerful Perl environment without the daunting task of having to work out how to do it all themselves.
+
+This is part one of a three part series.
+
+=head1 HARDWARE ENVIRONMENT
+
+I was lucky enough to be given an old server from work which used to run our Windows Small Business Server 2003 environment before we upgraded to SBS2011. It's an HP ML350 G3 with dual Xeon 3.06GHZ, 4GB RAM and 3 x 72GB SCSI running in Raid 5. 
+
+I know you can simply use VM software and run any OS in a virtual environment, but my main Windows desktop PC is an old Q6600 quad core, with 4GB of RAM and u320 SCSI (no raid), so it seemed a better choice to run separate hardware which is nearly as powerful as my current desktop environment, plus it would give me a chance to truly see how Linux compared to Windows, especially as I have first hand experience of this machine, though this did limit me to a 32bit version of Linux. 
+
+=head1 CHOOSING A GNU/LINUX DISTRIBUTION
+
+Now I want to point out, I'm not advocating or recommending what Linux you should use, I am hardly in a position to make any such recommendation, but I can explain what Linux I ended up using and how I came to this decision. 
+
+Obviously there are many distributions to choose from, as is the nature of GNU/Linux and the FSF/Open-Source projects, but the obvious choice it seemed, at least for a Windows user and Linux noob who wants a desktop environment, was Ubuntu so that's where I started.
+
+However, this didn't go smoothly at all, I tried the latest version 13.10, which wouldn't work, so I went for 12.04 LTS, but that wouldn't work either, so I then tried Kubuntu 12.04 LTS, which loaded fine, however, after a couple of days using it, I was a little disappointed by the performance, and felt perhaps I should try other versions and do some more research, so I did.
+
+After reading many "This Linux vs That Linux" type forums threads, I decided I would try a few in a VM environment as it seemed there were many desktop GUI's to choose from as well as distribution, so before I dared to wiped my current Kubuntu install, I set up a few in VMPlayer which gave me a chance to play with the current Kubuntu install as well as trial a few different other versions before I would decide which one I felt like replacing Kubuntu with.
+
+I gave Debian 7 XFCE a go, Red Hat Desktop (but having already gotten used to using .deb Debian packages in Kubuntu, I felt lost again, so decided I would stick with a Debian base), I tried Mint Linux XFCE and downloaded Mint KDE and also Lubuntu as a backup just in case. It seems that apparently the KDE environment is known for performing slower than other distributions, and found Debian 7 XFCE to be quite snappy in the VM environment and thought this might be a good choice.
+
+However, once again I hit installation problems on the physical machine, where it black screened and never provided a GUI install, which from the VM install I knew I should get. I decided I would try Lubuntu as it was the lightest in the Ubuntu family and thought at least it should run pretty fast, but that wouldn't load either. Desperate to give an alternative to the KDE desktop a trial on the physical machine, I installed Mint Linux 13 Maya XFCE, which loaded fine, but during the first software update it crashed, and when I rebooted the machine, it hung with just a flashing cursor and appeared as though the install had been totally corrupted by the update manager! 
+
+Agghh!, bit of a nightmare, but it had given me enough of a chance to get a feel for the XFCE desktop, which I quickly decided, I actually preferred KDE after all, even if XFCE performed faster. In a desperate attempt to not be in a situation of having just simply wiped a working install of Kubuntu and wasted several hours only to end up re-loading the original Kubuntu OS, I thought I would try Mint Linux 13 Maya KDE, still a KDE version, but supposedly more refined and I had hoped faster. The installation went fine and I have stuck with Linux Mint KDE and am happy with my choice. It is still a little slow compared to the original Windows SBS 2003 and XFCE Linux, but it certainly makes a Windows guy feel a little more at home.
+
+I did also replace the on-board video with an old PCI 128MB NVIDIA VGA DVI-D card and was impressed how it just worked, with Linux clearly finding and installing what ever new drivers were required, which has improved the VGA stutter I was experiencing considerably. Personally I do feel that Mint Linux KDE runs a little faster than Kubuntu (though this could be related to the VGA card, as I never ran Kubuntu with the 128MB NVIDIA), and I do prefer some of the Mint Linux KDE interface nuances, like having to double click to open a folder as it is more Windowsesque, though the differences seem few and subtle, such as removing the activities button from the panel (task bar).
+
+My brief experience trying various version of Linux has taught me, there are may flavours to choose from, and the right one is simply the one that works for you and you most easily get along with. After all, if this was a true server environment and not also a development desktop workstation, the GUI wouldn't be a deciding factor, however in this particular instance, I have sacrificed some performance for the desktop GUI I prefer.
+
+=head1 DESIRED IMPLEMENTATION GOALS / TECHNOLOGY PLATFORM
+
+Apart from implementing a Linux environment, I had specific technological goals I wanted to achieve so I could redesign my hobby website within a development environment that mimicked the final envisages target platform I had planned on deploying it to. This also gave me a project to work with to aide in learning this new environment and furthering my Catalyst skills.
+
+Here is my chosen platform...
+
+=over 3
+
+=item *
+
+Mint Linux 13 (Maya) LTS KDE i386 32bit - Operating System
+
+=item *
+
+NGINX - Internet Web Server
+
+=item * 
+
+perlbrew - Perl Distribution Management
+
+=item *
+
+Perl 5.16.0 - Perl Programming Language
+
+=item *
+
+CPAN Minus - CPAN Perl Module Install Helper
+
+=item *
+
+Catalyst MVC Framework - Perl MVC Application Development Environment
+
+=item *
+
+MySQL - Database Back-end 
+
+=item *
+
+PhpMyAdmin - Database Administration
+
+=back
+
+However, when discussing databases in the irc.perl.org #catalyst IRC chat, it was recommended that I move away from MySQL and looked at a more standards compliant database, such as PostGreSQL. This incidentally fitted in with my desire to completely overhaul the back-end design with a new DB schema, having completed a 10 month Open University degree course in Relational Databases : Practice & Theory and wanted to implement the knowledge I had acquired, so I added the following to my development environment...
+
+=over 3
+
+=item *
+
+PostGreSQL - Database Back-end 
+
+=item *
+
+pgAdmin III - Database Administration
+
+=back
+
+I would point out that initially I had gone for PhpPgAdmin, but during my initial installs I had a few issues with connection authentication, I then found through Software Manager that there was a PostGreSQL GUI, so being a Windows guy I jumped at the opportunity to use a fully fledged GUI application to manage my new SQL DB environment that I didn't have the first clue about using!
+
+I will now walk you through the various steps I performed to implement my chosen environment. Although you can install things in an alternate order, I have chosen to start with perlbrew and Catalyst plus your Catalyst application as it helps to ensure you set everything up where possible not using the root account at the start before we move on to needing the root password, plus this means the file system is appropriately structured before implementing the NGINX web-server.
+
+I have assumed you are familiar with firing up a bash/shell/terminal (command-prompt) window and executing commands. The syntax I am using is *Ubuntu style (*Linux Mint is based on Ubuntu), so you may need to alter according for your distribution. I am also using KATE for my text editing, which makes things easier for a Windows guy, but you can use what ever text editor you like. I also use the Dolphin file manager, but this again is just my preference to use a GUI where possible.
+
+Remember to save any edited or newly created files!
+
+=head1 INSTALLING PERLBREW
+
+Firstly you need to get Perl running in your local account, which helps to encapsulate your development environment and enables you to switch between Perl installs very easily without risking corruption of the root OS Perl install.           
+
+=over 3
+
+=item *
+
+sudo apt-get install perlbrew
+
+=back
+
+Once perlbrew is installed (requires your root password), you need to initialise it for the current user.
+
+=over 3
+
+=item *
+
+perlbrew init
+
+=back
+
+You will then see a message telling you to place the following line of code at the bottom of your ~/.bash_profile file.
+
+=over 3
+
+=item *
+
+source ~/perl5/perlbrew/etc/bashrc
+
+=back
+
+However I was unable to find this ~/.bash_profile file! I checked the perlbew website and the installation instructions say to add the line to your 'shell rc file', so I did some surfing and found that some call the command-prompt 'shell' while others call it 'bash', and there is a ~/.bashrc file in my home directory! (remember these are hidden files as they start with a period, so ensure you can see hidden files!)
+
+I did some further digging and found posts from others asking the same question regarding what file they should put this line of code in. Some suggested creating a .bash_profile file in your home directory (~/), while others claim only while the desktop GUI is firing up does a .bash_profile file exist, but once logged in, it becomes your .bashrc file, perhaps this is Ubuntu specific?
+
+In the end I decided to place it in my ~/.bashrc file, and it doesn't seem to have caused any issues and perlbew appears to be running fine, so that's where I will leave it until someone tells me otherwise. If anyone knows 100% where this line of code is meant to go, please feel to free to let me know as there is far too much contradictory and confusing documentation out there already, so a definitive answer is very much welcome!
+
+=head1 INSTALLING YOUR LOCAL PERL VERSION
+
+Now that you have perlbrew installed and initialised, you need to install a local version of Perl to use for your development, I decided to go with version 5.16.0, which you install with perlbrew as follows...
+
+=over 3
+
+=item *
+
+perlbrew install perl-5.16.0
+
+=back
+
+This process takes quite a while and you will receive a message to that effect with instructions on how you can monitor the progress using 'tail', simply execute this command in another command-prompt terminal window.
+
+=over 3
+
+=item *
+
+tail -f ~/perl5/perlbrew/build.log
+
+=back
+
+You will be informed when the process is complete and your cursor will re-appear in the initial install window. Simply close the 'tail' window once finished. You then need to ensure the newly installed version of Perl is the active Perl you will be working with using...
+
+=over 3
+
+=item *
+
+perlbrew switch perl-5.16.0
+
+=back
+
+You should now have a local install of Perl running and be ready to install CPAN Minus. It is worth noting that any Perl scripts / modules etc. you create, you should use the following shebang at the top of your scripts.
+
+=over 3
+
+=item *
+
+#!/usr/bin/env perl
+
+=back
+
+=head1 INSTALLING CPAN MINUS
+
+CPAN Minus is a neat tool that enables you to easily install desired Perl modules from the CPAN repository without having to install and manage the entire CPAN kit and caboodle. Using perlbrew install CPAN Minus (cpanm) as follows...
+
+=over 3
+
+=item *
+
+perlbrew install-cpanm
+
+=back
+
+You should receive a message giving you the path cpanm was just installed to.
+
+    cpanm is installed to
+
+        /home/your_user_name/perl5/perlbrew/bin/cpanm
+
+
+=head1 INSTALLING CATALYST
+
+OK, we have the Perl environment set up for your local user account and CPAN Minus installed, so now let's go get Catalyst...
+
+=over 3
+
+=item *
+
+cpanm Catalyst
+
+=back
+
+Again, this install can take a good few minutes, once finished you should get a message similar to this...
+
+      Successfully installed Catalyst-Runtime-5.90051
+      116 distributions installed
+
+Before we can create your skeleton Catalyst application, we need to install the Catalyst::Helper module and dependencies...
+
+=over 3
+
+=item *
+
+cpanm Catalyst::Helper
+
+=back
+
+This install should be fairly quick and will result in a message similar to this...
+
+      Successfully installed Catalyst-Devel-1.39
+      29 distribution installed
+
+Now we can create your skeleton Catalyst application. Firstly you have to decide where you are going to place your new web application. Personally I like to keep all my sites in a directory 'Websites', and then a sub-folder for each site, so I will use this structure for the rest of this guide, but of course you can alter it accordingly. So let's create this folder!
+
+=over 3
+
+=item *
+
+mkdir Websites
+
+=item *
+
+cd Websites
+
+=back
+
+Now we can use the Catalyst helper to create the skeleton application. I have chosen to name my application 'DMO', short for Dance Music Organisation, but of course replace with an appropriate name for your website application.
+
+=over 3
+
+=item *
+
+Catalyst.pl DMO
+
+=back
+
+Remember to follow the instructions once the skeleton application has been created and change to your application directory and run the Makefile script.
+
+=over 3
+
+=item *
+
+cd DMO
+
+=item *
+
+perl Makefile.PL
+
+=back
+
+You can now test that everything has worked so far by firing up the application development server.
+
+=over 3
+
+=item *
+
+perl script/dmo_server.pl
+
+=back
+
+Remember to replace 'dmo', with your application name! Then open up a web-browser and and try your site with the following URL.
+
+=over 3
+
+=item *
+
+http://localhost:3000
+
+=back
+
+If all went well you will see the Catalyst welcome page!
+
+=head1 SUMMARY
+
+We setup a basic server and got a familar modern Perl development enviroment using Perlbrew.  We also installed L<Catalyst> and got to the basic 'Welcome to Catalyst' screen in a running application.
+
+This ends part one of a three part series.  Stay tuned in tomorrow for the next installment!
+
+=head1 DISCLAIMER!
+
+This guide comes without any warranty! It is simply something I have put together over a week trying to get to grips with setting up a new Linux development environment. I apologise if there are errors, and please do not think this guide is adequate to be used in a live production, public facing web-server environment! This is simply meant to be a rough introduction into creating a local development environment using the latest software technologies for Catalyst application development on a GNU/Linux Debian Ubuntu Mint OS.
+
+I welcome all feedback with corrections, omissions or suggestions to any areas covered.
+
+=head1 CREDITS AND ACKNOWLEDGEMENTS
+
+Here are the main sources I used to crib this article together, to whom I am very grateful.
+
+=over 3
+
+=item *
+
+NGINX / MYSQL / PHP5-FPM : http://michael.lustfield.net/nginx/dummies-guide-to-setting-up-nginx
+
+=item *
+
+NGINX / DAEMON : http://blogs.perl.org/users/davewood/2013/01/nginx-fastcgi-vs-starman-erratum.html
+
+=item *
+
+PERLBREW : http://www.perlbrew.pl
+
+=item *
+
+CPANM / CATALYST : irc.perl.org#catalyst
+
+=item *
+
+POSTGRESQL : http://scratching.psybermonkey.net/2009/06/postgresql-how-to-reset-user-name.html
+
+=item *
+
+THE REST : http://www.bing.com - http://www.stackoverflow.com - various other forums, threads, blogs and how-to's.
+
+=back
+
+=head1 SPECIAL ACKNOWLEDGEMENT
+
+I would like to give a special thank-you to the Catalyst community, for without their help none of this would have been possible.
+
+=head1 AUTHOR
+
+Craig Chant <sspl@stepnstomp.co.uk> | IRC : SSPL
+
+=cut

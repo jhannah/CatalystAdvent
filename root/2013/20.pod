@@ -1,0 +1,326 @@
+=head1 A LINUX WEEK IN THE LIFE OF A WINDOWS GUY!
+
+A step by step guide in setting up a complete web-server application development environment utilising GNU/Linux, NGINX, MySQL, PhpMyAdmin, PostGreSQL, pgAdmin III (including php-fpm & Catalyst application Daemon), perlbrew, Perl 5.16.0, CPAN Minus and of course the Catalyst MVC framework.
+
+=head1 OVERVIEW
+
+Having spent a few months getting to grips with Catalyst in an Windows environment and having developed with Perl using Active-State on Windows for many years, I was keen to learn how to develop Catalyst MVC application utilising the power of modern software technologies and best practises, as well as having a chance to expose myself to the latest offerings of Linux. 
+
+I hope this guide enables others to quickly and easily set up a powerful development environment with as little effort and knowledge as possible, so new developers (especially Windows users), can quickly get the benefits of a powerful Perl environment without the daunting task of having to work out how to do it all themselves.
+
+This is part three of a three part series.
+
+=head1 INSTALLING MYSQL and Postgreslq
+
+To finish off the series lets install MySQL and some additional tools to help us manage it.  We also install Postgresql so that we can explore this alternative open source database.
+
+To install MySQL use the following...
+
+=over 3
+
+=item *
+
+sudo apt-get install mysql-server
+
+=back
+
+You will need to provide your root password to run the sudo command, but you will also be asked to provide a new password for the MySQL root account (twice), do not forget it!
+
+You now need to add some lines of code to the bottom of your file...
+
+=over 3
+
+=item *
+
+/etc/mysql/my.cnf
+
+=back
+
+      default-storage-engine = innodb
+      innodb_buffer_pool_size = 128M
+      innodb_log_file_size = 10M # May need to purge (rm)
+      /var/lib/mysql/ib_logfile*
+      innodb_flush_method = O_DIRECT
+      innodb_file_per_table = 1
+      innodb_flush_log_at_trx_commit = 2
+      innodb_log_buffer_size = 1M
+      innodb_additional_mem_pool_size = 20M
+      # num cpu's/cores x2 is a good base line for
+      innodb_thread_concurrency
+      innodb_thread_concurrency = 8
+      innodb_open_files = 1024
+      ignore-builtin-innodb
+      innodb_file_per_table
+      plugin-load=innodb=ha_innodb_plugin.so;innodb_trx=ha_innodb_plugin.so;innodb_locks=ha_innodb_plugin.so;innodb_lock_waits=ha_innodb_plugin.so;innodb_cmp=ha_innodb_plugin.so;innodb_cmp_reset=ha_innodb_plugin.so;innodb_cmpmem=ha_innodb_plugin.so;innodb_cmpmem_reset=ha_innodb_plugin.so
+
+This code was taken from another source (see credits), and it wasn't exactly explained why, so I have included it in a cargo-cult fashion and welcome any feedback.
+
+=head1 INSTALLING MYSQL - PHP COMPONENTS
+
+We now need to install php5-mysql, php5-fpm (FastCGI Process Manager) and php-apc (Alternative PHP Cache)
+
+=over 3
+
+=item *
+
+sudo apt-get install php5-mysql
+
+=item *
+
+sudo apt-get install php5-fpm
+
+=item *
+
+sudo apt-get install php-apc
+
+=back
+
+We now need to edit the following file...
+
+=over 3
+
+=item *
+
+/etc/php5/fpm/pool.d/www.conf
+
+=back
+
+The file should look something like this...
+
+    [www]
+    user = www-data
+    group = www-data
+    listen = /var/run/php5-fpm.socket;
+    listen.owner = www-data
+    listen.group = www-data
+    listen.mode = 0666
+    listen.allowed_clients = 127.0.0.1
+    pm = static
+    pm.max_children = 10
+    pm.start_servers = 4
+    pm.min_spare_servers = 2
+    pm.max_spare_servers = 6
+    pm.max_requests = 1000
+    chdir = /
+    php_admin_value[memory_limit] = 32M
+
+... however, I have removed all the comments and left only those settings which are active to make it easier for you to identify what settings have changed. I recommend you leave your file intact and simply make the necessary changes after making a backup copy of your file. There are a lot of other configuration settings available, with comments, which you may want to change at a later date, especially if you plan on developing with PHP as well!
+
+We now need to edit your NGINX website file...
+
+=over 3
+
+=item *
+
+/etc/nginx/sites-available/dance-music.org
+
+=back
+
+Add the following...
+
+	# PhpMyAdmin
+	location /phpmyadmin {
+		root /home/your_user_name/Websites/DMO/root;
+		index index.php;
+	}
+	
+	location ~ \.php$ {
+		root /home/your_user_name/Websites/DMO/root;
+		fastcgi_pass unix:/var/run/php5-fpm.socket;
+		fastcgi_index index.php;
+		include fastcgi_params;
+	}
+
+=head1 INSTALLING PHPMYADMIN
+
+Now we can install PhpMyAdmin and start the php / MySQL services.
+
+=over 3
+
+=item *
+
+sudo apt-get install phpmyadmin
+
+=back
+
+You will be asked to choose your web-server, simply press escape, you do not want to set up PhpMyAdmin for Apache or lighttpd as we are using NGINX! You also need to say <No> to the option of configuring your database.
+
+We now need to create a symbolic link from the PhpMyAdmin install to your development website...
+
+=over 3
+
+=item *
+
+sudo ln -s /usr/share/phpmyadmin/ ~/Websites/DMO/root/phpmyadmin
+
+=back
+
+Now let's restart the services and check everything is working.
+
+=over 3
+
+=item *
+
+sudo service MySQL restart
+
+=item *
+
+sudo service php5-fpm restart
+
+=item *
+
+sudo service nginx restart
+
+=item *
+
+/etc/init.d/cat-dmo restart
+
+=back
+
+Remember you can use stop / start / restart / status against these service and your own Daemon script at anytime, though do not start your Catalyst Daemon using sudo, it must run under your local account for the correct perl install to be used.
+
+Now open a web-browser and try PhpMyAdmin
+
+=over 3
+
+=item *
+
+http://dance-music.org/phpmyadmin/
+
+=back
+
+You should get the PhpMyAdmin log-in page, where you can use the user-name 'root' and the password you chose when it was installed, that you didn't forget!
+
+OK, if all you want is MySQL and PhpMyAdmin, you can now develop your Catalyst application and manage your MySQL back-end database.
+
+If you want to run PostGreSQL as well, continue with these few extra steps.
+
+=head1 INSTALLING POSTGRESQL AND PGADMIN III
+
+For the rest of this guide I will be using the desktop GUI and built-in applications. One reason is because the PostGreSQL website states to install PostGreSQL use the usual 'sudo apt-get' with version 'postgresql-9.3' for Debian packages, but I received an error when I tried this, saying the package doesn't exist? So I decided to give the GUI desktop apps a go and see what the Software Manager had to offer. You will need to use your root password to install the applications.
+
+I used Kickoff (Start Menu) and Software Manager, then in the top corner use the search box and enter postgresql.
+
+You will see in the search results a package for PostGreSQL and when you double click it, it should show Version '9.1+129ubuntu1', click the install button on the right.
+
+Then use the breadcrumb tabs to go back to your 'Search results' and double click the package for pgAdmin3 and click the install button on the right.
+
+Once installed, close the Software Manager, then use Kickoff and the search box at the top of the menu for pgAdmin3, right click the icon and choose 'add to panel', you now have an elephant icon on your panel (task bar) for easy access.
+
+Before you can connect to the PostGreSQL instance, you need to set a password for the default user-name 'postgres', as it is installed without one, but we need to give ourselves access to connect in order to do so.
+
+Open up the following file...
+
+=over 3
+
+=item *
+
+/etc/postgresql/9.1/main/pg_hba.conf
+
+=back
+
+And change the line...
+
+=over 3
+
+=item *
+
+local   all             postgres                                peer
+
+=item *
+
+to
+
+=item *
+
+local   all             postgres                                trust
+
+=back
+
+Then restart the service...
+
+=over 3
+
+=item *
+
+sudo service postgresql restart
+
+=back
+
+Now let's connect with psql and set the password.
+
+=over 3
+
+=item *
+
+psql -U postgres
+
+=item *
+
+ALTER USER postgres with password 'your_password';
+
+=item *
+
+\q
+
+=back
+
+Do not forget this password either! - Ensure you include the semi-colon, you should receive an ALTER success message.
+
+You also need to re-edit the /etc/postgresql/9.1/main/pg_hba.conf file, replacing 'trust' with 'peer' again, and restarting the PostGreSQL service.
+
+Now use your Elephant icon to fire up pgAdmin3, use the 'plug' connection icon, give the connection a name, use 'localhost' for host, and enter the password you just created, click OK, you should now be connected to your PostGreSQL instance with your pgAdmin3 GUI!
+
+=head1 SUMMARY
+
+This guide should help with setting up a fully integrated Catalyst MVC Perl & PHP5 application development environment running on NGINX with a Daemon Control service and all the tools you need to manage your MySQL & PostGreSQL back-end databases. 
+
+I have not tested database connectivity from Catalyst yet, nor provided any guide for setting up users or permission, this is something you will need to learn yourself, as will I!
+
+=head1 DISCLAIMER!
+
+This guide comes without any warranty! It is simply something I have put together over a week trying to get to grips with setting up a new Linux development environment. I apologise if there are errors, and please do not think this guide is adequate to be used in a live production, public facing web-server environment! This is simply meant to be a rough introduction into creating a local development environment using the latest software technologies for Catalyst application development on a GNU/Linux Debian Ubuntu Mint OS.
+
+I welcome all feedback with corrections, omissions or suggestions to any areas covered.
+
+=head1 CREDITS AND ACKNOWLEDGEMENTS
+
+Here are the main sources I used to crib this article together, to whom I am very grateful.
+
+=over 3
+
+=item *
+
+NGINX / MYSQL / PHP5-FPM : http://michael.lustfield.net/nginx/dummies-guide-to-setting-up-nginx
+
+=item *
+
+NGINX / DAEMON : http://blogs.perl.org/users/davewood/2013/01/nginx-fastcgi-vs-starman-erratum.html
+
+=item *
+
+PERLBREW : http://www.perlbrew.pl
+
+=item *
+
+CPANM / CATALYST : irc.perl.org#catalyst
+
+=item *
+
+POSTGRESQL : http://scratching.psybermonkey.net/2009/06/postgresql-how-to-reset-user-name.html
+
+=item *
+
+THE REST : http://www.bing.com - http://www.stackoverflow.com - various other forums, threads, blogs and how-to's.
+
+=back
+
+=head1 SPECIAL ACKNOWLEDGEMENT
+
+I would like to give a special thank-you to the Catalyst community, for without their help none of this would have been possible.
+
+=head1 AUTHOR
+
+Craig Chant <sspl@stepnstomp.co.uk> | IRC : SSPL
+
+=cut
