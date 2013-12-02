@@ -1,6 +1,4 @@
-=head1 Title
-
-HTTP Method Matching in Catalyst
+=head1 HTTP Method Matching in Catalyst
 
 =head1 Overview
 

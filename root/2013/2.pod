@@ -1,6 +1,4 @@
-=head1 Title
-
-Roll your own Catalyst Controller with Mooselike imports
+=head1 Roll your own Catalyst Controller with Mooselike imports
 
 =head1 Overview
 

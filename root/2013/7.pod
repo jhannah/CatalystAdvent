@@ -1,6 +1,4 @@
-=head1 Title
-
-How To Hack On Catalyst Core - Adding $response->from_psgi_response
+=head1 How To Hack On Catalyst Core - Adding $response->from_psgi_response
 
 =head1 Overview
 

@@ -1,6 +1,4 @@
-=head1 Title
-
-Perl Catalyst in 2013 - The Year in Review!
+=head1 Perl Catalyst in 2013 - The Year in Review!
 
 =head1 Overview
 

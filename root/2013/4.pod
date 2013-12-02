@@ -1,6 +1,4 @@
-=head1 Title
-
-Using PSGI Integration in Catalyst: Middleware and More
+=head1 Using PSGI Integration in Catalyst: Middleware and More
 
 =head1 Overview
 

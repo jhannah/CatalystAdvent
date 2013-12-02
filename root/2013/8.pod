@@ -1,6 +1,4 @@
-=head1 Title
-
-Matching Actions on Request Content Types
+=head1 Matching Actions on Request Content Types
 
 =head1 Overview
 

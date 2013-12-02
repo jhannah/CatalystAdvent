@@ -1,6 +1,4 @@
-=head1 Title
-
-Using Body Data Handlers in Catalyst 
+=head1 Using Body Data Handlers in Catalyst 
 
 =head1 Overview
 

@@ -1,6 +1,4 @@
-=head1 TITLE
-
-An Example Catalyst Plugin - Catalyst::Plugin::RunRequest
+=head1 An Example Catalyst Plugin - Catalyst::Plugin::RunRequest
 
 =head1 OVERVIEW
 

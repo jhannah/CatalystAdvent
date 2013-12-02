@@ -1,6 +1,4 @@
-=head1 Title
-
-A Websocket's Echo Server in L<Catalyst>
+=head1 A Websocket's Echo Server in L<Catalyst>
 
 =head1 Overview
 

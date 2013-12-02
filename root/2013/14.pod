@@ -1,6 +1,4 @@
-=head1 Title
-
-Streaming Nonblocking Files
+=head1 Streaming Nonblocking Files
 
 =head1 Overview
 

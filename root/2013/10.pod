@@ -1,6 +1,4 @@
-=head1 Title
-
-Nonblocking and Streaming 
+=head1 Nonblocking and Streaming 
 
 =head1 Overview
 

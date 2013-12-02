@@ -1,6 +1,4 @@
-=head1 Title
-
-Using the L<Hash::MultiValue> configuration option in L<Catalyst>
+=head1 Using the L<Hash::MultiValue> configuration option in L<Catalyst>
 
 =head1 Overview
 
