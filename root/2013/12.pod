@@ -294,6 +294,6 @@ L<Twiggy> to write a non blocking PSGI application.
 
 =head1 Author
 
-John Napiorkowski L<email:jjnapiork@cpan.org>
+John Napiorkowski L<jjnapiork@cpan.org>
 
 =cut

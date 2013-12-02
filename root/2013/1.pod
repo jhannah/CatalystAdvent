@@ -165,6 +165,6 @@ Mailing List Info: L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst>
 
 =head1 Author
 
-Your Name <your@email.com> | IRC nick
+John Napiorkowski L<jjnapiork@cpan.org>
 
 =cut

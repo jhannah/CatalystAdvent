@@ -123,6 +123,6 @@ Accessing the parsed content: L<Catalyst::Request/req-body_data>
 
 =head1 Author
 
-John Napiorkowski L<email:jjnapiork@cpan.org>
+John Napiorkowski L<jjnapiork@cpan.org>
 
 =cut

@@ -212,6 +212,6 @@ L<https://github.com/perl-catalyst/2013-Advent-Staging/tree/master/Websocket-Ech
 
 =head1 Author
 
-John Napiorkowski L<email:jjnapiork@cpan.org>
+John Napiorkowski L<jjnapiork@cpan.org>
 
 =cut
