@@ -210,6 +210,6 @@ nonblocking approach.
 
 =head1 Author
 
-John Napiorkowski L<jjnapiork@cpan.org>
+John Napiorkowski L<jjnapiork@cpan.org|email:jjnapiork@cpan.org>
 
 =cut

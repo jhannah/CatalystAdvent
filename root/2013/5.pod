@@ -117,6 +117,6 @@ so, you can enable this new feature with a single, global configuration option!
 
 =head1 Author
 
-John Napiorkowski L<jjnapiork@cpan.org>
+John Napiorkowski L<jjnapiork@cpan.org|email:jjnapiork@cpan.org>
 
 =cut
