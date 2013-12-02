@@ -158,9 +158,13 @@ full stack web application framework for Perl!
 =head1 For More Information
 
 CPAN: L<Catalyst>
+
 Github: L<https://github.com/perl-catalyst/>
+
 Code Repository: L<catagits@git.shadowcat.co.uk:Catalyst-Runtime.git>
+
 Questhub: L<http://questhub.io/realm/perl/explore/latest/tag/catalyst>
+
 Mailing List Info: L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst>
 
 =head1 Author
