@@ -207,7 +207,10 @@ sub feed : Chained('base') Args() {
 
     $c->stash->{year} = $year;
 
-    my @entry = reverse 1 .. 24;
+    my $now = $c->stash->{now};
+
+    # get only not published entries
+    my @entry = reverse 1 .. ( $year == $now->year ? $now->day : 24 );
     my %path = map { $_ => $c->path_to( 'root', $year, "$_.pod" ) } @entry;
     @entry = grep -e $path{ $_ }, @entry;
     
