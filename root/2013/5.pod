@@ -1,4 +1,4 @@
-=head1 Using the L<Hash::MultiValue> configuration option in L<Catalyst>
+=head1 Using the 'Hash::MultiValue' configuration for better Form Parameters
 
 =head1 Overview
 
