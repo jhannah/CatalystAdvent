@@ -76,7 +76,7 @@ Your hashref under C<data_handlers> can include as many types as you deem
 required, and you can override the build in JSON parsing since we apply
 you customizations ontop of the defaults.
 
-So, how do you access this new parsed content?  We've added a new attributes
+So, how do you access this new parsed content?  We've added a new attribute
 to L<Catalyst::Request> called C<body_data>.  This attribute is lazy, so
 unless you actually ask for it, we don't attempt to parse any request content
 against the defined L<data_handlers>.  So if you wrote a ton of your own
@@ -88,7 +88,7 @@ C<application/json> like "{'name':'Jason','age':'25'}":
 
     sub update_user : POST Path(/User) Consumes(JSON) {
       my $p = (my $c = pop)->req->body_data;
-      $c->res->body("My name is $posted->{name} and my age is $p->{age}");
+      $c->res->body("My name is $p->{name} and my age is $p->{age}");
     }
 
 Basically this is very similar to the request object's C<body_parameters>
