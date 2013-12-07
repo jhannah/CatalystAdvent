@@ -93,19 +93,21 @@ file and writes it.
     }
 
     sub read_chunk {
-      my ($self, $fh, $offset) = @_;
-      my $buffer = '';
-      aio_read $fh, $offset, 65536, $buffer, 0, sub {
-        my $status = shift;
-        die "read error[$status]: $!" unless $status >= 0;
-        if($status) {
-          $self->write($buffer);
-          $self->read_chunk($fh, ($offset + 65536));
-        } else {
-          $self->close;
-          aio_close $fh, sub { };
-        }
-      }
+       my ($self, $fh, $offset) = @_;
+       my $buffer = '';
+       aio_read $fh, $offset, 65536, $buffer, 0, sub {
+         my $status = shift;
+         die "read error[$status]: $!" unless $status >= 0;
+         if($status) {
+           eval {
+             $self->write($buffer); 1;
+           } || warn "Cannot write, probably a closed pipe: $@";
+           $self->read_chunk($fh, ($offset + 65536));
+         } else {
+           $self->close;
+           aio_close $fh, sub { };
+         }
+       }
     }
 
 One nice thing about doing this is how easy it is to write a test case and to
