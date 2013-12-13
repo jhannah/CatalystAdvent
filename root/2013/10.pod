@@ -4,7 +4,7 @@
 
 Modern versions of L<Catalyst> allow you to take charge of how your
 write operations work.  This enables better support for working inside
-common event loops such as L<AnyEvent> and <IO::Async> to support
+common event loops such as L<AnyEvent> and L<IO::Async> to support
 non blocking writes to stream large files.
 
 Lets explore how L<PSGI> implements delayed and streaming responses
