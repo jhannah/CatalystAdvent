@@ -1,4 +1,4 @@
-=head1 Title Nonblocking and Streaming - Part 3
+=head1 Nonblocking and Streaming - Part 3
 
 =head1 Overview
 
