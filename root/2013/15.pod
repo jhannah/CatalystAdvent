@@ -1,4 +1,4 @@
-=head1 A Websocket's Echo Server in L<Catalyst>
+=head1 A Websocket's Echo Server in Catalyst
 
 =head1 Overview
 
