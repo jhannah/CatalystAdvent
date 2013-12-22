@@ -1,4 +1,4 @@
-=head1 CataylstX::Controller::PSGI - Using Plack apps inside Catalyst Controllers - Part 2
+=head1 CatalystX::Controller::PSGI - Using Plack apps inside Catalyst Controllers - Part 2
 
 =head1 Overview
 
