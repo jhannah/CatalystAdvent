@@ -1,0 +1,189 @@
+=head1 Future Catalyst - Ghosts of Christmas Past, Present and Future
+
+=head1 Overview
+
+Some thoughts on where Perl L<Catalyst> might go in 2014 and beyond.  A review
+of the options we have and what it would take to make change successful.
+
+=head1 Managing Change in Catalyst
+
+I've spent a good portion of my free time open source allocation hacking on
+L<Catalyst>, blogging about it and speaking with many smart people about it.
+I've also spent time reading through source code of several other popular
+frameworks and reading blogs and articles published by web developers who are
+talking about their real world problems (sadly, there's way too little of that
+in the Perl world...)  This had lead me to some conclusions regarding L<Catalyst>
+and the future.  One of them is that we need to continue to change in some
+way if our framework is to remain relevent for the types of tasks web programmers
+are encountering now and tomorrow.  Change in L<Catalyst> however is not
+easily achieved.  Here's a short list of the things I find barriers to change:
+
+=head2 Lack of a clear technical vision for the Catalyst.
+
+I believe that L<Catalyst> is the best choice for building websites when the
+team is medium-large and the problem domain is not trivial.  Its built on a
+collection of well understand design patterns, such as MVC, Chain of
+Responsibility, Command Class, etc. which gives Catalyst a strong theoretical
+basis.  However not all these patterns are integrated as well as they could
+be and in general nobody really knows what L<Catalyst> should become over
+time.  Not knowing where to go is a huge barrier to change.
+
+=head2 Sprawling API
+
+L<Catalyst> was first designed in the era where the most successful web frame
+works of its time were ones with extensive, deep APIs.  Thus it was natural
+to think of a well designed Catalyst as one where each function was clearly
+separated.  Good OO design principles suggest this approach.  However by exposing
+a lot of API to public, it offers a lot of places for people to hack in, in
+ways that we can't predict or control, and as a result its becomes hard to
+change those APIs even when some of them are in the way of moving forward
+or are no longer needed due to changes in other parts of the application.
+
+Additionally since the interactions between methods calling other methods
+have no clear specification (and Catalyst core objects are often highly
+mutable, so its never always clear what the state of things are) this makes
+it very hard to change things since one can't fully envision all the use
+cases involved.
+
+As a side effect, I believe this complexity is a barrier for newcomers who
+would otherwise seek to contribute more.  
+
+=head2 Dedication to backwards compatibility
+
+Catalyst has a long history of being fanantically attached to being able to
+upgrade without requiring much from the upgrader.  In general this is a very
+good thing.  It means that one can usually feel safe about upgrading to a
+new version of Catalyst and promotes the type of stability that enterprises
+loves.
+
+However it has some disadvantages.  One is that major moves in the codebase
+tend to take a long time (The port to L<Moose> and L<PSGI> each dragged on
+for nearly two years and in the end failed to provide many highly visible
+key advantages to end users.)  Another is that we run the risk that our pace
+of change fails to keep up with the changing needs of web developers starting
+new projects and maintaining older ones.  
+
+To a large degree fear of changing core bits of Catalyst are made worse since
+as mentioned earlier its sprawling API gives end users a lot of (probably
+bad) places to hack in, which means we have very little idea how a given
+change would cause trouble in the Darkpan.  And given how often I've seen
+programmers in the Darkpan hacking workaround to issues in Catalyst rather
+than feedback those issues to the community, I also have a fear of changing
+stuff that breaks code I never find out about.
+
+Overall we have traditionally failed to make a clear policy regarding change
+in the codebase.
+
+=head2 Changes in Catalyst core are not often exciting
+
+In general there's not often a time where its easy to see how a change in
+L<Catalyst> is going to be game changing in terms of developing with it.  In
+many ways this is due to the fact that L<Catalyst> is intended to be as
+minimal as possible for its use case.  Unlike Rails or Django we are not
+trying to provide a full stack, and often the funner bits are in the view
+and model layers.  As a result there's not a lot of energy going into this
+part of the framework.
+
+In addition, although I generally see L<Catalyst> "I'm not trying to be a full
+stack" as a good thing, there as sometimes benefits from deeper top to bottom
+integration.  
+
+=head1 So What can we Do?
+
+I honestly believe we can continue to move L<Catalyst> forward is a few clear
+ways:
+
+=head2 More Middleware
+
+We can simplify some of the API sprawl and custom code by moving more of general
+problem code into Middleware.  Plack Middleware has a nice, clean API and I think
+visualizing the request / response cycle as a stack of middlware around a core
+application is much easier on developers and it leads to a less fragile codebase
+as compared to tons and tons of plugins.  Plus you get the benefit that middleware
+can be used for when you reach for a different web frameworks, or have a targeted
+need and you are rolling your own.
+
+Another big upside here is this work is rather straightforward to do and leads
+to a much simplier core code.
+
+=head2 Clear deprecation as needed
+
+There's a ton of code we could remove as long as we give people clear communication
+and upgrade steps.  For examples, there's a bunch of places in the code that only
+exists to support L<Catalyst::Engine::PSGI> which is totally unneeded now that we've
+stablized the port to PSGI project.  We just need to announce and clearly document
+available workarounds for when someone is trying to upgrade that Catalyst 5.7 era
+project!
+
+=head2 Refactoring code to take advantage of Moose better
+
+CataMoose was completed several years ago, yet there's still a ton of places in the
+code that are using 2006 era code.  There are a lot of places were we could improve
+things as long as we are careful to do so in interations and mark any clear compatibility
+issues.
+
+=head2 Catalyst::Stack '2014' and Demo applications
+
+I firmly believe in use case driven features.  The more that we are driving change
+as a result of finding issues when building applications, the more useful those
+changes are likely to be.  Additionally, I think newcomers to L<Catalyst> would
+benefit from having a more opinionated option when it comes to figuring out how
+to develop in L<Catalyst>.  Ideally we'd have a side project that built upon 
+L<Catalyst> and upon some of the better options that experts reach for when building
+an enterprise quality application.  Development of this stack would be based around
+a number of small but non trivial use case applications, that way we can see the
+pain points and feed that back into core L<Catalyst> development.
+
+=head1 The Future is up to US!
+
+So those are my thoughts regarding probably a years worth of changes to L<Catalyst>.
+If you like what you are reading, now is the time to step up.  If you don't, well 
+you better start expressing that and your alternative opinions.  I personally believe
+L<Catalyst> is a great product that Perl can't afford to watch drift into legacy and
+then into oblivion.  What about you?
+
+=head1 Announcing Catalyst 'Runner'
+
+We've recently announced the Winter 2014 development cycle (code named "Runner")
+
+L<http://jjnapiorkowski.typepad.com/modern-perl/2013/12/perl-catalyst-runner-new-development-branch-now-open.html>
+
+And we've already posted some development releases to CPAN with cool new stuff
+like improved support for filehandle type responses, more use of Plack Middleware
+and support for L<Plack::Middleware::HTTPExceptions>.  Go take a look at the code
+and the announcement to get involved!
+
+=head1 One more thing...
+
+Like many of us working in the Perl community, I've had a love/hate thing going
+with the Perl6 project for a long time.  There's been a lot of ups and downs
+over the years, but I think its safe to say its starting to feel like there's 
+some major progress toward a version of Perl6 I might actually want to use.
+And if I want to use it, I will certainly want to get paid for using it :)
+Which begs the question: What would a Perl6 port of L<Catalyst> look like?
+
+=head1 Summary
+
+We've discussion the roadmap to evolving L<Catalyst> in 2014 and beyond, and
+what would need to be in place for those paths to be successful.  We've also
+speculated about what it might take to port L<Catalyst> to other languages such
+as Perl6.  Lastly, we are reminded that L<Catalyst> can only be what we make it
+to be.  So get hacking!
+
+=head1 For More Information
+
+CPAN: L<Catalyst>
+
+Github: L<https://github.com/perl-catalyst/>
+
+Code Repository: L<catagits@git.shadowcat.co.uk:Catalyst-Runtime.git>
+
+Questhub: L<http://questhub.io/realm/perl/explore/latest/tag/catalyst>
+
+Mailing List Info: L<http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst>
+
+=head1 Author
+
+John Napiorkowski L<jjnapiork@cpan.org|email:jjnapiork@cpan.org>
+
+=cut
